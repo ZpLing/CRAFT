@@ -18,8 +18,11 @@ Key features:
 from __future__ import annotations
 
 import argparse
+import io
 import json
+import keyword
 import re
+import tokenize
 from collections import Counter, defaultdict
 from functools import lru_cache
 from pathlib import Path
@@ -210,16 +213,50 @@ def iter_equations(text: str):
 # untrusted input. These strings come from model-written traces, and the LaTeX path hands
 # over whatever sat between the dollar signs, so a step reading
 # $open('f','w').write('x')=1$ actually ran. Only expression characters reach the parser,
-# and dunders are refused outright. The character class is the defence: a call needs
-# quotes, a comma or a subscript to carry an argument, and none of them are in it. SymPy's
-# own namespace is left alone, since parse_expr() emits Integer(...)/Symbol(...) and
-# handing it an empty global_dict makes every expression fail to parse.
-_SAFE_EXPR_CHARS = re.compile(r'^[0-9A-Za-z_\.\s\+\-\*/\^\(\)]*$')
+# Filtering characters is not enough. Letters, dots and parentheses are all a call needs,
+# and a string argument can be built at run time without ever writing a quote:
+# eval(chr(95)+chr(95)+chr(105)+...) hands back __import__, and the dunder never appears in
+# the source for a substring check to catch. What has to be excluded is the *call*, so the
+# token stream is checked instead: a name followed by "(" is a call, a "." is an attribute
+# lookup, and with neither available the text can only combine names and numbers
+# arithmetically. A bare builtin name that survives evaluates to an object no operator here
+# can do anything with, and the resulting TypeError is caught below.
+_ARITHMETIC_OPS = frozenset({'+', '-', '*', '/', '**', '^', '(', ')'})
+_SKIPPABLE_TOKENS = frozenset({
+    tokenize.NEWLINE, tokenize.NL, tokenize.ENDMARKER, tokenize.INDENT, tokenize.DEDENT,
+})
+
+
+def _is_pure_arithmetic(expr: str) -> bool:
+    """True when the text can only combine names and numbers with arithmetic operators."""
+    try:
+        tokens = list(tokenize.generate_tokens(io.StringIO(expr).readline))
+    except Exception:
+        return False
+    previous_was_name = False
+    for token in tokens:
+        if token.type in _SKIPPABLE_TOKENS:
+            continue
+        if token.type == tokenize.NUMBER:
+            previous_was_name = False
+        elif token.type == tokenize.NAME:
+            if keyword.iskeyword(token.string):
+                return False
+            previous_was_name = True
+        elif token.type == tokenize.OP:
+            if token.string not in _ARITHMETIC_OPS:
+                return False          # "." , "," , "[" , ":" ... all refused
+            if token.string == '(' and previous_was_name:
+                return False          # a call
+            previous_was_name = False
+        else:
+            return False              # strings, f-strings, error tokens
+    return True
 
 
 def safe_parse_expr(expr: str, evaluate: bool = True):
     """parse_expr() restricted to things that can only be arithmetic. None if refused."""
-    if not _SYMPY_OK or not expr or '__' in expr or not _SAFE_EXPR_CHARS.match(expr):
+    if not _SYMPY_OK or not expr or not _is_pure_arithmetic(expr):
         return None
     try:
         return parse_expr(expr, transformations=_SYMPY_TRANSFORMS, evaluate=evaluate)
