@@ -76,6 +76,9 @@ OPENAI_BASE_URL: Optional[str]  = _cfg.OPENAI_BASE_URL
 API_CLIENT:      Optional[AsyncOpenAI] = None
 TEMPERATURE:     float          = float(os.getenv("OPENAI_TEMPERATURE", "0.7"))
 MAX_OUTPUT_TOKENS: int          = int(os.getenv("MAX_OUTPUT_TOKENS", "2048"))
+# Reasoning models (o4-mini, deepseek-r1) bill hidden reasoning against max_tokens.
+REASONING_TOTAL_TOKENS: int     = int(os.getenv("REASONING_TOTAL_TOKENS", "16000"))
+REASONING_VISIBLE_TOKENS: int   = int(os.getenv("REASONING_VISIBLE_TOKENS", "4096"))
 
 # Relative — resolved under the results root by _cfg.resolve_output()
 DEFAULT_OUTPUT_PATH = Path("generated_k_traces_reasoning.json")
@@ -203,10 +206,15 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
     REQUEST_TIMEOUT = 300
     temp = temperature if temperature is not None else TEMPERATURE
 
-    # o4-mini / deepseek-r1: ensure enough tokens for the actual response
+    # Reasoning models spend max_tokens on hidden reasoning before writing anything,
+    # so a budget sized for the visible answer alone comes back empty. Give the total
+    # a large ceiling and reserve a slice of it for the visible response.
+    _is_reasoning = MODEL_NAME in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1")
     effective_max_tokens = MAX_OUTPUT_TOKENS
-    if MODEL_NAME in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1"):
-        effective_max_tokens = max(effective_max_tokens, 4096)
+    _visible_tokens = None
+    if _is_reasoning:
+        effective_max_tokens = max(effective_max_tokens, REASONING_TOTAL_TOKENS)
+        _visible_tokens = min(effective_max_tokens, REASONING_VISIBLE_TOKENS)
 
     if API_CLIENT is not None:
         data = {
@@ -217,7 +225,7 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
             "timeout": REQUEST_TIMEOUT,
         }
         if OPENAI_BASE_URL:
-            data["extra_body"] = {"max_output_tokens": effective_max_tokens}
+            data["extra_body"] = {"max_output_tokens": _visible_tokens or effective_max_tokens}
         try:
             resp = await asyncio.wait_for(
                 API_CLIENT.chat.completions.create(**data),
@@ -245,6 +253,8 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
             "temperature": temp,
             "max_tokens": effective_max_tokens,
         }
+        if _visible_tokens:
+            payload["max_output_tokens"] = _visible_tokens
         async with session.post(
             "https://api.openai.com/v1/chat/completions",
             json=payload,
