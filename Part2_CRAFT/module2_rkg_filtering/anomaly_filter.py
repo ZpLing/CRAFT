@@ -64,11 +64,7 @@ from module1_trace_generation.extract_terms import (
 # SymPy (optional, only used for math domain)
 try:
     import sympy
-    from sympy.parsing.sympy_parser import (
-        parse_expr,
-        standard_transformations,
-        implicit_multiplication_application,
-    )
+    # Parsing goes through safe_parse_expr(); only simplify() is needed here.
     _SYMPY_AVAILABLE = True
 except ImportError:
     _SYMPY_AVAILABLE = False

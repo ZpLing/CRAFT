@@ -33,9 +33,19 @@ import numpy as np
 try:
     import sympy
     from sympy.parsing.sympy_parser import (
-        parse_expr, standard_transformations, implicit_multiplication_application,
+        parse_expr, standard_transformations, implicit_multiplication,
     )
-    _SYMPY_TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
+    # implicit_multiplication, NOT implicit_multiplication_application. The "application"
+    # half rewrites "sin x" as "sin(x)", inserting a call that was never in the text -- so
+    # "chr 97" evaluated to 'a' and "open 1" opened file descriptor 1 and closed stdout,
+    # neither of which any check on the token stream can see. Only 3p -> 3*p is wanted here.
+    _SYMPY_TRANSFORMS = standard_transformations + (implicit_multiplication,)
+    # A namespace holding SymPy's names and nothing else. eval() inserts __builtins__ when
+    # the globals lack it, so it is set empty rather than left out, and a bare builtin name
+    # resolves to a Symbol instead of the function object.
+    _SYMPY_NAMESPACE: dict = {}
+    exec('from sympy import *', _SYMPY_NAMESPACE)
+    _SYMPY_NAMESPACE['__builtins__'] = {}
     _SYMPY_OK = True
 except Exception:          # SymPy is optional; without it equations keep their written form
     _SYMPY_OK = False
@@ -259,7 +269,8 @@ def safe_parse_expr(expr: str, evaluate: bool = True):
     if not _SYMPY_OK or not expr or not _is_pure_arithmetic(expr):
         return None
     try:
-        return parse_expr(expr, transformations=_SYMPY_TRANSFORMS, evaluate=evaluate)
+        return parse_expr(expr, transformations=_SYMPY_TRANSFORMS, evaluate=evaluate,
+                          global_dict=_SYMPY_NAMESPACE)
     except Exception:
         return None
 
