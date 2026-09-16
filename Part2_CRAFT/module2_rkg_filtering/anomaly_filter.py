@@ -662,24 +662,22 @@ def detect_anomalous_steps_unsupervised(
         return anomalous_steps
 
     # ===== Math domain: SymPy pre-validation =====
+    # Verification only vouches for a step; it never condemns one. Reading an equation out
+    # of prose is lossy in a way no pattern fixes -- the left side of "25% of 36 =
+    # (25/100)*36" is English -- so a failed check says the step could not be read, not
+    # that its arithmetic is wrong, and four rounds of fixes each left a smaller set of
+    # correct steps being deleted outright. A step that verifies skips the z-score;
+    # everything else, failures included, is judged by consensus like any other step.
     math_force_keep: Set[Tuple[int, int]] = set()
-    math_force_remove: Set[Tuple[int, int]] = set()
 
     if domain == "math" and _SYMPY_AVAILABLE:
         for step_info in steps_with_terms:
-            key = (step_info["trace_idx"], step_info["step_number"])
-            result = verify_step_math(step_info["step_text"])
-            if result is True:
-                math_force_keep.add(key)
-            elif result is False:
-                math_force_remove.add(key)
-
-        anomalous_steps.update(math_force_remove)
+            if verify_step_math(step_info["step_text"]) is True:
+                math_force_keep.add((step_info["trace_idx"], step_info["step_number"]))
 
         steps_for_grpo = [
             s for s in steps_with_terms
             if (s["trace_idx"], s["step_number"]) not in math_force_keep
-            and (s["trace_idx"], s["step_number"]) not in math_force_remove
         ]
     else:
         steps_for_grpo = steps_with_terms
