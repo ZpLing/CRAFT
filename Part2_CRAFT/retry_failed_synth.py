@@ -33,6 +33,7 @@ from module1_trace_generation.extract_terms import (
     DocFreqTable,
     FlatDocFreqTable,
     resolve_df_table_path,
+    check_df_table,
 )
 from module3_synthesis.synthesize_trace import synthesize_trace_rkg
 
@@ -108,12 +109,7 @@ async def main_async(args):
             )
         df_table = DocFreqTable.load(Path(args.df_table))
         print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
-        if df_table.normalize != (args.idf_norm == "log_n"):
-            raise ValueError(
-                f"--df_table was built with idf_norm="
-                f"{'log_n' if df_table.normalize else 'raw'}, but this retry asks for "
-                f"{args.idf_norm}; match the flag the original run used"
-            )
+        check_df_table(df_table, "logical", args.idf_norm == "log_n")
     elif args.idf_scope == "none":
         df_table = FlatDocFreqTable()
         print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")

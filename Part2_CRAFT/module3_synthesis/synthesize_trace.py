@@ -44,6 +44,7 @@ from module1_trace_generation.extract_terms import (
     DocFreqTable,
     FlatDocFreqTable,
     resolve_df_table_path,
+    check_df_table,
     COMMON_LOGICAL_WORDS,
     MATH_COMMON_WORDS,
 )
@@ -1708,12 +1709,7 @@ async def synthesize_traces_for_dataset(
                 df_table.save(Path(df_table_path))
                 print(f"Saved global DF table: {df_table_path}")
         print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
-        if df_table.normalize != (idf_norm == "log_n"):
-            raise ValueError(
-                f"--df_table was built with idf_norm="
-                f"{'log_n' if df_table.normalize else 'raw'}, but this run asks for "
-                f"{idf_norm}; rebuild the table or match the flag"
-            )
+        check_df_table(df_table, domain, idf_norm == "log_n")
     elif idf_scope == "none":
         df_table = FlatDocFreqTable()
         print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")

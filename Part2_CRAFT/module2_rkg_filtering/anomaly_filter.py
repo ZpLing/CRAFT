@@ -53,6 +53,7 @@ from module1_trace_generation.extract_terms import (
     DocFreqTable,
     FlatDocFreqTable,
     resolve_df_table_path,
+    check_df_table,
     COMMON_LOGICAL_WORDS,
     LOGICAL_KEYWORDS,
     MATH_COMMON_WORDS,
@@ -144,7 +145,7 @@ def build_global_df_table(
     with the same precedence process_sample() uses, so the corpus covers the steps that
     actually get scored.
     """
-    table = DocFreqTable(normalize=normalize)
+    table = DocFreqTable(normalize=normalize, domain=domain)
     for sample in samples:
         traces = sample.get("traces", []) or sample.get("cleaned_traces", [])
         for trace in traces:
@@ -1428,12 +1429,7 @@ def main():
                 df_table.save(table_path)
                 print(f"Saved global DF table: {table_path}")
         print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
-        if df_table.normalize != (args.idf_norm == "log_n"):
-            raise ValueError(
-                f"--df_table was built with idf_norm="
-                f"{'log_n' if df_table.normalize else 'raw'}, but this run asks for "
-                f"{args.idf_norm}; rebuild the table or match the flag"
-            )
+        check_df_table(df_table, args.domain, args.idf_norm == "log_n")
     elif args.idf_scope == "none":
         df_table = FlatDocFreqTable()
         print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")

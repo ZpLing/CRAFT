@@ -295,7 +295,7 @@ class DocFreqTable:
     """
 
     def __init__(self, n_docs: int = 0, df: Optional[Dict[str, int]] = None,
-                 normalize: bool = False):
+                 normalize: bool = False, domain: Optional[str] = None):
         self.n_docs = n_docs
         self.df: Counter = Counter(df or {})
         # log(N/df) ranges over [0, log(N)], so its scale follows corpus size: the same raw
@@ -303,6 +303,10 @@ class DocFreqTable:
         # global one. Dividing by log(N) maps it to [0, 1] so absolute thresholds such as
         # min_tfidf carry the same meaning whichever corpus is in play.
         self.normalize = normalize
+        # Tokenisation differs per domain -- math emits MATH:/EQ: formula tokens where
+        # logical emits words -- so frequencies from one domain say nothing about the
+        # other. The domain is recorded here so a table cannot be loaded into the wrong run.
+        self.domain = domain
 
     def add_document(self, tokens: List[str]) -> None:
         self.n_docs += 1
@@ -310,8 +314,9 @@ class DocFreqTable:
 
     @classmethod
     def from_documents(cls, documents: List[List[str]],
-                       normalize: bool = False) -> "DocFreqTable":
-        table = cls(normalize=normalize)
+                       normalize: bool = False,
+                       domain: Optional[str] = None) -> "DocFreqTable":
+        table = cls(normalize=normalize, domain=domain)
         for tokens in documents:
             table.add_document(tokens)
         return table
@@ -335,12 +340,13 @@ class DocFreqTable:
         return idf
 
     def to_dict(self) -> Dict[str, Any]:
-        return {"n_docs": self.n_docs, "df": dict(self.df), "normalize": self.normalize}
+        return {"n_docs": self.n_docs, "df": dict(self.df), "normalize": self.normalize,
+                "domain": self.domain}
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DocFreqTable":
         return cls(n_docs=data.get("n_docs", 0), df=data.get("df", {}),
-                   normalize=data.get("normalize", False))
+                   normalize=data.get("normalize", False), domain=data.get("domain"))
 
     def save(self, path: Path) -> None:
         path = Path(path)
@@ -355,6 +361,27 @@ class DocFreqTable:
 
     def __len__(self) -> int:
         return len(self.df)
+
+
+def check_df_table(table: "DocFreqTable", domain: str, normalize: bool) -> None:
+    """Reject a saved DF table whose corpus does not match the run loading it.
+
+    A table holds frequencies for one tokenisation of one corpus on one IDF scale. Scoring
+    against a table built for the other domain, or the other scale, yields numbers that look
+    perfectly ordinary and mean nothing, so a mismatch is raised rather than absorbed. A
+    table saved before the domain was recorded carries None and is accepted.
+    """
+    if table.normalize != normalize:
+        raise ValueError(
+            f"--df_table was built with idf_norm="
+            f"{'log_n' if table.normalize else 'raw'}, but this run asks for "
+            f"{'log_n' if normalize else 'raw'}; rebuild the table or match the flag"
+        )
+    if table.domain is not None and table.domain != domain:
+        raise ValueError(
+            f"--df_table was built for domain={table.domain!r}, but this run is "
+            f"domain={domain!r}; each domain needs its own table"
+        )
 
 
 def resolve_df_table_path(path) -> Path:
