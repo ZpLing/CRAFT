@@ -518,6 +518,18 @@ Please generate the reasoning process now:"""
     return prompt
 
 
+_REASONING_MODELS = ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1")
+
+
+def _apply_reasoning_budget(payload: dict, model: str) -> dict:
+    """Reasoning models bill hidden reasoning against max_tokens, so a budget sized
+    for the visible answer comes back empty. Raise the total and reserve a visible slice."""
+    if model in _REASONING_MODELS:
+        payload["max_tokens"] = max(payload.get("max_tokens") or 0, 16000)
+        payload["max_output_tokens"] = min(payload["max_tokens"], 4096)
+    return payload
+
+
 @backoff.on_exception(
     backoff.expo,
     (aiohttp.ClientError, asyncio.TimeoutError, RuntimeError),
@@ -539,6 +551,7 @@ async def generate_reasoning_trace(
         "temperature": REQUEST_TEMPERATURE,
         "max_tokens": max_tokens or RESPONSE_TOKENS,
     }
+    _apply_reasoning_budget(payload, model)
     
     async with session.post(
         CHAT_COMPLETIONS_URL,
@@ -1088,6 +1101,20 @@ async def synthesize_trace_rkg(
         resp = await generate_reasoning_trace(session, prompt, model)
         if resp and _has_conclusion(resp):
             return resp.strip()
+
+        # The rewrite is asked to reproduce the whole chain, which gives the model room
+        # to drop the marker again. Fall back to asking for the verdict alone: a one-token
+        # answer the model has almost no way to get wrong, then append it ourselves.
+        verdict = await generate_reasoning_trace(
+            session,
+            (f"Problem:\n{problem_input}\n\nReasoning chain:\n{text}\n\n"
+             f"Based only on the reasoning above, {_conclusion_question}\n"
+             f"{_conclusion_format}"),
+            model, max_tokens=64,
+        )
+        ans = _extract_answer(verdict or "")
+        if ans:
+            return (text.rstrip() + _conclude_append(ans)).strip()
         return text  # Fallback: return original if post-processing failed
 
     async def _generate_once() -> Tuple[str, List[str]]:
