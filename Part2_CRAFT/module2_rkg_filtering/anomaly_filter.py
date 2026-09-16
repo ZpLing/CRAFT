@@ -413,8 +413,10 @@ def detect_anomalous_steps_supervised(
             terms_set_i = step_i["terms_set"]
 
             if not terms_set_i:
-                # No terms extracted — flag as anomalous
-                anomalous_steps.add((step_number, trace_idx_i))
+                # Nothing to compare: the tokenizer produced no terms for this step, which
+                # says the step could not be measured, not that it is anomalous. A logical
+                # step written purely in symbols, or a math step written purely in prose,
+                # lands here through no fault of its own, so it is kept and left unscored.
                 continue
 
             # Compute similarity against other traces
@@ -686,7 +688,7 @@ def detect_anomalous_steps_unsupervised(
             tfidf_i = step_i.get("tfidf_scores", {})
 
             if not terms_set_i:
-                anomalous_steps.add((trace_idx_i, step_number_i))
+                # Unscoreable, not anomalous — see the note in the supervised detector.
                 continue
 
             if use_weighted_similarity and tfidf_i:
@@ -744,7 +746,7 @@ def detect_anomalous_steps_unsupervised(
             tfidf_i = step_i.get("tfidf_scores", {})
 
             if not terms_set_i:
-                anomalous_steps.add((trace_idx_i, step_number_i))
+                # Unscoreable, not anomalous — see the note in the supervised detector.
                 continue
 
             similarities = []
