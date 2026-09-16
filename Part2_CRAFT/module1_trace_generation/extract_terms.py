@@ -223,14 +223,19 @@ def iter_equations(text: str):
 # untrusted input. These strings come from model-written traces, and the LaTeX path hands
 # over whatever sat between the dollar signs, so a step reading
 # $open('f','w').write('x')=1$ actually ran. Only expression characters reach the parser,
-# Filtering characters is not enough. Letters, dots and parentheses are all a call needs,
-# and a string argument can be built at run time without ever writing a quote:
-# eval(chr(95)+chr(95)+chr(105)+...) hands back __import__, and the dunder never appears in
-# the source for a substring check to catch. What has to be excluded is the *call*, so the
-# token stream is checked instead: a name followed by "(" is a call, a "." is an attribute
-# lookup, and with neither available the text can only combine names and numbers
-# arithmetically. A bare builtin name that survives evaluates to an object no operator here
-# can do anything with, and the resulting TypeError is caught below.
+# Filtering characters is not enough: letters, dots and parentheses are all a call needs,
+# and a string argument can be built at run time without ever writing a quote, so
+# eval(chr(95)+chr(95)+...) once handed back __import__ with no dunder in the source at all.
+# What closes that is the namespace, not the syntax. _SYMPY_NAMESPACE holds SymPy's bindings
+# and an empty __builtins__, so a name it does not know can never be called: with only
+# implicit_multiplication applied, "chr(97)" parses as 97*chr and "open(1)" as open. Written
+# calls are therefore allowed through here, which is what keeps sqrt(2), sin(x) and the f(x)
+# of ordinary function notation matchable -- 13% of Olympiad formulas.
+#
+# The token check still refuses what the namespace cannot: "." reaches attributes of objects
+# SymPy does hold, strings and keywords open other grammar, and a length cap bounds the work
+# a single expression can ask for.
+_MAX_EXPR_LEN = 200
 _ARITHMETIC_OPS = frozenset({'+', '-', '*', '/', '**', '^', '(', ')'})
 _SKIPPABLE_TOKENS = frozenset({
     tokenize.NEWLINE, tokenize.NL, tokenize.ENDMARKER, tokenize.INDENT, tokenize.DEDENT,
@@ -239,26 +244,21 @@ _SKIPPABLE_TOKENS = frozenset({
 
 def _is_pure_arithmetic(expr: str) -> bool:
     """True when the text can only combine names and numbers with arithmetic operators."""
+    if len(expr) > _MAX_EXPR_LEN:
+        return False
     try:
         tokens = list(tokenize.generate_tokens(io.StringIO(expr).readline))
     except Exception:
         return False
-    previous_was_name = False
     for token in tokens:
-        if token.type in _SKIPPABLE_TOKENS:
+        if token.type in _SKIPPABLE_TOKENS or token.type == tokenize.NUMBER:
             continue
-        if token.type == tokenize.NUMBER:
-            previous_was_name = False
-        elif token.type == tokenize.NAME:
+        if token.type == tokenize.NAME:
             if keyword.iskeyword(token.string):
                 return False
-            previous_was_name = True
         elif token.type == tokenize.OP:
             if token.string not in _ARITHMETIC_OPS:
                 return False          # "." , "," , "[" , ":" ... all refused
-            if token.string == '(' and previous_was_name:
-                return False          # a call
-            previous_was_name = False
         else:
             return False              # strings, f-strings, error tokens
     return True
