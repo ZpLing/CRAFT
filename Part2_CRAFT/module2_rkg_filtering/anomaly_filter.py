@@ -54,6 +54,7 @@ from module1_trace_generation.extract_terms import (
     FlatDocFreqTable,
     resolve_df_table_path,
     check_df_table,
+    _BARE_EQUATION,
     COMMON_LOGICAL_WORDS,
     LOGICAL_KEYWORDS,
     MATH_COMMON_WORDS,
@@ -577,33 +578,48 @@ def verify_step_math(step_text: str) -> Optional[bool]:
     if not _SYMPY_AVAILABLE or not step_text:
         return None
 
-    # Extract "LHS = RHS" patterns (excluding textual equalities like "Step 1 = ...")
-    eq_pattern = re.compile(
-        r"(?<![a-zA-Z_])([0-9a-zA-Z\+\-\*/\^\(\)\.\s]+?)\s*=\s*([0-9a-zA-Z\+\-\*/\^\(\)\.\s]+?)(?=[,\.\n]|$)"
-    )
+    # Reuse the tokenizer's equation pattern. The one that used to live here let whitespace
+    # float anywhere, so it cut equations out of prose -- "Using Betty = 16", "80 pages =
+    # 960 pages" -- and implicit multiplication turned the units into a product of letter
+    # symbols that could never cancel. Every such step was force-deleted: 322 of 2798 GSM8K
+    # steps failed against 78 that passed, a ratio no solver of this quality produces.
     transformations = standard_transformations + (implicit_multiplication_application,)
 
     verified_any = False
-    for match in eq_pattern.finditer(step_text):
-        lhs_str = match.group(1).strip()
-        rhs_str = match.group(2).strip()
-
-        # Skip purely textual equalities (more than 4 letters, no digits)
-        if re.match(r"^[a-zA-Z\s]+$", lhs_str) and len(lhs_str) > 4:
+    for match in _BARE_EQUATION.finditer(step_text):
+        equation = match.group(1)
+        if equation.count("=") != 1:
             continue
+        lhs_str, rhs_str = equation.split("=")
         # Skip "Step X" style patterns
-        if re.match(r"(?i)step\s*\d+", lhs_str):
+        if re.match(r"(?i)\s*step\s*\d+", lhs_str):
+            continue
+
+        # Judge closed arithmetic only. A letter on either side is either a quantity the
+        # step is naming or a unit, and SymPy reads several single letters as constants
+        # rather than symbols -- I is the imaginary unit, E is Euler's number -- so "7J =
+        # 70" comes back with no free symbol and a non-zero difference, which reads as an
+        # arithmetic error when it is nothing of the kind. Anything with letters goes to
+        # the z-score instead.
+        if re.search(r"[A-Za-z]", equation):
             continue
 
         try:
             lhs = parse_expr(lhs_str, transformations=transformations)
             rhs = parse_expr(rhs_str, transformations=transformations)
             diff = sympy.simplify(lhs - rhs)
-            verified_any = True
-            if diff != 0:
-                return False  # found an incorrect equation — flag as anomalous
         except Exception:
             continue  # parse failed, skip this equation
+
+        # A leftover symbol means the step is naming a quantity rather than asserting
+        # arithmetic. "Let the total be T = 3x" cannot simplify to zero and is not an
+        # error, so only closed arithmetic is judged; the rest goes to the z-score.
+        if diff.free_symbols:
+            continue
+
+        verified_any = True
+        if diff != 0:
+            return False  # found an incorrect equation — flag as anomalous
 
     return True if verified_any else None
 

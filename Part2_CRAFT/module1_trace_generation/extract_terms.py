@@ -21,10 +21,21 @@ import argparse
 import json
 import re
 from collections import Counter, defaultdict
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
+
+try:
+    import sympy
+    from sympy.parsing.sympy_parser import (
+        parse_expr, standard_transformations, implicit_multiplication_application,
+    )
+    _SYMPY_TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
+    _SYMPY_OK = True
+except Exception:          # SymPy is optional; without it equations keep their written form
+    _SYMPY_OK = False
 
 import importlib.util as _ilu
 _cfg_path = Path(__file__).resolve().parents[1] / "config.py"
@@ -145,6 +156,53 @@ _LATEX_COMMANDS = re.compile(
 )
 
 
+def _sort_commutative(expr):
+    """Order the operands of + and * so that writing order stops mattering."""
+    if not expr.args:
+        return expr
+    args = [_sort_commutative(a) for a in expr.args]
+    if isinstance(expr, (sympy.Add, sympy.Mul)):
+        args = sorted(args, key=sympy.srepr)
+    # Rebuild only what Add/Mul accept. Handing them a set or a relation is deprecated
+    # rather than an error, so it warns instead of raising and try/except would miss it.
+    if not all(isinstance(a, sympy.Expr) for a in args):
+        return expr
+    try:
+        return expr.func(*args, evaluate=False)
+    except Exception:
+        return expr          # not rebuildable; leave it as parsed
+
+
+@lru_cache(maxsize=50000)
+def _canonicalise_equation(expr: str) -> Optional[str]:
+    """Reduce an equation to a key that does not depend on how it was written.
+
+    Two traces deriving the same thing rarely type it the same way -- 3p+e=1.24,
+    e+3p=1.24 and 1.24=3p+e are one equation and three different strings, so consensus
+    counted them as three unrelated terms. Each side is parsed WITHOUT evaluation and its
+    commutative operands sorted, then the two sides are stored as an unordered pair.
+
+    Not evaluating is the point. Letting SymPy fold the arithmetic would collapse 2+2=4
+    and 3+1=4 onto one key, and reducing to lhs-rhs would collapse every true numeric
+    equation onto zero, merging steps that computed entirely different things. Returns
+    None when the equation cannot be parsed, and the caller keeps the written form.
+    """
+    if not _SYMPY_OK or expr.count('=') != 1:
+        return None
+    lhs, rhs = expr.split('=')
+    if not lhs.strip() or not rhs.strip():
+        return None
+    try:
+        sides = [
+            sympy.srepr(_sort_commutative(
+                parse_expr(side, transformations=_SYMPY_TRANSFORMS, evaluate=False)))
+            for side in (lhs, rhs)
+        ]
+    except Exception:
+        return None
+    return "EQN:" + "|".join(sorted(sides))
+
+
 # The command names themselves, for filtering them out of prose word counts.
 _LATEX_COMMAND_WORDS = frozenset(re.findall(r'[a-zA-Z]+', _LATEX_COMMANDS.pattern)) - {'re'}
 
@@ -159,6 +217,9 @@ def _normalise_latex_token(expr: str) -> str:
     - Discard tokens shorter than 3 chars after stripping
     """
     expr = expr.strip()
+    # Spell the unicode operators the way the parser and the rest of the pipeline do, so
+    # "3 \u00d7 4" and "3 * 4" are not two different terms.
+    expr = expr.translate(str.maketrans({'\u00d7': '*', '\u00f7': '/', '\u00b7': '*', '\u2212': '-'}))
     # Remove bare LaTeX commands (e.g. \\frac itself; keep its arguments)
     expr = _LATEX_COMMANDS.sub('', expr).strip()
     # Collapse whitespace
@@ -174,8 +235,12 @@ _LATEX_DISPLAY = re.compile(r'\\\[(.+?)\\\]|\\\((.+?)\\\)', re.DOTALL)
 # containing "=" match from its first word onward, so 40% of EQ: tokens were prose --
 # "EQ:Add all strawberries to get the total number used for jam. Using Betty = 16" -- which
 # is unique to its trace and therefore pure noise in the frequency counts.
+# \u00d7 \u00f7 \u00b7 \u2212 are operators too. Leaving them out made the pattern start after
+# them, so "0.5 \u00d7 12 = (50/100) \u00d7 12" was cut down to the fragment "12 = (50/100)" and the
+# two sides being compared were no longer the two sides the step had written.
 _EQ_OPERAND = r'[A-Za-z0-9_\.\\{}\^\(\)]+'
-_EQ_SIDE    = _EQ_OPERAND + r'(?:\s*[\+\-\*/\^]\s*' + _EQ_OPERAND + r')*'
+_EQ_OPS     = r'[\+\-\*/\^\u00d7\u00f7\u00b7\u2212]'
+_EQ_SIDE    = _EQ_OPERAND + r'(?:\s*' + _EQ_OPS + r'\s*' + _EQ_OPERAND + r')*'
 _BARE_EQUATION = re.compile(
     r'(?<![A-Za-z0-9])(' + _EQ_SIDE + r'\s*=\s*' + _EQ_SIDE + r')(?![A-Za-z0-9])'
 )
@@ -223,17 +288,11 @@ def tokenize_math_text(text: str) -> List[str]:
     tokens: List[str] = []
 
     # ── 1. Extract LaTeX formulas ($...$ and \[...\]) ─────────────────────────────
-    for m in _LATEX_INLINE.finditer(text):
+    for m in list(_LATEX_INLINE.finditer(text)) + list(_LATEX_DISPLAY.finditer(text)):
         expr = m.group(1) or m.group(2) or ''
         norm = _normalise_latex_token(expr)
         if len(norm) >= 3:
-            tokens.append('MATH:' + norm)
-
-    for m in _LATEX_DISPLAY.finditer(text):
-        expr = m.group(1) or m.group(2) or ''
-        norm = _normalise_latex_token(expr)
-        if len(norm) >= 3:
-            tokens.append('MATH:' + norm)
+            tokens.append('MATH:' + (_canonicalise_equation(norm) or norm))
 
     # ── 2. Extract bare equations (outside $, but containing =) ────────────────
     # Mask already-processed LaTeX regions to avoid double-counting
@@ -244,7 +303,7 @@ def tokenize_math_text(text: str) -> List[str]:
         expr = m.group(1).strip()
         norm = _normalise_latex_token(expr)
         if len(norm) >= 3 and '=' in norm:
-            tokens.append('EQ:' + norm)
+            tokens.append('EQ:' + (_canonicalise_equation(norm) or norm))
 
     # ── 3. Extract mathematical operation words (discriminative verbs/nouns) ────────────────────────────
     words = re.findall(r'\b[a-z]+\b', text.lower())
