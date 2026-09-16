@@ -229,10 +229,31 @@ def iter_equations(text: str):
 # What closes that is the namespace, not the syntax. _SYMPY_NAMESPACE holds SymPy's bindings
 # and an empty __builtins__, so a name it does not know can never be called: with only
 # implicit_multiplication applied, "chr(97)" parses as 97*chr and "open(1)" as open. Written
-# calls are therefore allowed through here, which is what keeps sqrt(2), sin(x) and the f(x)
-# of ordinary function notation matchable -- 13% of Olympiad formulas.
+# calls are therefore allowed, but only for names on this list.
 #
-# The token check still refuses what the namespace cannot: "." reaches attributes of objects
+# Emptying __builtins__ is not on its own enough. SymPy exports plenty that is not
+# mathematics -- plot() drew a figure, and preview() shells out to LaTeX and opens a viewer
+# -- so the callable names are enumerated rather than excluded. Everything here is an
+# ordinary analytic function of bounded cost; factorial and binomial are deliberately absent,
+# since factorial(10**9) is short to write and long to finish.
+#
+# Refusing the rest is also what keeps equations honest. An unknown name before a paren is
+# read as multiplication, so f(x) became f*x and matched a step that wrote f*x, while
+# f(x+1) became f*(x+1) and distributed across an argument. Those are different statements,
+# and refusing the expression leaves it in its written form, which matches nothing it should
+# not.
+# Intersected with the namespace, because a listed name SymPy does not define is not a call
+# at all: lowercase max is not bound, so max(1) would parse as the symbol max times (1) and
+# reintroduce exactly the multiplication-in-disguise this list exists to prevent.
+_CALLABLE_NAMES = frozenset(name for name in {
+    'sqrt', 'cbrt', 'root', 'exp', 'log', 'ln', 'Abs', 'abs', 'sign',
+    'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
+    'asin', 'acos', 'atan', 'acot', 'asec', 'acsc',
+    'sinh', 'cosh', 'tanh', 'coth', 'asinh', 'acosh', 'atanh',
+    'floor', 'ceiling', 'ceil', 'gcd', 'lcm', 'Min', 'Max', 'min', 'max',
+} if _SYMPY_OK and name in _SYMPY_NAMESPACE)
+
+# The token check also refuses what the namespace cannot: "." reaches attributes of objects
 # SymPy does hold, strings and keywords open other grammar, and a length cap bounds the work
 # a single expression can ask for.
 _MAX_EXPR_LEN = 200
@@ -250,15 +271,23 @@ def _is_pure_arithmetic(expr: str) -> bool:
         tokens = list(tokenize.generate_tokens(io.StringIO(expr).readline))
     except Exception:
         return False
+    previous_name = None
     for token in tokens:
-        if token.type in _SKIPPABLE_TOKENS or token.type == tokenize.NUMBER:
+        if token.type in _SKIPPABLE_TOKENS:
             continue
-        if token.type == tokenize.NAME:
+        if token.type == tokenize.NUMBER:
+            previous_name = None
+        elif token.type == tokenize.NAME:
             if keyword.iskeyword(token.string):
                 return False
+            previous_name = token.string
         elif token.type == tokenize.OP:
             if token.string not in _ARITHMETIC_OPS:
                 return False          # "." , "," , "[" , ":" ... all refused
+            if token.string == '(' and previous_name is not None:
+                if previous_name not in _CALLABLE_NAMES:
+                    return False      # an unlisted call, or multiplication in disguise
+            previous_name = None
         else:
             return False              # strings, f-strings, error tokens
     return True
