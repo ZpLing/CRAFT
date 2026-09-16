@@ -172,6 +172,7 @@ def collect_terms_by_step_position(
     num_buckets: int = 10,
     domain: str = "logical",
     df_table: Optional[DocFreqTable] = None,
+    idf_norm: bool = False,
 ) -> Dict[int, Dict[str, Any]]:
     """
     Collect terms at each step position across all traces.
@@ -219,11 +220,13 @@ def collect_terms_by_step_position(
                 "weight":      trace_weight,   # underthinking trace weight 0.3
             })
 
-    # Skipped under the global setting, where df_table already carries the corpus
-    all_step_documents = (
-        [] if df_table is not None
-        else [tokenize_text(text, domain=domain) for text in all_step_texts]
-    )
+    # Under the global setting df_table already carries the corpus; otherwise build this
+    # sample's own, which is the within-sample setting.
+    if df_table is None:
+        df_table = DocFreqTable.from_documents(
+            [tokenize_text(text, domain=domain) for text in all_step_texts],
+            normalize=idf_norm,
+        )
 
     # Step 2: Extract terms per bucket and compute frequency counts
     step_terms_summary = {}
@@ -237,7 +240,7 @@ def collect_terms_by_step_position(
             weight    = step_info.get("weight", 1.0)
             terms, tfidf_scores = extract_step_terms_with_tfidf(
                 step_text,
-                all_step_documents,
+                [],
                 min_tfidf=min_tfidf,
                 domain=domain,
                 df_table=df_table,
@@ -921,6 +924,7 @@ async def synthesize_trace_rkg(
     anchor_conclusion: bool = False,
     no_mv: bool = False,
     df_table: Optional[DocFreqTable] = None,
+    idf_norm: bool = False,
 ) -> Dict[str, Any]:
     """RKG-guided high-quality trace generation (blind synthesis, no access to ground_truth).
 
@@ -1061,7 +1065,7 @@ async def synthesize_trace_rkg(
         _step_terms_summary = collect_terms_by_step_position(
             _all_traces, min_tfidf=0.01,
             use_percentage_alignment=True, domain=domain,
-            df_table=df_table,
+            df_table=df_table, idf_norm=idf_norm,
         )
 
     if domain == "math":
@@ -1377,6 +1381,7 @@ async def synthesize_trace_for_sample(
     step_by_step: bool = True,
     domain: str = "logical",
     df_table: Optional[DocFreqTable] = None,
+    idf_norm: bool = False,
 ) -> Dict[str, Any]:
     """
     Generate a high-quality reasoning trace for a single sample.
@@ -1458,6 +1463,7 @@ async def synthesize_trace_for_sample(
         use_percentage_alignment=True,
         domain=domain,
         df_table=df_table,
+        idf_norm=idf_norm,
     )
 
     if not step_terms_summary:
@@ -1614,6 +1620,7 @@ async def synthesize_traces_for_dataset(
     anchor_conclusion: bool = False,
     no_mv: bool = False,
     idf_scope: str = "sample",
+    idf_norm: str = "raw",
     df_table_path: Optional[Path] = None,
 ):
     """Generate high-quality reasoning traces for the dataset (supports step_by_step and rkg strategies).
@@ -1695,16 +1702,24 @@ async def synthesize_traces_for_dataset(
             df_table = DocFreqTable.load(df_table_path)
             print(f"Loading global DF table: {df_table_path}")
         else:
-            df_table = build_global_df_table(samples, domain=domain)
+            df_table = build_global_df_table(samples, domain=domain,
+                                             normalize=(idf_norm == "log_n"))
             if df_table_path is not None:
                 df_table.save(Path(df_table_path))
                 print(f"Saved global DF table: {df_table_path}")
         print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
+        if df_table.normalize != (idf_norm == "log_n"):
+            raise ValueError(
+                f"--df_table was built with idf_norm="
+                f"{'log_n' if df_table.normalize else 'raw'}, but this run asks for "
+                f"{idf_norm}; rebuild the table or match the flag"
+            )
     elif idf_scope == "none":
         df_table = FlatDocFreqTable()
         print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
     else:
         print("IRF scope: sample (IDF computed within each sample's own steps)")
+    print(f"IDF scale: {idf_norm}")
 
     if max_samples:
         samples = samples[:max_samples]
@@ -1744,13 +1759,14 @@ async def synthesize_traces_for_dataset(
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
                 sample_dag = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_dag, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, df_table=df_table))
+                tasks.append(synthesize_trace_rkg(session, sample, sample_dag, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, df_table=df_table, idf_norm=(idf_norm == "log_n")))
             else:
                 tasks.append(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
                     step_by_step=(synthesis_strategy != "all_at_once"),
                     domain=domain,
                     df_table=df_table,
+                    idf_norm=(idf_norm == "log_n"),
                 ))
         
         pbar = tqdm(total=len(tasks), desc="Generation progress", unit="sample")
@@ -1822,6 +1838,14 @@ def main():
         help="IRF corpus: 'sample' scores IDF within each sample's own steps (default, "
              "current behaviour); 'global' scores it over every step of every sample; "
              "'none' disables the IRF factor entirely, leaving TF-IRF == TF"
+    )
+    parser.add_argument(
+        "--idf_norm",
+        type=str,
+        default="raw",
+        choices=["raw", "log_n"],
+        help="IDF scale: 'raw' is log(N/df) (default); 'log_n' divides by log(N) so the "
+             "score lands in [0,1] and min_tfidf means the same under either --idf_scope"
     )
     parser.add_argument(
         "--df_table",
@@ -1963,6 +1987,7 @@ def main():
             anchor_conclusion=args.anchor_conclusion,
             no_mv=args.no_mv,
             idf_scope=args.idf_scope,
+            idf_norm=args.idf_norm,
             df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
         )
     )

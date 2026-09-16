@@ -108,11 +108,18 @@ async def main_async(args):
             )
         df_table = DocFreqTable.load(Path(args.df_table))
         print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
+        if df_table.normalize != (args.idf_norm == "log_n"):
+            raise ValueError(
+                f"--df_table was built with idf_norm="
+                f"{'log_n' if df_table.normalize else 'raw'}, but this retry asks for "
+                f"{args.idf_norm}; match the flag the original run used"
+            )
     elif args.idf_scope == "none":
         df_table = FlatDocFreqTable()
         print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
     else:
         print("IRF scope: sample (IDF computed within each sample's own steps)")
+    print(f"IDF scale: {args.idf_norm}")
 
     async with aiohttp.ClientSession(connector=connector) as session:
         async def worker(sid):
@@ -125,7 +132,7 @@ async def main_async(args):
                     res = await synthesize_trace_rkg(
                         session, sample, rkg, model=args.model,
                         domain="logical", anchor_conclusion=args.anchor_conclusion,
-                        df_table=df_table,
+                        df_table=df_table, idf_norm=(args.idf_norm == "log_n"),
                     )
                     return sid, res
                 except Exception as e:
@@ -181,6 +188,8 @@ def main():
     p.add_argument("--idf_scope", default="sample", choices=["sample", "global", "none"],
                    help="Must match the --idf_scope the original run used, otherwise retried "
                         "samples get a different term weighting than the rest of the file")
+    p.add_argument("--idf_norm", default="raw", choices=["raw", "log_n"],
+                   help="Must match the --idf_norm the original run used")
     p.add_argument("--df_table", default=None,
                    help="Global DF table saved by the original run (--idf_scope global). "
                         "Required to reproduce that run's IRF scores on a retried subset")

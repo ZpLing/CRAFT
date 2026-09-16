@@ -294,17 +294,24 @@ class DocFreqTable:
     every sample, built once and shared. Only the corpus differs — the scoring is identical.
     """
 
-    def __init__(self, n_docs: int = 0, df: Optional[Dict[str, int]] = None):
+    def __init__(self, n_docs: int = 0, df: Optional[Dict[str, int]] = None,
+                 normalize: bool = False):
         self.n_docs = n_docs
         self.df: Counter = Counter(df or {})
+        # log(N/df) ranges over [0, log(N)], so its scale follows corpus size: the same raw
+        # score means something different under a 44-document sample corpus and a 17k-document
+        # global one. Dividing by log(N) maps it to [0, 1] so absolute thresholds such as
+        # min_tfidf carry the same meaning whichever corpus is in play.
+        self.normalize = normalize
 
     def add_document(self, tokens: List[str]) -> None:
         self.n_docs += 1
         self.df.update(set(tokens))
 
     @classmethod
-    def from_documents(cls, documents: List[List[str]]) -> "DocFreqTable":
-        table = cls()
+    def from_documents(cls, documents: List[List[str]],
+                       normalize: bool = False) -> "DocFreqTable":
+        table = cls(normalize=normalize)
         for tokens in documents:
             table.add_document(tokens)
         return table
@@ -318,14 +325,22 @@ class DocFreqTable:
         # reachable when the table was built on a corpus other than the steps being scored
         # (e.g. a frozen background table); for a table built over these steps, df >= 1.
         docs_containing_term = self.df.get(term, 0) or 1
-        return float(np.log(self.n_docs / docs_containing_term))
+        idf = float(np.log(self.n_docs / docs_containing_term))
+        if self.normalize:
+            scale = float(np.log(self.n_docs))
+            # A single-document corpus has no room for the ratio to vary; leave it raw
+            # rather than dividing by zero.
+            if scale > 0:
+                idf /= scale
+        return idf
 
     def to_dict(self) -> Dict[str, Any]:
-        return {"n_docs": self.n_docs, "df": dict(self.df)}
+        return {"n_docs": self.n_docs, "df": dict(self.df), "normalize": self.normalize}
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DocFreqTable":
-        return cls(n_docs=data.get("n_docs", 0), df=data.get("df", {}))
+        return cls(n_docs=data.get("n_docs", 0), df=data.get("df", {}),
+                   normalize=data.get("normalize", False))
 
     def save(self, path: Path) -> None:
         path = Path(path)
