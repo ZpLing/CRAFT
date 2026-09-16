@@ -145,6 +145,10 @@ _LATEX_COMMANDS = re.compile(
 )
 
 
+# The command names themselves, for filtering them out of prose word counts.
+_LATEX_COMMAND_WORDS = frozenset(re.findall(r'[a-zA-Z]+', _LATEX_COMMANDS.pattern)) - {'re'}
+
+
 def _normalise_latex_token(expr: str) -> str:
     """Normalise a LaTeX expression into a comparable token string.
 
@@ -182,8 +186,12 @@ _BARE_EQUATION = re.compile(
 # tokenizer below either breaks the binding (can_read(Mike) becomes can_read plus mike, so
 # it collides with took_bar(Mike)) or loses the term outright when the predicate or the
 # argument is a single letter, since V(B) yields v and b and both fail the len > 1 rule.
+# The name binds tight to the paren and the argument holds no whitespace. Prose writes its
+# asides with a space -- "is a fellow (Step 2)", "a student (Fact 3)" -- and allowing that
+# shape turned 55% of these tokens into citations while erasing the very words they cite
+# from the word stream below.
 _LOGIC_PREDICATE = re.compile(
-    r'([\u00ac~]\s*)?([A-Za-z][A-Za-z0-9_]*)\s*\(\s*([^()]{1,40}?)\s*\)'
+    r'([\u00ac~]\s*)?([A-Za-z][A-Za-z0-9_]*)\(([^()\s]{1,30})\)'
 )
 
 
@@ -245,12 +253,18 @@ def tokenize_math_text(text: str) -> List[str]:
             tokens.append(w)
 
     # ── 4. Content words ───────────────────────────────────────────────────────
+    # Read from the masked text, so a word inside a formula is not counted again beside the
+    # MATH:/EQ: token that already carries it, and drop bare LaTeX command names, which are
+    # markup rather than content and frequent enough to behave like stopwords.
+    words = re.findall(r'\b[a-z]+\b', text_no_latex.lower())
     # A step can carry its whole argument in prose -- "Convert the number of can payments
     # into dollars using the given value per payment" -- and steps 1-3 return nothing at all
     # for it. That left 1088 of 2798 GSM8K steps with no tokens, so they contributed nothing
     # to the consensus and could not be scored against it.
     for w in words:
         if w in MATH_OPERATION_WORDS or w in MATH_COMMON_WORDS or w in STOPWORDS:
+            continue
+        if w in _LATEX_COMMAND_WORDS:
             continue
         if len(w) > 2:
             tokens.append(w)
