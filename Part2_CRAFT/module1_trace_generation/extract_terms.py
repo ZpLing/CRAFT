@@ -156,6 +156,77 @@ _LATEX_COMMANDS = re.compile(
 )
 
 
+_OPERATOR_SPELLINGS = {
+    '\u00d7': '*', '\u00f7': '/', '\u00b7': '*', '\u2212': '-',
+}
+_LATEX_OPERATORS = re.compile(r'\\(?:cdot|times)\b')
+_LATEX_DIVIDE    = re.compile(r'\\div\b')
+
+
+def fold_math_operators(text: str) -> str:
+    """Write every spelling of an operator the one way the parser reads.
+
+    An operator the equation pattern does not recognise is read as another operand, and two
+    operands running together end the match, so the pattern restarts in the middle of the
+    expression. "2 \\cdot 3 = 6" was cut to "3 = 6" and judged an arithmetic error -- that
+    alone accounted for all 18 remaining force-deletions on GSM8K.
+    """
+    text = text.translate(str.maketrans(_OPERATOR_SPELLINGS))
+    text = _LATEX_OPERATORS.sub('*', text)
+    return _LATEX_DIVIDE.sub('/', text)
+
+
+# A match that begins straight after one of these began in the middle of an expression:
+# the character is part of the equation the step wrote, but not part of what was matched.
+# Widening the operand class one symbol at a time never ends -- $ and % took their turn
+# after \cdot and \u00d7 -- so the boundary is checked instead of enumerated.
+_MIDEXPR_PRECEDERS = set('+-*/^$%\u00b7\u00d7\u00f7\u2212')
+
+
+def iter_equations(text: str):
+    """Yield the equations in a step, skipping any the pattern only caught part of.
+
+    Delimited formulas come first and their spans are then masked, because a $ means one
+    thing opening a formula and another in front of a price. Once the formulas are out of
+    the way a $ can only be currency, and an equation starting right after one started in
+    the middle of what the step wrote.
+    """
+    text = fold_math_operators(text)
+
+    for match in list(_LATEX_INLINE.finditer(text)) + list(_LATEX_DISPLAY.finditer(text)):
+        body = match.group(1) or match.group(2) or ''
+        if '=' in body:
+            yield body
+
+    rest = _LATEX_DISPLAY.sub(' ', _LATEX_INLINE.sub(' ', text))
+    for match in _BARE_EQUATION.finditer(rest):
+        before = rest[:match.start()].rstrip()
+        if before and before[-1] in _MIDEXPR_PRECEDERS:
+            continue
+        yield match.group(1)
+
+
+# parse_expr() compiles and eval()s what it is given, which SymPy documents as unsafe on
+# untrusted input. These strings come from model-written traces, and the LaTeX path hands
+# over whatever sat between the dollar signs, so a step reading
+# $open('f','w').write('x')=1$ actually ran. Only expression characters reach the parser,
+# and dunders are refused outright. The character class is the defence: a call needs
+# quotes, a comma or a subscript to carry an argument, and none of them are in it. SymPy's
+# own namespace is left alone, since parse_expr() emits Integer(...)/Symbol(...) and
+# handing it an empty global_dict makes every expression fail to parse.
+_SAFE_EXPR_CHARS = re.compile(r'^[0-9A-Za-z_\.\s\+\-\*/\^\(\)]*$')
+
+
+def safe_parse_expr(expr: str, evaluate: bool = True):
+    """parse_expr() restricted to things that can only be arithmetic. None if refused."""
+    if not _SYMPY_OK or not expr or '__' in expr or not _SAFE_EXPR_CHARS.match(expr):
+        return None
+    try:
+        return parse_expr(expr, transformations=_SYMPY_TRANSFORMS, evaluate=evaluate)
+    except Exception:
+        return None
+
+
 def _sort_commutative(expr):
     """Order the operands of + and * so that writing order stops mattering."""
     if not expr.args:
@@ -192,12 +263,11 @@ def _canonicalise_equation(expr: str) -> Optional[str]:
     lhs, rhs = expr.split('=')
     if not lhs.strip() or not rhs.strip():
         return None
+    parsed = [safe_parse_expr(side, evaluate=False) for side in (lhs, rhs)]
+    if any(p is None for p in parsed):
+        return None
     try:
-        sides = [
-            sympy.srepr(_sort_commutative(
-                parse_expr(side, transformations=_SYMPY_TRANSFORMS, evaluate=False)))
-            for side in (lhs, rhs)
-        ]
+        sides = [sympy.srepr(_sort_commutative(p)) for p in parsed]
     except Exception:
         return None
     return "EQN:" + "|".join(sorted(sides))
@@ -219,7 +289,7 @@ def _normalise_latex_token(expr: str) -> str:
     expr = expr.strip()
     # Spell the unicode operators the way the parser and the rest of the pipeline do, so
     # "3 \u00d7 4" and "3 * 4" are not two different terms.
-    expr = expr.translate(str.maketrans({'\u00d7': '*', '\u00f7': '/', '\u00b7': '*', '\u2212': '-'}))
+    expr = fold_math_operators(expr)
     # Remove bare LaTeX commands (e.g. \\frac itself; keep its arguments)
     expr = _LATEX_COMMANDS.sub('', expr).strip()
     # Collapse whitespace
@@ -299,9 +369,8 @@ def tokenize_math_text(text: str) -> List[str]:
     text_no_latex = _LATEX_INLINE.sub('', text)
     text_no_latex = _LATEX_DISPLAY.sub('', text_no_latex)
 
-    for m in _BARE_EQUATION.finditer(text_no_latex):
-        expr = m.group(1).strip()
-        norm = _normalise_latex_token(expr)
+    for equation in iter_equations(text_no_latex):
+        norm = _normalise_latex_token(equation.strip())
         if len(norm) >= 3 and '=' in norm:
             tokens.append('EQ:' + (_canonicalise_equation(norm) or norm))
 

@@ -54,7 +54,8 @@ from module1_trace_generation.extract_terms import (
     FlatDocFreqTable,
     resolve_df_table_path,
     check_df_table,
-    _BARE_EQUATION,
+    iter_equations,
+    safe_parse_expr,
     COMMON_LOGICAL_WORDS,
     LOGICAL_KEYWORDS,
     MATH_COMMON_WORDS,
@@ -583,11 +584,8 @@ def verify_step_math(step_text: str) -> Optional[bool]:
     # 960 pages" -- and implicit multiplication turned the units into a product of letter
     # symbols that could never cancel. Every such step was force-deleted: 322 of 2798 GSM8K
     # steps failed against 78 that passed, a ratio no solver of this quality produces.
-    transformations = standard_transformations + (implicit_multiplication_application,)
-
     verified_any = False
-    for match in _BARE_EQUATION.finditer(step_text):
-        equation = match.group(1)
+    for equation in iter_equations(step_text):
         if equation.count("=") != 1:
             continue
         lhs_str, rhs_str = equation.split("=")
@@ -604,12 +602,13 @@ def verify_step_math(step_text: str) -> Optional[bool]:
         if re.search(r"[A-Za-z]", equation):
             continue
 
+        lhs, rhs = safe_parse_expr(lhs_str), safe_parse_expr(rhs_str)
+        if lhs is None or rhs is None:
+            continue  # refused or unparseable, skip this equation
         try:
-            lhs = parse_expr(lhs_str, transformations=transformations)
-            rhs = parse_expr(rhs_str, transformations=transformations)
             diff = sympy.simplify(lhs - rhs)
         except Exception:
-            continue  # parse failed, skip this equation
+            continue
 
         # A leftover symbol means the step is naming a quantity rather than asserting
         # arithmetic. "Let the total be T = 3x" cannot simplify to zero and is not an
