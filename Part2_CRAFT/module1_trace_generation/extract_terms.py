@@ -165,12 +165,36 @@ def _normalise_latex_token(expr: str) -> str:
 # Regex for extracting inline/display LaTeX formulas
 _LATEX_INLINE  = re.compile(r'\$\$(.+?)\$\$|\$(.+?)\$', re.DOTALL)
 _LATEX_DISPLAY = re.compile(r'\\\[(.+?)\\\]|\\\((.+?)\\\)', re.DOTALL)
-# Bare equations: composed of letters/digits/basic operators, containing =, no $ needed
+# Bare equations: an expression, =, an expression, with no $ needed. Whitespace is allowed
+# only around operators, never between two operands. Letting \s float free made any sentence
+# containing "=" match from its first word onward, so 40% of EQ: tokens were prose --
+# "EQ:Add all strawberries to get the total number used for jam. Using Betty = 16" -- which
+# is unique to its trace and therefore pure noise in the frequency counts.
+_EQ_OPERAND = r'[A-Za-z0-9_\.\\{}\^\(\)]+'
+_EQ_SIDE    = _EQ_OPERAND + r'(?:\s*[\+\-\*/\^]\s*' + _EQ_OPERAND + r')*'
 _BARE_EQUATION = re.compile(
-    r'(?<![a-zA-Z])([a-zA-Z0-9\+\-\*/\^\(\)\.\{\}\\,\s]{2,}?'
-    r'\s*=\s*'
-    r'[a-zA-Z0-9\+\-\*/\^\(\)\.\{\}\\,\s]{1,})(?=[,\.\n\)\s]|$)'
+    r'(?<![A-Za-z0-9])(' + _EQ_SIDE + r'\s*=\s*' + _EQ_SIDE + r')(?![A-Za-z0-9])'
 )
+
+
+# Logical predicate applications: Pred(arg), optionally negated. FLD and FOLIO carry a
+# step's content in these -- 33% of logical steps contain at least one -- and the word
+# tokenizer below either breaks the binding (can_read(Mike) becomes can_read plus mike, so
+# it collides with took_bar(Mike)) or loses the term outright when the predicate or the
+# argument is a single letter, since V(B) yields v and b and both fail the len > 1 rule.
+_LOGIC_PREDICATE = re.compile(
+    r'([\u00ac~]\s*)?([A-Za-z][A-Za-z0-9_]*)\s*\(\s*([^()]{1,40}?)\s*\)'
+)
+
+
+_NEG_MARK = '\u00ac'
+
+
+def _normalise_logic_token(neg: str, pred: str, arg: str) -> str:
+    """Render one predicate application as a single comparable token."""
+    arg = re.sub(r'\s+', ' ', arg.strip().lower())
+    mark = _NEG_MARK if neg else ''
+    return "LOGIC:" + mark + pred.lower() + "(" + arg + ")"
 
 
 def tokenize_math_text(text: str) -> List[str]:
@@ -220,6 +244,17 @@ def tokenize_math_text(text: str) -> List[str]:
         if w in MATH_OPERATION_WORDS and w not in MATH_COMMON_WORDS:
             tokens.append(w)
 
+    # ── 4. Content words ───────────────────────────────────────────────────────
+    # A step can carry its whole argument in prose -- "Convert the number of can payments
+    # into dollars using the given value per payment" -- and steps 1-3 return nothing at all
+    # for it. That left 1088 of 2798 GSM8K steps with no tokens, so they contributed nothing
+    # to the consensus and could not be scored against it.
+    for w in words:
+        if w in MATH_OPERATION_WORDS or w in MATH_COMMON_WORDS or w in STOPWORDS:
+            continue
+        if len(w) > 2:
+            tokens.append(w)
+
     return tokens
 
 
@@ -235,14 +270,22 @@ def tokenize_text(text: str, domain: str = "logical") -> List[str]:
     if not text:
         return []
 
+    # Predicate applications first, as atomic units, then mask their spans so the word
+    # tokenizer does not also emit their pieces and count the same content twice. This
+    # mirrors how tokenize_math_text() masks LaTeX before reading operation words.
+    tokens: List[str] = []
+    for m in _LOGIC_PREDICATE.finditer(text):
+        tokens.append(_normalise_logic_token(m.group(1), m.group(2), m.group(3)))
+    text = _LOGIC_PREDICATE.sub(' ', text)
+
     # Convert to lowercase
     text = text.lower()
 
     # Extract words (letters, digits, hyphens)
-    tokens = re.findall(r'\b[a-z0-9]+(?:\-[a-z0-9]+)*\b', text)
+    words = re.findall(r'\b[a-z0-9]+(?:\-[a-z0-9]+)*\b', text)
 
     # Filter out stopwords
-    tokens = [t for t in tokens if t not in STOPWORDS and len(t) > 1]
+    tokens.extend(t for t in words if t not in STOPWORDS and len(t) > 1)
 
     return tokens
 
