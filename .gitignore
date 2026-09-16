@@ -1,0 +1,42 @@
+# ── Credentials & secrets ────────────────────────────────────────────
+# Repo-root config.py holds the real API keys — never commit it
+/config.py
+*.env
+.env*
+secrets.*
+
+# ── Run logs (may contain API keys / local paths) ─────────────────────
+*.log
+
+# ── Experiment data — kept locally, never pushed ──────────────────────
+/results/
+
+# ── Vendored third-party code (clone separately) ──────────────────────
+/third_party/
+Part1_Correct_Answer_Guidance_Study/roscoe/ReCEval/
+
+# ── Python cache ─────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environments ──────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Jupyter ───────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── OS artefacts ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Paper source — kept locally, never pushed ─────────────────────────
+/Paper/
+/Reasoning_CoT_EMNLP*.zip
+/paper/
