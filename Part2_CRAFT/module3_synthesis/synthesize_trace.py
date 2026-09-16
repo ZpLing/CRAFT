@@ -41,11 +41,15 @@ from module1_trace_generation.extract_terms import (
     tokenize_text,
     calculate_tf,
     calculate_idf,
+    DocFreqTable,
+    FlatDocFreqTable,
+    resolve_df_table_path,
     COMMON_LOGICAL_WORDS,
     MATH_COMMON_WORDS,
 )
 from module2_rkg_filtering.anomaly_filter import (
     parse_steps_from_trace,
+    build_global_df_table,
     STEP_PATTERN,
 )
 
@@ -115,8 +119,14 @@ def extract_step_terms_with_tfidf(
     min_idf: float = 0.1,
     min_tfidf: float = 0.01,
     domain: str = "logical",
+    df_table: Optional[DocFreqTable] = None,
 ) -> Tuple[List[str], Dict[str, float]]:
-    """Extract important terms and their TF-IDF scores for a single step (domain-aware)."""
+    """Extract important terms and their TF-IDF scores for a single step (domain-aware).
+
+    df_table: when given, IDF is scored against that corpus (the global IRF setting) and
+    all_step_documents is ignored; when None, IDF comes from all_step_documents, i.e. the
+    within-sample setting.
+    """
     if not step_text:
         return [], {}
 
@@ -137,7 +147,8 @@ def extract_step_terms_with_tfidf(
             if term in common_filter:
                 continue
 
-        idf = calculate_idf(all_step_documents, term)
+        idf = (df_table.idf(term) if df_table is not None
+               else calculate_idf(all_step_documents, term))
         if idf < min_idf:
             continue
 
@@ -160,6 +171,7 @@ def collect_terms_by_step_position(
     use_percentage_alignment: bool = True,
     num_buckets: int = 10,
     domain: str = "logical",
+    df_table: Optional[DocFreqTable] = None,
 ) -> Dict[int, Dict[str, Any]]:
     """
     Collect terms at each step position across all traces.
@@ -207,7 +219,11 @@ def collect_terms_by_step_position(
                 "weight":      trace_weight,   # underthinking trace weight 0.3
             })
 
-    all_step_documents = [tokenize_text(text, domain=domain) for text in all_step_texts]
+    # Skipped under the global setting, where df_table already carries the corpus
+    all_step_documents = (
+        [] if df_table is not None
+        else [tokenize_text(text, domain=domain) for text in all_step_texts]
+    )
 
     # Step 2: Extract terms per bucket and compute frequency counts
     step_terms_summary = {}
@@ -224,6 +240,7 @@ def collect_terms_by_step_position(
                 all_step_documents,
                 min_tfidf=min_tfidf,
                 domain=domain,
+                df_table=df_table,
             )
 
             for term in terms:
@@ -903,6 +920,7 @@ async def synthesize_trace_rkg(
     domain: str = "logical",
     anchor_conclusion: bool = False,
     no_mv: bool = False,
+    df_table: Optional[DocFreqTable] = None,
 ) -> Dict[str, Any]:
     """RKG-guided high-quality trace generation (blind synthesis, no access to ground_truth).
 
@@ -1043,6 +1061,7 @@ async def synthesize_trace_rkg(
         _step_terms_summary = collect_terms_by_step_position(
             _all_traces, min_tfidf=0.01,
             use_percentage_alignment=True, domain=domain,
+            df_table=df_table,
         )
 
     if domain == "math":
@@ -1357,6 +1376,7 @@ async def synthesize_trace_for_sample(
     model: str = DEFAULT_MODEL,
     step_by_step: bool = True,
     domain: str = "logical",
+    df_table: Optional[DocFreqTable] = None,
 ) -> Dict[str, Any]:
     """
     Generate a high-quality reasoning trace for a single sample.
@@ -1437,6 +1457,7 @@ async def synthesize_trace_for_sample(
         min_tfidf=min_tfidf,
         use_percentage_alignment=True,
         domain=domain,
+        df_table=df_table,
     )
 
     if not step_terms_summary:
@@ -1592,8 +1613,14 @@ async def synthesize_traces_for_dataset(
     rkg_file: Optional[Path] = None,
     anchor_conclusion: bool = False,
     no_mv: bool = False,
+    idf_scope: str = "sample",
+    df_table_path: Optional[Path] = None,
 ):
-    """Generate high-quality reasoning traces for the dataset (supports step_by_step and rkg strategies)."""
+    """Generate high-quality reasoning traces for the dataset (supports step_by_step and rkg strategies).
+
+    idf_scope selects the IRF corpus: "sample" scores IDF within each sample's own steps
+    (default, current behaviour); "global" scores it over every step of every sample.
+    """
     print(f"Reading file: {input_file}")
     with open(input_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -1659,6 +1686,26 @@ async def synthesize_traces_for_dataset(
         except Exception as e:
             print(f"Warning: failed to load original file: {e}")
     
+    # Build (or reuse) the global IRF corpus once. Built from the full file, before the
+    # --max_samples cut, so a truncated debug run scores terms exactly like a full run and
+    # so Module II and Module III agree on the same input.
+    df_table = None
+    if idf_scope == "global":
+        if df_table_path is not None and Path(df_table_path).exists():
+            df_table = DocFreqTable.load(df_table_path)
+            print(f"Loading global DF table: {df_table_path}")
+        else:
+            df_table = build_global_df_table(samples, domain=domain)
+            if df_table_path is not None:
+                df_table.save(Path(df_table_path))
+                print(f"Saved global DF table: {df_table_path}")
+        print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
+    elif idf_scope == "none":
+        df_table = FlatDocFreqTable()
+        print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
+    else:
+        print("IRF scope: sample (IDF computed within each sample's own steps)")
+
     if max_samples:
         samples = samples[:max_samples]
 
@@ -1697,12 +1744,13 @@ async def synthesize_traces_for_dataset(
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
                 sample_dag = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_dag, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv))
+                tasks.append(synthesize_trace_rkg(session, sample, sample_dag, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, df_table=df_table))
             else:
                 tasks.append(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
                     step_by_step=(synthesis_strategy != "all_at_once"),
                     domain=domain,
+                    df_table=df_table,
                 ))
         
         pbar = tqdm(total=len(tasks), desc="Generation progress", unit="sample")
@@ -1765,6 +1813,22 @@ def main():
         type=float,
         default=0.01,
         help="Minimum TF-IDF threshold (default: 0.01)"
+    )
+    parser.add_argument(
+        "--idf_scope",
+        type=str,
+        default="sample",
+        choices=["sample", "global", "none"],
+        help="IRF corpus: 'sample' scores IDF within each sample's own steps (default, "
+             "current behaviour); 'global' scores it over every step of every sample; "
+             "'none' disables the IRF factor entirely, leaving TF-IRF == TF"
+    )
+    parser.add_argument(
+        "--df_table",
+        type=str,
+        default=None,
+        help="Path to a global DF table JSON (used with --idf_scope global). Loaded if it "
+             "exists, otherwise built from the input and saved here for reuse across modules"
     )
     parser.add_argument(
         "--concurrency",
@@ -1898,6 +1962,8 @@ def main():
             rkg_file=_cfg.resolve_input(args.rkg_file) if args.rkg_file else None,
             anchor_conclusion=args.anchor_conclusion,
             no_mv=args.no_mv,
+            idf_scope=args.idf_scope,
+            df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
         )
     )
 

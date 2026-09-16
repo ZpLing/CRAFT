@@ -29,6 +29,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from config import require_bosch, resolve_input
 import module3_synthesis.synthesize_trace as _synth_mod
+from module1_trace_generation.extract_terms import (
+    DocFreqTable,
+    FlatDocFreqTable,
+    resolve_df_table_path,
+)
 from module3_synthesis.synthesize_trace import synthesize_trace_rkg
 
 # Pinned endpoint, read from the gitignored repo-root config.py.
@@ -92,6 +97,23 @@ async def main_async(args):
     new_results = {}
     connector = aiohttp.TCPConnector(limit=args.concurrency * 3)
 
+    # Must match the scope the original run used, or the retried samples are scored on a
+    # different term weighting than the ones beside them in the same output file.
+    df_table = None
+    if args.idf_scope == "global":
+        if not args.df_table:
+            raise ValueError(
+                "--idf_scope global requires --df_table pointing at the table the original "
+                "run saved; a retry only sees the failed subset and cannot rebuild that corpus"
+            )
+        df_table = DocFreqTable.load(Path(args.df_table))
+        print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
+    elif args.idf_scope == "none":
+        df_table = FlatDocFreqTable()
+        print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
+    else:
+        print("IRF scope: sample (IDF computed within each sample's own steps)")
+
     async with aiohttp.ClientSession(connector=connector) as session:
         async def worker(sid):
             async with sem:
@@ -103,6 +125,7 @@ async def main_async(args):
                     res = await synthesize_trace_rkg(
                         session, sample, rkg, model=args.model,
                         domain="logical", anchor_conclusion=args.anchor_conclusion,
+                        df_table=df_table,
                     )
                     return sid, res
                 except Exception as e:
@@ -155,11 +178,22 @@ def main():
     p.add_argument("--concurrency", type=int, default=4)
     p.add_argument("--anchor_conclusion", action="store_true")
     p.add_argument("--in_place", action="store_true")
+    p.add_argument("--idf_scope", default="sample", choices=["sample", "global", "none"],
+                   help="Must match the --idf_scope the original run used, otherwise retried "
+                        "samples get a different term weighting than the rest of the file")
+    p.add_argument("--df_table", default=None,
+                   help="Global DF table saved by the original run (--idf_scope global). "
+                        "Required to reproduce that run's IRF scores on a retried subset")
 
     args = p.parse_args()
+    if args.idf_scope == "global" and not args.df_table:
+        p.error("--idf_scope global requires --df_table pointing at the table the original "
+                "run saved; a retry only sees the failed subset and cannot rebuild that corpus")
     args.synth   = str(resolve_input(args.synth))
     args.rkg     = str(resolve_input(args.rkg))
     args.cleaned = str(resolve_input(args.cleaned))
+    if args.df_table:
+        args.df_table = str(resolve_df_table_path(args.df_table))
     asyncio.run(main_async(args))
 
 if __name__ == "__main__":

@@ -50,6 +50,9 @@ from module1_trace_generation.extract_terms import (
     tokenize_text,
     calculate_tf,
     calculate_idf,
+    DocFreqTable,
+    FlatDocFreqTable,
+    resolve_df_table_path,
     COMMON_LOGICAL_WORDS,
     LOGICAL_KEYWORDS,
     MATH_COMMON_WORDS,
@@ -128,6 +131,29 @@ def parse_steps_from_trace(trace: Dict[str, Any]) -> List[Dict[str, Any]]:
     return parsed_steps
 
 
+def build_global_df_table(
+    samples: List[Dict[str, Any]],
+    domain: str = "logical",
+) -> DocFreqTable:
+    """Build one DF table over every step of every sample — the global IRF setting.
+
+    The document unit stays a single step, exactly as in the within-sample setting, so the
+    only thing that changes is the corpus: a term's IDF now reflects how common it is
+    across problems rather than how widely it spreads inside one problem. Traces are read
+    with the same precedence process_sample() uses, so the corpus covers the steps that
+    actually get scored.
+    """
+    table = DocFreqTable()
+    for sample in samples:
+        traces = sample.get("traces", []) or sample.get("cleaned_traces", [])
+        for trace in traces:
+            for step_info in parse_steps_from_trace(trace):
+                step_text = step_info["step_text"]
+                if step_text:
+                    table.add_document(tokenize_text(step_text, domain=domain))
+    return table
+
+
 def extract_step_terms(
     step_text: str,
     all_step_documents: List[List[str]],
@@ -135,8 +161,14 @@ def extract_step_terms(
     min_idf: float = 0.1,
     min_tfidf: float = 0.0,
     domain: str = "logical",
+    df_table: Optional[DocFreqTable] = None,
 ) -> List[str]:
-    """Extract important terms for a single step (domain-aware)."""
+    """Extract important terms for a single step (domain-aware).
+
+    df_table: when given, IDF is scored against that corpus (the global IRF setting) and
+    all_step_documents is ignored; when None, IDF comes from all_step_documents, i.e. the
+    within-sample setting.
+    """
     if not step_text:
         return []
 
@@ -156,7 +188,8 @@ def extract_step_terms(
             if term in common_filter:
                 continue
 
-        idf = calculate_idf(all_step_documents, term)
+        idf = (df_table.idf(term) if df_table is not None
+               else calculate_idf(all_step_documents, term))
         if idf < min_idf:
             continue
 
@@ -176,6 +209,7 @@ def extract_terms_for_all_steps(
     min_idf: float = 0.1,
     min_tfidf: float = 0.0,
     domain: str = "logical",
+    df_table: Optional[DocFreqTable] = None,
 ) -> Dict[int, List[Dict[str, Any]]]:
     """
     Extract terms for all steps across all traces in a sample.
@@ -211,8 +245,12 @@ def extract_terms_for_all_steps(
                     "step_text": step_text,
                 })
 
-    # Prepare all step documents for IDF computation
-    all_step_documents = [tokenize_text(text, domain=domain) for text in all_step_texts]
+    # Prepare all step documents for IDF computation (skipped under the global setting,
+    # where df_table already carries the corpus)
+    all_step_documents = (
+        [] if df_table is not None
+        else [tokenize_text(text, domain=domain) for text in all_step_texts]
+    )
 
     # Step 2: extract terms for each step
     steps_with_terms = defaultdict(list)
@@ -226,6 +264,7 @@ def extract_terms_for_all_steps(
                 min_idf=min_idf,
                 min_tfidf=min_tfidf,
                 domain=domain,
+                df_table=df_table,
             )
 
             steps_with_terms[step_number].append({
@@ -403,8 +442,12 @@ def extract_step_terms_with_tfidf(
     min_idf: float = 0.1,
     min_tfidf: float = 0.0,
     domain: str = "logical",
+    df_table: Optional[DocFreqTable] = None,
 ) -> Tuple[List[str], Dict[str, float]]:
-    """Extract important terms and their TF-IDF scores for a single step (domain-aware)."""
+    """Extract important terms and their TF-IDF scores for a single step (domain-aware).
+
+    df_table follows the same convention as extract_step_terms().
+    """
     if not step_text:
         return [], {}
 
@@ -425,7 +468,8 @@ def extract_step_terms_with_tfidf(
             if term in common_filter:
                 continue
 
-        idf = calculate_idf(all_step_documents, term)
+        idf = (df_table.idf(term) if df_table is not None
+               else calculate_idf(all_step_documents, term))
         if idf < min_idf:
             continue
 
@@ -448,6 +492,7 @@ def collect_all_steps_with_terms(
     min_idf: float = 0.1,
     min_tfidf: float = 0.0,
     domain: str = "logical",
+    df_table: Optional[DocFreqTable] = None,
 ) -> List[Dict[str, Any]]:
     """
     Collect all steps from all traces in a sample and extract their terms
@@ -480,8 +525,12 @@ def collect_all_steps_with_terms(
                     "step_text": step_text,
                 })
 
-    # Prepare all step documents for IDF computation
-    all_step_documents = [tokenize_text(text, domain=domain) for text in all_step_texts]
+    # Prepare all step documents for IDF computation (skipped under the global setting,
+    # where df_table already carries the corpus)
+    all_step_documents = (
+        [] if df_table is not None
+        else [tokenize_text(text, domain=domain) for text in all_step_texts]
+    )
 
     # Step 2: extract terms and TF-IDF scores for each step
     steps_with_terms = []
@@ -494,6 +543,7 @@ def collect_all_steps_with_terms(
             min_idf=min_idf,
             min_tfidf=min_tfidf,
             domain=domain,
+            df_table=df_table,
         )
 
         steps_with_terms.append({
@@ -1034,6 +1084,7 @@ def process_sample(
     domain: str = "logical",
     sample_rkg: Optional[Dict[str, Any]] = None,
     underthinking_threshold: float = 0.3,
+    df_table: Optional[DocFreqTable] = None,
 ) -> Dict[str, Any]:
     """
     Process a single sample: detect and remove anomalous steps.
@@ -1043,6 +1094,7 @@ def process_sample(
         method: "supervised" | "unsupervised" | "rkg"
         sample_rkg: required when method="rkg"; RKG data for this sample (from step3_2_build_rkg.py)
         domain: "logical" or "math"
+        df_table: global IRF corpus from build_global_df_table(); None keeps IDF within the sample
     """
     traces = sample.get("traces", []) or sample.get("cleaned_traces", [])
     if not traces:
@@ -1069,6 +1121,7 @@ def process_sample(
     if method == "supervised":
         steps_with_terms_dict = extract_terms_for_all_steps(
             traces, min_tf=min_tf, min_idf=min_idf, min_tfidf=min_tfidf, domain=domain,
+            df_table=df_table,
         )
         anomalous_steps = detect_anomalous_steps_supervised(
             steps_with_terms_dict, similarity_threshold=similarity_threshold,
@@ -1088,6 +1141,7 @@ def process_sample(
     elif method == "unsupervised":
         steps_with_terms_list = collect_all_steps_with_terms(
             traces, min_tf=min_tf, min_idf=min_idf, min_tfidf=min_tfidf, domain=domain,
+            df_table=df_table,
         )
         anomalous_steps = detect_anomalous_steps_unsupervised(
             steps_with_terms_list,
@@ -1203,6 +1257,22 @@ def main():
         type=float,
         default=0.001,
         help="Minimum term frequency threshold (default 0.001)",
+    )
+    parser.add_argument(
+        "--idf_scope",
+        type=str,
+        default="sample",
+        choices=["sample", "global", "none"],
+        help="IRF corpus: 'sample' scores IDF within each sample's own steps (default, "
+             "current behaviour); 'global' scores it over every step of every sample; "
+             "'none' disables the IRF factor entirely, leaving TF-IRF == TF",
+    )
+    parser.add_argument(
+        "--df_table",
+        type=str,
+        default=None,
+        help="Path to a global DF table JSON (used with --idf_scope global). Loaded if it "
+             "exists, otherwise built from the input and saved here for reuse across modules",
     )
     parser.add_argument(
         "--min_idf",
@@ -1327,6 +1397,25 @@ def main():
         rkg_lookup = {r["sample_id"]: r for r in rkg_results if "sample_id" in r}
         print(f"Loading RKG file: {rkg_path} ({len(rkg_lookup)} samples)")
 
+    # Build (or reuse) the global IRF corpus once, before any per-sample work
+    df_table = None
+    if args.idf_scope == "global":
+        table_path = resolve_df_table_path(args.df_table) if args.df_table else None
+        if table_path is not None and table_path.exists():
+            df_table = DocFreqTable.load(table_path)
+            print(f"Loading global DF table: {table_path}")
+        else:
+            df_table = build_global_df_table(samples, domain=args.domain)
+            if table_path is not None:
+                df_table.save(table_path)
+                print(f"Saved global DF table: {table_path}")
+        print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
+    elif args.idf_scope == "none":
+        df_table = FlatDocFreqTable()
+        print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
+    else:
+        print("IRF scope: sample (IDF computed within each sample's own steps)")
+
     print(f"Processing {len(samples)} samples | method: {args.method}")
 
     results = []
@@ -1351,6 +1440,7 @@ def main():
             domain=args.domain,
             sample_rkg=sample_rkg,
             underthinking_threshold=args.underthinking_threshold,
+            df_table=df_table,
         )
         results.append(result)
 

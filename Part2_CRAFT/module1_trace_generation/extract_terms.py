@@ -285,6 +285,88 @@ def calculate_idf(all_documents: List[List[str]], term: str) -> float:
     return idf
 
 
+class DocFreqTable:
+    """Document frequencies for a fixed corpus, so IDF can be scored without re-scanning it.
+
+    This is what makes the two IRF settings comparable. Under ``idf_scope="sample"`` the
+    corpus is one sample's own steps (a fresh table per sample, matching what
+    calculate_idf() computes on the fly); under ``idf_scope="global"`` it is every step of
+    every sample, built once and shared. Only the corpus differs — the scoring is identical.
+    """
+
+    def __init__(self, n_docs: int = 0, df: Optional[Dict[str, int]] = None):
+        self.n_docs = n_docs
+        self.df: Counter = Counter(df or {})
+
+    def add_document(self, tokens: List[str]) -> None:
+        self.n_docs += 1
+        self.df.update(set(tokens))
+
+    @classmethod
+    def from_documents(cls, documents: List[List[str]]) -> "DocFreqTable":
+        table = cls()
+        for tokens in documents:
+            table.add_document(tokens)
+        return table
+
+    def idf(self, term: str) -> float:
+        """IDF of a term against this corpus; mirrors calculate_idf()'s log(N/df)."""
+        if self.n_docs == 0:
+            return 0.0
+        # A term the corpus has never seen is maximally rare, not maximally common, so
+        # fall back to df=1 rather than returning 0.0 and letting min_idf delete it. Only
+        # reachable when the table was built on a corpus other than the steps being scored
+        # (e.g. a frozen background table); for a table built over these steps, df >= 1.
+        docs_containing_term = self.df.get(term, 0) or 1
+        return float(np.log(self.n_docs / docs_containing_term))
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"n_docs": self.n_docs, "df": dict(self.df)}
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "DocFreqTable":
+        return cls(n_docs=data.get("n_docs", 0), df=data.get("df", {}))
+
+    def save(self, path: Path) -> None:
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("w", encoding="utf-8") as f:
+            json.dump(self.to_dict(), f, ensure_ascii=False)
+
+    @classmethod
+    def load(cls, path: Path) -> "DocFreqTable":
+        with Path(path).open("r", encoding="utf-8") as f:
+            return cls.from_dict(json.load(f))
+
+    def __len__(self) -> int:
+        return len(self.df)
+
+
+def resolve_df_table_path(path) -> Path:
+    """Resolve a --df_table path identically in every module that touches it.
+
+    resolve_input() leaves a relative path that does not exist yet pointing at the CWD, so
+    the module that saves the table and the module that later loads it would disagree
+    whenever they run from different directories, and the loader would silently rebuild a
+    different corpus instead of reusing the saved one. Sending a not-yet-existing path
+    through resolve_output() instead pins both sides to RESULTS_ROOT.
+    """
+    existing = _cfg.resolve_input(path)
+    return existing if existing.exists() else _cfg.resolve_output(path)
+
+
+class FlatDocFreqTable(DocFreqTable):
+    """A table with no IRF signal at all: every term scores idf = 1.0.
+
+    This is the ablation that isolates what the IRF factor buys, leaving TF-IRF == TF.
+    Because 1.0 clears the usual min_idf floor, no term is dropped for being common
+    either, so the only thing removed relative to the other settings is the weighting.
+    """
+
+    def idf(self, term: str) -> float:
+        return 1.0
+
+
 def calculate_tfidf_for_sample(
     sample_traces: List[Dict[str, Any]],
     all_trace_documents: List[List[str]],
