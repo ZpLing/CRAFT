@@ -40,3 +40,6 @@ Thumbs.db
 /Paper/
 /Reasoning_CoT_EMNLP*.zip
 /paper/
+
+# ── Baselines — kept locally, never pushed ───────────────────────────
+/baselines/

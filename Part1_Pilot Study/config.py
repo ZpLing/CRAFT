@@ -13,12 +13,12 @@ REQUEST_TIMEOUT = int(os.getenv("OPENAI_REQUEST_TIMEOUT", "180"))
 
 # ── Output locations ─────────────────────────────────────────────────────────
 # Every artifact this part produces belongs under
-# <repo-root>/results/Part1_Correct_Answer_Guidance_Study/, so a rerun lands next
+# <repo-root>/results/Part1_Pilot Study/, so a rerun lands next
 # to the existing score files instead of writing beside the code. Override the
 # root with CRAFT_RESULTS_ROOT.
 REPO_ROOT    = Path(__file__).resolve().parents[1]
 RESULTS_ROOT = (Path(os.getenv("CRAFT_RESULTS_ROOT", REPO_ROOT / "results"))
-                / "Part1_Correct_Answer_Guidance_Study")
+                / "Part1_Pilot Study")
 
 
 def resolve_output(path) -> Path:

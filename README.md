@@ -7,7 +7,7 @@ Chain-of-Thought Synthesis*. The layout mirrors the paper: Part 1 is the empiric
 ## Layout
 
 ```
-Part1_Correct_Answer_Guidance_Study/  § 4.1  Correct Answer Guidance Study (w/ Answer vs w/o Answer)
+Part1_Pilot Study/  § 4.1  Correct Answer Guidance Study (w/ Answer vs w/o Answer)
     prmbench/                         step-level verification — StepAcc, 1stErr, F1
     roscoe/                           trace quality — Faithfulness, Informativeness, Grammar
 Part2_CRAFT/                          § 3.2  The CRAFT Framework
@@ -17,7 +17,7 @@ Part2_CRAFT/                          § 3.2  The CRAFT Framework
 dataset/                              FLD, FOLIO, GSM8K, OlympiadBench
                                       + PRMBench_150_stratified.jsonl (Part 1 input)
 results/                              experiment outputs (local only, gitignored)
-    Part1_Correct_Answer_Guidance_Study/   prmbench/results/, roscoe/
+    Part1_Pilot Study/   prmbench/results/, roscoe/
     Part2_CRAFT/                           craft_runs/, alignment_comparison/
 config.py                             API credentials (local only, gitignored)
 ```
@@ -34,16 +34,16 @@ overrides the `results/` location.
 Both benchmarks are evaluated in a single pass under two settings, `w/ Answer` and `w/o Answer`.
 
 ```bash
-P1=Part1_Correct_Answer_Guidance_Study
+P1="Part1_Pilot Study"
 
 # → results/$P1/prmbench/results/
-python $P1/prmbench/prmbench_evaluate_verifier.py --input dataset/PRMBench_150_stratified.jsonl --model <model>
-python $P1/prmbench/prmbench_results_summary.py   --add --model <model> --summary_file <run.summary.json>
+python "$P1"/prmbench/prmbench_evaluate_verifier.py --input dataset/PRMBench_150_stratified.jsonl --model <model>
+python "$P1"/prmbench/prmbench_results_summary.py   --add --model <model> --summary_file <run.summary.json>
 
 # → results/$P1/roscoe/
-python $P1/roscoe/receval_generate_traces.py --model <model> --concurrency 10 \
+python "$P1"/roscoe/receval_generate_traces.py --model <model> --concurrency 10 \
     --output roscoe/<model>_traces.json --export_dir roscoe/roscoe_results
-python $P1/roscoe/receval_evaluate_traces.py --input roscoe/<model>_traces.json \
+python "$P1"/roscoe/receval_evaluate_traces.py --input roscoe/<model>_traces.json \
     --output roscoe/receval_scores/<model>.json
 ```
 
@@ -54,10 +54,10 @@ reported runs does not.
 
 Neither scorer is vendored here:
 
-- `receval_evaluate_traces.py` expects ReCEval at `Part1_Correct_Answer_Guidance_Study/roscoe/ReCEval/`.
+- `receval_evaluate_traces.py` expects ReCEval at `Part1_Pilot Study/roscoe/ReCEval/`.
 - ROSCOE scoring needs a ParlAI checkout passed via `--roscoe_parlai_dir`, plus its corpora
   (`bash projects/roscoe/roscoe_data/download_annotated.sh`). Apply
-  `Part1_Correct_Answer_Guidance_Study/roscoe/parlai_simcse_optional.patch` to it first —
+  `Part1_Pilot Study/roscoe/parlai_simcse_optional.patch` to it first —
   upstream `score.py` hard-fails on a missing `simcse`, which the default
   `all-mpnet-base-v2` scorer never uses. The patch changes no scoring math.
 

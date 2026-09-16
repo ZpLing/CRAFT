@@ -40,7 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 try:
     from config import RESULTS_ROOT
 except ImportError:
-    RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results" / "Part1_Correct_Answer_Guidance_Study"
+    RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results" / "Part1_Pilot Study"
 
 RESULTS_DIR  = RESULTS_ROOT / "prmbench" / "results"
 MASTER_FILE  = RESULTS_DIR / "prmbench_master_results.json"
