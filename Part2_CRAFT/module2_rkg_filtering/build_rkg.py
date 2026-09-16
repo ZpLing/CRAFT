@@ -220,6 +220,18 @@ Reasoning steps:
 Respond with ONLY the JSON, no other text."""
 
 
+_REASONING_MODELS = ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1")
+
+
+def _apply_reasoning_budget(payload: dict, model: str) -> dict:
+    """Reasoning models bill hidden reasoning against max_tokens, so a budget sized
+    for the visible answer comes back empty. Raise the total and reserve a visible slice."""
+    if model in _REASONING_MODELS:
+        payload["max_tokens"] = max(payload.get("max_tokens") or 0, 16000)
+        payload["max_output_tokens"] = min(payload["max_tokens"], 4096)
+    return payload
+
+
 @backoff.on_exception(
     backoff.expo,
     (aiohttp.ClientError, asyncio.TimeoutError, RuntimeError),
@@ -234,6 +246,7 @@ async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str
         "temperature": 0.0,
         "max_tokens": RESPONSE_TOKENS,
     }
+    _apply_reasoning_budget(payload, model)
     async with session.post(
         CHAT_URL, json=payload, headers=HEADERS,
         timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
@@ -579,6 +592,7 @@ def _term_overlap_score(text_a: str, text_b: str) -> float:
 def build_consensus_rkg(
     trace_rkgs: List[Dict[str, Any]],
     consensus_threshold: float = 0.3,
+    node_threshold: Optional[float] = None,
     term_overlap_weight: float = 0.3,
     proved_threshold: Optional[float] = None,
     weight_by: str = "uniform",   # "uniform" | "step_count"
@@ -668,6 +682,10 @@ def build_consensus_rkg(
 
     # ── Build node text index (for P1-A term overlap) ──────────────────────
     all_node_texts: Dict[str, str] = {}
+    node_trace_count: Dict[str, int] = defaultdict(int)
+    for rkg_trace in trace_rkgs:
+        for nid in {n["id"] for n in rkg_trace.get("nodes", [])}:
+            node_trace_count[nid] += 1      # how many traces contain this node at all
     for rkg_trace in trace_rkgs:
         for node in rkg_trace.get("nodes", []):
             nid  = node["id"]
@@ -780,6 +798,17 @@ def build_consensus_rkg(
             consensus_node_ids.add(src)
             consensus_node_ids.add(dst)
 
+    # Node-frequency vote (beta). Collecting nodes only from edges that clear theta
+    # loses every node of a sample whose traces disagree on structure: the graph comes
+    # back empty even when a step is present in every single trace. A node carried by
+    # at least beta of the traces belongs in the consensus on its own merit.
+    _beta = consensus_threshold if node_threshold is None else node_threshold
+    n_traces = max(len(trace_rkgs), 1)
+    consensus_node_ids |= {
+        nid for nid, cnt in node_trace_count.items()
+        if cnt / n_traces >= _beta
+    }
+
     # Fact nodes are always retained
     fact_ids = {nid for nid, ntype in node_types.items() if ntype == "fact"}
     consensus_node_ids |= fact_ids
@@ -821,6 +850,7 @@ def build_consensus_rkg(
         "nodes":           consensus_nodes,
         "edges":           consensus_edges,
         "edge_frequencies": edge_frequencies,
+        "node_frequencies": {nid: round(c / n_traces, 4) for nid, c in node_trace_count.items()},
         "node_texts":      node_texts,
         "trace_weights":   trace_weights,   # uniform (all 1.0)
     }
@@ -836,6 +866,7 @@ async def build_rkgs_for_sample(
     model: str = DEFAULT_MODEL,
     domain: str = "logical",
     consensus_threshold: float = 0.3,
+    node_threshold: Optional[float] = None,
     use_alignment: bool = False,
 ) -> Dict[str, Any]:
     """Concurrently build per-trace RKGs for a sample, then compute the consensus RKG.
@@ -916,6 +947,7 @@ async def build_rkgs_for_sample(
     consensus = build_consensus_rkg(
         valid_rkgs,
         consensus_threshold=consensus_threshold,
+        node_threshold=node_threshold,
     )
 
     return {
@@ -933,6 +965,7 @@ async def build_rkgs_for_dataset(
     concurrency: int = 10,
     domain: str = "logical",
     consensus_threshold: float = 0.3,
+    node_threshold: Optional[float] = None,
     max_samples: Optional[int] = None,
 ) -> None:
     """Build RKGs for all samples in a dataset and write output to rkg.json."""
@@ -966,6 +999,7 @@ async def build_rkgs_for_dataset(
                         session, sample,
                         model=model, domain=domain,
                         consensus_threshold=consensus_threshold,
+                        node_threshold=node_threshold,
                     )
                 except Exception as e:
                     results[idx] = {
@@ -988,6 +1022,7 @@ async def build_rkgs_for_dataset(
             "model": model,
             "domain": domain,
             "consensus_threshold": consensus_threshold,
+            "node_threshold": consensus_threshold if node_threshold is None else node_threshold,
             "total_samples": len(samples),
             "successful": sum(1 for r in results if r and "error" not in r),
         },
@@ -1017,7 +1052,9 @@ def main() -> None:
     parser.add_argument("--concurrency", type=int, default=10, help="Concurrency level (default 10)")
     parser.add_argument("--domain", default="logical", choices=["logical", "math"])
     parser.add_argument("--consensus_threshold", type=float, default=0.3,
-                        help="Edge frequency threshold (default 0.3)")
+                        help="Edge frequency threshold theta (default 0.3)")
+    parser.add_argument("--node_threshold", type=float, default=None,
+                        help="Node frequency threshold beta (default: same as --consensus_threshold)")
     parser.add_argument("--max_samples", type=int, default=None)
     args = parser.parse_args()
 
@@ -1036,6 +1073,7 @@ def main() -> None:
         concurrency=args.concurrency,
         domain=args.domain,
         consensus_threshold=args.consensus_threshold,
+        node_threshold=args.node_threshold,
         max_samples=args.max_samples,
     ))
 
