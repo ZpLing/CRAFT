@@ -42,8 +42,16 @@ MODEL_TRACE_GEN = MODEL_RKG_BUILD = MODEL_SYNTHESIS = "o4-mini"
 REQUEST_TIMEOUT = 180
 ```
 
-ParlAI, the ROSCOE scorer used in Part 1, is not vendored and is cloned separately.
-Part 2 keeps only the one ReCEval file it scores with, under the upstream MIT license.
+Dependencies are one file for the whole repo:
+
+```bash
+python -m pip install -r requirements.txt
+python -m nltk.downloader punkt averaged_perceptron_tagger
+```
+
+ROSCOE's scorer is two files fetched from ParlAI on first use rather than vendored.
+ReCEval's is one file kept here under the upstream MIT license, and its AllenNLP SRL
+path needs an environment of its own — `requirements.txt` says how.
 
 ## Quick start
 
@@ -59,7 +67,7 @@ RUN=craft_runs/fld_o4mini_100
 M1=framework/module1_generation_filtering
 
 # Module I — Multi-Trace Generation: K=5 traces at T=0.7
-python $M1/generate_traces.py --datasets dataset/logical/FLD.json \
+python $M1/generate_traces.py --datasets dataset/label_prediction/logical/FLD.json \
     --k 5 --temperature 0.7 --output $RUN/k_traces.json
 
 # Module I — Steps Filtering: z-score cutoff over the TF-IRF consensus terms
@@ -99,16 +107,19 @@ framework of §3.2.
 │   │   └── roscoe_experiment/       trace quality — Faithfulness, Informativeness, Grammar
 │   └── results/<model>/             prmbench/ and roscoe/, one directory per model
 ├── Part2_CRAFT/                     § 3.2  The CRAFT framework
-│   ├── dataset/
-│   │   ├── logical/                 FLD, FOLIO
-│   │   └── math/                    GSM8K, OlympiadBench
+│   ├── dataset/                       mirrors evaluation/ below
+│   │   ├── label_prediction/
+│   │   │   ├── logical/             FLD, FOLIO
+│   │   │   └── math/                GSM8K, OlympiadBench
+│   │   └── reasoning_traces_quality/
+│   │       └── roscoe/              CosmosQA, DROP, eSNLI, GSM8K (125 each)
 │   ├── framework/                     one package per module of §3.2
 │   │   ├── module1_generation_filtering/  Module I   — K traces, TF-IRF terms, z-score filter
 │   │   ├── module2_rkg_construction/      Module II  — per-trace RKGs, consensus RKG G*
 │   │   └── module3_synthesis/             Module III — topology-guided synthesis over G*
 │   ├── evaluation/
 │   │   ├── label_prediction/          main-table accuracy + the A–E ablation
-│   │   └── reasoning_traces_quality/  ReCEval scoring of CRAFT traces (§4)
+│   │   └── reasoning_traces_quality/  ReCEval/ and ROSCOE/ scoring of CRAFT traces (§4)
 │   ├── detailed_analysis/           cross-trace step alignment study
 │   └── results/                     craft_runs/, alignment_comparison/, receval_eval/
 └── config.py                        API credentials (local only, git-ignored)
@@ -142,24 +153,43 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 
 ## Part 2 — CRAFT (§3.2)
 
-The stages of the Quick start above run in order. Trace quality is then scored with
-ReCEval (§4). `Part2_CRAFT/evaluation/reasoning_traces_quality/ReCEval/` holds our three
-scripts and the one upstream file they score with (`evaluate_receval.py`, MIT, kept
-under its own LICENSE); the PVI checkpoints it loads are downloaded separately.
+The stages of the Quick start above run in order. Trace quality is then scored two
+ways (§4): ReCEval over the CRAFT traces of the logical datasets, and ROSCOE over
+traces generated for its own four sets. `ReCEval/` holds our three scripts beside the
+one upstream file they score with (`evaluate_receval.py`, MIT, its notice kept in the
+file); its PVI checkpoints are downloaded separately. `ROSCOE/` holds the same three
+roles, and fetches upstream's two scoring files on first use.
 
 ```bash
-RTQ=evaluation/reasoning_traces_quality/ReCEval
+RTQ=evaluation/reasoning_traces_quality
 
 # label prediction — the main table, and the A–E ablation
 python evaluation/label_prediction/evaluate_direct_accuracy.py --input $RUN/synthesized.json --source synthesized
 
 # reasoning trace quality — pair raw CoT with the CRAFT trace, score, tabulate
-python $RTQ/receval_adapter_craft.py   --craft_dir $RUN --source dataset/logical/FLD.json \
+python $RTQ/ReCEval/receval_adapter_craft.py   --craft_dir $RUN --source dataset/label_prediction/logical/FLD.json \
     --output receval_eval/receval_inputs/<run>.json
-python $RTQ/receval_evaluate_traces.py --input receval_eval/receval_inputs/<run>.json \
+python $RTQ/ReCEval/receval_evaluate_traces.py --input receval_eval/receval_inputs/<run>.json \
     --score_keys entail contradict --K 0 --output receval_eval/receval_scores/<run>.json
-python $RTQ/receval_build_table.py     --scores "FLD / o4-mini:receval_eval/receval_scores/<run>.json" \
+python $RTQ/ReCEval/receval_build_table.py     --scores "FLD / o4-mini:receval_eval/receval_scores/<run>.json" \
     --metrics entail contradict --latex_out receval_eval/receval_scores/receval_craft_table.tex
+```
+
+ROSCOE scores its own four sets, so CRAFT runs on those first and the same three
+steps follow — adapt, score, tabulate:
+
+```bash
+ROS=$RTQ/ROSCOE
+RRUN=roscoe_craft/o4mini
+
+python $M1/generate_traces.py --datasets dataset/reasoning_traces_quality/roscoe/*.jsonl \
+    --k 5 --temperature 0.7 --output $RRUN/k_traces.json
+# ... the same Module I/II/III stages as the Quick start ...
+
+python $ROS/roscoe_adapter_craft.py --craft_dir $RRUN --export_dir $RRUN/roscoe_export
+python $ROS/roscoe_score.py         --export_dir $RRUN/roscoe_export
+python $ROS/roscoe_build_table.py   --summaries "o4-mini:$RRUN/roscoe_export/evaluation_results.json" \
+    --latex_out $RRUN/roscoe_craft_table.tex
 ```
 
 Hyperparameters fixed across all experiments (§4.6): Module I `K=5`, `T=0.7`,

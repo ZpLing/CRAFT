@@ -1,0 +1,42 @@
+# CRAFT — one environment for both parts.
+#
+#   python -m pip install -r requirements.txt
+#   python -m nltk.downloader punkt averaged_perceptron_tagger
+#
+# Verified on Python 3.9. Versions are floors, not pins: the repo does not depend
+# on any behaviour that changed after them, and pinning exactly would fight the
+# torch build a given machine needs.
+
+# ── Trace generation and every LLM-calling stage ──────────────────────────────
+openai>=1.40                 # Part 1 trace generation
+aiohttp>=3.9                 # Part 2's modules and the baselines call the API directly
+backoff>=2.2                 # retry policy around those calls
+tqdm>=4.65
+
+# ── Scoring, statistics, figures ──────────────────────────────────────────────
+numpy>=1.24
+scipy>=1.10                  # bootstrap CIs and the paired Wilcoxon test
+pandas>=2.0
+matplotlib>=3.7
+sympy>=1.12                  # equation-aware term matching in Module I's math domain
+
+# ── Reasoning-trace quality scorers ───────────────────────────────────────────
+# ROSCOE (Part 1's pilot study, Part 2's trace-quality table) runs in
+# sentence_transformer mode, so simcse is deliberately not required — the scorer
+# stubs that import out and fails loudly if a run ever reaches for it.
+torch>=2.0
+transformers>=4.30
+sentence-transformers>=2.2
+nltk>=3.8
+datasets>=2.14
+
+# ── ReCEval's SRL path — install separately, NOT in this environment ──────────
+# receval_evaluate_traces.py imports upstream evaluate_receval.py, which needs
+# AllenNLP at import time. AllenNLP's last release pins transformers 4.20 and
+# torch 1.10, which cannot coexist with the sentence-transformers above, so it
+# gets its own environment:
+#
+#   conda create -n receval python=3.9 && conda activate receval
+#   pip install allennlp==2.10.1 allennlp-models==2.10.1 supar transformers==4.20.1
+#
+# Everything else in the repo runs in the single environment this file describes.
