@@ -31,6 +31,9 @@ RESULTS_ROOT = PART_ROOT / "results"             # <results>/<model>/{prmbench,r
 
 # Every figure in the repo lands in one place, whatever produced it.
 FIGURE_DIR = REPO_ROOT / "Figure"
+# and a copy goes where the paper reads it from: section_files/4_Experiment.tex
+# includes significance_forest.pdf by bare name, which resolves against the tex root.
+LATEX_DIR  = REPO_ROOT / "paper"
 # Stats and the LaTeX table are not figures; they stay with the run outputs.
 OUT_DIR    = RESULTS_ROOT / "significance_testing"
 FIGURE_DIR.mkdir(parents=True, exist_ok=True)
@@ -80,11 +83,14 @@ PRM_DIM_LABELS = {"simplicity": "Simplicity", "soundness": "Soundness",
 # ROSCOE metrics to aggregate per dataset (bottom-row panels)
 ROSCOE_AGG_METRICS = ["faithfulness", "informativeness_step",
                       "informativeness_chain", "coherence_step_vs_step"]
+# Row labels down the left of every forest panel. Two lines each, so the widest
+# name sets the same left margin as the shortest and the panels keep their width;
+# the keys are MODELS' keys, or the label silently falls back to the full name.
 MODEL_DISPLAY = {
-    "GPT-o4-mini":    "GPT-o4-mini",
-    "Gemini-3-Flash": "Gemini-\n3-Flash",
-    "GPT-5.4-nano":   "GPT-\n5.4-nano",
-    "DeepSeek-R1":    "DeepSeek-R1",
+    "GPT-o4-mini":           "o4-mini",
+    "GPT-5.4-nano":          "GPT-\n5.4-nano",
+    "DeepSeek-V4-Flash":     "DeepSeek-\nV4-Flash",
+    "Gemini-3.1-Flash-Lite": "Gemini-3.1-\nFlash-Lite",
 }
 
 
@@ -117,6 +123,16 @@ def wilcoxon(a, b):
         return float(p)
     except Exception:
         return 1.0
+
+
+def fmt2(x, signed=True):
+    """Two decimals, rounded — the table's number format."""
+    return f"{x:+.2f}" if signed else f"{x:.2f}"
+
+
+def fmt_p(p):
+    """Two decimals, except where that would print a real p-value as 0.00."""
+    return "<0.01" if p < 0.005 else f"{p:.2f}"
 
 
 def sig_label(p):
@@ -507,11 +523,11 @@ def make_latex_table(stats):
             lines.append(
                 rf"\multirow{{5}}{{*}}{{\rotatebox{{90}}{{{short}}}}}"
                 rf" & PRMBench (Total)"
-                rf" & ${row['mean_diff']:+.3f}$"
-                rf" & ${row['ci_lo']:+.3f}$"
-                rf" & ${row['ci_hi']:+.3f}$"
-                rf" & ${row['p_wilcoxon']:.3f}$"
-                rf" & ${row['cohen_d']:+.3f}$"
+                rf" & ${fmt2(row['mean_diff'])}$"
+                rf" & ${fmt2(row['ci_lo'])}$"
+                rf" & ${fmt2(row['ci_hi'])}$"
+                rf" & ${fmt_p(row['p_wilcoxon'])}$"
+                rf" & ${fmt2(row['cohen_d'])}$"
                 rf" & {row['sig']} \\"
             )
         for dim in ["simplicity", "soundness", "sensitivity"]:
@@ -519,11 +535,11 @@ def make_latex_table(stats):
             if row:
                 lines.append(
                     rf" & \ \ {DIM_MAP[dim]}"
-                    rf" & ${row['mean_diff']:+.3f}$"
-                    rf" & ${row['ci_lo']:+.3f}$"
-                    rf" & ${row['ci_hi']:+.3f}$"
-                    rf" & ${row['p_wilcoxon']:.3f}$"
-                    rf" & ${row['cohen_d']:+.3f}$"
+                    rf" & ${fmt2(row['mean_diff'])}$"
+                    rf" & ${fmt2(row['ci_lo'])}$"
+                    rf" & ${fmt2(row['ci_hi'])}$"
+                    rf" & ${fmt_p(row['p_wilcoxon'])}$"
+                    rf" & ${fmt2(row['cohen_d'])}$"
                     rf" & {row['sig']} \\"
                 )
         # ROSCOE avg
@@ -535,11 +551,11 @@ def make_latex_table(stats):
             avg_d    = np.mean([r["cohen_d"] for r in roscoe_rows])
             lines.append(
                 rf" & ROSCOE (avg Faith.)"
-                rf" & ${avg_diff:+.3f}$"
+                rf" & ${fmt2(avg_diff)}$"
                 rf" & —"
                 rf" & —"
-                rf" & ${avg_p:.3f}$"
-                rf" & ${avg_d:+.3f}$"
+                rf" & ${fmt_p(avg_p)}$"
+                rf" & ${fmt2(avg_d)}$"
                 rf" & {sig_label(avg_p)} \\"
             )
         lines.append(r"\midrule")

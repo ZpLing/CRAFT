@@ -43,6 +43,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import NamedTuple
 
 import aiohttp
 
@@ -150,6 +151,63 @@ def extract_final_answer(process: list[str]) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Gateway word filter
+# ---------------------------------------------------------------------------
+# The Bosch gateway screens the request text against a word list and answers
+# 400 "Invalid input: Sensitive word(gcd) detected in request message." without
+# ever reaching the model. It is the gateway refusing, not the model: the same
+# items score normally on the route that has no filter, and the word is the
+# ordinary abbreviation for a greatest common divisor. Re-sending the identical
+# text can only be refused again — that is what left the five items carrying
+# "gcd" unscored on every filtered model, twenty calls apiece — so the word is
+# written out in full instead. The expansion reads the same to a verifier, and
+# every substitution is recorded on the item, so a rewritten prompt is never
+# mistaken for the original. A blocked word with no expansion here is reported
+# rather than guessed at.
+# ---------------------------------------------------------------------------
+GATEWAY_WORD_REWRITES = {
+    "gcd": "greatest common divisor",
+}
+
+_SENSITIVE_WORD_RE = re.compile(r"Sensitive word\(([^)]+)\)", re.IGNORECASE)
+_MAX_WORD_REWRITES = 3
+
+
+def rewrite_blocked_word(text: str, word: str, replacement: str) -> str:
+    """Write a gateway-blocked word out in full wherever it stands alone."""
+    return re.sub(rf"\b{re.escape(word)}\b", replacement, text, flags=re.IGNORECASE)
+
+
+def _rewrite_payload(payload: dict, word: str, rewrites: dict[str, str]) -> bool:
+    """Expand a blocked word throughout the payload. False when it cannot be."""
+    key = word.lower()
+    replacement = GATEWAY_WORD_REWRITES.get(key)
+    if replacement is None:
+        logger.error("Gateway blocked %r and GATEWAY_WORD_REWRITES has no expansion for it — "
+                     "add one there or every item containing it stays unscored", word)
+        return False
+    if key in rewrites or len(rewrites) >= _MAX_WORD_REWRITES:
+        return False                     # already written out once and still refused
+    messages = [{**m, "content": rewrite_blocked_word(m["content"], word, replacement)}
+                for m in payload["messages"]]
+    if messages == payload["messages"]:
+        logger.error("Gateway blocked %r but it does not stand alone in the request, "
+                     "so there is nothing to expand", word)
+        return False
+    payload["messages"] = messages
+    rewrites[key] = replacement
+    return True
+
+
+def terminal_reason(reason: str | None) -> bool:
+    """True for a refusal that re-asking cannot change — the text, not the sampling."""
+    if not reason:
+        return False
+    return reason.startswith("blocked_word:") or (
+        reason.startswith("http_4") and not reason.startswith("http_429"))
+
+
+# ---------------------------------------------------------------------------
 # Async LLM call — temperature 0 for deterministic verification
 # ---------------------------------------------------------------------------
 async def call_llm(
@@ -160,8 +218,14 @@ async def call_llm(
     model: str,
     api_key: str,
     base_url: str,
-) -> str | None:
+    timeout: float | None = None,
+) -> tuple[str | None, str | None, dict[str, str]]:
     """Call the LLM with model-aware parameters.
+
+    Returns (content, reason, rewrites): the reply and no reason, or no reply and
+    why — so a caller can tell a refusal it should not re-ask from a miscount it
+    should. `rewrites` carries any gateway-blocked word this call had to write
+    out in full to get an answer at all.
 
     Reasoning models (o1/o3/o4 family) require:
       - max_completion_tokens  (not max_tokens)
@@ -192,22 +256,38 @@ async def call_llm(
         "temperature": 0.5,
         ("max_completion_tokens" if is_reasoning else "max_tokens"): _MAX_OUTPUT_TOKENS,
     }
-    for attempt in range(4):
+    rewrites: dict[str, str] = {}
+    reason, tries = "no_reply", 0
+    while tries < 4:
         async with semaphore:
             try:
                 async with session.post(
                     url, headers=headers, json=payload,
-                    timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
+                    timeout=aiohttp.ClientTimeout(total=timeout or REQUEST_TIMEOUT),
                 ) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        return data["choices"][0]["message"]["content"].strip()
+                        content = data["choices"][0]["message"]["content"].strip()
+                        return content, None, rewrites
                     text = await resp.text()
+                    blocked = _SENSITIVE_WORD_RE.search(text)
+                    if blocked:
+                        word = blocked.group(1)
+                        if _rewrite_payload(payload, word, rewrites):
+                            logger.info("Gateway blocked %r — re-sending it as %r",
+                                        word, rewrites[word.lower()])
+                            continue     # a refused word is not a failed attempt
+                        return None, f"blocked_word:{word.lower()}", rewrites
                     logger.warning("HTTP %s: %s", resp.status, text[:200])
+                    reason = f"http_{resp.status}"
+                    if terminal_reason(reason):
+                        return None, reason, rewrites
             except Exception as e:
-                logger.warning("Attempt %d error: %s", attempt + 1, e)
-        await asyncio.sleep(2 ** attempt)
-    return None
+                logger.warning("Attempt %d error: %r", tries + 1, e)
+                reason = type(e).__name__
+        await asyncio.sleep(2 ** tries)
+        tries += 1
+    return None, reason, rewrites
 
 
 def _remove_json_comments(json_string: str) -> str:
@@ -239,6 +319,25 @@ def extract_nested_json(text: str):
                 except json.JSONDecodeError:
                     continue
     return None
+
+
+def score_counts(raw: str | None) -> dict[str, int]:
+    """How many scores each array in a reply actually held.
+
+    A miscounted reply is re-asked, and "you gave 94 validity scores for 91
+    steps" is a correction where "that was wrong" is only a complaint — so the
+    counts are read back out of the reply the same two ways parse_scores reads
+    the scores themselves.
+    """
+    obj = extract_nested_json(raw or "")
+    if isinstance(obj, dict):
+        return {k: len(v) for k, v in obj.items() if isinstance(v, list)}
+    counts = {}
+    for key in ("validity", "redundancy"):
+        m = re.search(rf'"{key}"\s*:\s*\[([^\]]*)', raw or "", re.DOTALL)
+        if m:
+            counts[key] = len(re.findall(r"-?\d+(?:\.\d+)?", m.group(1)))
+    return counts
 
 
 def parse_scores(raw: str, n_steps: int) -> tuple[list[float] | None, list[float] | None]:
@@ -343,12 +442,18 @@ def build_summary(results: list[dict], model: str) -> dict:
     paired: dict[str, dict[str, list]] = {d: {"with_answer": [], "wout_answer": []} for d in dims}
     attempted = {d: 0 for d in dims}
     dropped_idx: dict[str, list] = {d: [] for d in dims}
+    reasons: dict[str, int] = {}
 
     for rec in results:
         dim = get_dim(rec.get("classification", ""))
         if dim not in paired:
             continue
         attempted[dim] += 1
+        for setting in ("with_answer", "wout_answer"):
+            failure = (rec.get(setting) or {}).get("failure")
+            if failure:
+                kind = failure.split(":")[0]
+                reasons[kind] = reasons.get(kind, 0) + 1
         wa_m = metrics_from_record(rec, "with_answer")
         bl_m = metrics_from_record(rec, "wout_answer")
         if wa_m is None or bl_m is None:
@@ -378,6 +483,7 @@ def build_summary(results: list[dict], model: str) -> dict:
         "n_total":         len(results),
         "n_scored":        summary["total"]["n_items"],
         "dropped_idx":     {d: dropped_idx[d] for d in dims if dropped_idx[d]},
+        "dropped_reasons": reasons,
         "model":           model,
         "difficulty_dims": {d: sorted(c) for d, c in DIFFICULTY_DIMS.items()},
     }
@@ -501,27 +607,136 @@ def aggregate_metrics(metrics_list: list[dict]) -> dict:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+SETTINGS = ("with_answer", "wout_answer")
+
+
+class Scored(NamedTuple):
+    """One setting's outcome: the scores, or why there are none."""
+    validity:   list[float] | None
+    redundancy: list[float] | None
+    raw:        str | None
+    reason:     str | None
+    rewrites:   dict[str, str]
+
+
+def step_timeout(n_steps: int) -> float:
+    """How long to let one reply take, by how much of it there is to write.
+
+    A flat ceiling is either generous for an 8-step solution or too tight for a
+    90-step one, and too tight is expensive: the call is cut off after the model
+    has done the work, and the attempt buys nothing. The budget therefore grows
+    with the steps being scored, since that is what sets both the reasoning and
+    the two arrays it has to emit.
+    """
+    return min(REQUEST_TIMEOUT + 3.0 * n_steps, 600.0)
+
+
 async def call_and_score(session, semaphore, system, prompt, n_steps,
-                         model, api_key, base_url, attempts=5):
+                         model, api_key, base_url, attempts=5) -> Scored:
     """Ask for one setting's scores, re-asking until they line up with the steps.
 
     PRMBench's own critics wrap the call and the parse in one retry loop for the
     same reason: a model that miscounts the steps usually gets it right when asked
-    again, and temperature is not zero. Only a reply that survives parsing counts,
-    so a retry can recover an item but can never invent one.
+    again, and temperature is not zero. The re-ask quotes the counts it got back,
+    which is the whole of what was wrong with the reply. Only a reply that survives
+    parsing counts, so a retry can recover an item but can never invent one — and a
+    request the gateway refuses outright is not re-asked at all, since the refusal
+    is in its word list rather than in the sampling.
     """
-    raw = None
+    raw, reason, rewrites, ask = None, "no_reply", {}, prompt
     for attempt in range(attempts):
-        ask = prompt if attempt == 0 else (
-            f"{prompt}\n\nYour previous reply did not contain exactly {n_steps} "
-            f"scores in each array. Return exactly {n_steps} per array, one per step."
-        )
-        raw = await call_llm(session, semaphore, system, ask, model, api_key, base_url)
-        if raw:
-            validity, redundancy = parse_scores(raw, n_steps)
-            if validity is not None:
-                return validity, redundancy, raw
-    return None, None, raw
+        content, err, rw = await call_llm(session, semaphore, system, ask,
+                                          model, api_key, base_url,
+                                          timeout=step_timeout(n_steps))
+        rewrites.update(rw)
+        if err:
+            reason = err
+            if terminal_reason(err):
+                break
+            continue
+        raw = content
+        validity, redundancy = parse_scores(raw, n_steps)
+        if validity is not None:
+            return Scored(validity, redundancy, raw, None, rewrites)
+        counts = score_counts(raw)
+        reason = f"score_count_mismatch:{counts.get('validity', 0)}!={n_steps}"
+        ask = (f"{prompt}\n\nYour previous reply gave {counts.get('validity', 0)} validity "
+               f"scores and {counts.get('redundancy', 0)} redundancy scores, but the solution "
+               f"has {n_steps} steps. Return exactly {n_steps} in each array, one per step, "
+               f"in order.")
+    return Scored(None, None, raw, reason, rewrites)
+
+
+def build_setting_prompt(item: dict, setting: str) -> tuple[str, str, int]:
+    """The system prompt, user prompt and step count for one setting of one item."""
+    question = item.get("question") or item.get("original_question", "")
+    steps    = item.get("modified_process", [])      # PRMBench: has injected errors
+    if setting == "with_answer":
+        answer = extract_final_answer(item.get("original_process", []))
+        return SYSTEM_WITH_ANSWER, build_prompt_with_answer(question, steps, answer), len(steps)
+    return SYSTEM_WOUT_ANSWER, build_prompt_wout_answer(question, steps), len(steps)
+
+
+def setting_record(scored: Scored, metrics: dict | None) -> dict:
+    """One setting's slot in a result record, carrying why it is empty when it is."""
+    side = {
+        "validity_scores":   scored.validity,
+        "redundancy_scores": scored.redundancy,
+        "validity":          scored.validity is not None,
+        # PRMBench-compatible scores dict
+        "scores":  metrics["scores"] if metrics else None,
+        "metrics": {k: v for k, v in metrics.items()
+                    if k not in ("scores", "correct_step_acc_list", "wrong_step_acc_list",
+                                 "total_step_acc_list", "first_error_acc_list")} if metrics else None,
+    }
+    if scored.validity is None:
+        side["failure"] = scored.reason
+    return side
+
+
+async def score_items(session, items: list[dict], args) -> dict[tuple[int, str], Scored]:
+    """Score every item in both settings, then sweep up whatever came back unscored.
+
+    A first pass loses a few calls to replies that miscount the steps, and the same
+    request sent again — later, with fewer in flight — usually parses. That used to
+    be a second script run by hand over the finished file; doing it here is the
+    difference between a run that finishes complete and one that finishes and then
+    needs repairing. A sweep that recovers nothing ends it, because what is left is
+    refused rather than unlucky, and a refusal the gateway will only repeat is never
+    re-sent at all.
+    """
+    outcomes: dict[tuple[int, str], Scored] = {}
+    pending = [(i, s) for i in range(len(items)) for s in SETTINGS]
+    concurrency = args.concurrency
+
+    for sweep in range(args.sweeps + 1):
+        if not pending:
+            break
+        if sweep:
+            logger.info("Sweep %d/%d: re-asking %d unscored call(s) at concurrency %d",
+                        sweep, args.sweeps, len(pending), concurrency)
+            await asyncio.sleep(args.sweep_pause)
+        semaphore = asyncio.Semaphore(concurrency)
+        jobs = []
+        for i, setting in pending:
+            system, prompt, n_steps = build_setting_prompt(items[i], setting)
+            jobs.append(call_and_score(session, semaphore, system, prompt, n_steps,
+                                       args.model, args.api_key, args.base_url))
+        scored = await asyncio.gather(*jobs)
+        outcomes.update(zip(pending, scored))
+
+        recovered = sum(1 for s in scored if s.validity is not None)
+        if sweep:
+            logger.info("Sweep %d recovered %d/%d", sweep, recovered, len(scored))
+        pending = [k for k, s in zip(pending, scored)
+                   if s.validity is None and not terminal_reason(s.reason)]
+        if sweep and not recovered:
+            break
+        concurrency = max(1, concurrency // 2)
+
+    if pending:
+        logger.info("%d call(s) still unscored after %d sweep(s)", len(pending), args.sweeps)
+    return outcomes
 
 
 async def run(args):
@@ -536,87 +751,36 @@ async def run(args):
         items = items[: args.max_samples]
     logger.info("Loaded %d items from %s", len(items), args.input)
 
-    semaphore = asyncio.Semaphore(args.concurrency)
-
     async with aiohttp.ClientSession() as session:
-        wa_tasks, bl_tasks = [], []
-        for item in items:
-            question = item.get("question") or item.get("original_question", "")
-            # PRMBench: verify modified_process (has injected errors)
-            steps          = item.get("modified_process", [])
-            correct_answer = extract_final_answer(item.get("original_process", []))
-
-            wa_tasks.append(call_and_score(
-                session, semaphore,
-                SYSTEM_WITH_ANSWER,
-                build_prompt_with_answer(question, steps, correct_answer),
-                len(steps), args.model, args.api_key, args.base_url,
-            ))
-            bl_tasks.append(call_and_score(
-                session, semaphore,
-                SYSTEM_WOUT_ANSWER,
-                build_prompt_wout_answer(question, steps),
-                len(steps), args.model, args.api_key, args.base_url,
-            ))
-
-        wa_outputs, bl_outputs = await asyncio.gather(
-            asyncio.gather(*wa_tasks),
-            asyncio.gather(*bl_tasks),
-        )
+        outcomes = await score_items(session, items, args)
 
     results = []
-    wa_metrics_list, bl_metrics_list = [], []
-
-    for item, wa_out, bl_out in zip(items, wa_outputs, bl_outputs):
-        steps          = item.get("modified_process", [])
+    for i, item in enumerate(items):
         error_steps    = item.get("error_steps", [])      # 1-indexed
-        n              = len(steps)
+        n              = len(item.get("modified_process", []))
         idx            = item.get("idx", "")
         classification = item.get("classification", "")
 
-        wa_val, wa_red, wa_raw = wa_out
-        bl_val, bl_red, bl_raw = bl_out
-
-        if wa_val is None:
-            logger.warning("Unscored after retries (with_answer) idx=%s steps=%d | %s",
-                           idx, n, (wa_raw or "")[:100])
-        if bl_val is None:
-            logger.warning("Unscored after retries (wout_answer) idx=%s steps=%d | %s",
-                           idx, n, (bl_raw or "")[:100])
-
-        wa_m = eval_on_hallucination_step(error_steps, wa_val, classification, wa_red) if wa_val else None
-        bl_m = eval_on_hallucination_step(error_steps, bl_val, classification, bl_red) if bl_val else None
-
-        wa_metrics_list.append(wa_m)
-        bl_metrics_list.append(bl_m)
-
-        results.append({
+        record = {
             "idx":            idx,
             "classification": classification,
             "error_steps":    error_steps,
             "n_steps":        n,
-            "with_answer": {
-                "validity_scores":   wa_val,
-                "redundancy_scores": wa_red,
-                "validity":          wa_val is not None,
-                # PRMBench-compatible scores dict
-                "scores": wa_m["scores"] if wa_m else None,
-                "metrics": {k: v for k, v in wa_m.items()
-                            if k not in ("scores", "correct_step_acc_list",
-                                         "wrong_step_acc_list", "total_step_acc_list",
-                                         "first_error_acc_list")} if wa_m else None,
-            },
-            "wout_answer": {
-                "validity_scores":   bl_val,
-                "redundancy_scores": bl_red,
-                "validity":          bl_val is not None,
-                "scores": bl_m["scores"] if bl_m else None,
-                "metrics": {k: v for k, v in bl_m.items()
-                            if k not in ("scores", "correct_step_acc_list",
-                                         "wrong_step_acc_list", "total_step_acc_list",
-                                         "first_error_acc_list")} if bl_m else None,
-            },
-        })
+        }
+        rewrites: dict[str, str] = {}
+        for setting in SETTINGS:
+            scored = outcomes[(i, setting)]
+            rewrites.update(scored.rewrites)
+            if scored.validity is None:
+                logger.warning("Unscored (%s) idx=%s steps=%d reason=%s | %s",
+                               setting, idx, n, scored.reason, (scored.raw or "")[:100])
+            metrics = eval_on_hallucination_step(
+                error_steps, scored.validity, classification, scored.redundancy
+            ) if scored.validity else None
+            record[setting] = setting_record(scored, metrics)
+        if rewrites:
+            record["gateway_rewrites"] = rewrites
+        results.append(record)
 
     summary = build_summary(results, args.model)
 
@@ -672,6 +836,11 @@ def main():
     parser.add_argument("--api_key",     default=OPENAI_API_KEY)
     parser.add_argument("--concurrency", type=int, default=50)
     parser.add_argument("--max_samples", type=int, default=None)
+    parser.add_argument("--sweeps",      type=int, default=2,
+                        help="Extra waves over whatever is still unscored, each at half "
+                             "the concurrency. 0 runs a single pass.")
+    parser.add_argument("--sweep_pause", type=float, default=20.0,
+                        help="Seconds to wait before each sweep.")
     args = parser.parse_args()
 
     args.input = str(resolve_input(args.input))

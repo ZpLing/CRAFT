@@ -11,7 +11,7 @@ Part1_Pilot Study/  § 4.1  Correct Answer Guidance Study (w/ Answer vs w/o Answ
     experiments/prmbench_experiment/  step-level verification — StepAcc, 1stErr, F1
     experiments/roscoe_experiment/    trace quality — Faithfulness, Informativeness, Grammar
     dataset/prmbench/                 simplicity/soundness/sensitivity.jsonl (200 each)
-    dataset/roscoe/                   roscoe_100_sampled.json (25 × cosmos/drop/esnli/gsm8k)
+    dataset/roscoe/                   cosmos/drop/esnli/gsm8k.jsonl (125 each)
     results/<model>/prmbench|roscoe/  one directory per evaluated model (local only, gitignored)
 Part2_CRAFT/                          § 3.2  The CRAFT Framework
     module1_trace_generation/         Module I   — roll out K traces, TF-IRF consensus terms

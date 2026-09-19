@@ -110,7 +110,9 @@ def run_roscoe_evaluation(
     )
 
     all_results: dict = {}
-    json_files = sorted(export_path.glob("*.json"))
+    # .jsonl is what this pipeline writes; .json is what a ParlAI roscoe_data
+    # checkout calls the same newline-delimited content.
+    json_files = sorted(list(export_path.glob("*.jsonl")) + list(export_path.glob("*.json")))
 
     if not json_files:
         logger.warning("No .json files found in %s", export_path)
@@ -166,7 +168,16 @@ def run_roscoe_evaluation(
                 contexts.append(ctx)
 
         # ── Choose score types (reference-based only when refs available) ──
-        has_refs = len(refs) == len(hypotheses)
+        # Counting is not enough: an item whose reference text is missing yields an
+        # empty chain, and the reference-based scores would then be computed against
+        # nothing and reported as if they meant something. Every chain must hold text.
+        has_refs = (len(refs) == len(hypotheses)
+                    and all(getattr(r, "chain", None) for r in refs))
+        if refs and not has_refs:
+            logger.warning("%s/%s: %d of %d reference chains are empty — scoring "
+                           "without the reference-based metrics",
+                           dataset, setting,
+                           sum(1 for r in refs if not getattr(r, "chain", None)), len(refs))
         score_types = REASONING_SCORES if has_refs else UNSUPERVISED_SCORES
 
         # ── Feed into evaluator ────────────────────────────────────────────

@@ -143,6 +143,21 @@ def load_roscoe_dataset(path: Path, dataset_name: str, n: Optional[int], seed: i
     return unified
 
 
+_GSM8K_REF_PREFIX = "IGNORE THIS. Ground truth here for reference. "
+
+
+def gsm8k_reference_answer(hypothesis: str) -> str:
+    """Pull the final answer out of GSM8K's reference solution.
+
+    ROSCOE stores that solution in `hypothesis` behind a marker, and it always ends
+    with a line reading "A: <answer>". The dataset's own `answer` field is not this:
+    it records whether the GPT-3 solution ROSCOE shipped happened to be right.
+    """
+    body = hypothesis.split(_GSM8K_REF_PREFIX)[-1].strip()
+    last = body.split("\n")[-1].strip()
+    return last[2:].strip() if last.startswith("A:") else last
+
+
 def build_roscoe_prompts(item: dict) -> tuple[str, str, str, str]:
     """Return (system_wa, prompt_wa, system_wout_answer, prompt_wout_answer) for a ROSCOE item."""
     ds       = item["dataset"]
@@ -150,6 +165,9 @@ def build_roscoe_prompts(item: dict) -> tuple[str, str, str, str]:
     hypo     = item["hypothesis"]
     answer   = item["answer"]
 
+    # What counts as "the answer" differs per dataset, because ROSCOE's schema is
+    # built for verification: `hypothesis` holds the candidate answer and `answer`
+    # only says whether it is right. Only e-SNLI's `answer` is the label itself.
     if ds == "esnli":
         sys_wa   = SYSTEM_NLI_WITH_ANSWER
         sys_bl   = SYSTEM_NLI_WOUT_ANSWER
@@ -158,13 +176,13 @@ def build_roscoe_prompts(item: dict) -> tuple[str, str, str, str]:
     elif ds == "gsm8k":
         sys_wa   = SYSTEM_MATH_WITH_ANSWER
         sys_bl   = SYSTEM_MATH_WOUT_ANSWER
-        p_wa     = _math_with_answer_prompt(premise, answer)
+        p_wa     = _math_with_answer_prompt(premise, gsm8k_reference_answer(hypo))
         p_bl     = _math_wout_answer_prompt(premise)
-    else:  # drop, cosmos
+    else:  # drop, cosmos — the question is already inside premise, hypo is the answer
         sys_wa   = SYSTEM_RC_WITH_ANSWER
         sys_bl   = SYSTEM_RC_WOUT_ANSWER
-        p_wa     = _rc_with_answer_prompt(premise, hypo, answer)
-        p_bl     = _rc_wout_answer_prompt(premise, hypo)
+        p_wa     = _rc_with_answer_prompt(premise, hypo)
+        p_bl     = _rc_wout_answer_prompt(premise)
 
     return sys_wa, p_wa, sys_bl, p_bl
 
@@ -198,30 +216,24 @@ async def call_llm(
     url     = base_url.rstrip("/") + "/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
-    # Reasoning models (o1/o3/o4) use max_completion_tokens, not max_tokens
-    _REASONING = ("o1", "o3", "o4", "o-1", "o-3", "o-4")
+    # Reasoning models (o1/o3/o4 and the GPT-5 family) bill hidden reasoning against
+    # the same budget as the visible reply, and take max_completion_tokens rather
+    # than max_tokens. At a small ceiling they spend it thinking and return an empty
+    # body with HTTP 200, which looks like a model that wrote nothing rather than a
+    # budget that ran out — so the ceiling is set where a full chain always fits.
+    _REASONING = ("o1", "o3", "o4", "o-1", "o-3", "o-4", "gpt-5", "gpt5")
     is_reasoning = any(model.lower().startswith(p) for p in _REASONING)
+    _MAX_OUTPUT_TOKENS = 16000
 
-    if is_reasoning:
-        payload = {
-            "model":                 model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user",   "content": user},
-            ],
-            "temperature":           0.5,
-            "max_completion_tokens": 1024,
-        }
-    else:
-        payload = {
-            "model":       model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user",   "content": user},
-            ],
-            "temperature": temperature,
-            "max_tokens":  1024,
-        }
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user",   "content": user},
+        ],
+        "temperature": 0.5 if is_reasoning else temperature,
+        ("max_completion_tokens" if is_reasoning else "max_tokens"): _MAX_OUTPUT_TOKENS,
+    }
 
     for attempt in range(4):
         async with semaphore:
@@ -281,9 +293,10 @@ def export_for_roscoe(results: list[dict], export_dir: str) -> None:
         {export_dir}/with_answer.json   — traces generated with ground truth label
         {export_dir}/wout_answer.json         — traces generated without label
 
-    File names use .json extension (not .jsonl) because roscoe.py checks for
-    dataset name prefix in the filename, not the extension.
-    Each line is still newline-delimited JSON.
+    Files are named {dataset}_{setting}.jsonl: the content is newline-delimited
+    JSON, and saying so keeps editors from reporting every file after the first
+    line as malformed. ROSCOE's own roscoe.py matches on the dataset-name prefix
+    and takes the extension from --suffix, so it reads these with `-s jsonl`.
     """
     out = Path(export_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -297,7 +310,7 @@ def export_for_roscoe(results: list[dict], export_dir: str) -> None:
             by_dataset.setdefault(ds, []).append(r)
 
         for ds, items in by_dataset.items():
-            path = out / f"{ds}_{setting}.json"
+            path = out / f"{ds}_{setting}.jsonl"
             with open(path, "w", encoding="utf-8") as f:
                 for r in items:
                     trace_steps = r[setting]["steps"]
@@ -309,6 +322,11 @@ def export_for_roscoe(results: list[dict], export_dir: str) -> None:
                         "hypothesis": r["hypothesis"],
                         "answer":    r["proof_label"],
                         "gpt-3":     trace_text,       # ROSCOE reads this field
+                        # ROSCOE re-splits gpt-3 into sentences; the generator's own
+                        # step boundaries are kept here so step-level analysis does
+                        # not have to guess them back. Extra keys are ignored by the
+                        # scorer, so this file is the whole record of a run.
+                        "steps":     trace_steps,
                         "dataset":   ds,
                         "setting":   setting,
                     }
@@ -397,10 +415,12 @@ async def run_roscoe(args: argparse.Namespace) -> None:
             items = load_roscoe_dataset(path, name, args.samples_per_dataset, seed=args.seed)
             all_items.extend(items)
 
-        # Save sampled items for reproducibility
-        sampled_out = Path(args.sampled_output) if args.sampled_output \
-                      else Path(args.output).parent / "roscoe_sampled.json"
-        sampled_out.parent.mkdir(parents=True, exist_ok=True)
+        # The sample is already fixed on disk in dataset/roscoe/, so a snapshot of it
+        # beside every run's output would only duplicate it. One is written when a
+        # caller asks for it by name — e.g. when sampling fresh from a ParlAI checkout.
+        sampled_out = Path(args.sampled_output) if args.sampled_output else None
+        if sampled_out is not None:
+            sampled_out.parent.mkdir(parents=True, exist_ok=True)
         raw_save = []
         for item in all_items:
             entry = {
@@ -412,10 +432,11 @@ async def run_roscoe(args: argparse.Namespace) -> None:
                 for i, exp in enumerate(item.get("reference_explanations", []), 1):
                     entry[f"explanation_{i}"] = exp
             raw_save.append(entry)
-        with open(sampled_out, "w", encoding="utf-8") as f:
-            json.dump(raw_save, f, indent=2, ensure_ascii=False)
-        logger.info("Saved %d sampled items → %s (reuse with --sampled_input %s)",
-                    len(all_items), sampled_out, sampled_out)
+        if sampled_out is not None:
+            with open(sampled_out, "w", encoding="utf-8") as f:
+                json.dump(raw_save, f, indent=2, ensure_ascii=False)
+            logger.info("Saved %d sampled items → %s (reuse with --sampled_input %s)",
+                        len(all_items), sampled_out, sampled_out)
 
     logger.info("Total items: %d", len(all_items))
 
@@ -461,15 +482,18 @@ async def run_roscoe(args: argparse.Namespace) -> None:
             "reference_explanations": item.get("reference_explanations", []),
         })
 
-    # Save main output
-    out_path = Path(args.output)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
+    # The per-dataset export files below hold every trace, its steps and its
+    # context, so a combined dump beside them would only be a second copy. One is
+    # written when a caller names it with --output.
+    if args.output:
+        out_path = Path(args.output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(results, f, ensure_ascii=False, indent=2)
+        logger.info("Saved %d results → %s", len(results), out_path)
 
     wa_ok = sum(1 for r in results if r["with_answer"]["steps"])
     bl_ok = sum(1 for r in results if r["wout_answer"]["steps"])
-    logger.info("Saved %d results → %s", len(results), out_path)
     logger.info("with_answer success: %d/%d", wa_ok, len(results))
     logger.info("wout_answer success:       %d/%d", bl_ok, len(results))
 
@@ -623,7 +647,7 @@ def main() -> None:
                         help="Path to pre-saved sampled JSON (skips sampling, ensures reproducibility). "
                              "Use roscoe_results/roscoe_sampled.json")
     parser.add_argument("--sampled_output", default=None,
-                        help="Where to save the sampled items JSON (default: next to --output)")
+                        help="Write the sampled items to this path; omitted, none is written")
 
     # Entailment Bank mode args
     parser.add_argument("--input", default=None,
@@ -660,7 +684,11 @@ def main() -> None:
 
     # One directory per model, mirroring the PRMBench side of the study.
     model_dir = args.model.replace("/", "-").replace(":", "-") + "/roscoe"
-    args.output = str(resolve_output(args.output or f"{model_dir}/traces.json"))
+    if args.output:
+        args.output = str(resolve_output(args.output))
+    elif not args.roscoe_mode:
+        # Entailment Bank mode has no per-dataset export; its traces file is the run.
+        args.output = str(resolve_output(f"{model_dir}/traces.json"))
     args.export_dir = str(resolve_output(args.export_dir or model_dir))
     if args.sampled_output:
         args.sampled_output = str(resolve_output(args.sampled_output))
