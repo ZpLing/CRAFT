@@ -35,10 +35,25 @@ FIGURE_DIR = REPO_ROOT / "Figure"
 # and a copy goes where the paper reads it from: section_files/4_Experiment.tex
 # includes significance_forest.pdf by bare name, which resolves against the tex root.
 LATEX_DIR  = REPO_ROOT / "paper"
-# Stats and the LaTeX table are not figures; they stay with the run outputs.
-OUT_DIR    = RESULTS_ROOT / "significance_testing"
+# A model's stats live with that model's runs — <results>/<model>/ already holds
+# everything else it produced — so there is no separate directory of aggregates to
+# keep in step with them. The LaTeX table spans all four models and is paper
+# material rather than a run output, so it follows the figure into the tex root.
 FIGURE_DIR.mkdir(parents=True, exist_ok=True)
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def model_stats_path(model_name: str) -> Path:
+    """Where one model's significance stats land, beside its prmbench/ and roscoe/."""
+    return RESULTS_ROOT / MODELS[model_name] / "significance_results.json"
+
+
+def split_by_model(stats: dict) -> dict:
+    """Turn {section: {model: rows}} into {model: {section: rows}}."""
+    per_model: dict[str, dict] = {m: {} for m in MODELS}
+    for section, by_model in stats.items():
+        for model, rows in by_model.items():
+            per_model.setdefault(model, {})[section] = rows
+    return per_model
 
 # ──────────────────────────────────────────────────────────────
 # Model config
@@ -597,11 +612,14 @@ if __name__ == "__main__":
     print("Running significance tests...\n")
     stats = run_all_tests()
 
-    # Save JSON
-    json_path = OUT_DIR / "significance_results.json"
-    with open(json_path, "w") as f:
-        json.dump(stats, f, indent=2)
-    print(f"\nSaved: {json_path}")
+    # Save one JSON per model, next to that model's runs
+    print()
+    for model, per_model in split_by_model(stats).items():
+        out = model_stats_path(model)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with open(out, "w") as f:
+            json.dump(per_model, f, indent=2)
+        print(f"Saved: {out}")
 
     # Forest plot
     plot_path = FIGURE_DIR / "significance_forest.pdf"
@@ -609,7 +627,7 @@ if __name__ == "__main__":
 
     # LaTeX table
     tex = make_latex_table(stats)
-    tex_path = OUT_DIR / "significance_table.tex"
+    tex_path = LATEX_DIR / "significance_table.tex"
     with open(tex_path, "w") as f:
         f.write(tex)
     print(f"Saved: {tex_path}")

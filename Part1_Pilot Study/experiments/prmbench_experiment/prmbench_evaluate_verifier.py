@@ -42,6 +42,7 @@ import logging
 import os
 import re
 import sys
+import time
 from pathlib import Path
 from typing import NamedTuple
 
@@ -200,11 +201,14 @@ def _rewrite_payload(payload: dict, word: str, rewrites: dict[str, str]) -> bool
 
 
 def terminal_reason(reason: str | None) -> bool:
-    """True for a refusal that re-asking cannot change — the text, not the sampling."""
+    """True for what re-asking cannot change: the text the gateway refuses, or a
+    call that has already spent its whole clock. A sweep is for a miscounted reply,
+    which is cheap to ask again; it is not for buying a second half-hour."""
     if not reason:
         return False
-    return reason.startswith("blocked_word:") or (
-        reason.startswith("http_4") and not reason.startswith("http_429"))
+    return (reason.startswith("blocked_word:")
+            or reason.startswith("out_of_time:")
+            or (reason.startswith("http_4") and not reason.startswith("http_429")))
 
 
 # ---------------------------------------------------------------------------
@@ -623,17 +627,31 @@ def step_timeout(n_steps: int) -> float:
     """How long to let one reply take, by how much of it there is to write.
 
     A flat ceiling is either generous for an 8-step solution or too tight for a
-    90-step one, and too tight is expensive: the call is cut off after the model
-    has done the work, and the attempt buys nothing. The budget therefore grows
-    with the steps being scored, since that is what sets both the reasoning and
-    the two arrays it has to emit.
+    90-step one, so the budget grows with the steps being scored — that is what
+    sets both the reasoning and the two arrays the model has to emit. It stays
+    modest on purpose: the long items that fail here do not answer slowly, they
+    do not answer at all, and a request the gateway has dropped costs its whole
+    timeout before anything can be re-asked. Failing early and asking again beats
+    waiting longer.
     """
-    return min(REQUEST_TIMEOUT + 3.0 * n_steps, 600.0)
+    return min(REQUEST_TIMEOUT + 1.5 * n_steps, 360.0)
+
+
+# How much wall clock one (item, setting) may spend before it is given up on.
+# The re-ask loop and the loop inside call_llm multiply: five re-asks of four
+# tries each, at a timeout that now grows with the steps, is hours on the one
+# item that always times out — and the whole run waits on it. Attempts are
+# still capped as before; this caps the time they may take between them.
+_TIME_BUDGET_REPLIES = 2.5
 
 
 async def call_and_score(session, semaphore, system, prompt, n_steps,
                          model, api_key, base_url, attempts=5) -> Scored:
     """Ask for one setting's scores, re-asking until they line up with the steps.
+
+    Bounded by both a count and a clock: a reply that miscounts is cheap to ask
+    again, but one that times out costs its whole budget, and without the clock a
+    single 90-step item can hold a finished run open for half an hour.
 
     PRMBench's own critics wrap the call and the parse in one retry loop for the
     same reason: a model that miscounts the steps usually gets it right when asked
@@ -644,10 +662,17 @@ async def call_and_score(session, semaphore, system, prompt, n_steps,
     is in its word list rather than in the sampling.
     """
     raw, reason, rewrites, ask = None, "no_reply", {}, prompt
+    budget = step_timeout(n_steps)
+    deadline = time.monotonic() + _TIME_BUDGET_REPLIES * budget
     for attempt in range(attempts):
+        if attempt and time.monotonic() > deadline:
+            logger.warning("Out of time after %d attempt(s) — leaving it unscored (%s)",
+                           attempt, reason)
+            reason = f"out_of_time:{reason}"
+            break
         content, err, rw = await call_llm(session, semaphore, system, ask,
                                           model, api_key, base_url,
-                                          timeout=step_timeout(n_steps))
+                                          timeout=budget)
         rewrites.update(rw)
         if err:
             reason = err
@@ -691,6 +716,8 @@ def setting_record(scored: Scored, metrics: dict | None) -> dict:
     }
     if scored.validity is None:
         side["failure"] = scored.reason
+    if scored.rewrites:
+        side["gateway_rewrites"] = scored.rewrites
     return side
 
 
@@ -767,10 +794,8 @@ async def run(args):
             "error_steps":    error_steps,
             "n_steps":        n,
         }
-        rewrites: dict[str, str] = {}
         for setting in SETTINGS:
             scored = outcomes[(i, setting)]
-            rewrites.update(scored.rewrites)
             if scored.validity is None:
                 logger.warning("Unscored (%s) idx=%s steps=%d reason=%s | %s",
                                setting, idx, n, scored.reason, (scored.raw or "")[:100])
@@ -778,8 +803,6 @@ async def run(args):
                 error_steps, scored.validity, classification, scored.redundancy
             ) if scored.validity else None
             record[setting] = setting_record(scored, metrics)
-        if rewrites:
-            record["gateway_rewrites"] = rewrites
         results.append(record)
 
     summary = build_summary(results, args.model)

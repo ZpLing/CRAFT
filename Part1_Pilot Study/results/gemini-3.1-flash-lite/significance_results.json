@@ -1,0 +1,120 @@
+{
+  "prmbench": {
+    "simplicity": {
+      "n": 200,
+      "gt_mean": 0.7371,
+      "wout_answer_mean": 0.7533,
+      "mean_diff": -0.0162,
+      "ci_lo": -0.0423,
+      "ci_hi": 0.0059,
+      "p_wilcoxon": 0.5004,
+      "cohen_d": -0.0944,
+      "sig": "ns"
+    },
+    "soundness": {
+      "n": 200,
+      "gt_mean": 0.8535,
+      "wout_answer_mean": 0.8557,
+      "mean_diff": -0.0022,
+      "ci_lo": -0.0145,
+      "ci_hi": 0.0098,
+      "p_wilcoxon": 0.5145,
+      "cohen_d": -0.0256,
+      "sig": "ns"
+    },
+    "sensitivity": {
+      "n": 200,
+      "gt_mean": 0.8636,
+      "wout_answer_mean": 0.869,
+      "mean_diff": -0.0053,
+      "ci_lo": -0.0295,
+      "ci_hi": 0.0144,
+      "p_wilcoxon": 0.5725,
+      "cohen_d": -0.0328,
+      "sig": "ns"
+    },
+    "total": {
+      "n": 600,
+      "gt_mean": 0.8181,
+      "wout_answer_mean": 0.826,
+      "mean_diff": -0.0079,
+      "ci_lo": -0.0201,
+      "ci_hi": 0.0032,
+      "p_wilcoxon": 0.3145,
+      "cohen_d": -0.0545,
+      "sig": "ns"
+    }
+  },
+  "prmbench_metrics": {
+    "total_step_acc": {
+      "n": 600,
+      "gt_mean": 0.7856,
+      "wout_answer_mean": 0.7872,
+      "mean_diff": -0.0015,
+      "ci_lo": -0.0098,
+      "ci_hi": 0.007,
+      "p_wilcoxon": 0.4336,
+      "cohen_d": -0.0143,
+      "sig": "ns"
+    },
+    "first_error_acc": {
+      "n": 529,
+      "gt_mean": 0.6465,
+      "wout_answer_mean": 0.6578,
+      "mean_diff": -0.0113,
+      "ci_lo": -0.0397,
+      "ci_hi": 0.017,
+      "p_wilcoxon": 0.4227,
+      "cohen_d": -0.0348,
+      "sig": "ns"
+    },
+    "f1": {
+      "n": 600,
+      "gt_mean": 0.8181,
+      "wout_answer_mean": 0.826,
+      "mean_diff": -0.0079,
+      "ci_lo": -0.0201,
+      "ci_hi": 0.0032,
+      "p_wilcoxon": 0.3145,
+      "cohen_d": -0.0545,
+      "sig": "ns"
+    }
+  },
+  "prmbench_dims_combined": {
+    "simplicity": {
+      "n": 600,
+      "gt_mean": 0.714,
+      "wout_answer_mean": 0.7293,
+      "mean_diff": -0.0153,
+      "ci_lo": -0.0338,
+      "ci_hi": 0.0027,
+      "p_wilcoxon": 0.1294,
+      "cohen_d": -0.0671,
+      "sig": "ns"
+    },
+    "soundness": {
+      "n": 597,
+      "gt_mean": 0.7938,
+      "wout_answer_mean": 0.7951,
+      "mean_diff": -0.0013,
+      "ci_lo": -0.0152,
+      "ci_hi": 0.0128,
+      "p_wilcoxon": 0.5412,
+      "cohen_d": -0.0074,
+      "sig": "ns"
+    },
+    "sensitivity": {
+      "n": 532,
+      "gt_mean": 0.7555,
+      "wout_answer_mean": 0.7588,
+      "mean_diff": -0.0032,
+      "ci_lo": -0.022,
+      "ci_hi": 0.0163,
+      "p_wilcoxon": 0.6512,
+      "cohen_d": -0.0144,
+      "sig": "ns"
+    }
+  },
+  "roscoe": {},
+  "roscoe_combined": {}
+}

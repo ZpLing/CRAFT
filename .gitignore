@@ -14,9 +14,6 @@ secrets.*
 /results/
 Part2_CRAFT/results/
 
-# ── Local-only tooling (not part of the released pipeline) ───────────
-Part1_Pilot Study/experiments/prmbench_experiment/retry_failed.py
-
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/
 Part2_CRAFT/eval_receval/ReCEval/
