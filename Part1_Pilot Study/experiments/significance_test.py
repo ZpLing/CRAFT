@@ -6,8 +6,8 @@ Paired Wilcoxon signed-rank tests + bootstrap 95% CI + Cohen's d
 for PRMBench and ROSCOE GT vs No-GT conditions.
 
 Outputs:
-  - significance_results.json   — all stats
-  - significance_forest.pdf     — forest plot (GT − No-GT effect sizes)
+  - significance_testing_results.json — all stats, one file per benchmark per model
+  - significance_testing_forest.pdf  — forest plot (w/ Answer − w/o Answer effect sizes)
 
 Usage:
     python significance_test.py
@@ -645,12 +645,12 @@ if __name__ == "__main__":
             print(f"No {benchmark} statistics — its runs have not been scored yet.")
 
     # Forest plot
-    plot_path = FIGURE_DIR / "significance_forest.pdf"
+    plot_path = FIGURE_DIR / "significance_testing_forest.pdf"
     make_forest_plot(stats, plot_path)
 
     # LaTeX table
     tex = make_latex_table(stats)
-    tex_path = LATEX_DIR / "significance_table.tex"
+    tex_path = LATEX_DIR / "significance_testing_table.tex"
     with open(tex_path, "w") as f:
         f.write(tex)
     print(f"Saved: {tex_path}")
