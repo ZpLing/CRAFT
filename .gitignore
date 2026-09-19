@@ -40,9 +40,10 @@ ENV/
 Thumbs.db
 
 # ── Generated figures — regenerated from results, never pushed ───────
-/Figure/
-# and plot/, which holds the scripts that draw them: they need matplotlib, which
-# the requirements deliberately leave out, and they read results/ to redraw
+# chart/ is what the scripts draw into, plot/ is the scripts themselves: they
+# need matplotlib, which the requirements deliberately leave out, and they
+# redraw from results/ on demand.
+/chart/
 /plot/
 
 # ── Paper source — kept locally, never pushed ─────────────────────────

@@ -13,8 +13,12 @@ comparison well defined. Node ids are assigned while the trace is written, so
 from that text. Scoring a generated trace against FLD's proof would compare two
 different step numberings and report the mismatch as extraction error.
 
-FLD writes a proof as
+FLD publishes a proof as a chain of derivations,
+    sent2 -> int1: <text>; int1 & sent1 -> int2: <text>; int2 -> hypothesis;
+and an older export of the same thing numbers them,
     Step1: fact8 -> int1: <text>   Step2: int1 & fact10 -> int2: <text>   ...
+Both are read here. In the published form the step number is the position in the
+chain, and `sentN` is the premise this repo's files call `FactN`.
 so an antecedent is either a fact of the problem or something an earlier step
 derived, and the second is resolved to that step rather than assumed to be the
 step of the same number. Proofs by assumption open with
@@ -55,7 +59,8 @@ _STEP_SPLIT = re.compile(r"\bStep\s*(\d+)\s*:", re.IGNORECASE)
 _BODY = re.compile(
     r"^(?P<ante>.*?)->\s*(?P<concl>hypothesis|(?:int|assump)\s*\d+)\s*:?\s*(?P<text>.*)$",
     re.IGNORECASE | re.DOTALL)
-_REF = re.compile(r"\b(fact|int|assump)\s*(\d+)\b", re.IGNORECASE)
+# `sent` is what upstream calls a premise; this repo's files call the same thing `fact`.
+_REF = re.compile(r"\b(fact|sent|int|assump)\s*(\d+)\b", re.IGNORECASE)
 # "void" is FLD's way of saying a step rests on nothing, which an assumption does.
 _VOID = re.compile(r"^\s*void\s*$", re.IGNORECASE)
 
@@ -81,7 +86,8 @@ def parse_proof(nl_solution: str) -> Optional[List[Dict[str, Any]]]:
         if not m:
             return None
         ante_text = m.group("ante")
-        antecedents = [(kind.lower(), int(idx)) for kind, idx in _REF.findall(ante_text)]
+        antecedents = [("fact" if kind.lower() == "sent" else kind.lower(), int(idx))
+                       for kind, idx in _REF.findall(ante_text)]
         if not antecedents and not _VOID.match(ante_text):
             return None
         concl = m.group("concl").lower().replace(" ", "")
@@ -98,6 +104,44 @@ def parse_proof(nl_solution: str) -> Optional[List[Dict[str, Any]]]:
     if [s["n"] for s in steps] != list(range(1, len(steps) + 1)):
         return None
     return steps
+
+
+def parse_chain(proof: str) -> Optional[List[Dict[str, Any]]]:
+    """Parse the published form, whose steps are separated by ';' and unnumbered.
+
+    The step number is the position in the chain, which is what makes `Step3` in
+    the rendered trace mean the third derivation.
+    """
+    if not proof or not proof.strip():
+        return None
+    steps: List[Dict[str, Any]] = []
+    for n, part in enumerate((p for p in proof.split(";") if p.strip()), start=1):
+        m = _BODY.match(part.strip())
+        if not m:
+            return None
+        ante_text = m.group("ante")
+        antecedents = [("fact" if kind.lower() == "sent" else kind.lower(), int(idx))
+                       for kind, idx in _REF.findall(ante_text)]
+        if not antecedents and not _VOID.match(ante_text):
+            return None
+        steps.append({
+            "n": n,
+            "antecedents": antecedents,
+            "conclusion": m.group("concl").lower().replace(" ", ""),
+            "text": " ".join(m.group("text").split()),
+        })
+    return steps or None
+
+
+def proof_of(sample: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+    """The sample's proof, from whichever form it carries."""
+    published = sample.get("proofs")
+    if published:
+        first = published[0] if isinstance(published, list) else published
+        steps = parse_chain(str(first))
+        if steps:
+            return steps
+    return parse_proof(sample.get("nl_solution") or "")
 
 
 def facts_of(sample: Dict[str, Any]) -> Dict[int, str]:
@@ -175,15 +219,19 @@ def gold_edges(steps: List[Dict[str, Any]]) -> List[Tuple[str, str]]:
 def main() -> None:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--dataset", required=True,
-                    help="An FLD file carrying nl_solution (the annotated proof)")
+    ap.add_argument("--dataset", default=None,
+                    help="An FLD file carrying `proofs` (fetch_fld_proofs.py adds it) "
+                         "or the older nl_solution. Default: the repo's FLD.json")
     ap.add_argument("--output_dir", required=True,
                     help="Where gold_traces.json and gold_edges.json are written")
     ap.add_argument("--max_samples", type=int, default=None)
     ap.add_argument("--id_prefix", default="FLD", help="Prefix for the generated sample ids")
     args = ap.parse_args()
 
-    with open(resolve_input(args.dataset), encoding="utf-8") as f:
+    dataset = (args.dataset if args.dataset
+               else Path(__file__).resolve().parents[2]
+               / "dataset" / "label_prediction" / "logical" / "FLD.json")
+    with open(resolve_input(dataset), encoding="utf-8") as f:
         raw = json.load(f)
     rows = raw.get("results", raw) if isinstance(raw, dict) else raw
 
@@ -192,11 +240,10 @@ def main() -> None:
     n_no_proof = n_unparsed = 0
 
     for idx, sample in enumerate(rows):
-        nl = sample.get("nl_solution")
-        if not nl:
+        if not sample.get("proofs") and not sample.get("nl_solution"):
             n_no_proof += 1
             continue
-        steps = parse_proof(nl)
+        steps = proof_of(sample)
         if steps is None:
             n_unparsed += 1
             continue
@@ -209,7 +256,7 @@ def main() -> None:
 
         traces.append({
             "sample_id": sample_id,
-            "source_dataset": Path(args.dataset).name,
+            "source_dataset": Path(dataset).name,
             "source_index": idx,
             "target_answer": label,
             "problem_text": sample.get("input") or sample.get("Facts") or "",
@@ -234,7 +281,7 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "gold_traces.json").write_text(json.dumps(
         {"metadata": {"model": "FLD annotation", "k": 1,
-                      "source": str(args.dataset), "n_samples": len(traces)},
+                      "source": str(dataset), "n_samples": len(traces)},
          "results": traces}, indent=2, ensure_ascii=False), encoding="utf-8")
     (out_dir / "gold_edges.json").write_text(
         json.dumps(edges_by_id, indent=2), encoding="utf-8")
@@ -246,7 +293,7 @@ def main() -> None:
           f" → {out_dir}/gold_edges.json")
     print(f"  mean {n_edges / len(traces):.1f} edges per proof" if traces else "")
     if n_no_proof or n_unparsed:
-        print(f"  skipped: {n_no_proof} without nl_solution, {n_unparsed} that did not parse")
+        print(f"  skipped: {n_no_proof} without a proof, {n_unparsed} that did not parse")
 
 
 if __name__ == "__main__":

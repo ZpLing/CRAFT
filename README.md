@@ -109,7 +109,7 @@ framework of §3.2.
 ├── Part2_CRAFT/                     § 3.2  The CRAFT framework
 │   ├── dataset/                       mirrors evaluation/ below
 │   │   ├── label_prediction/
-│   │   │   ├── logical/             FLD, FOLIO
+│   │   │   ├── logical/             FLD (with its published proofs), FOLIO
 │   │   │   └── math/                GSM8K, OlympiadBench
 │   │   └── reasoning_traces_quality/
 │   │       ├── roscoe/              CosmosQA, DROP, eSNLI, GSM8K (125 each)
