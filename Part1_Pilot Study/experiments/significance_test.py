@@ -42,17 +42,35 @@ LATEX_DIR  = REPO_ROOT / "paper"
 FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def model_stats_path(model_name: str) -> Path:
-    """Where one model's significance stats land, beside its prmbench/ and roscoe/."""
-    return RESULTS_ROOT / MODELS[model_name] / "significance_results.json"
+# Which sections of the stats belong to which benchmark. A model's results live
+# in one directory per benchmark, and its significance stats land in the same
+# place under one name, so a benchmark's evidence — the runs and the test over
+# them — is never split across directories.
+BENCHMARK_SECTIONS = {
+    "prmbench": ("prmbench", "prmbench_metrics", "prmbench_dims_combined"),
+    "roscoe":   ("roscoe", "roscoe_combined"),
+}
+STATS_FILENAME = "significance_results.json"
+
+
+def model_stats_path(model_name: str, benchmark: str) -> Path:
+    """Where one model's stats for one benchmark land, beside that benchmark's runs."""
+    return RESULTS_ROOT / MODELS[model_name] / benchmark / STATS_FILENAME
 
 
 def split_by_model(stats: dict) -> dict:
-    """Turn {section: {model: rows}} into {model: {section: rows}}."""
-    per_model: dict[str, dict] = {m: {} for m in MODELS}
-    for section, by_model in stats.items():
-        for model, rows in by_model.items():
-            per_model.setdefault(model, {})[section] = rows
+    """Turn {section: {model: rows}} into {model: {benchmark: {section: rows}}}.
+
+    A benchmark with nothing to report — ROSCOE before its traces are scored —
+    is left out rather than written as an empty file that looks like a result.
+    """
+    per_model: dict[str, dict] = {}
+    for benchmark, sections in BENCHMARK_SECTIONS.items():
+        for section in sections:
+            for model, rows in stats.get(section, {}).items():
+                if not rows:
+                    continue
+                per_model.setdefault(model, {}).setdefault(benchmark, {})[section] = rows
     return per_model
 
 # ──────────────────────────────────────────────────────────────
@@ -612,14 +630,19 @@ if __name__ == "__main__":
     print("Running significance tests...\n")
     stats = run_all_tests()
 
-    # Save one JSON per model, next to that model's runs
+    # One JSON per model per benchmark, beside that benchmark's runs
     print()
-    for model, per_model in split_by_model(stats).items():
-        out = model_stats_path(model)
-        out.parent.mkdir(parents=True, exist_ok=True)
-        with open(out, "w") as f:
-            json.dump(per_model, f, indent=2)
-        print(f"Saved: {out}")
+    written = split_by_model(stats)
+    for model, by_benchmark in written.items():
+        for benchmark, sections in by_benchmark.items():
+            out = model_stats_path(model, benchmark)
+            out.parent.mkdir(parents=True, exist_ok=True)
+            with open(out, "w") as f:
+                json.dump(sections, f, indent=2)
+            print(f"Saved: {out}")
+    for benchmark in BENCHMARK_SECTIONS:
+        if not any(benchmark in b for b in written.values()):
+            print(f"No {benchmark} statistics — its runs have not been scored yet.")
 
     # Forest plot
     plot_path = FIGURE_DIR / "significance_forest.pdf"
