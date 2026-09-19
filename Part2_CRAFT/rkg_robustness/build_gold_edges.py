@@ -49,7 +49,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 try:
     from config import resolve_input, resolve_output
 except ImportError:
@@ -232,7 +232,7 @@ def main() -> None:
     args = ap.parse_args()
 
     dataset = (args.dataset if args.dataset
-               else Path(__file__).resolve().parents[2]
+               else Path(__file__).resolve().parents[1]
                / "dataset" / "label_prediction" / "logical" / "FLD.json")
     with open(resolve_input(dataset), encoding="utf-8") as f:
         raw = json.load(f)

@@ -27,17 +27,17 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 try:
     from config import RESULTS_ROOT, resolve_input, resolve_output, run_model
 except ImportError:
-    RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results"
+    RESULTS_ROOT = Path(__file__).resolve().parents[1] / "results"
     resolve_input = resolve_output = Path
 
     def run_model(*paths):  # noqa: D103
         return "unknown-model"
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]
                        / "evaluation" / "label_prediction"))
 try:
     from evaluate_direct_accuracy import normalise_math_answer

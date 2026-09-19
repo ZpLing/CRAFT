@@ -44,7 +44,7 @@ from pathlib import Path
 from statistics import mean
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 try:
     from config import resolve_input, resolve_output
 except ImportError:

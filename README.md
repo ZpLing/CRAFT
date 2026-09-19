@@ -122,10 +122,9 @@ framework of §3.2.
 │   ├── evaluation/
 │   │   ├── label_prediction/          main-table accuracy and its Wilson CIs
 │   │   └── reasoning_traces_quality/  ReCEval/, ROSCOE/, FineLogic/ (§4)
-│   ├── detailed_analysis/             the appendix analyses
-│   │   ├── ablation_study/          the six settings of the ablation table
-│   │   ├── k_sensitivity/           accuracy and RKG size against K
-│   │   └── rkg_robustness/          does the backbone change the extracted graph
+│   ├── ablation_study/              the six settings of the ablation table
+│   ├── k_sensitivity/               accuracy and RKG size against K
+│   ├── rkg_robustness/              does the backbone change the extracted graph
 │   └── results/                     craft_runs/, alignment_comparison/, receval_eval/,
 │                                    baseline_results/<model>/  the 13 main-table baselines
 │                                    detailed_analysis/<model>/ the appendix analyses
