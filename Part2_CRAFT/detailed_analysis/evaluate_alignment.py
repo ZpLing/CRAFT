@@ -17,7 +17,7 @@ Metrics reported per mode:
 
 Usage:
   python evaluate_alignment.py \
-    --input ../../"reasoning pipeline code2"/fld_gpt54nano_k5/k_traces_10_samples.json \
+    --input craft_runs/craft_k5_full_fld_nano/k_traces.json \
     --n_samples 10 \
     --model gpt-4.1-mini \
     --threshold 0.3 \
@@ -35,9 +35,9 @@ from typing import Any, Dict, List
 
 import aiohttp
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from config import require_pinned_endpoint, resolve_input, resolve_output
-from module2_rkg_filtering.build_rkg import build_rkgs_for_sample, OPENAI_API_KEY, OPENAI_BASE_URL
+from framework.module2_rkg_construction.build_rkg import build_rkgs_for_sample, OPENAI_API_KEY, OPENAI_BASE_URL
 
 # Pinned endpoint, read from the gitignored repo-root config.py.
 # Explicit rather than via OPENAI_* so a stray env var cannot redirect these runs.
@@ -90,7 +90,7 @@ async def run_sample(
 
 
 async def main_async(args: argparse.Namespace) -> None:
-    import module2_rkg_filtering.build_rkg as _rkg
+    import framework.module2_rkg_construction.build_rkg as _rkg
     _rkg.OPENAI_API_KEY  = PINNED_KEY
     _rkg.OPENAI_BASE_URL = PINNED_URL
     _rkg.CHAT_URL        = PINNED_URL.rstrip("/") + "/chat/completions"

@@ -11,8 +11,8 @@ Prints comparison table against existing Setting E result.
 
 Usage:
   python run_alignment_comparison.py \
-    --cleaned  "../../reasoning pipeline code2/fld_gpt54nano_100/cleaned_traces_z-1.0.json" \
-    --original ../../FLD.json \
+    --cleaned  craft_runs/craft_k5_full_fld_nano/cleaned.json \
+    --original dataset/logical/FLD.json \
     --model gpt-5.4-nano \
     --n_samples 100 \
     --threshold 0.3 \
@@ -31,18 +31,18 @@ from typing import Any, Dict, List, Optional
 
 import aiohttp
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from config import require_pinned_endpoint, resolve_input, resolve_output
-import module2_rkg_filtering.build_rkg as _rkg_mod
-from module2_rkg_filtering.build_rkg import build_rkgs_for_sample
-from module3_synthesis.synthesize_trace import synthesize_traces_for_dataset
+import framework.module2_rkg_construction.build_rkg as _rkg_mod
+from framework.module2_rkg_construction.build_rkg import build_rkgs_for_sample
+from framework.module3_synthesis.synthesize_trace import synthesize_traces_for_dataset
 
 # Pinned endpoint, read from the gitignored repo-root config.py.
 # Explicit rather than via OPENAI_* so a stray env var cannot redirect these runs.
 PINNED_KEY, PINNED_URL = require_pinned_endpoint()
 
-EXISTING_SETTING_E = {"accuracy": 0.560, "macro_f1": 0.494, "label": "E: DAG (gpt54nano, old pipeline)"}
+EXISTING_SETTING_E = {"accuracy": 0.560, "macro_f1": 0.494, "label": "E: RKG (gpt54nano, old pipeline)"}
 
 
 def patch_credentials():
@@ -198,7 +198,7 @@ async def main_async(args: argparse.Namespace):
     cleaned_path = cleaned_aug
 
     # Patch synthesize_trace credentials (must match exact variable names)
-    import module3_synthesis.synthesize_trace as _synth_mod
+    import framework.module3_synthesis.synthesize_trace as _synth_mod
     _synth_mod.OPENAI_API_KEY        = PINNED_KEY
     _synth_mod.OPENAI_BASE_URL       = PINNED_URL
     _synth_mod.CHAT_COMPLETIONS_URL  = PINNED_URL.rstrip("/") + "/chat/completions"
