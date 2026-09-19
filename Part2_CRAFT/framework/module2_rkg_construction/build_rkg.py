@@ -234,8 +234,8 @@ def _apply_reasoning_budget(payload: dict, model: str) -> dict:
 
 # Every LLM request this module makes passes through one function, so counting
 # there is the number of calls actually paid for — retries included — rather than
-# the number a run was expected to need. Stages write it into their metadata, and
-# detailed_analysis/compute_cost reads it back.
+# the number a run was expected to need. Each stage writes it into its own
+# metadata as api_calls, which is where the cost of a run is read from.
 API_CALLS = {"count": 0}
 
 
