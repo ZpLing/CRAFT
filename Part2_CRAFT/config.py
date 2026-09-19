@@ -45,12 +45,15 @@ def require_bosch() -> tuple:
         )
     return BOSCH_API_KEY, BOSCH_BASE_URL
 
-# ── Output locations ─────────────────────────────────────────────────────────
-# Every artifact this part produces belongs under <repo-root>/results/Part2_CRAFT/,
-# so a rerun lands next to the existing run directories instead of scattering
-# JSON files into the code tree. Override the root with CRAFT_RESULTS_ROOT.
-REPO_ROOT    = Path(__file__).resolve().parents[1]
-RESULTS_ROOT = Path(os.getenv("CRAFT_RESULTS_ROOT", REPO_ROOT / "results")) / "Part2_CRAFT"
+# ── Part-local locations ─────────────────────────────────────────────────────
+# This part is self-contained: its datasets live in Part2_CRAFT/dataset/ and every
+# artifact it produces lands in Part2_CRAFT/results/, so a rerun sits next to the
+# existing run directories instead of scattering JSON files into the code tree.
+# Override the results root with CRAFT_RESULTS_ROOT.
+PART_ROOT    = Path(__file__).resolve().parent
+REPO_ROOT    = PART_ROOT.parent
+DATASET_ROOT = PART_ROOT / "dataset"
+RESULTS_ROOT = Path(os.getenv("CRAFT_RESULTS_ROOT", PART_ROOT / "results"))
 
 
 def resolve_output(path) -> Path:
@@ -68,7 +71,7 @@ def resolve_output(path) -> Path:
 def resolve_input(path) -> Path:
     """Locate a relative --input, preferring the CWD and falling back to RESULTS_ROOT.
 
-    Keeps paths like ../dataset/FLD.json working while letting a stage read the
+    Keeps paths like dataset/FLD.json working while letting a stage read the
     previous stage's output by bare name.
     """
     p = Path(path)

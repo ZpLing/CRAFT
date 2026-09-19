@@ -8,26 +8,28 @@ Chain-of-Thought Synthesis*. The layout mirrors the paper: Part 1 is the empiric
 
 ```
 Part1_Pilot Study/  § 4.1  Correct Answer Guidance Study (w/ Answer vs w/o Answer)
-    prmbench/                         step-level verification — StepAcc, 1stErr, F1
-    roscoe/                           trace quality — Faithfulness, Informativeness, Grammar
+    experiments/prmbench_experiment/  step-level verification — StepAcc, 1stErr, F1
+    experiments/roscoe_experiment/    trace quality — Faithfulness, Informativeness, Grammar
+    dataset/prmbench/                 simplicity/soundness/sensitivity.jsonl (200 each)
+    dataset/roscoe/                   roscoe_100_sampled.json (25 × cosmos/drop/esnli/gsm8k)
+    results/                          prmbench/, roscoe/, significance/ (local only, gitignored)
 Part2_CRAFT/                          § 3.2  The CRAFT Framework
     module1_trace_generation/         Module I   — roll out K traces, TF-IRF consensus terms
     module2_rkg_filtering/            Module II  — z-score step filtering, consensus RKG G*
     module3_synthesis/                Module III — topology-guided trace synthesis over G*
-dataset/                              FLD, FOLIO, GSM8K, OlympiadBench
-                                      + PRMBench_150_stratified.jsonl (Part 1 input)
-results/                              experiment outputs (local only, gitignored)
-    Part1_Pilot Study/   prmbench/results/, roscoe/
-    Part2_CRAFT/                           craft_runs/, alignment_comparison/
+    eval_receval/                     ReCEval scoring of CRAFT traces (§4)
+    dataset/                          FLD, FOLIO, GSM8K, OlympiadBench
+    results/                          craft_runs/, alignment_comparison/, receval_eval/ (local only, gitignored)
 config.py                             API credentials (local only, gitignored)
 ```
 
-Every script resolves a **relative** `--output` / `--export_dir` under
-`results/<part>/`, so reruns land beside the existing runs no matter which directory
-you launch from. A relative `--input` prefers the working directory and falls back to
-the same results root, which is what lets one stage read the previous stage's output by
-bare name. Absolute paths always pass through untouched, and `CRAFT_RESULTS_ROOT`
-overrides the `results/` location.
+Each part is self-contained: its inputs live in `<part>/dataset/` and every artifact it
+produces lands in `<part>/results/`. A script resolves a **relative** `--output` /
+`--export_dir` under its own part's results root, so reruns land beside the existing runs
+no matter which directory you launch from. A relative `--input` prefers the working
+directory and falls back to the same results root, which is what lets one stage read the
+previous stage's output by bare name. Absolute paths always pass through untouched, and
+`CRAFT_RESULTS_ROOT` overrides one part's results location.
 
 ## Part 1 — Empirical study (§4.1)
 
@@ -36,45 +38,59 @@ Both benchmarks are evaluated in a single pass under two settings, `w/ Answer` a
 ```bash
 P1="Part1_Pilot Study"
 
-# → results/$P1/prmbench/results/
-python "$P1"/prmbench/prmbench_evaluate_verifier.py --input dataset/PRMBench_150_stratified.jsonl --model <model>
-python "$P1"/prmbench/prmbench_results_summary.py   --add --model <model> --summary_file <run.summary.json>
+# → $P1/results/prmbench/results/
+python "$P1"/experiments/prmbench_experiment/prmbench_evaluate_verifier.py --input "$P1"/dataset/prmbench/<dimension>.jsonl --model <model>
+python "$P1"/experiments/prmbench_experiment/prmbench_results_summary.py   --add --model <model> --summary_file <run.summary.json>
 
-# → results/$P1/roscoe/
-python "$P1"/roscoe/receval_generate_traces.py --model <model> --concurrency 10 \
+# → $P1/results/roscoe/
+python "$P1"/experiments/roscoe_experiment/receval_generate_traces.py --model <model> --concurrency 10 \
     --output roscoe/<model>_traces.json --export_dir roscoe/roscoe_results
-python "$P1"/roscoe/receval_evaluate_traces.py --input roscoe/<model>_traces.json \
-    --output roscoe/receval_scores/<model>.json
 ```
 
-`dataset/PRMBench_150_stratified.jsonl` is the exact input behind every reported PRMBench
-number — 50 items per difficulty dimension, sampled from PRMBench's `prmbench_preview.jsonl`.
-Drawing a different sample needs the upstream repo (`ssmisya/PRMBench`); reproducing the
-reported runs does not.
+`dataset/prmbench/{simplicity,soundness,sensitivity}.jsonl` hold 200 items each, sampled with
+seed 42 from PRMBench's 6,216-item `prmbench_preview.jsonl` and split by PRMBench's own
+taxonomy: Simplicity = redundency + circular, Soundness = counterfactual + step_contradiction
++ domain_inconsistency + confidence, Sensitivity = missing_condition + deception +
+multi_solutions. Within a dimension the categories are balanced (Sensitivity 67/67/66, the
+rest even). `prmbench_evaluate_verifier.py` groups by the same map, so an item's `_dim`
+and the reported dimension always agree.
 
-Neither scorer is vendored here:
+The three files supersede the earlier 150-item sample that produced the currently reported
+numbers: all 150 of its items are contained in them, so reruns stay comparable. Drawing a
+different sample needs the upstream `prmbench_preview.jsonl` (`ssmisya/PRMBench`, 6,216 items);
+reproducing the reported runs does not.
 
-- `receval_evaluate_traces.py` expects ReCEval at `Part1_Pilot Study/roscoe/ReCEval/`.
-- ROSCOE scoring needs a ParlAI checkout passed via `--roscoe_parlai_dir`, plus its corpora
-  (`bash projects/roscoe/roscoe_data/download_annotated.sh`). Apply
-  `Part1_Pilot Study/roscoe/parlai_simcse_optional.patch` to it first —
-  upstream `score.py` hard-fails on a missing `simcse`, which the default
-  `all-mpnet-base-v2` scorer never uses. The patch changes no scoring math.
+ROSCOE's scorer is not vendored here: it needs a ParlAI checkout passed via
+`--roscoe_parlai_dir`, plus its corpora (`bash projects/roscoe/roscoe_data/download_annotated.sh`).
+Apply `Part1_Pilot Study/experiments/roscoe_experiment/parlai_simcse_optional.patch` to it first — upstream
+`score.py` hard-fails on a missing `simcse`, which the default `all-mpnet-base-v2` scorer never
+uses. The patch changes no scoring math.
+
+`receval_generate_traces.py` keeps its historical name: despite the prefix it is the
+pilot study's trace generator (w/ Answer + w/o Answer), and ReCEval scoring lives in Part 2.
 
 ## Part 2 — CRAFT (§3.2)
 
 Modules run in order; each writes a JSON file that the next one reads. Naming the run
 directory in every path keeps one experiment together under
-`results/Part2_CRAFT/craft_runs/<run>/`.
+`Part2_CRAFT/results/craft_runs/<run>/`.
 
 ```bash
 cd Part2_CRAFT
 RUN=craft_runs/fld_o4mini_100
-python module1_trace_generation/generate_traces.py   --datasets ../dataset/FLD.json --k 5 --output $RUN/k_traces.json
+python module1_trace_generation/generate_traces.py   --datasets dataset/FLD.json --k 5 --output $RUN/k_traces.json
 python module1_trace_generation/extract_terms.py     --input $RUN/k_traces.json     --output $RUN/terms.json
 python module2_rkg_filtering/anomaly_filter.py       --input $RUN/k_traces.json     --output $RUN/cleaned.json
 python module2_rkg_filtering/build_rkg.py            --input $RUN/cleaned.json      --output $RUN/rkg.json
 python module3_synthesis/synthesize_trace.py         --input $RUN/cleaned.json --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
+```
+
+Trace quality is then scored with ReCEval (§4), which expects the upstream repo vendored at
+`Part2_CRAFT/eval_receval/ReCEval/` (cloned separately, gitignored):
+
+```bash
+python eval_receval/receval_evaluate_traces.py --input $RUN/synthesized.json \
+    --output receval_eval/receval_scores/<run>.json
 ```
 
 Hyperparameters fixed across all experiments (§4.6): `K=5`, TF-IRF threshold `β=0.3`,

@@ -36,11 +36,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
     from config import RESULTS_ROOT
 except ImportError:
-    RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results" / "Part1_Pilot Study"
+    RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results"
 
 RESULTS_DIR  = RESULTS_ROOT / "prmbench" / "results"
 MASTER_FILE  = RESULTS_DIR / "prmbench_master_results.json"
@@ -58,9 +58,9 @@ METRICS = [
 ]
 
 DIM_INFO = {
-    "simplicity":  "redundency",
-    "soundness":   "step_contradiction / domain_inconsistency / counterfactual",
-    "sensitivity": "circular / confidence / deception / missing_condition",
+    "simplicity":  "redundency / circular",
+    "soundness":   "counterfactual / step_contradiction / domain_inconsistency / confidence",
+    "sensitivity": "missing_condition / deception / multi_solutions",
     "total":       "all 3 dimensions",
 }
 

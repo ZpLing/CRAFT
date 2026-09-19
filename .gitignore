@@ -9,11 +9,14 @@ secrets.*
 *.log
 
 # ── Experiment data — kept locally, never pushed ──────────────────────
+# Each part now keeps its own results next to its code.
 /results/
+Part1_Pilot Study/results/
+Part2_CRAFT/results/
 
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/
-Part1_Correct_Answer_Guidance_Study/roscoe/ReCEval/
+Part2_CRAFT/eval_receval/ReCEval/
 
 # ── Python cache ─────────────────────────────────────────────────────
 __pycache__/

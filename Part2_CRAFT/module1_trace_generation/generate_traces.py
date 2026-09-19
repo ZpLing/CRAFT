@@ -82,7 +82,7 @@ REASONING_VISIBLE_TOKENS: int   = int(os.getenv("REASONING_VISIBLE_TOKENS", "409
 
 # Relative — resolved under the results root by _cfg.resolve_output()
 DEFAULT_OUTPUT_PATH = Path("generated_k_traces_reasoning.json")
-DEFAULT_DATASET_PATH = _cfg.REPO_ROOT / "dataset" / "FLD.json"
+DEFAULT_DATASET_PATH = _cfg.DATASET_ROOT / "FLD.json"
 
 HEADERS = {
     "Authorization": f"Bearer {OPENAI_API_KEY or ''}",

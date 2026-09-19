@@ -49,7 +49,7 @@ import aiohttp
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
     from config import (OPENAI_API_KEY, OPENAI_BASE_URL, DEFAULT_MODEL, REQUEST_TIMEOUT,
                         resolve_input, resolve_output)
@@ -489,12 +489,18 @@ async def run(args):
         })
 
     # ---------------------------------------------------------------------------
-    # Difficulty dimension mapping (PRMBench paper taxonomy)
+    # Difficulty dimension mapping — PRMBench's own taxonomy (prmbench.github.io):
+    # Simplicity = Non-Redundancy + Non-Circular Logic; Soundness = Empirical
+    # Soundness + Step Consistency + Domain Consistency + Confidence Invariance;
+    # Sensitivity = Prerequisite Sensitivity + Deception Resistance +
+    # Multi-Solution Consistency. An item's `_dim` in the sampled dataset agrees
+    # with this map, so grouping here and stratification there cannot drift apart.
     # ---------------------------------------------------------------------------
     DIFFICULTY_DIMS = {
-        "simplicity":  {"redundency"},
-        "soundness":   {"step_contradiction", "domain_inconsistency", "counterfactual"},
-        "sensitivity": {"circular", "confidence", "deception", "missing_condition"},
+        "simplicity":  {"redundency", "circular"},
+        "soundness":   {"counterfactual", "step_contradiction",
+                        "domain_inconsistency", "confidence"},
+        "sensitivity": {"missing_condition", "deception", "multi_solutions"},
     }
 
     def get_dim(classification: str) -> str:

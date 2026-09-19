@@ -67,7 +67,7 @@ import aiohttp
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
     from config import (OPENAI_API_KEY, OPENAI_BASE_URL, DEFAULT_MODEL, REQUEST_TIMEOUT,
                         resolve_input, resolve_output)
