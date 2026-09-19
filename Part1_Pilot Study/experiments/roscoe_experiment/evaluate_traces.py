@@ -1,5 +1,5 @@
 """
-roscoe_score.py — Score exported traces with ROSCOE, and report the comparison.
+evaluate_traces.py — Score exported traces with ROSCOE, and report the comparison.
 
 Imports ROSCOE's Evaluator out of a ParlAI checkout directly rather than shelling
 out to its CLI, and runs it in sentence_transformer mode, so the checkout needs no
@@ -374,9 +374,9 @@ def print_roscoe_results(all_results: dict) -> None:
         for s in settings:
             print(f"  {s:>14}", end="")
         if len(settings) == 2:
-            print(f"  {'Δ(A-B)':>10}", end="")
+            print(f"  {'Δ(with−wout)':>14}", end="")
         print()
-        print("  " + "─" * (35 + len(settings) * 16 + 12))
+        print("  " + "─" * (35 + len(settings) * 16 + 16))
 
         for metric in all_metrics:
             vals = []
@@ -391,7 +391,7 @@ def print_roscoe_results(all_results: dict) -> None:
             if len(vals) == 2 and vals[0] is not None and vals[1] is not None:
                 delta = vals[0] - vals[1]
                 sign  = "+" if delta > 0 else ""
-                print(f"  {sign+f'{delta:.4f}':>10}", end="")
+                print(f"  {sign+f'{delta:.4f}':>14}", end="")
             print()
 
 

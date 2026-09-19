@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 """
-prmbench_results_summary.py
-----------------------------
+results_summary.py
+------------------
 Aggregates PRMBench evaluation results across multiple models into a single
 comparison table.
 
 Each entry in the registry corresponds to one run:
   - model:    model name used
   - api:      which API endpoint was used
-  - n_per_dim: samples per dimension (simplicity / soundness / sensitivity)
+  - n_per_dimension: samples per dimension (simplicity / soundness / sensitivity)
   - file:     a run's results, named by dimension (both settings are read)
 
 Usage:
     # Show current summary table
-    python prmbench_results_summary.py
+    python results_summary.py
 
     # Register a new run and append to the master JSON
-    python prmbench_results_summary.py --add \
+    python results_summary.py --add \
         --model gpt-4.1-mini \
         --api api_a \
-        --n_per_dim N \
+        --n_per_dimension N \
         --results_base <dimension>
 
 Output files:
@@ -46,7 +46,7 @@ except ImportError:
 # all of them, so it sits at the results root rather than inside any one model.
 MASTER_FILE  = RESULTS_ROOT / "prmbench_master_results.json"
 
-DIMS    = ["simplicity", "soundness", "sensitivity", "total"]
+DIMENSIONS    = ["simplicity", "soundness", "sensitivity", "total"]
 METRICS = [
     ("total_step_acc",   "Total Step Acc"),
     ("correct_step_acc", "Correct Step Acc"),
@@ -58,7 +58,7 @@ METRICS = [
     ("negative_f1",      "Negative F1"),
 ]
 
-DIM_INFO = {
+DIMENSION_INFO = {
     "simplicity":  "redundency / circular",
     "soundness":   "counterfactual / step_contradiction / domain_inconsistency / confidence",
     "sensitivity": "missing_condition / deception / multi_solutions",
@@ -88,7 +88,7 @@ def save_master(records: List[Dict]) -> None:
 # Add a new run
 # ---------------------------------------------------------------------------
 
-def summarize_run(model: str, dim_files_base: Path) -> Dict[str, Any]:
+def summarize_run(model: str, dimension_files_base: Path) -> Dict[str, Any]:
     """Recompute a run's summary from its two per-setting results files.
 
     The verifier writes only per-item scores; everything an aggregate says is
@@ -98,33 +98,34 @@ def summarize_run(model: str, dim_files_base: Path) -> Dict[str, Any]:
     import importlib.util
 
     spec = importlib.util.spec_from_file_location(
-        "prmbench_verifier", Path(__file__).resolve().parent / "prmbench_evaluate_verifier.py")
+        "evaluate_verifier", Path(__file__).resolve().parent / "evaluate_verifier.py")
     V = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(V)
 
     sides = {}
     for setting in ("with_answer", "wout_answer"):
-        path = dim_files_base.with_name(f"{dim_files_base.name}_{setting}.jsonl")
+        path = dimension_files_base.with_name(f"{dimension_files_base.name}_{setting}.jsonl")
         if not path.exists():
             raise FileNotFoundError(f"Missing results file: {path}")
         with path.open() as f:
             sides[setting] = {json.loads(l)["idx"]: json.loads(l) for l in f if l.strip()}
 
     records = []
-    for idx, wa in sides["with_answer"].items():
-        bl = sides["wout_answer"].get(idx)
-        if bl is None:
+    for idx, with_rec in sides["with_answer"].items():
+        wout_rec = sides["wout_answer"].get(idx)
+        if wout_rec is None:
             continue
-        records.append({"idx": idx, "classification": wa["classification"],
-                        "error_steps": wa["error_steps"], "n_steps": wa["n_steps"],
-                        "with_answer": wa, "wout_answer": bl})
+        records.append({"idx": idx, "classification": with_rec["classification"],
+                        "error_steps": with_rec["error_steps"],
+                        "n_steps": with_rec["n_steps"],
+                        "with_answer": with_rec, "wout_answer": wout_rec})
     return V.build_summary(records, model)
 
 
 def add_run(
     model: str,
     api: str,
-    n_per_dim: int,
+    n_per_dimension: int,
     results_base: str,
     note: str = "",
 ) -> None:
@@ -136,27 +137,27 @@ def add_run(
     record: Dict[str, Any] = {
         "model":      model,
         "api":        api,
-        "n_per_dim":  n_per_dim,
+        "n_per_dimension":  n_per_dimension,
         "timestamp":  datetime.now().strftime("%Y-%m-%d %H:%M"),
         "note":       note,
-        "dims":       {},
+        "dimensions":       {},
     }
 
-    for dim in DIMS:
-        d = summary.get(dim, {})
+    for dimension in DIMENSIONS:
+        d = summary.get(dimension, {})
         n   = d.get("n_items", 0)
-        wa  = d.get("with_answer", {})
-        bl  = d.get("wout_answer", {})
-        record["dims"][dim] = {
+        with_m = d.get("with_answer", {})
+        wout_m = d.get("wout_answer", {})
+        record["dimensions"][dimension] = {
             "n_items":      n,
-            "with_answer":  {k: wa.get(k) for k, _ in METRICS},
-            "wout_answer":        {k: bl.get(k) for k, _ in METRICS},
+            "with_answer": {k: with_m.get(k) for k, _ in METRICS},
+            "wout_answer": {k: wout_m.get(k) for k, _ in METRICS},
         }
 
     records = load_master()
     records.append(record)
     save_master(records)
-    print(f"Added: {model} ({api}) — {n_per_dim} samples/dim  [{record['timestamp']}]")
+    print(f"Added: {model} ({api}) — {n_per_dimension} samples/dimension  [{record['timestamp']}]")
 
 
 # ---------------------------------------------------------------------------
@@ -174,40 +175,39 @@ def print_table(records: List[Dict]) -> None:
         print("No results registered yet.")
         return
 
-    for dim in DIMS:
+    for dimension in DIMENSIONS:
         print()
         print("=" * 90)
-        print(f"  DIMENSION: {dim.upper()}  ({DIM_INFO.get(dim, '')})")
+        print(f"  DIMENSION: {dimension.upper()}  ({DIMENSION_INFO.get(dimension, '')})")
         print("=" * 90)
 
-        # Header: each model gets two columns (A / B)
+        # Header: each model spans two columns, one per setting
         model_labels = [f"{r['model']} ({r['api']})" for r in records]
         col_w = 14
         header = f"  {'Metric':<22}"
         for label in model_labels:
-            short = label[:12]
-            header += f"  {'A:'+short:>{col_w}}  {'B:'+short:>{col_w}}"
+            header += f"  {label[: col_w * 2]:^{col_w * 2 + 2}}"
         print(header)
 
         subhdr = f"  {'':22}"
         for r in records:
-            subhdr += f"  {'w/ answer':>{col_w}}  {'wout_answer':>{col_w}}"
+            subhdr += f"  {'with_answer':>{col_w}}  {'wout_answer':>{col_w}}"
         print(subhdr)
         print("  " + "-" * (22 + len(records) * (col_w * 2 + 4)))
 
         for key, label in METRICS:
             row = f"  {label:<22}"
             for r in records:
-                d  = r["dims"].get(dim, {})
-                wa = d.get("with_answer", {}).get(key)
-                bl = d.get("wout_answer", {}).get(key)
-                row += f"  {_fmt(wa):>{col_w}}  {_fmt(bl):>{col_w}}"
+                d  = r["dimensions"].get(dimension, {})
+                v_with = d.get("with_answer", {}).get(key)
+                v_wout = d.get("wout_answer", {}).get(key)
+                row += f"  {_fmt(v_with):>{col_w}}  {_fmt(v_wout):>{col_w}}"
             print(row)
 
         # n_items row
         n_row = f"  {'n_items':<22}"
         for r in records:
-            n = r["dims"].get(dim, {}).get("n_items", 0)
+            n = r["dimensions"].get(dimension, {}).get("n_items", 0)
             n_row += f"  {str(n):>{col_w}}  {'—':>{col_w}}"
         print(n_row)
 
@@ -219,7 +219,7 @@ def print_table(records: List[Dict]) -> None:
     for i, r in enumerate(records, 1):
         note = f"  [{r['note']}]" if r.get("note") else ""
         print(f"  [{i}] {r['model']:<20} api={r['api']:<12} "
-              f"n_per_dim={r['n_per_dim']}  {r['timestamp']}{note}")
+              f"n_per_dimension={r['n_per_dimension']}  {r['timestamp']}{note}")
 
 
 # ---------------------------------------------------------------------------
@@ -232,7 +232,7 @@ def main() -> None:
                         help="Register a new run into the master results")
     parser.add_argument("--model",        default=None)
     parser.add_argument("--api",          default=None, help="API used (anonymized label)")
-    parser.add_argument("--n_per_dim",    type=int, default=None)
+    parser.add_argument("--n_per_dimension",    type=int, default=None)
     parser.add_argument("--results_base", default=None,
                         help="A run's results named by dimension without the setting "
                              "suffix, e.g. simplicity (relative → <model>/prmbench/)")
@@ -245,7 +245,7 @@ def main() -> None:
         add_run(
             model        = args.model,
             api          = args.api or "unknown",
-            n_per_dim    = args.n_per_dim,
+            n_per_dimension    = args.n_per_dimension,
             results_base = args.results_base,
             note         = args.note,
         )

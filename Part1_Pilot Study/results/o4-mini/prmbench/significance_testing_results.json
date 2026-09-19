@@ -2,7 +2,7 @@
   "prmbench": {
     "simplicity": {
       "n": 200,
-      "gt_mean": 0.7545,
+      "with_answer_mean": 0.7545,
       "wout_answer_mean": 0.7778,
       "mean_diff": -0.0234,
       "ci_lo": -0.0517,
@@ -13,7 +13,7 @@
     },
     "soundness": {
       "n": 200,
-      "gt_mean": 0.8814,
+      "with_answer_mean": 0.8814,
       "wout_answer_mean": 0.8777,
       "mean_diff": 0.0038,
       "ci_lo": -0.006,
@@ -24,7 +24,7 @@
     },
     "sensitivity": {
       "n": 199,
-      "gt_mean": 0.8855,
+      "with_answer_mean": 0.8855,
       "wout_answer_mean": 0.8828,
       "mean_diff": 0.0028,
       "ci_lo": -0.0092,
@@ -35,7 +35,7 @@
     },
     "total": {
       "n": 599,
-      "gt_mean": 0.8404,
+      "with_answer_mean": 0.8404,
       "wout_answer_mean": 0.846,
       "mean_diff": -0.0056,
       "ci_lo": -0.0163,
@@ -48,7 +48,7 @@
   "prmbench_metrics": {
     "total_step_acc": {
       "n": 599,
-      "gt_mean": 0.7958,
+      "with_answer_mean": 0.7958,
       "wout_answer_mean": 0.8008,
       "mean_diff": -0.0049,
       "ci_lo": -0.0127,
@@ -59,7 +59,7 @@
     },
     "first_error_acc": {
       "n": 528,
-      "gt_mean": 0.6742,
+      "with_answer_mean": 0.6742,
       "wout_answer_mean": 0.6723,
       "mean_diff": 0.0019,
       "ci_lo": -0.0246,
@@ -70,7 +70,7 @@
     },
     "f1": {
       "n": 599,
-      "gt_mean": 0.8404,
+      "with_answer_mean": 0.8404,
       "wout_answer_mean": 0.846,
       "mean_diff": -0.0056,
       "ci_lo": -0.0163,
@@ -80,10 +80,10 @@
       "sig": "ns"
     }
   },
-  "prmbench_dims_combined": {
+  "prmbench_dimensions_combined": {
     "simplicity": {
       "n": 600,
-      "gt_mean": 0.7029,
+      "with_answer_mean": 0.7029,
       "wout_answer_mean": 0.7098,
       "mean_diff": -0.0069,
       "ci_lo": -0.0269,
@@ -94,7 +94,7 @@
     },
     "soundness": {
       "n": 597,
-      "gt_mean": 0.8224,
+      "with_answer_mean": 0.8224,
       "wout_answer_mean": 0.8283,
       "mean_diff": -0.0059,
       "ci_lo": -0.0191,
@@ -105,7 +105,7 @@
     },
     "sensitivity": {
       "n": 529,
-      "gt_mean": 0.8004,
+      "with_answer_mean": 0.8004,
       "wout_answer_mean": 0.796,
       "mean_diff": 0.0044,
       "ci_lo": -0.0091,

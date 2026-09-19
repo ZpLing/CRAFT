@@ -93,7 +93,7 @@ from prompts import (
     _nli_with_answer_prompt, _nli_wout_answer_prompt,
     _math_with_answer_prompt, _math_wout_answer_prompt,
 )
-from roscoe_score import run_roscoe_evaluation, print_roscoe_results
+from evaluate_traces import run_roscoe_evaluation, print_roscoe_results
 
 
 # ---------------------------------------------------------------------------
@@ -159,7 +159,7 @@ def gsm8k_reference_answer(hypothesis: str) -> str:
 
 
 def build_roscoe_prompts(item: dict) -> tuple[str, str, str, str]:
-    """Return (system_wa, prompt_wa, system_wout_answer, prompt_wout_answer) for a ROSCOE item."""
+    """Return (system_with, prompt_with, system_wout, prompt_wout) for a ROSCOE item."""
     ds       = item["dataset"]
     premise  = item["premise"]
     hypo     = item["hypothesis"]
@@ -169,22 +169,22 @@ def build_roscoe_prompts(item: dict) -> tuple[str, str, str, str]:
     # built for verification: `hypothesis` holds the candidate answer and `answer`
     # only says whether it is right. Only e-SNLI's `answer` is the label itself.
     if ds == "esnli":
-        sys_wa   = SYSTEM_NLI_WITH_ANSWER
-        sys_bl   = SYSTEM_NLI_WOUT_ANSWER
-        p_wa     = _nli_with_answer_prompt(premise, hypo, answer)
-        p_bl     = _nli_wout_answer_prompt(premise, hypo)
+        system_with = SYSTEM_NLI_WITH_ANSWER
+        system_wout = SYSTEM_NLI_WOUT_ANSWER
+        prompt_with = _nli_with_answer_prompt(premise, hypo, answer)
+        prompt_wout = _nli_wout_answer_prompt(premise, hypo)
     elif ds == "gsm8k":
-        sys_wa   = SYSTEM_MATH_WITH_ANSWER
-        sys_bl   = SYSTEM_MATH_WOUT_ANSWER
-        p_wa     = _math_with_answer_prompt(premise, gsm8k_reference_answer(hypo))
-        p_bl     = _math_wout_answer_prompt(premise)
+        system_with = SYSTEM_MATH_WITH_ANSWER
+        system_wout = SYSTEM_MATH_WOUT_ANSWER
+        prompt_with = _math_with_answer_prompt(premise, gsm8k_reference_answer(hypo))
+        prompt_wout = _math_wout_answer_prompt(premise)
     else:  # drop, cosmos — the question is already inside premise, hypo is the answer
-        sys_wa   = SYSTEM_RC_WITH_ANSWER
-        sys_bl   = SYSTEM_RC_WOUT_ANSWER
-        p_wa     = _rc_with_answer_prompt(premise, hypo)
-        p_bl     = _rc_wout_answer_prompt(premise)
+        system_with = SYSTEM_RC_WITH_ANSWER
+        system_wout = SYSTEM_RC_WOUT_ANSWER
+        prompt_with = _rc_with_answer_prompt(premise, hypo)
+        prompt_wout = _rc_wout_answer_prompt(premise)
 
-    return sys_wa, p_wa, sys_bl, p_bl
+    return system_with, prompt_with, system_wout, prompt_wout
 
 
 # ---------------------------------------------------------------------------
@@ -444,26 +444,26 @@ async def run_roscoe(args: argparse.Namespace) -> None:
     semaphore = asyncio.Semaphore(args.concurrency)
 
     async with aiohttp.ClientSession() as session:
-        wa_tasks, bl_tasks = [], []
+        with_tasks, wout_tasks = [], []
         for item in all_items:
-            sys_wa, p_wa, sys_bl, p_bl = build_roscoe_prompts(item)
-            wa_tasks.append(call_llm(session, semaphore, sys_wa, p_wa,
+            system_with, prompt_with, system_wout, prompt_wout = build_roscoe_prompts(item)
+            with_tasks.append(call_llm(session, semaphore, system_with, prompt_with,
                                      args.model, args.temperature,
                                      args.api_key, args.base_url))
-            bl_tasks.append(call_llm(session, semaphore, sys_bl, p_bl,
+            wout_tasks.append(call_llm(session, semaphore, system_wout, prompt_wout,
                                      args.model, args.temperature,
                                      args.api_key, args.base_url))
 
         logger.info("Generating %d with_answer + %d wout_answer traces...",
-                    len(wa_tasks), len(bl_tasks))
-        wa_outputs, bl_outputs = await asyncio.gather(
-            asyncio.gather(*wa_tasks),
-            asyncio.gather(*bl_tasks),
+                    len(with_tasks), len(wout_tasks))
+        with_outputs, wout_outputs = await asyncio.gather(
+            asyncio.gather(*with_tasks),
+            asyncio.gather(*wout_tasks),
         )
 
     # Build results
     results = []
-    for item, wa_raw, bl_raw in zip(all_items, wa_outputs, bl_outputs):
+    for item, with_raw, wout_raw in zip(all_items, with_outputs, wout_outputs):
         results.append({
             "id":           item["id"],
             "dataset":      item["dataset"],
@@ -471,12 +471,12 @@ async def run_roscoe(args: argparse.Namespace) -> None:
             "proof_label":  item["answer"],         # ground truth answer
             "question":     item["premise"],         # context
             "with_answer": {
-                "steps": parse_steps(wa_raw) if wa_raw else [],
-                "raw":   wa_raw or "",
+                "steps": parse_steps(with_raw) if with_raw else [],
+                "raw":   with_raw or "",
             },
             "wout_answer": {
-                "steps": parse_steps(bl_raw) if bl_raw else [],
-                "raw":   bl_raw or "",
+                "steps": parse_steps(wout_raw) if wout_raw else [],
+                "raw":   wout_raw or "",
             },
             # keep reference explanations for esnli export
             "reference_explanations": item.get("reference_explanations", []),
@@ -492,10 +492,10 @@ async def run_roscoe(args: argparse.Namespace) -> None:
             json.dump(results, f, ensure_ascii=False, indent=2)
         logger.info("Saved %d results → %s", len(results), out_path)
 
-    wa_ok = sum(1 for r in results if r["with_answer"]["steps"])
-    bl_ok = sum(1 for r in results if r["wout_answer"]["steps"])
-    logger.info("with_answer success: %d/%d", wa_ok, len(results))
-    logger.info("wout_answer success:       %d/%d", bl_ok, len(results))
+    with_ok = sum(1 for r in results if r["with_answer"]["steps"])
+    wout_ok = sum(1 for r in results if r["wout_answer"]["steps"])
+    logger.info("with_answer success: %d/%d", with_ok, len(results))
+    logger.info("wout_answer success: %d/%d", wout_ok, len(results))
 
     # Export for ROSCOE
     if args.export_dir:
@@ -548,37 +548,37 @@ async def run_generate(args: argparse.Namespace) -> None:
     semaphore = asyncio.Semaphore(args.concurrency)
 
     async with aiohttp.ClientSession() as session:
-        wa_tasks, bl_tasks = [], []
+        with_tasks, wout_tasks = [], []
         for item in items:
             premises   = extract_premises(item)
             hypothesis = item.get("hypothesis", "")
             proof_label = infer_proof_label(item)
 
-            wa_tasks.append(call_llm(
+            with_tasks.append(call_llm(
                 session, semaphore,
                 SYSTEM_WITH_ANSWER,
                 build_prompt_with_answer(hypothesis, premises, proof_label),
                 args.model, args.temperature, args.api_key, args.base_url,
             ))
-            bl_tasks.append(call_llm(
+            wout_tasks.append(call_llm(
                 session, semaphore,
                 SYSTEM_WOUT_ANSWER,
                 build_prompt_wout_answer(hypothesis, premises),
                 args.model, args.temperature, args.api_key, args.base_url,
             ))
 
-        wa_outputs, bl_outputs = await asyncio.gather(
-            asyncio.gather(*wa_tasks),
-            asyncio.gather(*bl_tasks),
+        with_outputs, wout_outputs = await asyncio.gather(
+            asyncio.gather(*with_tasks),
+            asyncio.gather(*wout_tasks),
         )
 
     results = []
     label_correct = 0
-    for item, wa_raw, bl_raw in zip(items, wa_outputs, bl_outputs):
+    for item, with_raw, wout_raw in zip(items, with_outputs, wout_outputs):
         premises    = extract_premises(item)
         hypothesis  = item.get("hypothesis", "")
         gold_label  = infer_proof_label(item)
-        predicted   = extract_predicted_label(bl_raw) if bl_raw else ""
+        predicted   = extract_predicted_label(wout_raw) if wout_raw else ""
         if predicted == gold_label:
             label_correct += 1
 
@@ -589,13 +589,13 @@ async def run_generate(args: argparse.Namespace) -> None:
             "proof_label": gold_label,
             "question":    " ".join(premises),
             "with_answer": {
-                "steps": parse_steps(wa_raw) if wa_raw else [],
-                "raw":   wa_raw or "",
+                "steps": parse_steps(with_raw) if with_raw else [],
+                "raw":   with_raw or "",
             },
             "wout_answer": {
-                "steps": parse_steps(bl_raw) if bl_raw else [],
+                "steps": parse_steps(wout_raw) if wout_raw else [],
                 "predicted_label": predicted,
-                "raw":   bl_raw or "",
+                "raw":   wout_raw or "",
             },
         })
 
@@ -605,12 +605,12 @@ async def run_generate(args: argparse.Namespace) -> None:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
     n     = len(results)
-    wa_ok = sum(1 for r in results if r["with_answer"]["steps"])
-    bl_ok = sum(1 for r in results if r["wout_answer"]["steps"])
+    with_ok = sum(1 for r in results if r["with_answer"]["steps"])
+    wout_ok = sum(1 for r in results if r["wout_answer"]["steps"])
     logger.info("Saved %d results → %s", n, out_path)
-    logger.info("with_answer chain success: %d/%d", wa_ok, n)
-    logger.info("wout_answer chain success:       %d/%d", bl_ok, n)
-    logger.info("wout_answer label accuracy:      %d/%d (%.1f%%)",
+    logger.info("with_answer chain success: %d/%d", with_ok, n)
+    logger.info("wout_answer chain success: %d/%d", wout_ok, n)
+    logger.info("wout_answer label accuracy: %d/%d (%.1f%%)",
                 label_correct, n, 100 * label_correct / max(n, 1))
 
     if args.export_dir:

@@ -2,7 +2,7 @@
   "roscoe": {
     "cosmos": {
       "n": 125,
-      "gt_mean": 0.8321,
+      "with_answer_mean": 0.8321,
       "wout_answer_mean": 0.8158,
       "mean_diff": 0.0163,
       "ci_lo": 0.0091,
@@ -13,7 +13,7 @@
     },
     "drop": {
       "n": 125,
-      "gt_mean": 0.8392,
+      "with_answer_mean": 0.8392,
       "wout_answer_mean": 0.8394,
       "mean_diff": -0.0002,
       "ci_lo": -0.0068,
@@ -24,7 +24,7 @@
     },
     "esnli": {
       "n": 125,
-      "gt_mean": 0.6924,
+      "with_answer_mean": 0.6924,
       "wout_answer_mean": 0.6912,
       "mean_diff": 0.0012,
       "ci_lo": -0.0054,
@@ -35,7 +35,7 @@
     },
     "gsm8k": {
       "n": 125,
-      "gt_mean": 0.8053,
+      "with_answer_mean": 0.8053,
       "wout_answer_mean": 0.8098,
       "mean_diff": -0.0046,
       "ci_lo": -0.0107,
@@ -48,47 +48,47 @@
   "roscoe_combined": {
     "cosmos": {
       "n": 500,
-      "gt_mean": 0.7536,
-      "wout_answer_mean": 0.7356,
-      "mean_diff": 0.018,
-      "ci_lo": -0.0058,
-      "ci_hi": 0.0417,
+      "with_answer_mean": 0.8644,
+      "wout_answer_mean": 0.8582,
+      "mean_diff": 0.0061,
+      "ci_lo": 0.0015,
+      "ci_hi": 0.0106,
       "p_wilcoxon": 0.0,
-      "cohen_d": 0.067,
+      "cohen_d": 0.1188,
       "sig": "***"
     },
     "drop": {
       "n": 500,
-      "gt_mean": 0.7422,
-      "wout_answer_mean": 0.7545,
-      "mean_diff": -0.0122,
-      "ci_lo": -0.0325,
-      "ci_hi": 0.0083,
-      "p_wilcoxon": 0.4909,
-      "cohen_d": -0.0531,
+      "with_answer_mean": 0.8774,
+      "wout_answer_mean": 0.8781,
+      "mean_diff": -0.0008,
+      "ci_lo": -0.0043,
+      "ci_hi": 0.0028,
+      "p_wilcoxon": 0.6969,
+      "cohen_d": -0.0187,
       "sig": "ns"
     },
     "esnli": {
       "n": 500,
-      "gt_mean": 0.6325,
-      "wout_answer_mean": 0.6241,
-      "mean_diff": 0.0084,
-      "ci_lo": -0.0041,
-      "ci_hi": 0.0215,
-      "p_wilcoxon": 0.0252,
-      "cohen_d": 0.0569,
-      "sig": "*"
+      "with_answer_mean": 0.7918,
+      "wout_answer_mean": 0.7918,
+      "mean_diff": 0.0,
+      "ci_lo": -0.0039,
+      "ci_hi": 0.0042,
+      "p_wilcoxon": 0.6674,
+      "cohen_d": 0.0007,
+      "sig": "ns"
     },
     "gsm8k": {
       "n": 500,
-      "gt_mean": 0.6884,
-      "wout_answer_mean": 0.692,
-      "mean_diff": -0.0036,
-      "ci_lo": -0.0168,
-      "ci_hi": 0.0092,
-      "p_wilcoxon": 0.0569,
-      "cohen_d": -0.025,
-      "sig": "ns"
+      "with_answer_mean": 0.8807,
+      "wout_answer_mean": 0.8835,
+      "mean_diff": -0.0028,
+      "ci_lo": -0.006,
+      "ci_hi": 0.0007,
+      "p_wilcoxon": 0.0298,
+      "cohen_d": -0.0721,
+      "sig": "*"
     }
   }
 }

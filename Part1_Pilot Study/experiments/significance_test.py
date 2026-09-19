@@ -3,7 +3,7 @@
 significance_test.py
 ====================
 Paired Wilcoxon signed-rank tests + bootstrap 95% CI + Cohen's d
-for PRMBench and ROSCOE GT vs No-GT conditions.
+for PRMBench and ROSCOE, with_answer vs wout_answer.
 
 Outputs:
   - significance_testing_results.json — all stats, one file per benchmark per model
@@ -37,7 +37,7 @@ RESULTS_ROOT = PART_ROOT / "results"             # <results>/<model>/{prmbench,r
 # place under one name, so a benchmark's evidence — the runs and the test over
 # them — is never split across directories.
 BENCHMARK_SECTIONS = {
-    "prmbench": ("prmbench", "prmbench_metrics", "prmbench_dims_combined"),
+    "prmbench": ("prmbench", "prmbench_metrics", "prmbench_dimensions_combined"),
     "roscoe":   ("roscoe", "roscoe_combined"),
 }
 STATS_FILENAME = "significance_testing_results.json"
@@ -67,7 +67,7 @@ def split_by_model(stats: dict) -> dict:
 # Model config
 # ──────────────────────────────────────────────────────────────
 # Display name → the model's directory under the results root. Everything a model
-# produced lives there: prmbench/<dim>_<api>_results.jsonl and roscoe/roscoe_scores/.
+# produced lives there: prmbench/<dimension>_<setting>.jsonl and roscoe/roscoe_scores/.
 MODELS = {
     "GPT-o4-mini":           "o4-mini",
     "GPT-5.4-nano":          "gpt-5.4-nano",
@@ -82,8 +82,6 @@ MODEL_COLORS = {
     "Gemini-3.1-Flash-Lite": "#09554D",   # dark teal
 }
 
-DIM_MAP = {"simplicity": "Simplicity", "soundness": "Soundness",
-           "sensitivity": "Sensitivity"}
 ROSCOE_DATASETS = ["cosmos", "drop", "esnli", "gsm8k"]
 ROSCOE_DS_LABELS = {"cosmos": "CosmosQA", "drop": "DROP",
                     "esnli": "eSNLI", "gsm8k": "GSM8K"}
@@ -100,13 +98,15 @@ PRM_METRIC_LABELS = {
 }
 
 # PRMBench dimensions for top-row panels
-PRM_DIMS = ["simplicity", "soundness", "sensitivity"]
-PRM_DIM_LABELS = {"simplicity": "Simplicity", "soundness": "Soundness",
-                  "sensitivity": "Sensitivity"}
+PRMBENCH_DIMENSIONS = ["simplicity", "soundness", "sensitivity"]
+DIMENSION_LABELS = {"simplicity": "Simplicity", "soundness": "Soundness",
+                    "sensitivity": "Sensitivity"}
 
 # ROSCOE metrics to aggregate per dataset (bottom-row panels)
+# The four the paper reports and pools (Appendix, Significance Testing
+# Methodology): Faithfulness, Informativeness step/chain, Grammar.
 ROSCOE_AGG_METRICS = ["faithfulness", "informativeness_step",
-                      "informativeness_chain", "coherence_step_vs_step"]
+                      "informativeness_chain", "grammar_step"]
 
 # How each model is named in the LaTeX table; a model not listed keeps its full name.
 MODEL_DISPLAY = {
@@ -175,17 +175,17 @@ def sig_label(p):
 # Data loading
 # ──────────────────────────────────────────────────────────────
 def prm_items(model_name):
-    """Yield (dim, item) for one model's PRMBench runs.
+    """Yield (dimension, item) for one model's PRMBench runs.
 
     The dimension comes from the file the item was scored in — the dataset is split
     into simplicity/soundness/sensitivity.jsonl and each run writes back under that
     name — so this cannot drift from how the items were sampled or scored.
     """
     base = RESULTS_ROOT / MODELS[model_name] / "prmbench"
-    for dim in ("simplicity", "soundness", "sensitivity"):
+    for dimension in ("simplicity", "soundness", "sensitivity"):
         sides = {}
         for setting in ("with_answer", "wout_answer"):
-            path = base / f"{dim}_{setting}.jsonl"
+            path = base / f"{dimension}_{setting}.jsonl"
             if not path.exists():
                 continue
             with path.open() as f:
@@ -195,37 +195,38 @@ def prm_items(model_name):
             continue
         # The two settings are separate files; an item is whatever both hold for
         # the same idx, so a comparison never pairs one item with another's score.
-        for idx, wa in sides["with_answer"].items():
-            bl = sides["wout_answer"].get(idx)
-            if bl is None:
+        for idx, with_rec in sides["with_answer"].items():
+            wout_rec = sides["wout_answer"].get(idx)
+            if wout_rec is None:
                 continue
-            yield dim, {"idx": idx, "classification": wa.get("classification"),
-                        "with_answer": wa, "wout_answer": bl}
+            yield dimension, {"idx": idx,
+                        "classification": with_rec.get("classification"),
+                        "with_answer": with_rec, "wout_answer": wout_rec}
 
 
 def load_prm(model_name):
-    """Load one model's PRMBench runs → dict[dim] → (with_answer, wout_answer)."""
-    dims = {"simplicity": [], "soundness": [], "sensitivity": []}
-    for dim, item in prm_items(model_name):
-        wa = (item.get("with_answer") or {}).get("metrics") or {}
-        bl = (item.get("wout_answer") or {}).get("metrics") or {}
-        gt, no_gt = wa.get(PRM_METRIC), bl.get(PRM_METRIC)
-        if gt is not None and no_gt is not None:
-            dims[dim].append((gt, no_gt))
+    """Load one model's PRMBench runs → dict[dimension] → (with_answer, wout_answer)."""
+    dimensions = {"simplicity": [], "soundness": [], "sensitivity": []}
+    for dimension, item in prm_items(model_name):
+        m_with = (item.get("with_answer") or {}).get("metrics") or {}
+        m_wout = (item.get("wout_answer") or {}).get("metrics") or {}
+        v_with, v_wout = m_with.get(PRM_METRIC), m_wout.get(PRM_METRIC)
+        if v_with is not None and v_wout is not None:
+            dimensions[dimension].append((v_with, v_wout))
     # also build "total" = all items
-    all_pairs = [p for ps in dims.values() for p in ps]
-    dims["total"] = all_pairs
-    return {d: ([x[0] for x in ps], [x[1] for x in ps]) for d, ps in dims.items() if ps}
+    all_pairs = [p for ps in dimensions.values() for p in ps]
+    dimensions["total"] = all_pairs
+    return {d: ([x[0] for x in ps], [x[1] for x in ps]) for d, ps in dimensions.items() if ps}
 
 
 def load_prm_metrics(model_name):
-    """Load one model's PRMBench runs → dict[metric] → (gt, no_gt) across ALL items."""
+    """Load one model's PRMBench runs → dict[metric] → (v_with, v_wout) across ALL items."""
     buckets = {m: [] for m in PRM_PLOT_METRICS}
     for _dim, item in prm_items(model_name):
-        wa = (item.get("with_answer") or {}).get("metrics") or {}
-        bl = (item.get("wout_answer")       or {}).get("metrics") or {}
+        m_with = (item.get("with_answer") or {}).get("metrics") or {}
+        m_wout = (item.get("wout_answer")       or {}).get("metrics") or {}
         for m in PRM_PLOT_METRICS:
-            g, b = wa.get(m), bl.get(m)
+            g, b = m_with.get(m), m_wout.get(m)
             if g is not None and b is not None:
                 buckets[m].append((g, b))
     return {m: ([x[0] for x in ps], [x[1] for x in ps])
@@ -233,52 +234,52 @@ def load_prm_metrics(model_name):
 
 
 def load_roscoe(model_name):
-    """Load per-item ROSCOE TSV scores → dict[dataset] → (gt_scores, wout_answer_scores)."""
+    """Load per-item ROSCOE TSV scores → dict[dataset] → (with_scores, wout_scores)."""
     base = RESULTS_ROOT / MODELS[model_name] / "roscoe" / "roscoe_scores"
     result = {}
     for ds in ROSCOE_DATASETS:
-        p_gt  = base / f"scores_{ds}_with_answer.tsv"
-        p_bl  = base / f"scores_{ds}_wout_answer.tsv"
-        if not p_gt.exists() or not p_bl.exists():
+        path_with  = base / f"scores_{ds}_with_answer.tsv"
+        path_wout  = base / f"scores_{ds}_wout_answer.tsv"
+        if not path_with.exists() or not path_wout.exists():
             continue
-        df_gt = pd.read_csv(p_gt, sep=r"\s+", engine="python")
-        df_bl = pd.read_csv(p_bl, sep=r"\s+", engine="python")
-        if ROSCOE_METRIC not in df_gt.columns or ROSCOE_METRIC not in df_bl.columns:
+        df_with = pd.read_csv(path_with, sep=r"\s+", engine="python")
+        df_wout = pd.read_csv(path_wout, sep=r"\s+", engine="python")
+        if ROSCOE_METRIC not in df_with.columns or ROSCOE_METRIC not in df_wout.columns:
             continue
-        n = min(len(df_gt), len(df_bl))
-        gt_raw = df_gt[ROSCOE_METRIC].values[:n]
-        bl_raw = df_bl[ROSCOE_METRIC].values[:n]
+        n = min(len(df_with), len(df_wout))
+        raw_with = df_with[ROSCOE_METRIC].values[:n]
+        raw_wout = df_wout[ROSCOE_METRIC].values[:n]
         # Drop pairs where either value is NaN
         import numpy as _np
-        mask = ~(_np.isnan(gt_raw) | _np.isnan(bl_raw))
-        gt = gt_raw[mask].tolist()
-        bl = bl_raw[mask].tolist()
-        if len(gt) < 5:  # skip if too few valid pairs
+        mask = ~(_np.isnan(raw_with) | _np.isnan(raw_wout))
+        v_with = raw_with[mask].tolist()
+        v_wout = raw_wout[mask].tolist()
+        if len(v_with) < 5:  # skip if too few valid pairs
             continue
-        result[ds] = (gt, bl)
+        result[ds] = (v_with, v_wout)
     return result
 
 
-def load_prm_dims_combined(model_name):
-    """Load PRMBench JSONL → dict[dim] → (gt_diffs_pooled, bl_diffs_pooled).
+def load_prm_dimensions_combined(model_name):
+    """Load PRMBench JSONL → dict[dimension] → (with_pooled, wout_pooled).
 
     For each dimension, pool paired differences across ALL 3 metrics
     (step_acc, first_error_acc, f1) so one panel = one dimension.
     """
-    dims = {d: [] for d in PRM_DIMS}
-    for dim, item in prm_items(model_name):
-        wa = (item.get("with_answer") or {}).get("metrics") or {}
-        bl = (item.get("wout_answer")       or {}).get("metrics") or {}
+    dimensions = {d: [] for d in PRMBENCH_DIMENSIONS}
+    for dimension, item in prm_items(model_name):
+        m_with = (item.get("with_answer") or {}).get("metrics") or {}
+        m_wout = (item.get("wout_answer")       or {}).get("metrics") or {}
         for m in PRM_PLOT_METRICS:
-            g, b = wa.get(m), bl.get(m)
+            g, b = m_with.get(m), m_wout.get(m)
             if g is not None and b is not None:
-                dims[dim].append((g, b))
+                dimensions[dimension].append((g, b))
     return {d: ([x[0] for x in ps], [x[1] for x in ps])
-            for d, ps in dims.items() if ps}
+            for d, ps in dimensions.items() if ps}
 
 
 def load_roscoe_combined(model_name):
-    """Load ROSCOE scores → dict[dataset] → (gt_pooled, bl_pooled).
+    """Load ROSCOE scores → dict[dataset] → (with_pooled, wout_pooled).
 
     For each dataset, pool paired values across ROSCOE_AGG_METRICS
     so one panel = one dataset aggregating multiple metrics.
@@ -286,41 +287,41 @@ def load_roscoe_combined(model_name):
     base = RESULTS_ROOT / MODELS[model_name] / "roscoe" / "roscoe_scores"
     result = {}
     for ds in ROSCOE_DATASETS:
-        p_gt = base / f"scores_{ds}_with_answer.tsv"
-        p_bl = base / f"scores_{ds}_wout_answer.tsv"
-        if not p_gt.exists() or not p_bl.exists():
+        path_with = base / f"scores_{ds}_with_answer.tsv"
+        path_wout = base / f"scores_{ds}_wout_answer.tsv"
+        if not path_with.exists() or not path_wout.exists():
             continue
-        df_gt = pd.read_csv(p_gt, sep=r"\s+", engine="python")
-        df_bl = pd.read_csv(p_bl, sep=r"\s+", engine="python")
-        n = min(len(df_gt), len(df_bl))
-        gt_all, bl_all = [], []
+        df_with = pd.read_csv(path_with, sep=r"\s+", engine="python")
+        df_wout = pd.read_csv(path_wout, sep=r"\s+", engine="python")
+        n = min(len(df_with), len(df_wout))
+        all_with, all_wout = [], []
         for metric in ROSCOE_AGG_METRICS:
-            if metric not in df_gt.columns or metric not in df_bl.columns:
+            if metric not in df_with.columns or metric not in df_wout.columns:
                 continue
-            gt_raw = df_gt[metric].values[:n]
-            bl_raw = df_bl[metric].values[:n]
-            mask = ~(np.isnan(gt_raw) | np.isnan(bl_raw))
-            gt_all.extend(gt_raw[mask].tolist())
-            bl_all.extend(bl_raw[mask].tolist())
-        if len(gt_all) >= 5:
-            result[ds] = (gt_all, bl_all)
+            raw_with = df_with[metric].values[:n]
+            raw_wout = df_wout[metric].values[:n]
+            mask = ~(np.isnan(raw_with) | np.isnan(raw_wout))
+            all_with.extend(raw_with[mask].tolist())
+            all_wout.extend(raw_wout[mask].tolist())
+        if len(all_with) >= 5:
+            result[ds] = (all_with, all_wout)
     return result
 
 
 # ──────────────────────────────────────────────────────────────
 # Run all tests
 # ──────────────────────────────────────────────────────────────
-def _compute_stat(gt, bl, tag=""):
-    mean_diff, lo, hi = bootstrap_ci(gt, bl)
-    p = wilcoxon(gt, bl)
-    d = cohen_d(gt, bl)
+def _compute_stat(v_with, v_wout, tag=""):
+    mean_diff, lo, hi = bootstrap_ci(v_with, v_wout)
+    p = wilcoxon(v_with, v_wout)
+    d = cohen_d(v_with, v_wout)
     if tag:
         print(f"  {tag}: diff={mean_diff:+.4f} [{lo:+.4f},{hi:+.4f}]"
               f" p={p:.4f} d={d:.4f} {sig_label(p)}")
     return {
-        "n":          len(gt),
-        "gt_mean":    round(float(np.mean(gt)), 4),
-        "wout_answer_mean": round(float(np.mean(bl)), 4),
+        "n":          len(v_with),
+        "with_answer_mean": round(float(np.mean(v_with)), 4),
+        "wout_answer_mean": round(float(np.mean(v_wout)), 4),
         "mean_diff":  round(mean_diff, 4),
         "ci_lo":      round(lo, 4),
         "ci_hi":      round(hi, 4),
@@ -332,49 +333,49 @@ def _compute_stat(gt, bl, tag=""):
 
 def run_all_tests():
     all_stats = {"prmbench": {}, "prmbench_metrics": {},
-                 "prmbench_dims_combined": {}, "roscoe": {},
+                 "prmbench_dimensions_combined": {}, "roscoe": {},
                  "roscoe_combined": {}}
 
     for model in MODELS:
         all_stats["prmbench"][model] = {}
         all_stats["prmbench_metrics"][model] = {}
-        all_stats["prmbench_dims_combined"][model] = {}
+        all_stats["prmbench_dimensions_combined"][model] = {}
         # --- per-dimension (for LaTeX table) ---
         try:
-            for dim, (gt, bl) in load_prm(model).items():
-                all_stats["prmbench"][model][dim] = _compute_stat(
-                    gt, bl, f"PRMBench {model} {dim}")
+            for dimension, (v_with, v_wout) in load_prm(model).items():
+                all_stats["prmbench"][model][dimension] = _compute_stat(
+                    v_with, v_wout, f"PRMBench {model} {dimension}")
         except Exception as e:
-            print(f"  [PRMBench dim] {model}: {e}")
+            print(f"  [PRMBench dimension] {model}: {e}")
         # --- per-metric (for 7-panel plot, kept for reference) ---
         try:
-            for metric, (gt, bl) in load_prm_metrics(model).items():
+            for metric, (v_with, v_wout) in load_prm_metrics(model).items():
                 all_stats["prmbench_metrics"][model][metric] = _compute_stat(
-                    gt, bl, f"PRMBench {model} {metric}")
+                    v_with, v_wout, f"PRMBench {model} {metric}")
         except Exception as e:
             print(f"  [PRMBench metric] {model}: {e}")
         # --- per-dimension, all metrics pooled (for new plot) ---
         try:
-            for dim, (gt, bl) in load_prm_dims_combined(model).items():
-                all_stats["prmbench_dims_combined"][model][dim] = _compute_stat(
-                    gt, bl, f"PRMBench {model} {dim} (combined)")
+            for dimension, (v_with, v_wout) in load_prm_dimensions_combined(model).items():
+                all_stats["prmbench_dimensions_combined"][model][dimension] = _compute_stat(
+                    v_with, v_wout, f"PRMBench {model} {dimension} (combined)")
         except Exception as e:
-            print(f"  [PRMBench dim combined] {model}: {e}")
+            print(f"  [PRMBench dimension combined] {model}: {e}")
 
     for model in MODELS:
         all_stats["roscoe"][model] = {}
         all_stats["roscoe_combined"][model] = {}
         try:
-            for ds, (gt, bl) in load_roscoe(model).items():
+            for ds, (v_with, v_wout) in load_roscoe(model).items():
                 all_stats["roscoe"][model][ds] = _compute_stat(
-                    gt, bl, f"ROSCOE   {model} {ds}")
+                    v_with, v_wout, f"ROSCOE   {model} {ds}")
         except Exception as e:
             print(f"  [ROSCOE] {model}: {e}")
         # --- per-dataset, all metrics pooled (for new plot) ---
         try:
-            for ds, (gt, bl) in load_roscoe_combined(model).items():
+            for ds, (v_with, v_wout) in load_roscoe_combined(model).items():
                 all_stats["roscoe_combined"][model][ds] = _compute_stat(
-                    gt, bl, f"ROSCOE   {model} {ds} (combined)")
+                    v_with, v_wout, f"ROSCOE   {model} {ds} (combined)")
         except Exception as e:
             print(f"  [ROSCOE combined] {model}: {e}")
 
@@ -388,8 +389,10 @@ def make_latex_table(stats):
     lines = [
         r"\begin{table}[!ht]",
         r"\centering\small",
-        r"\caption{Paired Wilcoxon signed-rank test results (GT vs.\ No-GT). "
-        r"$\Delta$ = mean(GT$-$NoGT), 95\% CI via bootstrap, $d$ = Cohen's $d$.}",
+        r"\caption{Paired Wilcoxon signed-rank test results "
+        r"(w/ Answer vs.\ w/o Answer). "
+        r"$\Delta$ = mean(w/~Answer $-$ w/o~Answer), 95\% CI via bootstrap, "
+        r"$d$ = Cohen's $d$.}",
         r"\label{tab:significance}",
         r"\setlength{\tabcolsep}{4pt}",
         r"\begin{tabular}{llrrrrrl}",
@@ -412,11 +415,11 @@ def make_latex_table(stats):
                 rf" & ${fmt2(row['cohen_d'])}$"
                 rf" & {row['sig']} \\"
             )
-        for dim in ["simplicity", "soundness", "sensitivity"]:
-            row = stats["prmbench"].get(model, {}).get(dim)
+        for dimension in ["simplicity", "soundness", "sensitivity"]:
+            row = stats["prmbench"].get(model, {}).get(dimension)
             if row:
                 lines.append(
-                    rf" & \ \ {DIM_MAP[dim]}"
+                    rf" & \ \ {DIMENSION_LABELS[dimension]}"
                     rf" & ${fmt2(row['mean_diff'])}$"
                     rf" & ${fmt2(row['ci_lo'])}$"
                     rf" & ${fmt2(row['ci_hi'])}$"

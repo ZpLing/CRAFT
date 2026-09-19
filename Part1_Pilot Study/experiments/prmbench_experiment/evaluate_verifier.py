@@ -23,12 +23,19 @@ These are then passed through PRMBench's eval_on_hallucination_step() to
 compute official metrics: correct_step_acc, wrong_step_acc, total_step_acc,
 first_error_acc, F1.
 
-Settings:
-  A (with_answer): LLM is told the correct final answer before verifying steps.
-  B (wout_answer):       LLM verifies steps without knowing the answer.
+Settings differ by one line of the prompt and nothing else. Either way the whole
+chain is scored in a single call, so the answer — when it is given — is in context
+for every step's judgement, not revealed as the verifier walks the chain.
+  with_answer: the prompt carries "Correct final answer: ...", taken from the
+               item's unmodified `original_process`, above the steps to score.
+  wout_answer: that line is absent.
+
+The steps scored are `modified_process` in both settings, so the w/ Answer prompt
+states the answer a correct solution reaches while showing the chain PRMBench
+injected an error into.
 
 Usage:
-    python prmbench_evaluate_verifier.py \\
+    python evaluate_verifier.py \\
         --input PRMBench/mr_eval/tasks/prmbench_stem/data/prmbench_preview.jsonl \\
         --output verifier_results.jsonl \\
         --model gpt-4.1-mini --concurrency 10
@@ -91,7 +98,7 @@ so validity = -1. Step 3 propagates the wrong answer, so validity = -1.
 """
 
 SYSTEM_WITH_ANSWER = (
-    "You are a math reasoning verifier.\n"
+    "You are a mathematical reasoning verifier.\n"
     "You will be given a math problem, its correct final answer, and numbered solution steps.\n"
     "For each step, output two scores:\n"
     "  - validity:   +1.0 if the step is logically correct, -1.0 if it contains an error, "
@@ -104,7 +111,7 @@ SYSTEM_WITH_ANSWER = (
 )
 
 SYSTEM_WOUT_ANSWER = (
-    "You are a math reasoning verifier.\n"
+    "You are a mathematical reasoning verifier.\n"
     "You will be given a math problem and numbered solution steps.\n"
     "For each step, output two scores:\n"
     "  - validity:   +1.0 if the step is logically correct, -1.0 if it contains an error, "
@@ -243,7 +250,7 @@ def terminal_reason(reason: str | None) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Async LLM call — temperature 0 for deterministic verification
+# Async LLM call — temperature 0.5 for every model
 # ---------------------------------------------------------------------------
 async def call_llm(
     session: aiohttp.ClientSession,
@@ -262,13 +269,11 @@ async def call_llm(
     should. `rewrites` carries any gateway-blocked word this call had to write
     out in full to get an answer at all.
 
-    Reasoning models (o1/o3/o4 family) require:
-      - max_completion_tokens  (not max_tokens)
-      - temperature = 1        (fixed, not configurable)
-
-    Standard chat models (gpt-4.x, gpt-3.5, etc.) use:
-      - max_tokens
-      - temperature = 0        (deterministic)
+    Reasoning models (o1/o3/o4 and the GPT-5 family) take max_completion_tokens;
+    standard chat models (gpt-4.x, gpt-3.5, etc.) take max_tokens. Temperature is
+    0.5 for both: the reasoning models reject 0, and holding one value across the
+    four backbones keeps the two settings comparable, which is what this study
+    measures.
     """
     url = base_url.rstrip("/") + "/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
@@ -426,14 +431,14 @@ def parse_scores(raw: str, n_steps: int) -> tuple[list[float] | None, list[float
 # Threshold: score > 0 → True (valid); score <= 0 → False (invalid)
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-# Difficulty dimension mapping — PRMBench's own taxonomy (prmbench.github.io):
+# Dimension mapping — PRMBench's own taxonomy (prmbench.github.io):
 # Simplicity = Non-Redundancy + Non-Circular Logic; Soundness = Empirical
 # Soundness + Step Consistency + Domain Consistency + Confidence Invariance;
 # Sensitivity = Prerequisite Sensitivity + Deception Resistance + Multi-Solution
 # Consistency. An item's `_dim` in the sampled dataset agrees with this map, so
 # grouping here and stratification there cannot drift apart.
 # ---------------------------------------------------------------------------
-DIFFICULTY_DIMS = {
+DIMENSIONS = {
     "simplicity":  {"redundency", "circular"},
     "soundness":   {"counterfactual", "step_contradiction",
                     "domain_inconsistency", "confidence"},
@@ -441,10 +446,10 @@ DIFFICULTY_DIMS = {
 }
 
 
-def get_dim(classification: str) -> str:
-    for dim, classes in DIFFICULTY_DIMS.items():
+def get_dimension(classification: str) -> str:
+    for dimension, classes in DIMENSIONS.items():
         if classification in classes:
-            return dim
+            return dimension
     return "unknown"
 
 
@@ -465,7 +470,7 @@ def metrics_from_record(rec: dict, setting: str) -> dict | None:
 
 
 def build_summary(results: list[dict], model: str) -> dict:
-    """Aggregate per-item metrics into the 3 difficulty dimensions plus a total.
+    """Aggregate per-item metrics into the 3 dimensions plus a total.
 
     An item counts only when BOTH settings produced parsable scores. A call the
     endpoint refuses (its content filter rejects e.g. "gcd") or a reply that will
@@ -473,54 +478,54 @@ def build_summary(results: list[dict], model: str) -> dict:
     Answer are always compared over the same items and n is the number actually
     scored, never the number attempted.
     """
-    dims = ("simplicity", "soundness", "sensitivity")
-    paired: dict[str, dict[str, list]] = {d: {"with_answer": [], "wout_answer": []} for d in dims}
-    attempted = {d: 0 for d in dims}
-    dropped_idx: dict[str, list] = {d: [] for d in dims}
+    dimensions = ("simplicity", "soundness", "sensitivity")
+    paired: dict[str, dict[str, list]] = {d: {"with_answer": [], "wout_answer": []} for d in dimensions}
+    attempted = {d: 0 for d in dimensions}
+    dropped_idx: dict[str, list] = {d: [] for d in dimensions}
     reasons: dict[str, int] = {}
 
     for rec in results:
-        dim = get_dim(rec.get("classification", ""))
-        if dim not in paired:
+        dimension = get_dimension(rec.get("classification", ""))
+        if dimension not in paired:
             continue
-        attempted[dim] += 1
+        attempted[dimension] += 1
         for setting in ("with_answer", "wout_answer"):
             failure = (rec.get(setting) or {}).get("failure")
             if failure:
                 kind = failure.split(":")[0]
                 reasons[kind] = reasons.get(kind, 0) + 1
-        wa_m = metrics_from_record(rec, "with_answer")
-        bl_m = metrics_from_record(rec, "wout_answer")
-        if wa_m is None or bl_m is None:
-            dropped_idx[dim].append(rec.get("idx", ""))
+        with_m = metrics_from_record(rec, "with_answer")
+        wout_m = metrics_from_record(rec, "wout_answer")
+        if with_m is None or wout_m is None:
+            dropped_idx[dimension].append(rec.get("idx", ""))
             continue
-        paired[dim]["with_answer"].append(wa_m)
-        paired[dim]["wout_answer"].append(bl_m)
+        paired[dimension]["with_answer"].append(with_m)
+        paired[dimension]["wout_answer"].append(wout_m)
 
-    def dim_summary(wa_list, bl_list, n_attempted, dropped):
+    def dimension_summary(with_list, wout_list, n_attempted, dropped):
         return {
-            "with_answer": aggregate_metrics(wa_list),
-            "wout_answer":       aggregate_metrics(bl_list),
-            "n_items":     len(wa_list),
+            "with_answer": aggregate_metrics(with_list),
+            "wout_answer":       aggregate_metrics(wout_list),
+            "n_items":     len(with_list),
             "n_attempted": n_attempted,
             "n_dropped":   len(dropped),
         }
 
-    summary = {d: dim_summary(paired[d]["with_answer"], paired[d]["wout_answer"],
-                              attempted[d], dropped_idx[d]) for d in dims}
-    summary["total"] = dim_summary(
-        [m for d in dims for m in paired[d]["with_answer"]],
-        [m for d in dims for m in paired[d]["wout_answer"]],
+    summary = {d: dimension_summary(paired[d]["with_answer"], paired[d]["wout_answer"],
+                              attempted[d], dropped_idx[d]) for d in dimensions}
+    summary["total"] = dimension_summary(
+        [m for d in dimensions for m in paired[d]["with_answer"]],
+        [m for d in dimensions for m in paired[d]["wout_answer"]],
         sum(attempted.values()),
-        [i for d in dims for i in dropped_idx[d]],
+        [i for d in dimensions for i in dropped_idx[d]],
     )
     summary["meta"] = {
         "n_total":         len(results),
         "n_scored":        summary["total"]["n_items"],
-        "dropped_idx":     {d: dropped_idx[d] for d in dims if dropped_idx[d]},
+        "dropped_idx":     {d: dropped_idx[d] for d in dimensions if dropped_idx[d]},
         "dropped_reasons": reasons,
         "model":           model,
-        "difficulty_dims": {d: sorted(c) for d, c in DIFFICULTY_DIMS.items()},
+        "dimensions": {d: sorted(c) for d, c in DIMENSIONS.items()},
     }
     return summary
 
@@ -866,16 +871,16 @@ async def run(args):
     for path in written:
         logger.info("Saved %d results → %s", len(results), path)
     logger.info("=== PRMBench LLM Verifier Comparison ===")
-    header = f"{'dim':<12}  {'setting':<12}  {'total_acc':>9}  {'wrong_acc':>9}  {'1st_err':>7}  {'f1':>7}  n"
+    header = f"{'dimension':<12}  {'setting':<12}  {'total_acc':>9}  {'wrong_acc':>9}  {'1st_err':>7}  {'f1':>7}  n"
     logger.info(header)
     logger.info("-" * len(header))
-    for dim in ("simplicity", "soundness", "sensitivity", "total"):
-        n = summary[dim]["n_items"]
+    for dimension in ("simplicity", "soundness", "sensitivity", "total"):
+        n = summary[dimension]["n_items"]
         for s in ("with_answer", "wout_answer"):
-            m = summary[dim][s]
+            m = summary[dimension][s]
             logger.info(
                 "%-12s  %-12s  %9.4f  %9.4f  %7.4f  %7.4f  %d",
-                dim, s,
+                dimension, s,
                 m.get("total_step_acc",  -1),
                 m.get("wrong_step_acc",  -1),
                 m.get("first_error_acc", -1),
