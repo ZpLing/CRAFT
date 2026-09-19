@@ -23,7 +23,7 @@ Core pipeline:
 Output format:
   {
     "sample_id": "...",
-    "trace_dags": [
+    "trace_rkgs": [
       {
         "trace_idx": 0,
         "nodes": [{"id": "Fact1", "type": "fact", "text": "...", "step_number": null}, ...],
@@ -32,7 +32,7 @@ Output format:
         "extraction_method": "llm" | "regex_fallback"
       }
     ],
-    "consensus_dag": {
+    "consensus_rkg": {
       "nodes": [...],
       "edges": [...],
       "edge_frequencies": {"Fact1->Step2": 0.9, ...}
@@ -606,7 +606,7 @@ def build_consensus_rkg(
                          + term_overlap_weight * overlap_score
 
     Args:
-        trace_dags:            k trace RKG list (one per trace)
+        trace_rkgs:            k trace RKG list (one per trace)
         consensus_threshold:   edge frequency threshold (edges >= this value are included in consensus)
         term_overlap_weight:   lambda, the edge-weight balance between the LLM's confidence
                                and the term-overlap score (paper: 0.3)
@@ -869,6 +869,7 @@ async def build_rkgs_for_sample(
     consensus_threshold: float = 0.3,
     node_threshold: Optional[float] = None,
     use_alignment: bool = False,
+    edge_lambda: float = 0.3,
 ) -> Dict[str, Any]:
     """Concurrently build per-trace RKGs for a sample, then compute the consensus RKG.
 
@@ -949,12 +950,13 @@ async def build_rkgs_for_sample(
         valid_rkgs,
         consensus_threshold=consensus_threshold,
         node_threshold=node_threshold,
+        term_overlap_weight=edge_lambda,
     )
 
     return {
         "sample_id":     sample.get("sample_id", "unknown"),
-        "trace_dags":    trace_rkgs,
-        "consensus_dag": consensus,
+        "trace_rkgs":    trace_rkgs,
+        "consensus_rkg": consensus,
         "alignment":     alignment_info,
     }
 
@@ -968,6 +970,7 @@ async def build_rkgs_for_dataset(
     consensus_threshold: float = 0.3,
     node_threshold: Optional[float] = None,
     max_samples: Optional[int] = None,
+    edge_lambda: float = 0.3,
 ) -> None:
     """Build RKGs for all samples in a dataset and write output to rkg.json."""
     print(f"Reading file: {input_file}")
@@ -1001,13 +1004,14 @@ async def build_rkgs_for_dataset(
                         model=model, domain=domain,
                         consensus_threshold=consensus_threshold,
                         node_threshold=node_threshold,
+                        edge_lambda=edge_lambda,
                     )
                 except Exception as e:
                     results[idx] = {
                         "sample_id": sample.get("sample_id", f"unknown_{idx}"),
                         "error": str(e),
-                        "trace_dags": [],
-                        "consensus_dag": {},
+                        "trace_rkgs": [],
+                        "consensus_rkg": {},
                     }
                 finally:
                     pbar.update(1)
@@ -1023,6 +1027,7 @@ async def build_rkgs_for_dataset(
             "model": model,
             "domain": domain,
             "consensus_threshold": consensus_threshold,
+            "edge_lambda": edge_lambda,
             "node_threshold": consensus_threshold if node_threshold is None else node_threshold,
             "total_samples": len(samples),
             "successful": sum(1 for r in results if r and "error" not in r),
@@ -1049,7 +1054,7 @@ def rebuild_consensus(
     weight_by: str = "uniform",
     gt_file: Optional[Path] = None,
 ) -> None:
-    """Recompute consensus_dag in an existing RKG file from its cached trace_dags.
+    """Recompute consensus_rkg in an existing RKG file from its cached trace_rkgs.
 
     No LLM calls: the per-trace graphs are already stored, so a changed voting rule
     can be applied to a finished run without paying for extraction again. Rewrites
@@ -1073,10 +1078,10 @@ def rebuild_consensus(
     matrix: Counter = Counter()
 
     for r in results:
-        valid = [copy.deepcopy(t) for t in r.get("trace_dags", [])
+        valid = [copy.deepcopy(t) for t in (r.get("trace_rkgs") or r.get("trace_dags") or [])
                  if t.get("extraction_method") != "error"]
         if not valid:
-            r["consensus_dag"] = {"nodes": [], "edges": []}
+            r["consensus_rkg"] = {"nodes": [], "edges": []}
             continue
         consensus = build_consensus_rkg(
             valid,
@@ -1084,7 +1089,7 @@ def rebuild_consensus(
             proved_threshold=proved_threshold,
             weight_by=weight_by,
         )
-        r["consensus_dag"] = consensus
+        r["consensus_rkg"] = consensus
 
         if not gt_map:
             continue
@@ -1133,11 +1138,15 @@ def main() -> None:
     parser.add_argument("--node_threshold", type=float, default=None,
                         help="Node frequency threshold beta (default: same as --consensus_threshold)")
     parser.add_argument("--max_samples", type=int, default=None)
+    parser.add_argument("--edge_lambda", type=float, default=0.3,
+                        help="Edge weight balance lambda: W(e) = (1-lambda)*LLM confidence "
+                             "+ lambda*term overlap (paper: 0.3). 0 drops the fusion, which "
+                             "is the ablation's 'w/o Weighted Edges Fusion' setting")
 
-    # Offline mode: re-vote an existing RKG file's cached trace_dags, no LLM calls.
+    # Offline mode: re-vote an existing RKG file's cached trace_rkgs, no LLM calls.
     parser.add_argument("--rebuild_consensus", action="store_true",
-                        help="Recompute consensus_dag in --input in place from its cached "
-                             "trace_dags (no LLM calls); --output is ignored")
+                        help="Recompute consensus_rkg in --input in place from its cached "
+                             "trace_rkgs (no LLM calls); --output is ignored")
     parser.add_argument("--proved_threshold", type=float, default=None,
                         help="--rebuild_consensus: asymmetric voting tau; predict PROVED when the "
                              "PROVED weight ratio >= tau (default: plain majority vote)")
@@ -1174,6 +1183,7 @@ def main() -> None:
         consensus_threshold=args.consensus_threshold,
         node_threshold=args.node_threshold,
         max_samples=args.max_samples,
+        edge_lambda=args.edge_lambda,
     ))
 
 

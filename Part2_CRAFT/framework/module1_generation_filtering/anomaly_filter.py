@@ -48,7 +48,7 @@ _cfg_path = _Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_part_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
 
-# Reuse functions from extract_terms.py (Step 2: TF-IDF Term Extraction)
+# Reuse functions from extract_terms.py (Step 2: TF-IRF Term Extraction)
 from framework.module1_generation_filtering.extract_terms import (
     tokenize_text,
     calculate_tf,
@@ -305,12 +305,12 @@ def weighted_jaccard_similarity(
     """
     Compute weighted Jaccard similarity (inspired by GRPO).
 
-    Uses TF-IDF scores as weights so that steps containing core terms
+    Uses TF-IRF scores as weights so that steps containing core terms
     receive higher similarity scores.
 
     Args:
         set1, set2: term sets
-        tfidf1, tfidf2: corresponding TF-IDF score dicts
+        tfidf1, tfidf2: corresponding TF-IRF score dicts
 
     Returns:
         Weighted Jaccard similarity [0, 1]
@@ -320,14 +320,14 @@ def weighted_jaccard_similarity(
     if not set1 or not set2:
         return 0.0
 
-    # Intersection: sum of TF-IDF scores for shared terms
+    # Intersection: sum of TF-IRF scores for shared terms
     intersection_terms = set1 & set2
     intersection_weight = sum(
         tfidf1.get(term, 0.0) + tfidf2.get(term, 0.0)
         for term in intersection_terms
     ) / 2.0  # take average
 
-    # Union: sum of TF-IDF scores for all terms
+    # Union: sum of TF-IRF scores for all terms
     union_terms = set1 | set2
     union_weight = sum(
         max(tfidf1.get(term, 0.0), tfidf2.get(term, 0.0))
@@ -452,7 +452,7 @@ def extract_step_terms_with_tfidf(
     domain: str = "logical",
     df_table: Optional[DocFreqTable] = None,
 ) -> Tuple[List[str], Dict[str, float]]:
-    """Extract important terms and their TF-IDF scores for a single step (domain-aware).
+    """Extract important terms and their TF-IRF scores for a single step (domain-aware).
 
     df_table follows the same convention as extract_step_terms().
     """
@@ -515,7 +515,7 @@ def collect_all_steps_with_terms(
             "step_text": str,
             "terms": List[str],
             "terms_set": Set[str],
-            "tfidf_scores": Dict[str, float]  # added: TF-IDF scores
+            "tfidf_scores": Dict[str, float]  # added: TF-IRF scores
         }
     """
     # Step 1: collect all step texts (for IDF computation)
@@ -541,7 +541,7 @@ def collect_all_steps_with_terms(
             normalize=idf_norm,
         )
 
-    # Step 2: extract terms and TF-IDF scores for each step
+    # Step 2: extract terms and TF-IRF scores for each step
     steps_with_terms = []
 
     for step_info in all_steps_info:
@@ -561,7 +561,7 @@ def collect_all_steps_with_terms(
             "step_text": step_info["step_text"],
             "terms": terms,
             "terms_set": set(terms),
-            "tfidf_scores": tfidf_scores,  # added: TF-IDF scores
+            "tfidf_scores": tfidf_scores,  # added: TF-IRF scores
         })
 
     return steps_with_terms
@@ -1191,8 +1191,9 @@ def process_sample(
     elif method == "rkg":
         if sample_rkg is None:
             raise ValueError("method='rkg' requires sample_rkg argument (from build_rkg.py output)")
-        trace_rkgs    = sample_rkg.get("trace_dags", [])
-        consensus_rkg = sample_rkg.get("consensus_dag", {})
+        # Runs written before the keys were renamed to the paper's RKG still say dag.
+        trace_rkgs    = sample_rkg.get("trace_rkgs") or sample_rkg.get("trace_dags") or []
+        consensus_rkg = sample_rkg.get("consensus_rkg") or sample_rkg.get("consensus_dag") or {}
         anomalous_rkg, underthinking_traces = detect_anomalous_steps_rkg(
             trace_rkgs, consensus_rkg,
             consensus_threshold=consensus_threshold,
@@ -1373,7 +1374,7 @@ def main():
         "--use_weighted_similarity",
         action="store_true",
         default=True,
-        help="Whether to use weighted Jaccard similarity (accounts for TF-IDF weights, default True)",
+        help="Whether to use weighted Jaccard similarity (accounts for TF-IRF weights, default True)",
     )
     parser.add_argument(
         "--no_weighted_similarity",

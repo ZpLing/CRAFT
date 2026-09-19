@@ -122,7 +122,7 @@ def extract_step_terms_with_tfidf(
     domain: str = "logical",
     df_table: Optional[DocFreqTable] = None,
 ) -> Tuple[List[str], Dict[str, float]]:
-    """Extract important terms and their TF-IDF scores for a single step (domain-aware).
+    """Extract important terms and their TF-IRF scores for a single step (domain-aware).
 
     df_table: when given, IDF is scored against that corpus (the global IRF setting) and
     all_step_documents is ignored; when None, IDF comes from all_step_documents, i.e. the
@@ -665,7 +665,7 @@ def extract_facts_from_traces(traces: List[Dict[str, Any]]) -> str:
 # RKG-Guided Synthesis
 #########################
 
-def topological_sort_dag(consensus_dag: Dict[str, Any]) -> List[str]:
+def topological_sort_dag(consensus_rkg: Dict[str, Any]) -> List[str]:
     """Kahn topological sort of consensus RKG nodes.
 
     If cycles exist (due to LLM misclassification), remove the lowest-confidence
@@ -676,8 +676,8 @@ def topological_sort_dag(consensus_dag: Dict[str, Any]) -> List[str]:
     """
     from collections import deque
 
-    nodes = {n["id"]: n for n in consensus_dag.get("nodes", [])}
-    edges = consensus_dag.get("edges", [])
+    nodes = {n["id"]: n for n in consensus_rkg.get("nodes", [])}
+    edges = consensus_rkg.get("edges", [])
 
     # Build adjacency list & in-degree table
     in_degree: Dict[str, int] = {nid: 0 for nid in nodes}
@@ -719,7 +719,7 @@ def topological_sort_dag(consensus_dag: Dict[str, Any]) -> List[str]:
 
 
 def build_synthesis_plan_from_dag(
-    consensus_dag: Dict[str, Any],
+    consensus_rkg: Dict[str, Any],
     topo_order: List[str],
 ) -> List[Dict[str, Any]]:
     """Convert topological sort result into a step-by-step synthesis plan.
@@ -732,9 +732,9 @@ def build_synthesis_plan_from_dag(
     - num_traces_supporting: number of traces supporting this node
     - edge_confidence: average confidence of incoming edges
     """
-    nodes = {n["id"]: n for n in consensus_dag.get("nodes", [])}
-    edges = consensus_dag.get("edges", [])
-    edge_frequencies = consensus_dag.get("edge_frequencies", {})
+    nodes = {n["id"]: n for n in consensus_rkg.get("nodes", [])}
+    edges = consensus_rkg.get("edges", [])
+    edge_frequencies = consensus_rkg.get("edge_frequencies", {})
 
     # Build dst → src lookup
     predecessors: Dict[str, List[str]] = defaultdict(list)
@@ -794,7 +794,7 @@ def build_rkg_synthesis_prompt(
     """Build generation prompt for a single RKG node.
 
     For math domain (P1-B): use consensus node_text as reference anchor.
-    For logical domain: use RKG topology (predecessor dependencies) + TF-IDF
+    For logical domain: use RKG topology (predecessor dependencies) + TF-IRF
       frequency hints — avoids contamination from biased node_texts in samples
       where most k-traces predict the wrong label.
     """
@@ -845,7 +845,7 @@ def build_rkg_synthesis_prompt(
   \"{ref_hint[:300]}\"
   (Preserve the logical structure and content; you may rephrase for clarity.)
 """
-    # Additionally provide TF-IDF term hints for logical domain (supplementary guidance)
+    # Additionally provide TF-IRF term hints for logical domain (supplementary guidance)
     if domain == "logical" and step_terms_summary and total_steps > 1:
         bucket = round((step_pos - 1) / max(total_steps - 1, 1) * 9)
         step_data = step_terms_summary.get(bucket)
@@ -919,7 +919,7 @@ def build_rkg_synthesis_prompt(
 async def synthesize_trace_rkg(
     session: aiohttp.ClientSession,
     sample: Dict[str, Any],
-    sample_dag: Dict[str, Any],
+    sample_rkg: Dict[str, Any],
     model: str = DEFAULT_MODEL,
     domain: str = "logical",
     anchor_conclusion: bool = False,
@@ -963,10 +963,10 @@ async def synthesize_trace_rkg(
         return results
 
     sample_id      = sample.get("sample_id", "unknown")
-    consensus_dag  = sample_dag.get("consensus_dag", {})
+    consensus_rkg  = sample_rkg.get("consensus_rkg") or sample_rkg.get("consensus_dag") or {}
 
-    if not consensus_dag.get("nodes"):
-        return {"sample_id": sample_id, "error": "empty_consensus_dag", "synthesized_trace": None}
+    if not consensus_rkg.get("nodes"):
+        return {"sample_id": sample_id, "error": "empty_consensus_rkg", "synthesized_trace": None}
 
     problem_input = (
         sample.get("problem_text")
@@ -1035,8 +1035,8 @@ async def synthesize_trace_rkg(
             if _label_counts:
                 _mv_label = max(_label_counts, key=_label_counts.get)
 
-    topo_order = topological_sort_dag(consensus_dag)
-    plan       = build_synthesis_plan_from_dag(consensus_dag, topo_order)
+    topo_order = topological_sort_dag(consensus_rkg)
+    plan       = build_synthesis_plan_from_dag(consensus_rkg, topo_order)
 
     if not plan:
         return {"sample_id": sample_id, "error": "empty_synthesis_plan", "synthesized_trace": None}
@@ -1058,7 +1058,7 @@ async def synthesize_trace_rkg(
     else:
         total_steps = len(plan)
 
-    # Compute TF-IDF step-term hints.
+    # Compute TF-IRF step-term hints.
     # For logical domain: unbiased frequency counts as content hints.
     # For math domain: also compute — helps RKG synthesis fill intermediate steps.
     _step_terms_summary: Dict[int, Dict] = {}
@@ -1754,8 +1754,8 @@ async def synthesize_traces_for_dataset(
 
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
-                sample_dag = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_dag, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, df_table=df_table, idf_norm=(idf_norm == "log_n")))
+                sample_rkg = rkg_lookup.get(sample_id, {})
+                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, df_table=df_table, idf_norm=(idf_norm == "log_n")))
             else:
                 tasks.append(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
@@ -1933,7 +1933,7 @@ def main():
         "--min_tfidf",
         type=float,
         default=0.01,
-        help="Minimum TF-IDF threshold (default: 0.01)"
+        help="Minimum TF-IRF threshold (default: 0.01)"
     )
     parser.add_argument(
         "--idf_scope",

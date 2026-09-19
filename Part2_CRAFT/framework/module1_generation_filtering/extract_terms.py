@@ -6,11 +6,11 @@ Extract important logical terms and domain-specific vocabulary from reasoning tr
 
 Called internally by anomaly_filter.py (Module I) and synthesize_trace.py (Module III);
 run directly it just dumps the term table for inspection.
-It implements TF-IDF term extraction: terms that appear frequently within a single
+It implements TF-IRF term extraction: terms that appear frequently within a single
 sample's traces but rarely across other samples' traces are considered important.
 
 Key features:
-- TF-IDF based extraction: high within-sample TF, low across-sample IDF
+- TF-IRF based extraction: high within-sample TF, low across-sample IDF
 - Averages term frequencies across k traces per sample before extraction
 - Supports both logical domain (LOGICAL_KEYWORDS) and math domain (LaTeX formula tokens)
 - Outputs important term lists per sample
@@ -680,13 +680,13 @@ def calculate_tfidf_for_sample(
     domain: str = "logical",
 ) -> Dict[str, float]:
     """
-    Compute TF-IDF scores for a single sample.
+    Compute TF-IRF scores for a single sample.
 
     Procedure:
     1. Compute term frequency (TF) for each trace individually
     2. Average TF values across k traces to get the sample-level average TF
     3. Compute IDF for each term (relative to all traces, not just this sample)
-    4. TF-IDF = average_TF * IDF
+    4. TF-IRF = average_TF * IDF
 
     Args:
         sample_traces: All traces for this sample
@@ -695,7 +695,7 @@ def calculate_tfidf_for_sample(
         min_idf: Minimum IDF threshold
 
     Returns:
-        Dictionary mapping terms to their TF-IDF scores
+        Dictionary mapping terms to their TF-IRF scores
     """
     # Extract text from all traces of this sample
     sample_texts = extract_reasoning_text(sample_traces)
@@ -763,7 +763,7 @@ def extract_important_terms(
         top_k: Number of top important terms to extract per sample
         min_tf: Minimum TF threshold
         min_idf: Minimum IDF threshold
-        min_tfidf: Minimum TF-IDF score threshold (only terms above this are considered semantically rich)
+        min_tfidf: Minimum TF-IRF score threshold (only terms above this are considered semantically rich)
         prioritize_logical: Whether to prioritize logical keywords
 
     Returns:
@@ -796,7 +796,7 @@ def extract_important_terms(
 
         sample_traces_list.append(traces)
 
-    # Step 2: Compute TF-IDF for each sample
+    # Step 2: Compute TF-IRF for each sample
     all_important_terms = []
 
     for idx, (sample, traces) in enumerate(zip(results, sample_traces_list)):
@@ -857,7 +857,7 @@ def extract_important_terms(
                 # Add semantically rich logical words first, then domain terms
                 selected_terms = sorted_semantic_logical + sorted_regular
             else:
-                # Sort purely by TF-IDF score (common logical words already filtered)
+                # Sort purely by TF-IRF score (common logical words already filtered)
                 selected_terms = sorted(filtered_tfidf_scores.items(), key=lambda x: x[1], reverse=True)
         else:
             # Limit to top-k
@@ -867,7 +867,7 @@ def extract_important_terms(
                 num_semantic = max(1, int(top_k * semantic_ratio))
                 selected_terms = sorted_semantic_logical[:num_semantic] + sorted_regular[:top_k - num_semantic]
             else:
-                # Sort purely by TF-IDF score (common logical words already filtered)
+                # Sort purely by TF-IRF score (common logical words already filtered)
                 all_sorted = sorted(filtered_tfidf_scores.items(), key=lambda x: x[1], reverse=True)
                 selected_terms = all_sorted[:top_k]
 
@@ -961,7 +961,7 @@ def main():
     parser.add_argument(
         "--no_prioritize_logical",
         action="store_true",
-        help="Do not prioritize logical words; sort purely by TF-IDF score",
+        help="Do not prioritize logical words; sort purely by TF-IRF score",
     )
     parser.add_argument(
         "--domain",
@@ -992,7 +992,7 @@ def main():
     print(f"  - Top K: {args.top_k if args.top_k else 'unlimited (extract all terms meeting criteria)'}")
     print(f"  - Min TF: {args.min_tf}")
     print(f"  - Min IDF: {args.min_idf}")
-    print(f"  - Min TF-IDF: {args.min_tfidf} (only terms above this threshold are considered semantically rich)")
+    print(f"  - Min TF-IRF: {args.min_tfidf} (only terms above this threshold are considered semantically rich)")
     print(f"  - Prioritize logical words: {not args.no_prioritize_logical}")
 
     # Extract important terms
