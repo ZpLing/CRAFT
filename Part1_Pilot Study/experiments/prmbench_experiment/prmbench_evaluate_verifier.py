@@ -1,6 +1,6 @@
 from __future__ import annotations
 """
-PRMBench — LLM-as-Verifier: with_answer vs blind
+PRMBench — LLM-as-Verifier: with_answer vs wout_answer
 
 Research question: Does knowing the correct final answer improve the LLM's
 ability to detect erroneous steps in a reasoning chain?
@@ -25,7 +25,7 @@ first_error_acc, F1.
 
 Settings:
   A (with_answer): LLM is told the correct final answer before verifying steps.
-  B (blind):       LLM verifies steps without knowing the answer.
+  B (wout_answer):       LLM verifies steps without knowing the answer.
 
 Usage:
     python prmbench_evaluate_verifier.py \\
@@ -101,7 +101,7 @@ SYSTEM_WITH_ANSWER = (
     + FEW_SHOT_EXAMPLE
 )
 
-SYSTEM_BLIND = (
+SYSTEM_WOUT_ANSWER = (
     "You are a math reasoning verifier.\n"
     "You will be given a math problem and numbered solution steps.\n"
     "For each step, output two scores:\n"
@@ -126,7 +126,7 @@ def build_prompt_with_answer(question: str, steps: list[str], correct_answer: st
     )
 
 
-def build_prompt_blind(question: str, steps: list[str]) -> str:
+def build_prompt_wout_answer(question: str, steps: list[str]) -> str:
     steps_block = "\n".join(f"Step {i+1}: {s}" for i, s in enumerate(steps))
     return (
         f"Question: {question}\n\n"
@@ -174,36 +174,24 @@ async def call_llm(
     url = base_url.rstrip("/") + "/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
-    # Detect reasoning model by name prefix
-    _REASONING_PREFIXES = ("o1", "o3", "o4", "o-1", "o-3", "o-4")
+    # Reasoning models (o1/o3/o4 and the GPT-5 family) bill hidden reasoning against
+    # the same budget as the visible reply and take max_completion_tokens rather than
+    # max_tokens. At 4096 they spend the budget thinking and return an empty or
+    # truncated body on the longer items, which then fails to parse and drops the
+    # sample — so the ceiling is set high enough that the JSON always fits.
+    _REASONING_PREFIXES = ("o1", "o3", "o4", "o-1", "o-3", "o-4", "gpt-5", "gpt5")
     is_reasoning = any(model.lower().startswith(p) for p in _REASONING_PREFIXES)
+    _MAX_OUTPUT_TOKENS = 16000
 
-    # Detect reasoning model — requires max_completion_tokens instead of max_tokens
-    _REASONING_PREFIXES = ("o1", "o3", "o4", "o-1", "o-3", "o-4")
-    is_reasoning = any(model.lower().startswith(p) for p in _REASONING_PREFIXES)
-
-    if is_reasoning:
-        # o1/o3/o4 family: must use max_completion_tokens (not max_tokens)
-        payload = {
-            "model":                 model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user",   "content": user},
-            ],
-            "temperature":           0.5,
-            "max_completion_tokens": 4096,
-        }
-    else:
-        # Standard chat models (gpt-4.x etc.): use max_tokens
-        payload = {
-            "model":       model,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user",   "content": user},
-            ],
-            "temperature": 0.5,
-            "max_tokens":  4096,
-        }
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user",   "content": user},
+        ],
+        "temperature": 0.5,
+        ("max_completion_tokens" if is_reasoning else "max_tokens"): _MAX_OUTPUT_TOKENS,
+    }
     for attempt in range(4):
         async with semaphore:
             try:
@@ -279,6 +267,99 @@ def parse_scores(raw: str, n_steps: int) -> tuple[list[float] | None, list[float
 # PRMBench eval_on_hallucination_step — verbatim port from task.py
 # Threshold: score > 0 → True (valid); score <= 0 → False (invalid)
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Difficulty dimension mapping — PRMBench's own taxonomy (prmbench.github.io):
+# Simplicity = Non-Redundancy + Non-Circular Logic; Soundness = Empirical
+# Soundness + Step Consistency + Domain Consistency + Confidence Invariance;
+# Sensitivity = Prerequisite Sensitivity + Deception Resistance + Multi-Solution
+# Consistency. An item's `_dim` in the sampled dataset agrees with this map, so
+# grouping here and stratification there cannot drift apart.
+# ---------------------------------------------------------------------------
+DIFFICULTY_DIMS = {
+    "simplicity":  {"redundency", "circular"},
+    "soundness":   {"counterfactual", "step_contradiction",
+                    "domain_inconsistency", "confidence"},
+    "sensitivity": {"missing_condition", "deception", "multi_solutions"},
+}
+
+
+def get_dim(classification: str) -> str:
+    for dim, classes in DIFFICULTY_DIMS.items():
+        if classification in classes:
+            return dim
+    return "unknown"
+
+
+def metrics_from_record(rec: dict, setting: str) -> dict | None:
+    """Rebuild one setting's metrics from the scores stored in a result record.
+
+    The record keeps the model's raw per-step scores, so a summary can be rebuilt
+    from a results file alone — no second pass over the API.
+    """
+    side = rec.get(setting) or {}
+    validity = side.get("validity_scores")
+    if not validity:
+        return None
+    return eval_on_hallucination_step(
+        rec.get("error_steps", []), validity,
+        rec.get("classification", ""), side.get("redundancy_scores"),
+    )
+
+
+def build_summary(results: list[dict], model: str) -> dict:
+    """Aggregate per-item metrics into the 3 difficulty dimensions plus a total.
+
+    An item counts only when BOTH settings produced parsable scores. A call the
+    endpoint refuses (its content filter rejects e.g. "gcd") or a reply that will
+    not parse takes the whole item out of both settings, so w/ Answer and w/o
+    Answer are always compared over the same items and n is the number actually
+    scored, never the number attempted.
+    """
+    dims = ("simplicity", "soundness", "sensitivity")
+    paired: dict[str, dict[str, list]] = {d: {"with_answer": [], "wout_answer": []} for d in dims}
+    attempted = {d: 0 for d in dims}
+    dropped_idx: dict[str, list] = {d: [] for d in dims}
+
+    for rec in results:
+        dim = get_dim(rec.get("classification", ""))
+        if dim not in paired:
+            continue
+        attempted[dim] += 1
+        wa_m = metrics_from_record(rec, "with_answer")
+        bl_m = metrics_from_record(rec, "wout_answer")
+        if wa_m is None or bl_m is None:
+            dropped_idx[dim].append(rec.get("idx", ""))
+            continue
+        paired[dim]["with_answer"].append(wa_m)
+        paired[dim]["wout_answer"].append(bl_m)
+
+    def dim_summary(wa_list, bl_list, n_attempted, dropped):
+        return {
+            "with_answer": aggregate_metrics(wa_list),
+            "wout_answer":       aggregate_metrics(bl_list),
+            "n_items":     len(wa_list),
+            "n_attempted": n_attempted,
+            "n_dropped":   len(dropped),
+        }
+
+    summary = {d: dim_summary(paired[d]["with_answer"], paired[d]["wout_answer"],
+                              attempted[d], dropped_idx[d]) for d in dims}
+    summary["total"] = dim_summary(
+        [m for d in dims for m in paired[d]["with_answer"]],
+        [m for d in dims for m in paired[d]["wout_answer"]],
+        sum(attempted.values()),
+        [i for d in dims for i in dropped_idx[d]],
+    )
+    summary["meta"] = {
+        "n_total":         len(results),
+        "n_scored":        summary["total"]["n_items"],
+        "dropped_idx":     {d: dropped_idx[d] for d in dims if dropped_idx[d]},
+        "model":           model,
+        "difficulty_dims": {d: sorted(c) for d, c in DIFFICULTY_DIMS.items()},
+    }
+    return summary
+
+
 def eval_on_hallucination_step(
     hallucination_steps: list[int],
     validity_scores: list[float],
@@ -426,8 +507,8 @@ async def run(args):
             ))
             bl_tasks.append(call_llm(
                 session, semaphore,
-                SYSTEM_BLIND,
-                build_prompt_blind(question, steps),
+                SYSTEM_WOUT_ANSWER,
+                build_prompt_wout_answer(question, steps),
                 args.model, args.api_key, args.base_url,
             ))
 
@@ -452,7 +533,7 @@ async def run(args):
         if wa_val is None:
             logger.warning("Parse failed (with_answer) idx=%s | %s", idx, (wa_raw or "")[:100])
         if bl_val is None:
-            logger.warning("Parse failed (blind) idx=%s | %s", idx, (bl_raw or "")[:100])
+            logger.warning("Parse failed (wout_answer) idx=%s | %s", idx, (bl_raw or "")[:100])
 
         wa_m = eval_on_hallucination_step(error_steps, wa_val, classification, wa_red) if wa_val else None
         bl_m = eval_on_hallucination_step(error_steps, bl_val, classification, bl_red) if bl_val else None
@@ -476,7 +557,7 @@ async def run(args):
                                          "wrong_step_acc_list", "total_step_acc_list",
                                          "first_error_acc_list")} if wa_m else None,
             },
-            "blind": {
+            "wout_answer": {
                 "validity_scores":   bl_val,
                 "redundancy_scores": bl_red,
                 "validity":          bl_val is not None,
@@ -488,77 +569,7 @@ async def run(args):
             },
         })
 
-    # ---------------------------------------------------------------------------
-    # Difficulty dimension mapping — PRMBench's own taxonomy (prmbench.github.io):
-    # Simplicity = Non-Redundancy + Non-Circular Logic; Soundness = Empirical
-    # Soundness + Step Consistency + Domain Consistency + Confidence Invariance;
-    # Sensitivity = Prerequisite Sensitivity + Deception Resistance +
-    # Multi-Solution Consistency. An item's `_dim` in the sampled dataset agrees
-    # with this map, so grouping here and stratification there cannot drift apart.
-    # ---------------------------------------------------------------------------
-    DIFFICULTY_DIMS = {
-        "simplicity":  {"redundency", "circular"},
-        "soundness":   {"counterfactual", "step_contradiction",
-                        "domain_inconsistency", "confidence"},
-        "sensitivity": {"missing_condition", "deception", "multi_solutions"},
-    }
-
-    def get_dim(classification: str) -> str:
-        for dim, classes in DIFFICULTY_DIMS.items():
-            if classification in classes:
-                return dim
-        return "unknown"
-
-    # Group per-item metrics by difficulty dimension
-    # Structure: {dim: {"with_answer": [...], "blind": [...]}}
-    dim_metrics: dict[str, dict[str, list]] = {
-        dim: {"with_answer": [], "blind": []}
-        for dim in ("simplicity", "soundness", "sensitivity")
-    }
-
-    for item_result, wa_m, bl_m in zip(results, wa_metrics_list, bl_metrics_list):
-        dim = get_dim(item_result["classification"])
-        if dim in dim_metrics:
-            dim_metrics[dim]["with_answer"].append(wa_m)
-            dim_metrics[dim]["blind"].append(bl_m)
-
-    # Build summary: 3 difficulty dims + total, each with with_answer and blind
-    def build_dim_summary(wa_list, bl_list, n_items):
-        return {
-            "with_answer": aggregate_metrics([m for m in wa_list if m]),
-            "blind":       aggregate_metrics([m for m in bl_list if m]),
-            "n_items": n_items,
-        }
-
-    summary = {
-        "simplicity": build_dim_summary(
-            dim_metrics["simplicity"]["with_answer"],
-            dim_metrics["simplicity"]["blind"],
-            len(dim_metrics["simplicity"]["with_answer"]),
-        ),
-        "soundness": build_dim_summary(
-            dim_metrics["soundness"]["with_answer"],
-            dim_metrics["soundness"]["blind"],
-            len(dim_metrics["soundness"]["with_answer"]),
-        ),
-        "sensitivity": build_dim_summary(
-            dim_metrics["sensitivity"]["with_answer"],
-            dim_metrics["sensitivity"]["blind"],
-            len(dim_metrics["sensitivity"]["with_answer"]),
-        ),
-        "total": build_dim_summary(
-            wa_metrics_list,
-            bl_metrics_list,
-            len(results),
-        ),
-        "meta": {
-            "n_total":             len(results),
-            "n_with_answer_valid": sum(1 for r in results if r["with_answer"]["validity"]),
-            "n_blind_valid":       sum(1 for r in results if r["blind"]["validity"]),
-            "model":               args.model,
-            "difficulty_dims":     {dim: list(classes) for dim, classes in DIFFICULTY_DIMS.items()},
-        },
-    }
+    summary = build_summary(results, args.model)
 
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -578,7 +589,7 @@ async def run(args):
     logger.info("-" * len(header))
     for dim in ("simplicity", "soundness", "sensitivity", "total"):
         n = summary[dim]["n_items"]
-        for s in ("with_answer", "blind"):
+        for s in ("with_answer", "wout_answer"):
             m = summary[dim][s]
             logger.info(
                 "%-12s  %-12s  %9.4f  %9.4f  %7.4f  %7.4f  %d",
@@ -594,8 +605,8 @@ async def run(args):
 def main():
     parser = argparse.ArgumentParser(
         description=(
-            "PRMBench — LLM-as-Verifier (with_answer vs blind).\n"
-            "Output files are auto-named as prmbench/results/<N>_<model>_<api>_results.jsonl\n"
+            "PRMBench — LLM-as-Verifier (with_answer vs wout_answer).\n"
+            "Output files are auto-named as <model>/prmbench/<dimension>_<api>_results.jsonl\n"
             "under the results root when --output is omitted. "
             "Use --api_name to label the API in the filename."
         )
@@ -603,7 +614,7 @@ def main():
     parser.add_argument("--input",       required=True, help="PRMBench JSONL input file")
     parser.add_argument("--output",      default=None,
                         help="Output JSONL path. Relative paths resolve under the results "
-                             "root; if omitted, auto-generated in prmbench/results/")
+                             "root; if omitted, auto-generated in <model>/prmbench/")
     parser.add_argument("--api_name",    default=None,
                         help="API label for filename. "
                              "Derived from a short hash of base_url if omitted.")
@@ -618,14 +629,19 @@ def main():
 
     # Auto-generate output path if not specified
     if args.output is None:
-        n_label = str(args.max_samples) if args.max_samples else "all"
         # Derive api_name from a short hash of base_url if not given
         api_label = args.api_name
         if not api_label:
             url = (args.base_url or "").strip().lower()
             api_label = "api_" + hashlib.md5(url.encode("utf-8")).hexdigest()[:6] if url else "api"
         model_safe = args.model.replace("/", "-").replace(":", "-")
-        args.output = f"prmbench/results/prmbench_{n_label}_{model_safe}_{api_label}_results.jsonl"
+        # One directory per model, one file per dimension: the input's own name
+        # ("simplicity" / "soundness" / "sensitivity") carries through to the output,
+        # so a run is identifiable without opening it.
+        stem = Path(args.input).stem
+        if args.max_samples:
+            stem = f"{stem}_{args.max_samples}"
+        args.output = f"{model_safe}/prmbench/{stem}_{api_label}_results.jsonl"
     args.output = str(resolve_output(args.output))
     logger.info("Output path: %s", args.output)
 

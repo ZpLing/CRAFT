@@ -18,7 +18,7 @@ get_reasoning_chain_text(), we take a flat list of step strings directly.
 Input JSON (output of receval_generate_traces.py):
     [{"id": "...", "hypothesis": "...", "question": "...",
       "with_answer": {"steps": ["Step 1 ...", "Step 2 ..."]},
-      "blind":       {"steps": ["Step 1 ...", "Step 2 ..."]}}, ...]
+      "wout_answer":       {"steps": ["Step 1 ...", "Step 2 ..."]}}, ...]
 
 Output JSON:
     {
@@ -26,7 +26,7 @@ Output JSON:
         "per_sample": [{"id": "...", "entail": 0.91, "ll_info": 0.12, ...}],
         "aggregate":  {"entail": 0.88, "ll_info": 0.09, ...}
       },
-      "blind": { ... same structure ... },
+      "wout_answer": { ... same structure ... },
       "comparison": {"entail_delta": 0.03, "ll_info_delta": 0.03, ...}
     }
 
@@ -458,7 +458,7 @@ def main():
         hypothesis = item.get("hypothesis", "")
         question   = item.get("question", "")  # joined premises as input context
 
-        for setting, container in (("with_answer", wa_results), ("blind", bl_results)):
+        for setting, container in (("with_answer", wa_results), ("wout_answer", bl_results)):
             steps = item[setting].get("steps", [])
             if not steps:
                 logger.warning("Empty steps for id=%s setting=%s", item.get("id"), setting)
@@ -487,7 +487,7 @@ def main():
 
     output = {
         "with_answer": {"per_sample": wa_results, "aggregate": wa_agg},
-        "blind":       {"per_sample": bl_results, "aggregate": bl_agg},
+        "wout_answer":       {"per_sample": bl_results, "aggregate": bl_agg},
         "comparison":  comparison,
         "config": {"score_keys": args.score_keys, "K": args.K, "n_samples": len(items)},
     }
@@ -501,7 +501,7 @@ def main():
     logger.info("=== ReCEval Score Comparison ===")
     for k in args.score_keys:
         logger.info(
-            "%-12s  with_answer=%.4f  blind=%.4f  delta=%+.4f",
+            "%-12s  with_answer=%.4f  wout_answer=%.4f  delta=%+.4f",
             k,
             wa_agg.get(k) or float("nan"),
             bl_agg.get(k) or float("nan"),

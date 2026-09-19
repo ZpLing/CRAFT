@@ -1,0 +1,576 @@
+#!/usr/bin/env python3
+"""
+significance_test.py
+====================
+Paired Wilcoxon signed-rank tests + bootstrap 95% CI + Cohen's d
+for PRMBench and ROSCOE GT vs No-GT conditions.
+
+Outputs:
+  - significance_results.json   — all stats
+  - significance_forest.pdf     — forest plot (GT − No-GT effect sizes)
+
+Usage:
+    python significance_test.py
+"""
+
+import json, os, subprocess
+from pathlib import Path
+import numpy as np
+import pandas as pd
+from scipy import stats
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from matplotlib.transforms import blended_transform_factory
+
+BENCH_DIR    = Path(__file__).resolve().parent    # Part1_Pilot Study/experiments/
+PART_ROOT    = BENCH_DIR.parent                   # Part1_Pilot Study/
+REPO_ROOT    = PART_ROOT.parent
+RESULTS_ROOT = PART_ROOT / "results"             # <results>/<model>/{prmbench,roscoe}/
+
+# Every figure in the repo lands in one place, whatever produced it.
+FIGURE_DIR = REPO_ROOT / "Figure"
+# Stats and the LaTeX table are not figures; they stay with the run outputs.
+OUT_DIR    = RESULTS_ROOT / "significance_testing"
+FIGURE_DIR.mkdir(parents=True, exist_ok=True)
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+# ──────────────────────────────────────────────────────────────
+# Model config
+# ──────────────────────────────────────────────────────────────
+# Display name → the model's directory under the results root. Everything a model
+# produced lives there: prmbench/<dim>_<api>_results.jsonl and roscoe/roscoe_scores/.
+MODELS = {
+    "GPT-o4-mini":           "o4-mini",
+    "GPT-5.4-nano":          "gpt-5.4-nano",
+    "DeepSeek-V4-Flash":     "deepseek-v4-flash",
+    "Gemini-3.1-Flash-Lite": "gemini-3.1-flash-lite",
+}
+
+MODEL_COLORS = {
+    "GPT-o4-mini":           "#B4DEB6",   # light sage
+    "GPT-5.4-nano":          "#7BC6BE",   # mid teal
+    "DeepSeek-V4-Flash":     "#439CC4",   # steel blue
+    "Gemini-3.1-Flash-Lite": "#09554D",   # dark teal
+}
+
+DIM_MAP = {"simplicity": "Simplicity", "soundness": "Soundness",
+           "sensitivity": "Sensitivity"}
+ROSCOE_DATASETS = ["cosmos", "drop", "esnli", "gsm8k"]
+ROSCOE_DS_LABELS = {"cosmos": "CosmosQA", "drop": "DROP",
+                    "esnli": "eSNLI", "gsm8k": "GSM8K"}
+
+PRM_METRIC    = "f1"            # primary PRMBench metric (kept for table)
+ROSCOE_METRIC = "faithfulness"  # primary ROSCOE metric
+
+# For the 7-panel plot
+PRM_PLOT_METRICS = ["total_step_acc", "first_error_acc", "f1"]
+PRM_METRIC_LABELS = {
+    "total_step_acc":  "Step Acc",
+    "first_error_acc": "1st Err Acc",
+    "f1":              "F1",
+}
+
+# PRMBench dimensions for top-row panels
+PRM_DIMS = ["simplicity", "soundness", "sensitivity"]
+PRM_DIM_LABELS = {"simplicity": "Simplicity", "soundness": "Soundness",
+                  "sensitivity": "Sensitivity"}
+
+# ROSCOE metrics to aggregate per dataset (bottom-row panels)
+ROSCOE_AGG_METRICS = ["faithfulness", "informativeness_step",
+                      "informativeness_chain", "coherence_step_vs_step"]
+MODEL_DISPLAY = {
+    "GPT-o4-mini":    "GPT-o4-mini",
+    "Gemini-3-Flash": "Gemini-\n3-Flash",
+    "GPT-5.4-nano":   "GPT-\n5.4-nano",
+    "DeepSeek-R1":    "DeepSeek-R1",
+}
+
+
+# ──────────────────────────────────────────────────────────────
+# Statistics helpers
+# ──────────────────────────────────────────────────────────────
+def cohen_d(a, b):
+    """Paired Cohen's d (mean diff / pooled SD of differences)."""
+    diff = np.array(a) - np.array(b)
+    return diff.mean() / (diff.std(ddof=1) + 1e-12)
+
+
+def bootstrap_ci(a, b, n_boot=5000, ci=0.95, seed=42):
+    """Bootstrap 95% CI on mean(a − b)."""
+    rng  = np.random.default_rng(seed)
+    diff = np.array(a) - np.array(b)
+    boot = rng.choice(diff, size=(n_boot, len(diff)), replace=True).mean(axis=1)
+    lo   = np.percentile(boot, 100 * (1 - ci) / 2)
+    hi   = np.percentile(boot, 100 * (1 + ci) / 2)
+    return float(diff.mean()), float(lo), float(hi)
+
+
+def wilcoxon(a, b):
+    """Wilcoxon signed-rank test; returns p-value (two-sided)."""
+    diff = np.array(a) - np.array(b)
+    if np.all(diff == 0):
+        return 1.0
+    try:
+        _, p = stats.wilcoxon(diff, alternative="two-sided", zero_method="wilcox")
+        return float(p)
+    except Exception:
+        return 1.0
+
+
+def sig_label(p):
+    if p < 0.001: return "***"
+    if p < 0.01:  return "**"
+    if p < 0.05:  return "*"
+    return "ns"
+
+
+# ──────────────────────────────────────────────────────────────
+# Data loading
+# ──────────────────────────────────────────────────────────────
+def prm_items(model_name):
+    """Yield (dim, item) for one model's PRMBench runs.
+
+    The dimension comes from the file the item was scored in — the dataset is split
+    into simplicity/soundness/sensitivity.jsonl and each run writes back under that
+    name — so this cannot drift from how the items were sampled or scored.
+    """
+    base = RESULTS_ROOT / MODELS[model_name] / "prmbench"
+    for dim in ("simplicity", "soundness", "sensitivity"):
+        for path in sorted(base.glob(f"{dim}_*_results.jsonl")):
+            with path.open() as f:
+                for line in f:
+                    if line.strip():
+                        yield dim, json.loads(line)
+
+
+def load_prm(model_name):
+    """Load one model's PRMBench runs → dict[dim] → (with_answer, wout_answer)."""
+    dims = {"simplicity": [], "soundness": [], "sensitivity": []}
+    for dim, item in prm_items(model_name):
+        wa = (item.get("with_answer") or {}).get("metrics") or {}
+        bl = (item.get("wout_answer") or {}).get("metrics") or {}
+        gt, no_gt = wa.get(PRM_METRIC), bl.get(PRM_METRIC)
+        if gt is not None and no_gt is not None:
+            dims[dim].append((gt, no_gt))
+    # also build "total" = all items
+    all_pairs = [p for ps in dims.values() for p in ps]
+    dims["total"] = all_pairs
+    return {d: ([x[0] for x in ps], [x[1] for x in ps]) for d, ps in dims.items() if ps}
+
+
+def load_prm_metrics(model_name):
+    """Load one model's PRMBench runs → dict[metric] → (gt, no_gt) across ALL items."""
+    buckets = {m: [] for m in PRM_PLOT_METRICS}
+    for _dim, item in prm_items(model_name):
+        wa = (item.get("with_answer") or {}).get("metrics") or {}
+        bl = (item.get("wout_answer")       or {}).get("metrics") or {}
+        for m in PRM_PLOT_METRICS:
+            g, b = wa.get(m), bl.get(m)
+            if g is not None and b is not None:
+                buckets[m].append((g, b))
+    return {m: ([x[0] for x in ps], [x[1] for x in ps])
+            for m, ps in buckets.items() if ps}
+
+
+def load_roscoe(model_name):
+    """Load per-item ROSCOE TSV scores → dict[dataset] → (gt_scores, wout_answer_scores)."""
+    base = RESULTS_ROOT / MODELS[model_name] / "roscoe" / "roscoe_scores"
+    result = {}
+    for ds in ROSCOE_DATASETS:
+        p_gt  = base / f"scores_{ds}_with_answer.tsv"
+        p_bl  = base / f"scores_{ds}_wout_answer.tsv"
+        if not p_gt.exists() or not p_bl.exists():
+            continue
+        df_gt = pd.read_csv(p_gt, sep=r"\s+", engine="python")
+        df_bl = pd.read_csv(p_bl, sep=r"\s+", engine="python")
+        if ROSCOE_METRIC not in df_gt.columns or ROSCOE_METRIC not in df_bl.columns:
+            continue
+        n = min(len(df_gt), len(df_bl))
+        gt_raw = df_gt[ROSCOE_METRIC].values[:n]
+        bl_raw = df_bl[ROSCOE_METRIC].values[:n]
+        # Drop pairs where either value is NaN
+        import numpy as _np
+        mask = ~(_np.isnan(gt_raw) | _np.isnan(bl_raw))
+        gt = gt_raw[mask].tolist()
+        bl = bl_raw[mask].tolist()
+        if len(gt) < 5:  # skip if too few valid pairs
+            continue
+        result[ds] = (gt, bl)
+    return result
+
+
+def load_prm_dims_combined(model_name):
+    """Load PRMBench JSONL → dict[dim] → (gt_diffs_pooled, bl_diffs_pooled).
+
+    For each dimension, pool paired differences across ALL 3 metrics
+    (step_acc, first_error_acc, f1) so one panel = one dimension.
+    """
+    dims = {d: [] for d in PRM_DIMS}
+    for dim, item in prm_items(model_name):
+        wa = (item.get("with_answer") or {}).get("metrics") or {}
+        bl = (item.get("wout_answer")       or {}).get("metrics") or {}
+        for m in PRM_PLOT_METRICS:
+            g, b = wa.get(m), bl.get(m)
+            if g is not None and b is not None:
+                dims[dim].append((g, b))
+    return {d: ([x[0] for x in ps], [x[1] for x in ps])
+            for d, ps in dims.items() if ps}
+
+
+def load_roscoe_combined(model_name):
+    """Load ROSCOE scores → dict[dataset] → (gt_pooled, bl_pooled).
+
+    For each dataset, pool paired values across ROSCOE_AGG_METRICS
+    so one panel = one dataset aggregating multiple metrics.
+    """
+    base = RESULTS_ROOT / MODELS[model_name] / "roscoe" / "roscoe_scores"
+    result = {}
+    for ds in ROSCOE_DATASETS:
+        p_gt = base / f"scores_{ds}_with_answer.tsv"
+        p_bl = base / f"scores_{ds}_wout_answer.tsv"
+        if not p_gt.exists() or not p_bl.exists():
+            continue
+        df_gt = pd.read_csv(p_gt, sep=r"\s+", engine="python")
+        df_bl = pd.read_csv(p_bl, sep=r"\s+", engine="python")
+        n = min(len(df_gt), len(df_bl))
+        gt_all, bl_all = [], []
+        for metric in ROSCOE_AGG_METRICS:
+            if metric not in df_gt.columns or metric not in df_bl.columns:
+                continue
+            gt_raw = df_gt[metric].values[:n]
+            bl_raw = df_bl[metric].values[:n]
+            mask = ~(np.isnan(gt_raw) | np.isnan(bl_raw))
+            gt_all.extend(gt_raw[mask].tolist())
+            bl_all.extend(bl_raw[mask].tolist())
+        if len(gt_all) >= 5:
+            result[ds] = (gt_all, bl_all)
+    return result
+
+
+# ──────────────────────────────────────────────────────────────
+# Run all tests
+# ──────────────────────────────────────────────────────────────
+def _compute_stat(gt, bl, tag=""):
+    mean_diff, lo, hi = bootstrap_ci(gt, bl)
+    p = wilcoxon(gt, bl)
+    d = cohen_d(gt, bl)
+    if tag:
+        print(f"  {tag}: diff={mean_diff:+.4f} [{lo:+.4f},{hi:+.4f}]"
+              f" p={p:.4f} d={d:.4f} {sig_label(p)}")
+    return {
+        "n":          len(gt),
+        "gt_mean":    round(float(np.mean(gt)), 4),
+        "wout_answer_mean": round(float(np.mean(bl)), 4),
+        "mean_diff":  round(mean_diff, 4),
+        "ci_lo":      round(lo, 4),
+        "ci_hi":      round(hi, 4),
+        "p_wilcoxon": round(p, 4),
+        "cohen_d":    round(d, 4),
+        "sig":        sig_label(p),
+    }
+
+
+def run_all_tests():
+    all_stats = {"prmbench": {}, "prmbench_metrics": {},
+                 "prmbench_dims_combined": {}, "roscoe": {},
+                 "roscoe_combined": {}}
+
+    for model in MODELS:
+        all_stats["prmbench"][model] = {}
+        all_stats["prmbench_metrics"][model] = {}
+        all_stats["prmbench_dims_combined"][model] = {}
+        # --- per-dimension (for LaTeX table) ---
+        try:
+            for dim, (gt, bl) in load_prm(model).items():
+                all_stats["prmbench"][model][dim] = _compute_stat(
+                    gt, bl, f"PRMBench {model} {dim}")
+        except Exception as e:
+            print(f"  [PRMBench dim] {model}: {e}")
+        # --- per-metric (for 7-panel plot, kept for reference) ---
+        try:
+            for metric, (gt, bl) in load_prm_metrics(model).items():
+                all_stats["prmbench_metrics"][model][metric] = _compute_stat(
+                    gt, bl, f"PRMBench {model} {metric}")
+        except Exception as e:
+            print(f"  [PRMBench metric] {model}: {e}")
+        # --- per-dimension, all metrics pooled (for new plot) ---
+        try:
+            for dim, (gt, bl) in load_prm_dims_combined(model).items():
+                all_stats["prmbench_dims_combined"][model][dim] = _compute_stat(
+                    gt, bl, f"PRMBench {model} {dim} (combined)")
+        except Exception as e:
+            print(f"  [PRMBench dim combined] {model}: {e}")
+
+    for model in MODELS:
+        all_stats["roscoe"][model] = {}
+        all_stats["roscoe_combined"][model] = {}
+        try:
+            for ds, (gt, bl) in load_roscoe(model).items():
+                all_stats["roscoe"][model][ds] = _compute_stat(
+                    gt, bl, f"ROSCOE   {model} {ds}")
+        except Exception as e:
+            print(f"  [ROSCOE] {model}: {e}")
+        # --- per-dataset, all metrics pooled (for new plot) ---
+        try:
+            for ds, (gt, bl) in load_roscoe_combined(model).items():
+                all_stats["roscoe_combined"][model][ds] = _compute_stat(
+                    gt, bl, f"ROSCOE   {model} {ds} (combined)")
+        except Exception as e:
+            print(f"  [ROSCOE combined] {model}: {e}")
+
+    return all_stats
+
+
+# ──────────────────────────────────────────────────────────────
+# Forest plot — 7 mini-panels: 3 PRMBench metrics (top row) +
+#               4 ROSCOE datasets (bottom row).
+# Each panel: y-axis = 4 models, x-axis = GT − No-GT effect size.
+# Dashed border on every panel. Style = k_chart_area.py.
+# ──────────────────────────────────────────────────────────────
+def _fill_metric_ax(ax, model_stat_dict, title, x_lo, x_hi,
+                    show_ylabel=True, show_legend=False):
+    """
+    One mini-forest panel.
+    model_stat_dict: {model_name: {mean_diff, ci_lo, ci_hi, p_wilcoxon, ...}}
+    y-axis: one row per model (top→bottom in MODELS order).
+    """
+    models = list(MODELS.keys())
+    colors = [MODEL_COLORS[m] for m in models]
+    ROW_H  = 1.0
+
+    yticks, ylabels = [], []
+    for mi, model in enumerate(models):
+        y = -mi * ROW_H
+        yticks.append(y)
+        ylabels.append(MODEL_DISPLAY.get(model, model) if show_ylabel else "")
+
+        row = model_stat_dict.get(model)
+        if not row:
+            continue
+        diff = row["mean_diff"]
+        lo, hi = row["ci_lo"], row["ci_hi"]
+        p = row["p_wilcoxon"]
+
+        ax.plot([lo, hi], [y, y], color=colors[mi], lw=0.9,
+                solid_capstyle="round", zorder=2, alpha=0.6)
+        marker = "D" if p < 0.05 else "o"
+        ax.scatter([diff], [y], color=colors[mi],
+                   s=11 if p < 0.05 else 9,
+                   zorder=3, marker=marker, linewidths=0, alpha=0.75)
+
+        # star: axes-x coord so box is always inside subplot; data-y coord
+        star = sig_label(p)
+        if star != "ns":
+            trans = blended_transform_factory(ax.transAxes, ax.transData)
+            ax.text(0.97, y, star,
+                    transform=trans,
+                    fontsize=4.8, va="center", ha="right",
+                    color="#E67E22", fontweight="bold", clip_on=True,
+                    bbox=dict(boxstyle="square,pad=0.28", facecolor="white",
+                              edgecolor="black", linewidth=0.6))
+
+    n = len(models)
+    ax.set_yticks(yticks)
+    ax.set_yticklabels(ylabels, fontsize=4.5)
+    ax.axvline(0, color="#333", lw=0.7, ls="--", zorder=1)
+    ax.set_xlim(x_lo, x_hi)
+    ax.set_ylim(-(n - 1) * ROW_H - 0.55, 0.55)
+    ax.grid(axis="x", lw=0.3, alpha=0.35, ls="--", zorder=0)
+    ax.set_axisbelow(True)
+    ax.tick_params(axis="y", length=0, pad=2)
+    ax.tick_params(axis="x", labelsize=5, pad=2)
+    ax.set_title(title, fontsize=6.5, fontweight="bold", pad=3)
+    ax.set_xlabel("w/ Answer − w/o Answer", fontsize=5.5, fontweight="bold", labelpad=2)
+
+    # dashed border
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_linestyle((0, (4, 3)))
+        spine.set_linewidth(0.55)
+        spine.set_color("#aaa")
+
+
+
+def make_forest_plot(stats, out_path):
+    """
+    7-panel figure  (style = k_chart_area.py):
+      Top row  (3 panels): PRMBench dimensions — Simplicity | Soundness | Sensitivity
+                            (each panel aggregates Step Acc + 1st Err Acc + F1)
+      Bottom row (4 panels): ROSCOE datasets — CosmosQA | DROP | eSNLI | GSM8K
+                            (each panel aggregates 4 ROSCOE metrics)
+    Each panel: y-axis = 4 models, x-axis = GT − No-GT effect size.
+    """
+    from matplotlib.gridspec import GridSpec
+
+    plt.rcParams.update({
+        "font.family": "Arial", "font.size": 6,
+        "axes.linewidth": 0.6,
+        "xtick.major.width": 0.5, "ytick.major.width": 0.5,
+        "xtick.major.size": 2.5,  "ytick.major.size": 2.5,
+    })
+
+    # 12-column grid: top 3 × 4 cols, bottom 4 × 3 cols
+    fig = plt.figure(figsize=(5.5, 2.9))
+    gs  = GridSpec(2, 12, figure=fig,
+                   hspace=0.52, wspace=0.55,
+                   top=0.88, bottom=0.12, left=0.09, right=0.97)
+
+    prm_axes = [fig.add_subplot(gs[0, 0:4]),
+                fig.add_subplot(gs[0, 4:8]),
+                fig.add_subplot(gs[0, 8:12])]
+    ros_axes = [fig.add_subplot(gs[1, 0:3]),
+                fig.add_subplot(gs[1, 3:6]),
+                fig.add_subplot(gs[1, 6:9]),
+                fig.add_subplot(gs[1, 9:12])]
+
+    # shared x-range per benchmark (all panels in each row share the same scale)
+    def _xlim(rows_iter, pad=0.35):
+        vals = [v for r in rows_iter if r
+                for v in (r["ci_lo"], r["ci_hi"])]
+        if not vals:
+            return -0.2, 0.2
+        lo, hi = min(vals), max(vals)
+        rng = max(hi - lo, 0.04)
+        return lo - rng * pad, hi + rng * pad
+
+    prm_rows = [stats["prmbench_dims_combined"].get(m, {}).get(dim)
+                for m in MODELS for dim in PRM_DIMS]
+    ros_rows = [stats["roscoe_combined"].get(m, {}).get(ds)
+                for m in MODELS for ds in ROSCOE_DATASETS]
+    prm_lo, prm_hi = _xlim(prm_rows)
+    ros_lo, ros_hi = _xlim(ros_rows)
+
+    # ── PRMBench top row (by dimension, metrics pooled) ──────
+    for i, dim in enumerate(PRM_DIMS):
+        msd = {m: stats["prmbench_dims_combined"].get(m, {}).get(dim)
+               for m in MODELS}
+        _fill_metric_ax(prm_axes[i], msd,
+                        title       = PRM_DIM_LABELS[dim],
+                        x_lo=prm_lo, x_hi=prm_hi,
+                        show_ylabel = (i == 0),
+                        show_legend = (i == 0))
+
+    # ── ROSCOE bottom row (by dataset, metrics pooled) ───────
+    for i, ds in enumerate(ROSCOE_DATASETS):
+        msd = {m: stats["roscoe_combined"].get(m, {}).get(ds) for m in MODELS}
+        _fill_metric_ax(ros_axes[i], msd,
+                        title       = ROSCOE_DS_LABELS[ds],
+                        x_lo=ros_lo, x_hi=ros_hi,
+                        show_ylabel = (i == 0),
+                        show_legend = False)
+
+    # Row group labels on far left
+    fig.text(0.005, 0.70, "PRMBench", fontsize=6.5, fontweight="bold",
+             va="center", rotation=90, color="#222")
+    fig.text(0.005, 0.28, "ROSCOE",   fontsize=6.5, fontweight="bold",
+             va="center", rotation=90, color="#222")
+
+    plt.savefig(out_path, dpi=300, bbox_inches="tight",
+                pad_inches=0.04, facecolor="white", edgecolor="none")
+    plt.close()
+    print(f"Saved: {out_path}")
+
+    import shutil
+    # Copy to LaTeX directory (primary destination)
+    latex_dst = LATEX_DIR / Path(out_path).name
+    shutil.copy(out_path, latex_dst)
+    print(f"Copied to LaTeX: {latex_dst}")
+    # Also copy to Downloads for quick preview
+    dl_dst = Path.home() / "Downloads" / Path(out_path).name
+    shutil.copy(out_path, dl_dst)
+    subprocess.Popen(["open", str(dl_dst)])
+
+
+# ──────────────────────────────────────────────────────────────
+# LaTeX table  (compact, suitable for appendix)
+# ──────────────────────────────────────────────────────────────
+def make_latex_table(stats):
+    lines = [
+        r"\begin{table}[!ht]",
+        r"\centering\small",
+        r"\caption{Paired Wilcoxon signed-rank test results (GT vs.\ No-GT). "
+        r"$\Delta$ = mean(GT$-$NoGT), 95\% CI via bootstrap, $d$ = Cohen's $d$.}",
+        r"\label{tab:significance}",
+        r"\setlength{\tabcolsep}{4pt}",
+        r"\begin{tabular}{llrrrrrl}",
+        r"\toprule",
+        r"Benchmark & Condition & $\Delta$ & CI$_{\text{lo}}$ & CI$_{\text{hi}}$ & $p$ & $d$ & \\",
+        r"\midrule",
+    ]
+    for model in MODELS:
+        short = model.replace("GPT-", "").replace("Gemini-3-Flash", "Gemini")
+        # PRMBench total
+        row = stats["prmbench"].get(model, {}).get("total")
+        if row:
+            lines.append(
+                rf"\multirow{{5}}{{*}}{{\rotatebox{{90}}{{{short}}}}}"
+                rf" & PRMBench (Total)"
+                rf" & ${row['mean_diff']:+.3f}$"
+                rf" & ${row['ci_lo']:+.3f}$"
+                rf" & ${row['ci_hi']:+.3f}$"
+                rf" & ${row['p_wilcoxon']:.3f}$"
+                rf" & ${row['cohen_d']:+.3f}$"
+                rf" & {row['sig']} \\"
+            )
+        for dim in ["simplicity", "soundness", "sensitivity"]:
+            row = stats["prmbench"].get(model, {}).get(dim)
+            if row:
+                lines.append(
+                    rf" & \ \ {DIM_MAP[dim]}"
+                    rf" & ${row['mean_diff']:+.3f}$"
+                    rf" & ${row['ci_lo']:+.3f}$"
+                    rf" & ${row['ci_hi']:+.3f}$"
+                    rf" & ${row['p_wilcoxon']:.3f}$"
+                    rf" & ${row['cohen_d']:+.3f}$"
+                    rf" & {row['sig']} \\"
+                )
+        # ROSCOE avg
+        roscoe_rows = [stats["roscoe"].get(model, {}).get(ds) for ds in ROSCOE_DATASETS]
+        roscoe_rows = [r for r in roscoe_rows if r]
+        if roscoe_rows:
+            avg_diff = np.mean([r["mean_diff"] for r in roscoe_rows])
+            avg_p    = np.mean([r["p_wilcoxon"] for r in roscoe_rows])
+            avg_d    = np.mean([r["cohen_d"] for r in roscoe_rows])
+            lines.append(
+                rf" & ROSCOE (avg Faith.)"
+                rf" & ${avg_diff:+.3f}$"
+                rf" & —"
+                rf" & —"
+                rf" & ${avg_p:.3f}$"
+                rf" & ${avg_d:+.3f}$"
+                rf" & {sig_label(avg_p)} \\"
+            )
+        lines.append(r"\midrule")
+
+    lines[-1] = r"\bottomrule"
+    lines += [r"\end{tabular}", r"\end{table}"]
+    return "\n".join(lines)
+
+
+# ──────────────────────────────────────────────────────────────
+# Main
+# ──────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    print("Running significance tests...\n")
+    stats = run_all_tests()
+
+    # Save JSON
+    json_path = OUT_DIR / "significance_results.json"
+    with open(json_path, "w") as f:
+        json.dump(stats, f, indent=2)
+    print(f"\nSaved: {json_path}")
+
+    # Forest plot
+    plot_path = FIGURE_DIR / "significance_forest.pdf"
+    make_forest_plot(stats, plot_path)
+
+    # LaTeX table
+    tex = make_latex_table(stats)
+    tex_path = OUT_DIR / "significance_table.tex"
+    with open(tex_path, "w") as f:
+        f.write(tex)
+    print(f"Saved: {tex_path}")
+    print("\nLaTeX table snippet:\n")
+    print(tex[:600], "...")

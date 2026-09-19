@@ -42,8 +42,9 @@ try:
 except ImportError:
     RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results"
 
-RESULTS_DIR  = RESULTS_ROOT / "prmbench" / "results"
-MASTER_FILE  = RESULTS_DIR / "prmbench_master_results.json"
+# One directory per model (<results>/<model>/prmbench/); the master index spans
+# all of them, so it sits at the results root rather than inside any one model.
+MASTER_FILE  = RESULTS_ROOT / "prmbench_master_results.json"
 
 DIMS    = ["simplicity", "soundness", "sensitivity", "total"]
 METRICS = [
@@ -95,11 +96,14 @@ def add_run(
     note: str = "",
 ) -> None:
     path = Path(summary_file)
-    # If not absolute, look inside the results root's prmbench/results/ first
+    # A bare filename resolves against this model's own prmbench directory, then
+    # against any model's — naming a run by its file alone stays unambiguous.
     if not path.is_absolute() and not path.exists():
-        candidate = RESULTS_DIR / path
-        if candidate.exists():
-            path = candidate
+        for candidate in (RESULTS_ROOT / model / "prmbench" / path,
+                          *sorted(RESULTS_ROOT.glob(f"*/prmbench/{path}"))):
+            if candidate.exists():
+                path = candidate
+                break
     if not path.exists():
         raise FileNotFoundError(f"Summary file not found: {path}")
 
@@ -119,11 +123,11 @@ def add_run(
         d = summary.get(dim, {})
         n   = d.get("n_items", 0)
         wa  = d.get("with_answer", {})
-        bl  = d.get("blind", {})
+        bl  = d.get("wout_answer", {})
         record["dims"][dim] = {
             "n_items":      n,
             "with_answer":  {k: wa.get(k) for k, _ in METRICS},
-            "blind":        {k: bl.get(k) for k, _ in METRICS},
+            "wout_answer":        {k: bl.get(k) for k, _ in METRICS},
         }
 
     records = load_master()
@@ -164,7 +168,7 @@ def print_table(records: List[Dict]) -> None:
 
         subhdr = f"  {'':22}"
         for r in records:
-            subhdr += f"  {'w/ answer':>{col_w}}  {'blind':>{col_w}}"
+            subhdr += f"  {'w/ answer':>{col_w}}  {'wout_answer':>{col_w}}"
         print(subhdr)
         print("  " + "-" * (22 + len(records) * (col_w * 2 + 4)))
 
@@ -173,7 +177,7 @@ def print_table(records: List[Dict]) -> None:
             for r in records:
                 d  = r["dims"].get(dim, {})
                 wa = d.get("with_answer", {}).get(key)
-                bl = d.get("blind", {}).get(key)
+                bl = d.get("wout_answer", {}).get(key)
                 row += f"  {_fmt(wa):>{col_w}}  {_fmt(bl):>{col_w}}"
             print(row)
 

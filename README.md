@@ -12,7 +12,7 @@ Part1_Pilot Study/  § 4.1  Correct Answer Guidance Study (w/ Answer vs w/o Answ
     experiments/roscoe_experiment/    trace quality — Faithfulness, Informativeness, Grammar
     dataset/prmbench/                 simplicity/soundness/sensitivity.jsonl (200 each)
     dataset/roscoe/                   roscoe_100_sampled.json (25 × cosmos/drop/esnli/gsm8k)
-    results/                          prmbench/, roscoe/, significance/ (local only, gitignored)
+    results/<model>/prmbench|roscoe/  one directory per evaluated model (local only, gitignored)
 Part2_CRAFT/                          § 3.2  The CRAFT Framework
     module1_trace_generation/         Module I   — roll out K traces, TF-IRF consensus terms
     module2_rkg_filtering/            Module II  — z-score step filtering, consensus RKG G*
@@ -38,13 +38,12 @@ Both benchmarks are evaluated in a single pass under two settings, `w/ Answer` a
 ```bash
 P1="Part1_Pilot Study"
 
-# → $P1/results/prmbench/results/
+# → $P1/results/<model>/prmbench/
 python "$P1"/experiments/prmbench_experiment/prmbench_evaluate_verifier.py --input "$P1"/dataset/prmbench/<dimension>.jsonl --model <model>
 python "$P1"/experiments/prmbench_experiment/prmbench_results_summary.py   --add --model <model> --summary_file <run.summary.json>
 
-# → $P1/results/roscoe/
-python "$P1"/experiments/roscoe_experiment/receval_generate_traces.py --model <model> --concurrency 10 \
-    --output roscoe/<model>_traces.json --export_dir roscoe/roscoe_results
+# → $P1/results/<model>/roscoe/
+python "$P1"/experiments/roscoe_experiment/receval_generate_traces.py --model <model> --concurrency 10
 ```
 
 `dataset/prmbench/{simplicity,soundness,sensitivity}.jsonl` hold 200 items each, sampled with
@@ -54,6 +53,10 @@ taxonomy: Simplicity = redundency + circular, Soundness = counterfactual + step_
 multi_solutions. Within a dimension the categories are balanced (Sensitivity 67/67/66, the
 rest even). `prmbench_evaluate_verifier.py` groups by the same map, so an item's `_dim`
 and the reported dimension always agree.
+
+Each model's runs land in `results/<model>/prmbench/` and `results/<model>/roscoe/`; the
+cross-model index `results/prmbench_master_results.json` and the significance outputs sit at
+the results root. Both scripts derive those paths from `--model`, so a run needs no `--output`.
 
 The three files supersede the earlier 150-item sample that produced the currently reported
 numbers: all 150 of its items are contained in them, so reruns stay comparable. Drawing a

@@ -1,7 +1,7 @@
 """
 receval_generate_traces.py
 ---------------------------
-ReCEval — Reasoning Trace Quality: with_answer vs blind
+ReCEval — Reasoning Trace Quality: with_answer vs wout_answer
 
 Research question: Does telling the LLM the correct answer/label produce
 higher-quality reasoning traces than letting it reason freely?
@@ -16,7 +16,7 @@ Mode 1 — Entailment Bank (original):
 
 Mode 2 — ROSCOE datasets:
     Sample items from each of drop / esnli / cosmos / gsm8k,
-    generate with_answer + blind traces, export for ROSCOE evaluation.
+    generate with_answer + wout_answer traces, export for ROSCOE evaluation.
 
     python receval_generate_traces.py \\
         --roscoe_mode \\
@@ -33,12 +33,12 @@ Output format (both modes):
         "proof_label": str,      # ground truth answer
         "question": str,         # context / premises (joined)
         "with_answer": {"steps": [...], "raw": str},
-        "blind":       {"steps": [...], "predicted_label": str, "raw": str}
+        "wout_answer":       {"steps": [...], "predicted_label": str, "raw": str}
     }]
 
 Export for ROSCOE roscoe.py (via --export_dir):
     roscoe_results/with_answer.jsonl  — each line: {premise, hypothesis, gpt-3}
-    roscoe_results/blind.jsonl        — each line: {premise, hypothesis, gpt-3}
+    roscoe_results/wout_answer.jsonl        — each line: {premise, hypothesis, gpt-3}
     (field 'gpt-3' = our generated reasoning trace, matching ROSCOE's expected key)
 
 Then score with:
@@ -47,7 +47,7 @@ Then score with:
         -t sentence_transformer \\
         -m all-mpnet-base-v2 \\
         --dataset-path ../roscoe_results/ \\
-        --datasets with_answer blind
+        --datasets with_answer wout_answer
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ SYSTEM_WITH_ANSWER = (
     "Each step must be a single sentence and logically follow from prior steps or premises."
 )
 
-SYSTEM_BLIND = (
+SYSTEM_WOUT_ANSWER = (
     "You are an expert at logical reasoning. "
     "Given a set of premises and a hypothesis, reason step-by-step to decide "
     "whether the hypothesis is proved or disproved based solely on the premises. "
@@ -111,7 +111,7 @@ def build_prompt_with_answer(hypothesis: str, premises: list[str], proof_label: 
     )
 
 
-def build_prompt_blind(hypothesis: str, premises: list[str]) -> str:
+def build_prompt_wout_answer(hypothesis: str, premises: list[str]) -> str:
     prem_block = "\n".join(f"- {p}" for p in premises)
     return (
         f"Premises:\n{prem_block}\n\n"
@@ -133,7 +133,7 @@ SYSTEM_RC_WITH_ANSWER = (
     "Each step must be a single sentence."
 )
 
-SYSTEM_RC_BLIND = (
+SYSTEM_RC_WOUT_ANSWER = (
     "You are an expert at reading comprehension and reasoning. "
     "Given a passage and a question, reason step-by-step to find the answer. "
     "Each step must be a single sentence. "
@@ -148,7 +148,7 @@ SYSTEM_NLI_WITH_ANSWER = (
     "Each step must be a single sentence."
 )
 
-SYSTEM_NLI_BLIND = (
+SYSTEM_NLI_WOUT_ANSWER = (
     "You are an expert at natural language inference. "
     "Given two sentences (premise and hypothesis), reason step-by-step to determine "
     "whether the hypothesis is entailed, contradicted, or neutral with respect to the premise. "
@@ -164,7 +164,7 @@ SYSTEM_MATH_WITH_ANSWER = (
     "Each step must be a single sentence showing one calculation or logical deduction."
 )
 
-SYSTEM_MATH_BLIND = (
+SYSTEM_MATH_WOUT_ANSWER = (
     "You are an expert at solving math word problems. "
     "Given a math problem, solve it step by step. "
     "Each step must be a single sentence showing one calculation or logical deduction. "
@@ -181,7 +181,7 @@ def _rc_with_answer_prompt(premise: str, hypothesis: str, answer: str) -> str:
     )
 
 
-def _rc_blind_prompt(premise: str, hypothesis: str) -> str:
+def _rc_wout_answer_prompt(premise: str, hypothesis: str) -> str:
     return (
         f"Passage:\n{premise}\n\n"
         f"Question: {hypothesis}\n\n"
@@ -201,7 +201,7 @@ def _nli_with_answer_prompt(premise: str, hypothesis: str, answer: str) -> str:
     )
 
 
-def _nli_blind_prompt(premise: str, hypothesis: str) -> str:
+def _nli_wout_answer_prompt(premise: str, hypothesis: str) -> str:
     return (
         f"Premise: {premise}\n"
         f"Hypothesis: {hypothesis}\n\n"
@@ -218,7 +218,7 @@ def _math_with_answer_prompt(premise: str, answer: str) -> str:
     )
 
 
-def _math_blind_prompt(premise: str) -> str:
+def _math_wout_answer_prompt(premise: str) -> str:
     return (
         f"Problem: {premise}\n\n"
         "Write a numbered step-by-step solution."
@@ -273,7 +273,7 @@ def load_roscoe_dataset(path: Path, dataset_name: str, n: Optional[int], seed: i
 
 
 def build_roscoe_prompts(item: dict) -> tuple[str, str, str, str]:
-    """Return (system_wa, prompt_wa, system_blind, prompt_blind) for a ROSCOE item."""
+    """Return (system_wa, prompt_wa, system_wout_answer, prompt_wout_answer) for a ROSCOE item."""
     ds       = item["dataset"]
     premise  = item["premise"]
     hypo     = item["hypothesis"]
@@ -281,19 +281,19 @@ def build_roscoe_prompts(item: dict) -> tuple[str, str, str, str]:
 
     if ds == "esnli":
         sys_wa   = SYSTEM_NLI_WITH_ANSWER
-        sys_bl   = SYSTEM_NLI_BLIND
+        sys_bl   = SYSTEM_NLI_WOUT_ANSWER
         p_wa     = _nli_with_answer_prompt(premise, hypo, answer)
-        p_bl     = _nli_blind_prompt(premise, hypo)
+        p_bl     = _nli_wout_answer_prompt(premise, hypo)
     elif ds == "gsm8k":
         sys_wa   = SYSTEM_MATH_WITH_ANSWER
-        sys_bl   = SYSTEM_MATH_BLIND
+        sys_bl   = SYSTEM_MATH_WOUT_ANSWER
         p_wa     = _math_with_answer_prompt(premise, answer)
-        p_bl     = _math_blind_prompt(premise)
+        p_bl     = _math_wout_answer_prompt(premise)
     else:  # drop, cosmos
         sys_wa   = SYSTEM_RC_WITH_ANSWER
-        sys_bl   = SYSTEM_RC_BLIND
+        sys_bl   = SYSTEM_RC_WOUT_ANSWER
         p_wa     = _rc_with_answer_prompt(premise, hypo, answer)
-        p_bl     = _rc_blind_prompt(premise, hypo)
+        p_bl     = _rc_wout_answer_prompt(premise, hypo)
 
     return sys_wa, p_wa, sys_bl, p_bl
 
@@ -408,7 +408,7 @@ def export_for_roscoe(results: list[dict], export_dir: str) -> None:
 
     We write two files:
         {export_dir}/with_answer.json   — traces generated with ground truth label
-        {export_dir}/blind.json         — traces generated without label
+        {export_dir}/wout_answer.json         — traces generated without label
 
     File names use .json extension (not .jsonl) because roscoe.py checks for
     dataset name prefix in the filename, not the extension.
@@ -417,7 +417,7 @@ def export_for_roscoe(results: list[dict], export_dir: str) -> None:
     out = Path(export_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    for setting in ("with_answer", "blind"):
+    for setting in ("with_answer", "wout_answer"):
         # Group by dataset so we can write one file per dataset per setting,
         # matching ROSCOE's convention: filename must start with dataset name.
         by_dataset: dict[str, list] = {}
@@ -456,7 +456,7 @@ def export_for_roscoe(results: list[dict], export_dir: str) -> None:
 def export_for_receval(results: list[dict], export_dir: str) -> None:
     """Export traces for ReCEval's evaluate_receval.py (original EB format)."""
     Path(export_dir).mkdir(parents=True, exist_ok=True)
-    for setting in ("with_answer", "blind"):
+    for setting in ("with_answer", "wout_answer"):
         path = Path(export_dir) / f"{setting}.jsonl"
         with open(path, "w", encoding="utf-8") as f:
             for r in results:
@@ -560,7 +560,7 @@ async def run_roscoe(args: argparse.Namespace) -> None:
                                      args.model, args.temperature,
                                      args.api_key, args.base_url))
 
-        logger.info("Generating %d with_answer + %d blind traces...",
+        logger.info("Generating %d with_answer + %d wout_answer traces...",
                     len(wa_tasks), len(bl_tasks))
         wa_outputs, bl_outputs = await asyncio.gather(
             asyncio.gather(*wa_tasks),
@@ -580,7 +580,7 @@ async def run_roscoe(args: argparse.Namespace) -> None:
                 "steps": parse_steps(wa_raw) if wa_raw else [],
                 "raw":   wa_raw or "",
             },
-            "blind": {
+            "wout_answer": {
                 "steps": parse_steps(bl_raw) if bl_raw else [],
                 "raw":   bl_raw or "",
             },
@@ -595,10 +595,10 @@ async def run_roscoe(args: argparse.Namespace) -> None:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
     wa_ok = sum(1 for r in results if r["with_answer"]["steps"])
-    bl_ok = sum(1 for r in results if r["blind"]["steps"])
+    bl_ok = sum(1 for r in results if r["wout_answer"]["steps"])
     logger.info("Saved %d results → %s", len(results), out_path)
     logger.info("with_answer success: %d/%d", wa_ok, len(results))
-    logger.info("blind success:       %d/%d", bl_ok, len(results))
+    logger.info("wout_answer success:       %d/%d", bl_ok, len(results))
 
     # Export for ROSCOE
     if args.export_dir:
@@ -664,8 +664,8 @@ async def run_generate(args: argparse.Namespace) -> None:
             ))
             bl_tasks.append(call_llm(
                 session, semaphore,
-                SYSTEM_BLIND,
-                build_prompt_blind(hypothesis, premises),
+                SYSTEM_WOUT_ANSWER,
+                build_prompt_wout_answer(hypothesis, premises),
                 args.model, args.temperature, args.api_key, args.base_url,
             ))
 
@@ -694,7 +694,7 @@ async def run_generate(args: argparse.Namespace) -> None:
                 "steps": parse_steps(wa_raw) if wa_raw else [],
                 "raw":   wa_raw or "",
             },
-            "blind": {
+            "wout_answer": {
                 "steps": parse_steps(bl_raw) if bl_raw else [],
                 "predicted_label": predicted,
                 "raw":   bl_raw or "",
@@ -708,11 +708,11 @@ async def run_generate(args: argparse.Namespace) -> None:
 
     n     = len(results)
     wa_ok = sum(1 for r in results if r["with_answer"]["steps"])
-    bl_ok = sum(1 for r in results if r["blind"]["steps"])
+    bl_ok = sum(1 for r in results if r["wout_answer"]["steps"])
     logger.info("Saved %d results → %s", n, out_path)
     logger.info("with_answer chain success: %d/%d", wa_ok, n)
-    logger.info("blind chain success:       %d/%d", bl_ok, n)
-    logger.info("blind label accuracy:      %d/%d (%.1f%%)",
+    logger.info("wout_answer chain success:       %d/%d", bl_ok, n)
+    logger.info("wout_answer label accuracy:      %d/%d (%.1f%%)",
                 label_correct, n, 100 * label_correct / max(n, 1))
 
     if args.export_dir:
@@ -809,14 +809,14 @@ def run_roscoe_evaluation(
     for json_file in json_files:
         fname = json_file.name  # e.g. "drop_with_answer.json"
         # Parse dataset name and setting from filename
-        # Filename format: {dataset}_{setting}.json  (setting = with_answer or blind)
+        # Filename format: {dataset}_{setting}.json  (setting = with_answer or wout_answer)
         stem = json_file.stem  # "drop_with_answer"
         if stem.endswith("_with_answer"):
             dataset = stem[: -len("_with_answer")]
             setting = "with_answer"
-        elif stem.endswith("_blind"):
-            dataset = stem[: -len("_blind")]
-            setting = "blind"
+        elif stem.endswith("_wout_answer"):
+            dataset = stem[: -len("_wout_answer")]
+            setting = "wout_answer"
         else:
             logger.warning("Skipping unrecognized filename: %s", fname)
             continue
@@ -890,7 +890,7 @@ def run_roscoe_evaluation(
 
 
 def print_roscoe_results(all_results: dict) -> None:
-    """Print a comparison table: with_answer vs blind per dataset and metric."""
+    """Print a comparison table: with_answer vs wout_answer per dataset and metric."""
     if not all_results:
         return
 
@@ -902,7 +902,7 @@ def print_roscoe_results(all_results: dict) -> None:
 
     print()
     print("=" * 90)
-    print("  ROSCOE EVALUATION RESULTS  (with_answer vs blind)")
+    print("  ROSCOE EVALUATION RESULTS  (with_answer vs wout_answer)")
     print("=" * 90)
 
     for dataset in datasets:
@@ -938,7 +938,7 @@ def print_roscoe_results(all_results: dict) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "ReCEval / ROSCOE — Generate reasoning traces (with_answer vs blind).\n"
+            "ReCEval / ROSCOE — Generate reasoning traces (with_answer vs wout_answer).\n"
             "Two modes: --roscoe_mode (ROSCOE datasets) or --input (Entailment Bank)."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -967,11 +967,13 @@ def main() -> None:
                         help="Entailment Bank JSONL input file (required without --roscoe_mode)")
 
     # Shared args
-    parser.add_argument("--output", required=True,
-                        help="Main output JSON path (relative paths resolve under the results root)")
+    parser.add_argument("--output", default=None,
+                        help="Main output JSON path (relative paths resolve under the results "
+                             "root; defaults to <model>/roscoe/traces.json)")
     parser.add_argument("--export_dir", default=None,
                         help="Export per-setting JSONL for ROSCOE/ReCEval scoring "
-                             "(relative paths resolve under the results root)")
+                             "(relative paths resolve under the results root; "
+                             "defaults to <model>/roscoe/)")
     parser.add_argument("--model",       default=DEFAULT_MODEL)
     parser.add_argument("--base_url",    default=OPENAI_BASE_URL)
     parser.add_argument("--api_key",     default=OPENAI_API_KEY)
@@ -993,9 +995,10 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    args.output = str(resolve_output(args.output))
-    if args.export_dir:
-        args.export_dir = str(resolve_output(args.export_dir))
+    # One directory per model, mirroring the PRMBench side of the study.
+    model_dir = args.model.replace("/", "-").replace(":", "-") + "/roscoe"
+    args.output = str(resolve_output(args.output or f"{model_dir}/traces.json"))
+    args.export_dir = str(resolve_output(args.export_dir or model_dir))
     if args.sampled_output:
         args.sampled_output = str(resolve_output(args.sampled_output))
     if args.input:
