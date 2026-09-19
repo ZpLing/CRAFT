@@ -7,37 +7,29 @@ for PRMBench and ROSCOE GT vs No-GT conditions.
 
 Outputs:
   - significance_testing_results.json — all stats, one file per benchmark per model
-  - significance_testing_forest.pdf  — forest plot (w/ Answer − w/o Answer effect sizes)
+  - the LaTeX table, printed
+
+Figures are drawn elsewhere from these numbers; this file only produces them.
 
 Usage:
     python significance_test.py
 """
 
-import json, os, subprocess
+import json, os
 from pathlib import Path
 import numpy as np
 import pandas as pd
 from scipy import stats
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.transforms import blended_transform_factory
-from matplotlib.ticker import MaxNLocator, FormatStrFormatter
 
 BENCH_DIR    = Path(__file__).resolve().parent    # Part1_Pilot Study/experiments/
 PART_ROOT    = BENCH_DIR.parent                   # Part1_Pilot Study/
 REPO_ROOT    = PART_ROOT.parent
 RESULTS_ROOT = PART_ROOT / "results"             # <results>/<model>/{prmbench,roscoe}/
 
-# Every figure in the repo lands in one place, whatever produced it.
-FIGURE_DIR = REPO_ROOT / "Figure"
-# and a copy goes where the paper reads it from: section_files/4_Experiment.tex
 # A model's stats live with that model's runs — <results>/<model>/ already holds
 # everything else it produced — so there is no separate directory of aggregates to
 # keep in step with them. The LaTeX table spans all four models and is paper
-# material rather than a run output, so it follows the figure into the tex root.
-FIGURE_DIR.mkdir(parents=True, exist_ok=True)
+# material rather than a run output, so it is printed rather than written.
 
 
 # Which sections of the stats belong to which benchmark. A model's results live
@@ -115,14 +107,13 @@ PRM_DIM_LABELS = {"simplicity": "Simplicity", "soundness": "Soundness",
 # ROSCOE metrics to aggregate per dataset (bottom-row panels)
 ROSCOE_AGG_METRICS = ["faithfulness", "informativeness_step",
                       "informativeness_chain", "coherence_step_vs_step"]
-# Row labels down the left of every forest panel. Two lines each, so the widest
-# name sets the same left margin as the shortest and the panels keep their width;
-# the keys are MODELS' keys, or the label silently falls back to the full name.
+
+# How each model is named in the LaTeX table; a model not listed keeps its full name.
 MODEL_DISPLAY = {
     "GPT-o4-mini":           "o4-mini",
-    "GPT-5.4-nano":          "GPT-\n5.4-nano",
-    "DeepSeek-V4-Flash":     "DeepSeek-\nV4-Flash",
-    "Gemini-3.1-Flash-Lite": "Gemini-3.1-\nFlash-Lite",
+    "GPT-5.4-nano":          "GPT-5.4-nano",
+    "DeepSeek-V4-Flash":     "DeepSeek-V4-Flash",
+    "Gemini-3.1-Flash-Lite": "Gemini-3.1-Flash-Lite",
 }
 
 
@@ -391,167 +382,6 @@ def run_all_tests():
 
 
 # ──────────────────────────────────────────────────────────────
-# Forest plot — 7 mini-panels: 3 PRMBench metrics (top row) +
-#               4 ROSCOE datasets (bottom row).
-# Each panel: y-axis = 4 models, x-axis = GT − No-GT effect size.
-# Dashed border on every panel. Style = k_chart_area.py.
-# ──────────────────────────────────────────────────────────────
-def _fill_metric_ax(ax, model_stat_dict, title, x_lo, x_hi,
-                    show_ylabel=True, show_legend=False):
-    """
-    One mini-forest panel.
-    model_stat_dict: {model_name: {mean_diff, ci_lo, ci_hi, p_wilcoxon, ...}}
-    y-axis: one row per model (top→bottom in MODELS order).
-    """
-    models = list(MODELS.keys())
-    colors = [MODEL_COLORS[m] for m in models]
-    ROW_H  = 1.0
-
-    yticks, ylabels = [], []
-    for mi, model in enumerate(models):
-        y = -mi * ROW_H
-        yticks.append(y)
-        ylabels.append(MODEL_DISPLAY.get(model, model) if show_ylabel else "")
-
-        row = model_stat_dict.get(model)
-        if not row:
-            continue
-        diff = row["mean_diff"]
-        lo, hi = row["ci_lo"], row["ci_hi"]
-        p = row["p_wilcoxon"]
-
-        ax.plot([lo, hi], [y, y], color=colors[mi], lw=0.9,
-                solid_capstyle="round", zorder=2, alpha=0.6)
-        marker = "D" if p < 0.05 else "o"
-        ax.scatter([diff], [y], color=colors[mi],
-                   s=11 if p < 0.05 else 9,
-                   zorder=3, marker=marker, linewidths=0, alpha=0.75)
-
-        # star: axes-x coord so box is always inside subplot; data-y coord
-        star = sig_label(p)
-        if star != "ns":
-            trans = blended_transform_factory(ax.transAxes, ax.transData)
-            ax.text(0.97, y, star,
-                    transform=trans,
-                    fontsize=4.8, va="center", ha="right",
-                    color="#E67E22", fontweight="bold", clip_on=True,
-                    bbox=dict(boxstyle="square,pad=0.28", facecolor="white",
-                              edgecolor="black", linewidth=0.6))
-
-    n = len(models)
-    ax.set_yticks(yticks)
-    ax.set_yticklabels(ylabels, fontsize=4.5)
-    ax.axvline(0, color="#333", lw=0.7, ls="--", zorder=1)
-    ax.set_xlim(x_lo, x_hi)
-    # Two decimals on the axis, and ticks only where two decimals are the exact
-    # value: steps of 0.01/0.02/0.05/0.10 print as written rather than as a
-    # rounded stand-in for 0.025.
-    ax.xaxis.set_major_locator(MaxNLocator(nbins=5, steps=[1, 2, 5, 10]))
-    ax.xaxis.set_major_formatter(FormatStrFormatter("%.2f"))
-    ax.set_ylim(-(n - 1) * ROW_H - 0.55, 0.55)
-    ax.grid(axis="x", lw=0.3, alpha=0.35, ls="--", zorder=0)
-    ax.set_axisbelow(True)
-    ax.tick_params(axis="y", length=0, pad=2)
-    ax.tick_params(axis="x", labelsize=5, pad=2)
-    ax.set_title(title, fontsize=6.5, fontweight="bold", pad=3)
-    ax.set_xlabel("w/ Answer − w/o Answer", fontsize=5.5, fontweight="bold", labelpad=2)
-
-    # dashed border
-    for spine in ax.spines.values():
-        spine.set_visible(True)
-        spine.set_linestyle((0, (4, 3)))
-        spine.set_linewidth(0.55)
-        spine.set_color("#aaa")
-
-
-
-def make_forest_plot(stats, out_path):
-    """
-    7-panel figure  (style = k_chart_area.py):
-      Top row  (3 panels): PRMBench dimensions — Simplicity | Soundness | Sensitivity
-                            (each panel aggregates Step Acc + 1st Err Acc + F1)
-      Bottom row (4 panels): ROSCOE datasets — CosmosQA | DROP | eSNLI | GSM8K
-                            (each panel aggregates 4 ROSCOE metrics)
-    Each panel: y-axis = 4 models, x-axis = GT − No-GT effect size.
-    """
-    from matplotlib.gridspec import GridSpec
-
-    plt.rcParams.update({
-        "font.family": "Arial", "font.size": 6,
-        "axes.linewidth": 0.6,
-        "xtick.major.width": 0.5, "ytick.major.width": 0.5,
-        "xtick.major.size": 2.5,  "ytick.major.size": 2.5,
-    })
-
-    # 12-column grid: top 3 × 4 cols, bottom 4 × 3 cols
-    fig = plt.figure(figsize=(5.5, 2.9))
-    gs  = GridSpec(2, 12, figure=fig,
-                   hspace=0.52, wspace=0.55,
-                   top=0.88, bottom=0.12, left=0.09, right=0.97)
-
-    prm_axes = [fig.add_subplot(gs[0, 0:4]),
-                fig.add_subplot(gs[0, 4:8]),
-                fig.add_subplot(gs[0, 8:12])]
-    ros_axes = [fig.add_subplot(gs[1, 0:3]),
-                fig.add_subplot(gs[1, 3:6]),
-                fig.add_subplot(gs[1, 6:9]),
-                fig.add_subplot(gs[1, 9:12])]
-
-    # shared x-range per benchmark (all panels in each row share the same scale)
-    def _xlim(rows_iter, pad=0.35):
-        vals = [v for r in rows_iter if r
-                for v in (r["ci_lo"], r["ci_hi"])]
-        if not vals:
-            return -0.2, 0.2
-        lo, hi = min(vals), max(vals)
-        rng = max(hi - lo, 0.04)
-        return lo - rng * pad, hi + rng * pad
-
-    prm_rows = [stats["prmbench_dims_combined"].get(m, {}).get(dim)
-                for m in MODELS for dim in PRM_DIMS]
-    ros_rows = [stats["roscoe_combined"].get(m, {}).get(ds)
-                for m in MODELS for ds in ROSCOE_DATASETS]
-    prm_lo, prm_hi = _xlim(prm_rows)
-    ros_lo, ros_hi = _xlim(ros_rows)
-
-    # ── PRMBench top row (by dimension, metrics pooled) ──────
-    for i, dim in enumerate(PRM_DIMS):
-        msd = {m: stats["prmbench_dims_combined"].get(m, {}).get(dim)
-               for m in MODELS}
-        _fill_metric_ax(prm_axes[i], msd,
-                        title       = PRM_DIM_LABELS[dim],
-                        x_lo=prm_lo, x_hi=prm_hi,
-                        show_ylabel = (i == 0),
-                        show_legend = (i == 0))
-
-    # ── ROSCOE bottom row (by dataset, metrics pooled) ───────
-    for i, ds in enumerate(ROSCOE_DATASETS):
-        msd = {m: stats["roscoe_combined"].get(m, {}).get(ds) for m in MODELS}
-        _fill_metric_ax(ros_axes[i], msd,
-                        title       = ROSCOE_DS_LABELS[ds],
-                        x_lo=ros_lo, x_hi=ros_hi,
-                        show_ylabel = (i == 0),
-                        show_legend = False)
-
-    # Row group labels on far left
-    fig.text(0.005, 0.70, "PRMBench", fontsize=6.5, fontweight="bold",
-             va="center", rotation=90, color="#222")
-    fig.text(0.005, 0.28, "ROSCOE",   fontsize=6.5, fontweight="bold",
-             va="center", rotation=90, color="#222")
-
-    plt.savefig(out_path, dpi=300, bbox_inches="tight",
-                pad_inches=0.04, facecolor="white", edgecolor="none")
-    plt.close()
-    print(f"Saved: {out_path}")
-
-    import shutil
-    # The figure lives in Figure/; this copy is only so it opens for a look.
-    dl_dst = Path.home() / "Downloads" / Path(out_path).name
-    shutil.copy(out_path, dl_dst)
-    subprocess.Popen(["open", str(dl_dst)])
-
-
-# ──────────────────────────────────────────────────────────────
 # LaTeX table  (compact, suitable for appendix)
 # ──────────────────────────────────────────────────────────────
 def make_latex_table(stats):
@@ -637,10 +467,6 @@ if __name__ == "__main__":
     for benchmark in BENCHMARK_SECTIONS:
         if not any(benchmark in b for b in written.values()):
             print(f"No {benchmark} statistics — its runs have not been scored yet.")
-
-    # Forest plot
-    plot_path = FIGURE_DIR / "significance_testing_forest.pdf"
-    make_forest_plot(stats, plot_path)
 
     # The LaTeX table is printed, not written: it is one rendering of the stats
     # above for whoever is editing the paper, and a copy on disk would be a third
