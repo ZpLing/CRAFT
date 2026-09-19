@@ -84,7 +84,7 @@ python $M1/anomaly_filter.py --input $RUN/cleaned_z.json \
 
 # Module III — Topology-guided Trace Synthesis: one step generated per node of G*
 python framework/module3_synthesis/synthesize_trace.py --input $RUN/cleaned.json \
-    --synthesis_strategy rkg --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
+    --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
 ```
 
 GSM8K and OlympiadBench take `--domain math` on every stage. `extract_terms.py` is not a
@@ -149,8 +149,8 @@ Both benchmarks are evaluated in a single pass under two settings, `w/ Answer` a
 P1="Part1_Pilot Study"
 
 # → $P1/results/<model>/prmbench/
-python "$P1"/experiments/prmbench_experiment/prmbench_evaluate_verifier.py --input "$P1"/dataset/prmbench/<dimension>.jsonl --model <model>
-python "$P1"/experiments/prmbench_experiment/prmbench_results_summary.py   --add --model <model> --summary_file <run.summary.json>
+python "$P1"/experiments/prmbench_experiment/evaluate_verifier.py --input "$P1"/dataset/prmbench/<dimension>.jsonl --model <model>
+python "$P1"/experiments/prmbench_experiment/results_summary.py   --add --model <model> --results_base <dimension>
 
 # → $P1/results/<model>/roscoe/
 python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --concurrency 10

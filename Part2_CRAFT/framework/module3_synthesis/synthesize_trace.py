@@ -1733,7 +1733,10 @@ async def synthesize_traces_for_dataset(
     if synthesis_strategy == "rkg":
         if rkg_file is None or not rkg_file.exists():
             raise FileNotFoundError(
-                f"synthesis_strategy=rkg requires a valid --rkg_file path (current: {rkg_file})"
+                f"synthesis_strategy=rkg requires a valid --rkg_file path (current: {rkg_file}). "
+                "Build one with module2_rkg_construction/build_rkg.py, or pass "
+                "--synthesis_strategy step_by_step to synthesize without the graph — "
+                "which is the ablation's 'w/o RKG' setting, not CRAFT."
             )
         with open(rkg_file, 'r', encoding='utf-8') as f:
             rkg_raw = json.load(f)
@@ -2001,14 +2004,16 @@ def main():
     parser.add_argument(
         "--step_by_step",
         action="store_true",
-        default=True,
-        help="Generate each step one at a time (default True; each step includes all previous steps)"
+        default=False,
+        help="Shorthand for --synthesis_strategy step_by_step: generate one step at a "
+             "time without the graph, each step seeing the previous ones"
     )
     parser.add_argument(
         "--all_at_once",
         action="store_true",
         default=False,
-        help="Generate all steps at once (mutually exclusive with --step_by_step)"
+        help="Shorthand for --synthesis_strategy all_at_once: generate the whole trace "
+             "in one call"
     )
     parser.add_argument(
         "--domain",
@@ -2020,9 +2025,12 @@ def main():
     parser.add_argument(
         "--synthesis_strategy",
         type=str,
-        default="step_by_step",
+        default="rkg",
         choices=["step_by_step", "all_at_once", "rkg"],
-        help="Synthesis strategy: step_by_step | all_at_once | rkg (topological, requires --rkg_file)",
+        help="Synthesis strategy. 'rkg' (default) is Module III as the paper describes "
+             "it — a topological walk over the consensus RKG, so it requires --rkg_file. "
+             "'step_by_step' and 'all_at_once' ignore the graph and are the ablation's "
+             "'w/o RKG' setting rather than CRAFT",
     )
     parser.add_argument(
         "--rkg_file",
@@ -2070,9 +2078,15 @@ def main():
     args = parser.parse_args()
 
     # Synthesis strategy
+    # The two shorthands select a strategy, and saying both is a contradiction
+    # rather than a precedence puzzle.
+    if args.all_at_once and args.step_by_step:
+        parser.error("--step_by_step and --all_at_once select different strategies; pass one")
     synthesis_strategy = args.synthesis_strategy
     if args.all_at_once:
         synthesis_strategy = "all_at_once"
+    elif args.step_by_step:
+        synthesis_strategy = "step_by_step"
 
     # Update configuration
     global OPENAI_API_KEY, OPENAI_BASE_URL, CHAT_COMPLETIONS_URL, HEADERS
