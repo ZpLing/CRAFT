@@ -71,7 +71,7 @@ def resolve_output(path) -> Path:
 def resolve_input(path) -> Path:
     """Locate a relative --input, preferring the CWD and falling back to RESULTS_ROOT.
 
-    Keeps paths like dataset/FLD.json working while letting a stage read the
+    Keeps paths like dataset/logical/FLD.json working while letting a stage read the
     previous stage's output by bare name.
     """
     p = Path(path)
