@@ -15,24 +15,24 @@ It reuses ALL scoring functions from evaluate_receval.py unchanged:
 The only change: instead of reading EB tree structures and calling
 get_reasoning_chain_text(), we take a flat list of step strings directly.
 
-The two containers are named with_answer / blind for historical reasons: the CRAFT
+The two containers are named craft / raw: the CRAFT
 comparison feeds this scorer through receval_adapter_craft.py, which puts CRAFT's
-synthesized trace in "with_answer" and the raw CoT in "blind" so this file runs
+synthesized trace in "craft" and the raw CoT in "raw".
 unmodified, and receval_build_table.py relabels them Raw / CRAFT in the table. They
 are containers, not settings — Part 1's w/ Answer vs w/o Answer is a different axis.
 
 Input JSON (output of receval_generate_traces.py):
     [{"id": "...", "hypothesis": "...", "question": "...",
-      "with_answer": {"steps": ["Step 1 ...", "Step 2 ..."]},
-      "blind":       {"steps": ["Step 1 ...", "Step 2 ..."]}}, ...]
+      "craft": {"steps": ["Step 1 ...", "Step 2 ..."]},
+      "raw":       {"steps": ["Step 1 ...", "Step 2 ..."]}}, ...]
 
 Output JSON:
     {
-      "with_answer": {
+      "craft": {
         "per_sample": [{"id": "...", "entail": 0.91, "ll_info": 0.12, ...}],
         "aggregate":  {"entail": 0.88, "ll_info": 0.09, ...}
       },
-      "blind": { ... same structure ... },
+      "raw": { ... same structure ... },
       "comparison": {"entail_delta": 0.03, "ll_info_delta": 0.03, ...}
     }
 
@@ -464,7 +464,7 @@ def main():
         hypothesis = item.get("hypothesis", "")
         question   = item.get("question", "")  # joined premises as input context
 
-        for setting, container in (("with_answer", wa_results), ("blind", bl_results)):
+        for setting, container in (("craft", wa_results), ("raw", bl_results)):
             steps = item[setting].get("steps", [])
             if not steps:
                 logger.warning("Empty steps for id=%s setting=%s", item.get("id"), setting)
@@ -492,8 +492,8 @@ def main():
     }
 
     output = {
-        "with_answer": {"per_sample": wa_results, "aggregate": wa_agg},
-        "blind":       {"per_sample": bl_results, "aggregate": bl_agg},
+        "craft": {"per_sample": wa_results, "aggregate": wa_agg},
+        "raw":       {"per_sample": bl_results, "aggregate": bl_agg},
         "comparison":  comparison,
         "config": {"score_keys": args.score_keys, "K": args.K, "n_samples": len(items)},
     }
@@ -507,7 +507,7 @@ def main():
     logger.info("=== ReCEval Score Comparison ===")
     for k in args.score_keys:
         logger.info(
-            "%-12s  with_answer=%.4f  blind=%.4f  delta=%+.4f",
+            "%-12s  craft=%.4f  raw=%.4f  delta=%+.4f",
             k,
             wa_agg.get(k) or float("nan"),
             bl_agg.get(k) or float("nan"),

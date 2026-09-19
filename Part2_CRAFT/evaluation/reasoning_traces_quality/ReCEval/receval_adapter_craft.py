@@ -7,19 +7,18 @@ exact schema that receval_evaluate_traces.py expects:
 
     [{
        "id": ..., "hypothesis": ..., "question": ...,
-       "with_answer": {"steps": [...]},   # CRAFT post-processed
-       "blind":       {"steps": [...]},   # raw CoT
+       "craft": {"steps": [...]},         # CRAFT post-processed
+       "raw":   {"steps": [...]},         # raw CoT
     }]
 
-Container names (with_answer/blind) are kept so the existing
-receval_evaluate_traces.py runs without modification. The comparison
-script relabels them in the final table.
+The two sides are named `raw` and `craft`, matching the ROSCOE and FineLogic
+adapters beside this one.
 
 Usage:
     python receval_adapter_craft.py \\
-        --craft_dir results/craft_runs/craft_fld_o4mini_100 \\
-        --source    dataset/label_prediction/logical/FLD.json \\
-        --output    receval_inputs/fld_o4mini.json \\
+        --craft_dir results/craft_runs/craft_fld_gemini_100 \\
+        --dataset   dataset/reasoning_traces_quality/receval/FLD.json \\
+        --output    receval_inputs/fld_gemini.json \\
         [--raw_mode first|majority]
 """
 
@@ -28,8 +27,15 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+try:
+    from config import resolve_input, resolve_output
+except ImportError:
+    resolve_input = resolve_output = Path
 
 
 # ---------------------------------------------------------------------------
@@ -111,34 +117,41 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--craft_dir", required=True,
                     help="CRAFT pipeline output directory (contains k_traces_*.json and synthesized_traces.json)")
-    ap.add_argument("--source", required=True,
-                    help="Source dataset JSON (FLD.json / FOLIO.json / ...) for hypothesis+premises lookup")
-    ap.add_argument("--output", required=True, help="Output JSON in ReCEval schema")
+    ap.add_argument("--dataset", required=True,
+                    help="Source dataset JSON (FLD.json / FOLIO.json) for hypothesis+premises lookup")
+    ap.add_argument("--output", required=True,
+                    help="Output JSON in ReCEval schema; relative paths resolve under the results root")
+    ap.add_argument("--synth_file", default=None,
+                    help="Synthesis output to read (default: the one synthesized*.json in --craft_dir)")
     ap.add_argument("--raw_mode", choices=["first", "majority"], default="first",
                     help="How to pick the 'raw CoT' baseline from k_traces (default: first)")
     ap.add_argument("--max_samples", type=int, default=None)
     args = ap.parse_args()
 
-    craft_dir = Path(args.craft_dir)
+    craft_dir = Path(resolve_input(args.craft_dir))
     # Find k_traces file (k=5 or k=10)
     k_trace_files = sorted(craft_dir.glob("k_traces_*_samples.json"))
     if not k_trace_files:
         raise FileNotFoundError(f"No k_traces_*_samples.json in {craft_dir}")
     k_path = k_trace_files[0]
-    synth_path = craft_dir / "synthesized_traces.json"
-    if not synth_path.exists():
-        raise FileNotFoundError(f"{synth_path} missing")
+    if args.synth_file:
+        synth_path = Path(resolve_input(args.synth_file))
+    else:
+        synth_files = sorted(craft_dir.glob("synthesized*.json"))
+        if not synth_files:
+            raise FileNotFoundError(f"No synthesized*.json in {craft_dir}")
+        synth_path = synth_files[0]
 
     print(f"[adapter] k_traces  : {k_path.name}")
     print(f"[adapter] synth     : {synth_path.name}")
-    print(f"[adapter] source    : {args.source}")
+    print(f"[adapter] dataset   : {args.dataset}")
     print(f"[adapter] raw_mode  : {args.raw_mode}")
 
     with open(k_path) as f:
         k_data = json.load(f)
     with open(synth_path) as f:
         synth_data = json.load(f)
-    with open(args.source) as f:
+    with open(resolve_input(args.dataset)) as f:
         src_data = json.load(f)
 
     # Index source by original_index / metadata for FOLIO, by source_index for FLD
@@ -146,7 +159,8 @@ def main():
     for i, s in enumerate(src_data):
         src_by_idx[i] = s
 
-    synth_by_id = {r["sample_id"]: r for r in synth_data["results"]}
+    synth_rows = synth_data.get("results", synth_data) if isinstance(synth_data, dict) else synth_data
+    synth_by_id = {r["sample_id"]: r for r in synth_rows if "sample_id" in r}
 
     out_items: list[dict] = []
     n_raw_empty = n_synth_empty = n_src_missing = 0
@@ -181,13 +195,13 @@ def main():
             "hypothesis": hyp,
             "question": prem,
             "proof_label": rec.get("target_answer", ""),
-            "with_answer": {"steps": synth_steps},  # CRAFT post
-            "blind":       {"steps": raw_steps},    # raw CoT
+            "craft": {"steps": synth_steps},
+            "raw":   {"steps": raw_steps},
         })
         if args.max_samples and len(out_items) >= args.max_samples:
             break
 
-    out_path = Path(args.output)
+    out_path = Path(resolve_output(args.output))
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(out_items, f, indent=2, ensure_ascii=False)

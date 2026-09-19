@@ -294,8 +294,12 @@ def merge_shards_when_complete(export_dir: Path) -> Path | None:
     result is too, and the write goes through a temporary file to keep a reader
     from seeing a half-written one.
     """
-    datasets = sorted({f.stem.rsplit("_", 2)[0]
-                       for f in export_dir.glob("*_answer.jsonl")})
+    # Part 1 names its exports {ds}_with_answer / _wout_answer and splits on the last
+    # two underscores; here they are {ds}_raw and {ds}_craft, so the dataset name is
+    # everything before the last one. Matching on the wrong shape finds nothing and
+    # the merge silently never fires.
+    datasets = sorted({f.stem.rsplit("_", 1)[0]
+                       for f in export_dir.glob("*_raw.jsonl")})
     if not datasets:
         return None
     shards = {ds: export_dir / f"evaluation_results.{ds}.json" for ds in datasets}

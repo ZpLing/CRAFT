@@ -3,7 +3,7 @@ Build the raw-CoT vs CRAFT-post-processed comparison table from
 receval_evaluate_traces.py outputs.
 
 Input: multiple score JSONs produced by receval_evaluate_traces.py.
-       In each JSON, 'with_answer' = CRAFT post, 'blind' = raw CoT
+       In each JSON, 'craft' = CRAFT post-processed, 'raw' = raw CoT
        (convention set by receval_adapter_craft.py).
 
 Output: a markdown table (stdout) + LaTeX table (--latex_out).
@@ -12,9 +12,9 @@ Example:
     python receval_build_table.py \\
         --scores \\
             "FLD / GPT-5.4-nano:scores/fld_nano.json" \\
-            "FLD / o4-mini:scores/fld_o4mini.json" \\
+            "FLD / Gemini-3.1-flash-lite:scores/fld_gemini.json" \\
             "FOLIO / GPT-5.4-nano:scores/folio_nano.json" \\
-            "FOLIO / o4-mini:scores/folio_o4mini.json" \\
+            "FOLIO / Gemini-3.1-flash-lite:scores/folio_gemini.json" \\
         --metrics entail contradict \\
         --latex_out receval_table.tex
 """
@@ -23,7 +23,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+try:
+    from config import resolve_input, resolve_output
+except ImportError:
+    resolve_input = resolve_output = Path
 
 
 METRIC_PRETTY = {
@@ -68,9 +75,9 @@ def main():
             raise ValueError(f"bad --scores entry (need LABEL:PATH): {spec}")
         label, path = spec.split(":", 1)
         data = load_score_file(path)
-        wa = data["with_answer"]["aggregate"]  # CRAFT post
-        bl = data["blind"]["aggregate"]        # raw
-        n = data.get("config", {}).get("n_samples", len(data["with_answer"]["per_sample"]))
+        wa = data["craft"]["aggregate"]
+        bl = data["raw"]["aggregate"]
+        n = data.get("config", {}).get("n_samples", len(data["craft"]["per_sample"]))
         row = {"label": label.strip(), "n": n}
         for m in args.metrics:
             row[f"raw__{m}"]   = bl.get(m)

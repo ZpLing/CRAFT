@@ -5,8 +5,8 @@ Adapter: CRAFT pipeline outputs -> ROSCOE export schema.
 Pairs the raw CoT baseline (the first of the K candidate traces) with CRAFT's
 synthesized trace and writes one file per dataset per setting:
 
-    <export_dir>/{dataset}_raw.jsonl      raw CoT
-    <export_dir>/{dataset}_craft.jsonl    CRAFT post-processed
+    <output_dir>/{dataset}_raw.jsonl      raw CoT
+    <output_dir>/{dataset}_craft.jsonl    CRAFT post-processed
 
 which is what roscoe_score.py reads. Each line carries ROSCOE's own fields —
 `premise`, `hypothesis`, `gpt-3` (the trace it scores) — plus the step
@@ -20,8 +20,8 @@ Module I's loader is what keeps it out of generation.
 Usage:
     python roscoe_adapter_craft.py \\
         --craft_dir  results/roscoe_craft/nano \\
-        --source_dir dataset/reasoning_traces_quality/roscoe \\
-        --export_dir roscoe_craft/nano
+        --dataset    dataset/reasoning_traces_quality/roscoe \\
+        --output_dir roscoe_craft/nano
 """
 
 from __future__ import annotations
@@ -105,9 +105,9 @@ def main() -> None:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--craft_dir", required=True,
                     help="CRAFT run directory (k_traces_*_samples.json + synthesized*.json)")
-    ap.add_argument("--source_dir", default="dataset/reasoning_traces_quality/roscoe",
+    ap.add_argument("--dataset", default="dataset/reasoning_traces_quality/roscoe",
                     help="Directory of the ROSCOE .jsonl sets the run was generated from")
-    ap.add_argument("--export_dir", required=True,
+    ap.add_argument("--output_dir", required=True,
                     help="Where the {dataset}_{raw,craft}.jsonl pairs are written; "
                          "a relative path resolves under the results root")
     ap.add_argument("--synth_file", default=None,
@@ -128,11 +128,11 @@ def main() -> None:
             raise FileNotFoundError(f"No synthesized*.json in {craft_dir}")
         synth_path = synth_files[0]
 
-    source = load_source(Path(resolve_input(args.source_dir)))
+    source = load_source(Path(resolve_input(args.dataset)))
     k_records = load_records(k_files[0])
     synth_by_id = {r["sample_id"]: r for r in load_records(synth_path) if "sample_id" in r}
 
-    export_dir = Path(resolve_output(args.export_dir))
+    export_dir = Path(resolve_output(args.output_dir))
     export_dir.mkdir(parents=True, exist_ok=True)
 
     pairs: Dict[str, List[tuple]] = defaultdict(list)

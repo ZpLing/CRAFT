@@ -12,7 +12,7 @@ Output: a markdown table on stdout, and a LaTeX body with --latex_out.
 Example:
     python roscoe_build_table.py \\
         --summaries "GPT-5.4-nano:roscoe_craft/nano/evaluation_results.json" \\
-                    "o4-mini:roscoe_craft/o4mini/evaluation_results.json" \\
+                    "Gemini-3.1-flash-lite:roscoe_craft/gemini/evaluation_results.json" \\
         --latex_out roscoe_craft/roscoe_craft_table.tex
 """
 
