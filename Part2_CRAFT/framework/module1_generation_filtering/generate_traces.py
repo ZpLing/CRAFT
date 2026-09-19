@@ -83,7 +83,7 @@ REASONING_VISIBLE_TOKENS: int   = int(os.getenv("REASONING_VISIBLE_TOKENS", "409
 
 # Relative — resolved under the results root by _cfg.resolve_output()
 DEFAULT_OUTPUT_PATH = Path("generated_k_traces_reasoning.json")
-DEFAULT_DATASET_PATH = _cfg.DATASET_ROOT / "logical" / "FLD.json"
+DEFAULT_DATASET_PATH = _cfg.DATASET_ROOT / "label_prediction" / "logical" / "FLD.json"
 
 HEADERS = {
     "Authorization": f"Bearer {OPENAI_API_KEY or ''}",
@@ -98,11 +98,38 @@ def slugify_brand(name: str) -> str:
     """Convert a brand name into a safe key string."""
     return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
 
+def _domain_of(sample: Dict[str, Any]) -> str:
+    """Domain for a record that does not carry one: only ROSCOE's GSM8K is math."""
+    return "math" if str(sample.get("_dataset", "")).lower() == "gsm8k" else "logical"
+
+
+def _roscoe_problem_text(sample: Dict[str, Any]) -> Optional[str]:
+    """Problem text for a ROSCOE record, which keeps the answer out of the prompt.
+
+    ROSCOE's sets are built for verification rather than for asking, so `hypothesis`
+    is not part of the question: for CosmosQA and DROP it holds the correct answer
+    (the question is already appended to `premise`), and for GSM8K it holds the
+    reference solution. eSNLI is the exception — there the hypothesis is the sentence
+    whose relation to the premise is the task, so it has to be shown.
+    """
+    if "_dataset" not in sample or "gpt-3" not in sample:
+        return None
+    premise = str(sample.get("premise", "")).strip()
+    if str(sample["_dataset"]).lower() == "esnli":
+        hypothesis = str(sample.get("hypothesis", "")).strip()
+        return f"Premise: {premise}\nHypothesis: {hypothesis}".strip()
+    return premise
+
+
 def extract_problem_text(sample: Dict[str, Any]) -> str:
     """Uniformly extract problem text, preferring the `input` field."""
     primary = sample.get("input")
     if isinstance(primary, str) and primary.strip():
         return primary.strip()
+
+    roscoe = _roscoe_problem_text(sample)
+    if roscoe:
+        return roscoe
 
     parts: List[str] = []
     for key in ("Facts", "facts", "Premise", "ori_premises", "ori_conclusion", "hypothesis"):
@@ -122,6 +149,10 @@ def extract_problem_text(sample: Dict[str, Any]) -> str:
 
 def pick_target_answer(sample: Dict[str, Any]) -> Optional[str]:
     """Return proof_label first, then Label; for math domain return answer/Answer field."""
+    # ROSCOE's `answer` is a human judgement of the trace it ships ("yes"/"no"), not
+    # the problem's answer, so those records deliberately carry no target.
+    if "_dataset" in sample and "gpt-3" in sample:
+        return None
     for key in ("proof_label", "Label", "label", "answer", "Answer", "solution"):
         value = sample.get(key)
         if isinstance(value, str) and value.strip():
@@ -598,7 +629,12 @@ def load_unified_datasets(paths: Iterable[Path]) -> tuple[List[List[Dict[str, An
 
     for path in paths:
         with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
+            if path.suffix == ".jsonl":
+                # ROSCOE ships its four sets newline-delimited; every other dataset
+                # here is one JSON list, and both end up as a list of records.
+                data = [json.loads(line) for line in f if line.strip()]
+            else:
+                data = json.load(f)
 
         if not isinstance(data, list):
             raise ValueError(f"Dataset {path} is not a list")
@@ -609,7 +645,7 @@ def load_unified_datasets(paths: Iterable[Path]) -> tuple[List[List[Dict[str, An
         for idx, item in enumerate(data):
             # Skip proof-type math problems: answer_type key present but None/empty
             # (OlympiadBench proof problems — distinct from GSM8K which has no answer_type key)
-            sample_domain = item.get("domain", "logical")
+            sample_domain = item.get("domain") or _domain_of(item)
             if sample_domain == "math" and "answer_type" in item and not item.get("answer_type"):
                 continue
 
