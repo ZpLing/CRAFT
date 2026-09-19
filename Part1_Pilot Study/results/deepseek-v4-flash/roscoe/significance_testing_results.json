@@ -1,0 +1,94 @@
+{
+  "roscoe": {
+    "cosmos": {
+      "n": 125,
+      "gt_mean": 0.8374,
+      "wout_answer_mean": 0.8199,
+      "mean_diff": 0.0175,
+      "ci_lo": 0.0121,
+      "ci_hi": 0.023,
+      "p_wilcoxon": 0.0,
+      "cohen_d": 0.563,
+      "sig": "***"
+    },
+    "drop": {
+      "n": 125,
+      "gt_mean": 0.8295,
+      "wout_answer_mean": 0.8345,
+      "mean_diff": -0.005,
+      "ci_lo": -0.01,
+      "ci_hi": 0.0002,
+      "p_wilcoxon": 0.0348,
+      "cohen_d": -0.1714,
+      "sig": "*"
+    },
+    "esnli": {
+      "n": 125,
+      "gt_mean": 0.6885,
+      "wout_answer_mean": 0.6848,
+      "mean_diff": 0.0037,
+      "ci_lo": -0.0018,
+      "ci_hi": 0.0089,
+      "p_wilcoxon": 0.1512,
+      "cohen_d": 0.1186,
+      "sig": "ns"
+    },
+    "gsm8k": {
+      "n": 125,
+      "gt_mean": 0.817,
+      "wout_answer_mean": 0.825,
+      "mean_diff": -0.008,
+      "ci_lo": -0.0134,
+      "ci_hi": -0.0027,
+      "p_wilcoxon": 0.0017,
+      "cohen_d": -0.2588,
+      "sig": "**"
+    }
+  },
+  "roscoe_combined": {
+    "cosmos": {
+      "n": 500,
+      "gt_mean": 0.7503,
+      "wout_answer_mean": 0.7582,
+      "mean_diff": -0.0079,
+      "ci_lo": -0.0332,
+      "ci_hi": 0.0164,
+      "p_wilcoxon": 0.0003,
+      "cohen_d": -0.0279,
+      "sig": "***"
+    },
+    "drop": {
+      "n": 500,
+      "gt_mean": 0.7272,
+      "wout_answer_mean": 0.7312,
+      "mean_diff": -0.004,
+      "ci_lo": -0.026,
+      "ci_hi": 0.0178,
+      "p_wilcoxon": 0.0105,
+      "cohen_d": -0.0157,
+      "sig": "*"
+    },
+    "esnli": {
+      "n": 500,
+      "gt_mean": 0.6171,
+      "wout_answer_mean": 0.6105,
+      "mean_diff": 0.0066,
+      "ci_lo": -0.0036,
+      "ci_hi": 0.017,
+      "p_wilcoxon": 0.0193,
+      "cohen_d": 0.0576,
+      "sig": "*"
+    },
+    "gsm8k": {
+      "n": 500,
+      "gt_mean": 0.6714,
+      "wout_answer_mean": 0.6867,
+      "mean_diff": -0.0154,
+      "ci_lo": -0.0295,
+      "ci_hi": -0.0017,
+      "p_wilcoxon": 0.0,
+      "cohen_d": -0.0955,
+      "sig": "***"
+    }
+  }
+}

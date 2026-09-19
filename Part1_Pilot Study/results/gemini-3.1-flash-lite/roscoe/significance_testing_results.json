@@ -1,0 +1,94 @@
+{
+  "roscoe": {
+    "cosmos": {
+      "n": 125,
+      "gt_mean": 0.8179,
+      "wout_answer_mean": 0.8047,
+      "mean_diff": 0.0132,
+      "ci_lo": 0.0075,
+      "ci_hi": 0.0189,
+      "p_wilcoxon": 0.0001,
+      "cohen_d": 0.3938,
+      "sig": "***"
+    },
+    "drop": {
+      "n": 125,
+      "gt_mean": 0.8317,
+      "wout_answer_mean": 0.8304,
+      "mean_diff": 0.0013,
+      "ci_lo": -0.0039,
+      "ci_hi": 0.0073,
+      "p_wilcoxon": 0.7158,
+      "cohen_d": 0.0391,
+      "sig": "ns"
+    },
+    "esnli": {
+      "n": 125,
+      "gt_mean": 0.6844,
+      "wout_answer_mean": 0.6853,
+      "mean_diff": -0.0009,
+      "ci_lo": -0.007,
+      "ci_hi": 0.0052,
+      "p_wilcoxon": 0.7797,
+      "cohen_d": -0.0254,
+      "sig": "ns"
+    },
+    "gsm8k": {
+      "n": 125,
+      "gt_mean": 0.8191,
+      "wout_answer_mean": 0.8324,
+      "mean_diff": -0.0133,
+      "ci_lo": -0.0186,
+      "ci_hi": -0.0082,
+      "p_wilcoxon": 0.0,
+      "cohen_d": -0.4433,
+      "sig": "***"
+    }
+  },
+  "roscoe_combined": {
+    "cosmos": {
+      "n": 500,
+      "gt_mean": 0.7715,
+      "wout_answer_mean": 0.754,
+      "mean_diff": 0.0176,
+      "ci_lo": -0.0086,
+      "ci_hi": 0.0445,
+      "p_wilcoxon": 0.0,
+      "cohen_d": 0.057,
+      "sig": "***"
+    },
+    "drop": {
+      "n": 500,
+      "gt_mean": 0.7302,
+      "wout_answer_mean": 0.7393,
+      "mean_diff": -0.0091,
+      "ci_lo": -0.028,
+      "ci_hi": 0.0097,
+      "p_wilcoxon": 0.6408,
+      "cohen_d": -0.0428,
+      "sig": "ns"
+    },
+    "esnli": {
+      "n": 500,
+      "gt_mean": 0.6081,
+      "wout_answer_mean": 0.6094,
+      "mean_diff": -0.0014,
+      "ci_lo": -0.0118,
+      "ci_hi": 0.0088,
+      "p_wilcoxon": 0.2596,
+      "cohen_d": -0.0113,
+      "sig": "ns"
+    },
+    "gsm8k": {
+      "n": 500,
+      "gt_mean": 0.6851,
+      "wout_answer_mean": 0.711,
+      "mean_diff": -0.0259,
+      "ci_lo": -0.0405,
+      "ci_hi": -0.012,
+      "p_wilcoxon": 0.0,
+      "cohen_d": -0.1609,
+      "sig": "***"
+    }
+  }
+}

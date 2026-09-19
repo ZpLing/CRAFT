@@ -295,7 +295,10 @@ def build_evaluation_summary(scores: dict, export_dir: Path) -> dict:
         counts = {}
         for setting in settings:
             path = export_dir / f"{ds}_{setting}.jsonl"
-            counts[setting] = sum(1 for _ in path.open()) if path.exists() else 0
+            # Traces carry curly quotes and the like; a machine whose locale is
+            # ASCII decodes them only if the encoding is named.
+            counts[setting] = (sum(1 for _ in path.open(encoding="utf-8"))
+                               if path.exists() else 0)
         per_dataset[ds] = {
             "n_traces": counts,
             "metrics": {st: scores.get(st, {}).get(ds, {}) for st in settings},
@@ -418,9 +421,12 @@ def main() -> None:
         print_roscoe_results(scores)
         suffix = f".{args.datasets[0]}" if args.datasets and len(args.datasets) == 1 else ""
         out = export_dir / f"evaluation_results{suffix}.json"
-        with out.open("w", encoding="utf-8") as f:
-            json.dump(build_evaluation_summary(scores, export_dir), f,
-                      indent=2, ensure_ascii=False)
+        # Build it before opening the file: opening for write truncates, so a
+        # failure while building would leave an empty file that looks like a run
+        # that produced nothing rather than one that crashed.
+        summary = json.dumps(build_evaluation_summary(scores, export_dir),
+                             indent=2, ensure_ascii=False)
+        out.write_text(summary, encoding="utf-8")
         logger.info("Summary → %s", out)
 
 

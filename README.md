@@ -111,32 +111,6 @@ python "$P1"/experiments/prmbench_experiment/prmbench_results_summary.py   --add
 python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --concurrency 10
 ```
 
-`dataset/prmbench/{simplicity,soundness,sensitivity}.jsonl` hold 200 items each, sampled with
-seed 42 from PRMBench's 6,216-item `prmbench_preview.jsonl` and split by PRMBench's own
-taxonomy: Simplicity = redundency + circular, Soundness = counterfactual + step_contradiction
-+ domain_inconsistency + confidence, Sensitivity = missing_condition + deception +
-multi_solutions. Within a dimension the categories are balanced (Sensitivity 67/67/66, the
-rest even). `prmbench_evaluate_verifier.py` groups by the same map, so an item's `_dim`
-and the reported dimension always agree.
-
-Each model's runs land in `results/<model>/prmbench/` and `results/<model>/roscoe/`; the
-cross-model index `results/prmbench_master_results.json` and the significance outputs sit at
-the results root. Both scripts derive those paths from `--model`, so a run needs no `--output`.
-
-The three files supersede the earlier 150-item sample that produced the currently reported
-numbers: all 150 of its items are contained in them, so reruns stay comparable. Drawing a
-different sample needs the upstream `prmbench_preview.jsonl` (`ssmisya/PRMBench`, 6,216 items);
-reproducing the reported runs does not.
-
-ROSCOE's scorer is not vendored here: it needs a ParlAI checkout passed via
-`--roscoe_parlai_dir`, plus its corpora (`bash projects/roscoe/roscoe_data/download_annotated.sh`).
-The checkout needs no patching — upstream `score.py` hard-fails on a missing `simcse`, which the
-default `all-mpnet-base-v2` scorer never uses, so the scoring code stubs that import out before
-loading it. Asking for the `sim_sce` model type still raises rather than silently substituting.
-
-The generator splits across three files: `prompts.py` holds every prompt as a
-w/ Answer / w/o Answer pair, `generate_traces.py` samples and generates, and
-`roscoe_score.py` scores the exports. ReCEval scoring is Part 2's, not this study's.
 
 ## Part 2 — CRAFT (§3.2)
 

@@ -1,0 +1,213 @@
+{
+  "datasets": {
+    "cosmos": {
+      "n_traces": {
+        "with_answer": 125,
+        "wout_answer": 125
+      },
+      "metrics": {
+        "with_answer": {
+          "faithfulness": 0.8321,
+          "informativeness_step": 0.8059,
+          "informativeness_chain": 0.9129,
+          "faithfulness_ww": 0.9401,
+          "repetition_word": 0.0489,
+          "repetition_step": 0.0594,
+          "discourse_representation": 0.3024,
+          "coherence_step_vs_step": 0.4635,
+          "perplexity_step": 0.0047,
+          "perplexity_chain": 0.0325,
+          "perplexity_step_max": 0.0023,
+          "grammar_step": 0.9066,
+          "grammar_step_max": 0.7088
+        },
+        "wout_answer": {
+          "faithfulness": 0.8158,
+          "informativeness_step": 0.7881,
+          "informativeness_chain": 0.916,
+          "faithfulness_ww": 0.9387,
+          "repetition_word": 0.0492,
+          "repetition_step": 0.0454,
+          "discourse_representation": 0.2603,
+          "coherence_step_vs_step": 0.4228,
+          "perplexity_step": 0.0051,
+          "perplexity_chain": 0.0371,
+          "perplexity_step_max": 0.0027,
+          "grammar_step": 0.9132,
+          "grammar_step_max": 0.7223
+        }
+      }
+    },
+    "drop": {
+      "n_traces": {
+        "with_answer": 125,
+        "wout_answer": 125
+      },
+      "metrics": {
+        "with_answer": {
+          "faithfulness": 0.8392,
+          "informativeness_step": 0.8051,
+          "informativeness_chain": 0.9226,
+          "faithfulness_ww": 0.9396,
+          "repetition_word": 0.049,
+          "repetition_step": 0.058,
+          "discourse_representation": 0.0367,
+          "coherence_step_vs_step": 0.4021,
+          "perplexity_step": 0.0069,
+          "perplexity_chain": 0.0581,
+          "perplexity_step_max": 0.003,
+          "grammar_step": 0.9426,
+          "grammar_step_max": 0.8268
+        },
+        "wout_answer": {
+          "faithfulness": 0.8394,
+          "informativeness_step": 0.8027,
+          "informativeness_chain": 0.9207,
+          "faithfulness_ww": 0.9402,
+          "repetition_word": 0.0442,
+          "repetition_step": 0.046,
+          "discourse_representation": 0.067,
+          "coherence_step_vs_step": 0.4552,
+          "perplexity_step": 0.0074,
+          "perplexity_chain": 0.0619,
+          "perplexity_step_max": 0.0036,
+          "grammar_step": 0.9499,
+          "grammar_step_max": 0.8581
+        }
+      }
+    },
+    "esnli": {
+      "n_traces": {
+        "with_answer": 125,
+        "wout_answer": 125
+      },
+      "metrics": {
+        "with_answer": {
+          "faithfulness": 0.6924,
+          "informativeness_step": 0.7757,
+          "informativeness_chain": 0.8626,
+          "faithfulness_ww": 0.9137,
+          "repetition_word": 0.0494,
+          "repetition_step": 0.0677,
+          "reasoning_alignment": 0.731,
+          "external_hallucination": 0.7964,
+          "redundancy": 0.5895,
+          "common_sense_error": 0.9358,
+          "missing_step": 0.7721,
+          "semantic_coverage_step": 0.906,
+          "semantic_coverage_chain": 0.8849,
+          "discourse_representation": 0.2237,
+          "coherence_step_vs_step": 0.1993,
+          "perplexity_step": 0.0024,
+          "perplexity_chain": 0.0427,
+          "perplexity_step_max": 0.0003,
+          "grammar_step": 0.8365,
+          "grammar_step_max": 0.5918
+        },
+        "wout_answer": {
+          "faithfulness": 0.6912,
+          "informativeness_step": 0.777,
+          "informativeness_chain": 0.8608,
+          "faithfulness_ww": 0.9113,
+          "repetition_word": 0.0491,
+          "repetition_step": 0.0645,
+          "reasoning_alignment": 0.7237,
+          "external_hallucination": 0.7829,
+          "redundancy": 0.5647,
+          "common_sense_error": 0.9362,
+          "missing_step": 0.7732,
+          "semantic_coverage_step": 0.9047,
+          "semantic_coverage_chain": 0.8779,
+          "discourse_representation": 0.2396,
+          "coherence_step_vs_step": 0.1672,
+          "perplexity_step": 0.0022,
+          "perplexity_chain": 0.0452,
+          "perplexity_step_max": 0.0003,
+          "grammar_step": 0.838,
+          "grammar_step_max": 0.6187
+        }
+      }
+    },
+    "gsm8k": {
+      "n_traces": {
+        "with_answer": 125,
+        "wout_answer": 125
+      },
+      "metrics": {
+        "with_answer": {
+          "faithfulness": 0.8053,
+          "informativeness_step": 0.8234,
+          "informativeness_chain": 0.9555,
+          "faithfulness_ww": 0.9055,
+          "repetition_word": 0.0384,
+          "repetition_step": 0.0571,
+          "reasoning_alignment": 0.8511,
+          "external_hallucination": 0.9273,
+          "redundancy": 0.765,
+          "common_sense_error": 0.8844,
+          "missing_step": 0.7102,
+          "semantic_coverage_step": 0.9592,
+          "semantic_coverage_chain": 0.9619,
+          "discourse_representation": 0.3223,
+          "coherence_step_vs_step": 0.1694,
+          "perplexity_step": 0.0044,
+          "perplexity_chain": 0.0718,
+          "perplexity_step_max": 0.0014,
+          "grammar_step": 0.9388,
+          "grammar_step_max": 0.8052
+        },
+        "wout_answer": {
+          "faithfulness": 0.8098,
+          "informativeness_step": 0.8279,
+          "informativeness_chain": 0.9558,
+          "faithfulness_ww": 0.9054,
+          "repetition_word": 0.0387,
+          "repetition_step": 0.0565,
+          "reasoning_alignment": 0.8483,
+          "external_hallucination": 0.9257,
+          "redundancy": 0.7566,
+          "common_sense_error": 0.8729,
+          "missing_step": 0.6815,
+          "semantic_coverage_step": 0.9525,
+          "semantic_coverage_chain": 0.9606,
+          "discourse_representation": 0.2655,
+          "coherence_step_vs_step": 0.1746,
+          "perplexity_step": 0.0048,
+          "perplexity_chain": 0.072,
+          "perplexity_step_max": 0.0015,
+          "grammar_step": 0.9404,
+          "grammar_step_max": 0.8145
+        }
+      }
+    }
+  },
+  "meta": {
+    "settings": [
+      "with_answer",
+      "wout_answer"
+    ],
+    "n_datasets": 4,
+    "metrics": [
+      "coherence_step_vs_step",
+      "common_sense_error",
+      "discourse_representation",
+      "external_hallucination",
+      "faithfulness",
+      "faithfulness_ww",
+      "grammar_step",
+      "grammar_step_max",
+      "informativeness_chain",
+      "informativeness_step",
+      "missing_step",
+      "perplexity_chain",
+      "perplexity_step",
+      "perplexity_step_max",
+      "reasoning_alignment",
+      "redundancy",
+      "repetition_step",
+      "repetition_word",
+      "semantic_coverage_chain",
+      "semantic_coverage_step"
+    ]
+  }
+}

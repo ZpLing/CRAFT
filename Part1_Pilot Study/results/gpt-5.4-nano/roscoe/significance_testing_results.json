@@ -1,0 +1,94 @@
+{
+  "roscoe": {
+    "cosmos": {
+      "n": 125,
+      "gt_mean": 0.8321,
+      "wout_answer_mean": 0.8158,
+      "mean_diff": 0.0163,
+      "ci_lo": 0.0091,
+      "ci_hi": 0.0236,
+      "p_wilcoxon": 0.0001,
+      "cohen_d": 0.3927,
+      "sig": "***"
+    },
+    "drop": {
+      "n": 125,
+      "gt_mean": 0.8392,
+      "wout_answer_mean": 0.8394,
+      "mean_diff": -0.0002,
+      "ci_lo": -0.0068,
+      "ci_hi": 0.0065,
+      "p_wilcoxon": 0.669,
+      "cohen_d": -0.0044,
+      "sig": "ns"
+    },
+    "esnli": {
+      "n": 125,
+      "gt_mean": 0.6924,
+      "wout_answer_mean": 0.6912,
+      "mean_diff": 0.0012,
+      "ci_lo": -0.0054,
+      "ci_hi": 0.0076,
+      "p_wilcoxon": 0.5082,
+      "cohen_d": 0.0323,
+      "sig": "ns"
+    },
+    "gsm8k": {
+      "n": 125,
+      "gt_mean": 0.8053,
+      "wout_answer_mean": 0.8098,
+      "mean_diff": -0.0046,
+      "ci_lo": -0.0107,
+      "ci_hi": 0.0016,
+      "p_wilcoxon": 0.1197,
+      "cohen_d": -0.1312,
+      "sig": "ns"
+    }
+  },
+  "roscoe_combined": {
+    "cosmos": {
+      "n": 500,
+      "gt_mean": 0.7536,
+      "wout_answer_mean": 0.7356,
+      "mean_diff": 0.018,
+      "ci_lo": -0.0058,
+      "ci_hi": 0.0417,
+      "p_wilcoxon": 0.0,
+      "cohen_d": 0.067,
+      "sig": "***"
+    },
+    "drop": {
+      "n": 500,
+      "gt_mean": 0.7422,
+      "wout_answer_mean": 0.7545,
+      "mean_diff": -0.0122,
+      "ci_lo": -0.0325,
+      "ci_hi": 0.0083,
+      "p_wilcoxon": 0.4909,
+      "cohen_d": -0.0531,
+      "sig": "ns"
+    },
+    "esnli": {
+      "n": 500,
+      "gt_mean": 0.6325,
+      "wout_answer_mean": 0.6241,
+      "mean_diff": 0.0084,
+      "ci_lo": -0.0041,
+      "ci_hi": 0.0215,
+      "p_wilcoxon": 0.0252,
+      "cohen_d": 0.0569,
+      "sig": "*"
+    },
+    "gsm8k": {
+      "n": 500,
+      "gt_mean": 0.6884,
+      "wout_answer_mean": 0.692,
+      "mean_diff": -0.0036,
+      "ci_lo": -0.0168,
+      "ci_hi": 0.0092,
+      "p_wilcoxon": 0.0569,
+      "cohen_d": -0.025,
+      "sig": "ns"
+    }
+  }
+}
