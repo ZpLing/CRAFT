@@ -16,7 +16,6 @@ Part2_CRAFT/results/
 
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/
-Part2_CRAFT/eval_receval/ReCEval/
 Part1_Pilot Study/experiments/roscoe_experiment/ParlAI/
 
 # ── Python cache ─────────────────────────────────────────────────────

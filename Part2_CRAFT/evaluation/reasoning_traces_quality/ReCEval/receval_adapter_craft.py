@@ -17,8 +17,8 @@ script relabels them in the final table.
 
 Usage:
     python receval_adapter_craft.py \\
-        --craft_dir ../CRAFT_pipeline_results/craft_fld_o4mini_100 \\
-        --source    ../FLD.json \\
+        --craft_dir results/craft_runs/craft_fld_o4mini_100 \\
+        --source    dataset/logical/FLD.json \\
         --output    receval_inputs/fld_o4mini.json \\
         [--raw_mode first|majority]
 """
