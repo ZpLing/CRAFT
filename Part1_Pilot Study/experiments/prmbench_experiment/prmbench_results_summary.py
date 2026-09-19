@@ -9,7 +9,7 @@ Each entry in the registry corresponds to one run:
   - model:    model name used
   - api:      which API endpoint was used
   - n_per_dim: samples per dimension (simplicity / soundness / sensitivity)
-  - file:     path to the .summary.json produced by prmbench_evaluate_verifier.py
+  - file:     a run's results, named by dimension (both settings are read)
 
 Usage:
     # Show current summary table
@@ -20,7 +20,7 @@ Usage:
         --model gpt-4.1-mini \
         --api api_a \
         --n_per_dim N \
-        --summary_file prmbench_<N>_<model>_results.summary.json
+        --results_base <dimension>
 
 Output files:
     prmbench_master_results.json   — machine-readable master record
@@ -88,27 +88,50 @@ def save_master(records: List[Dict]) -> None:
 # Add a new run
 # ---------------------------------------------------------------------------
 
+def summarize_run(model: str, dim_files_base: Path) -> Dict[str, Any]:
+    """Recompute a run's summary from its two per-setting results files.
+
+    The verifier writes only per-item scores; everything an aggregate says is
+    derived from them, so it is derived here rather than stored twice and left to
+    drift apart.
+    """
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "prmbench_verifier", Path(__file__).resolve().parent / "prmbench_evaluate_verifier.py")
+    V = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(V)
+
+    sides = {}
+    for setting in ("with_answer", "wout_answer"):
+        path = dim_files_base.with_name(f"{dim_files_base.name}_{setting}.jsonl")
+        if not path.exists():
+            raise FileNotFoundError(f"Missing results file: {path}")
+        with path.open() as f:
+            sides[setting] = {json.loads(l)["idx"]: json.loads(l) for l in f if l.strip()}
+
+    records = []
+    for idx, wa in sides["with_answer"].items():
+        bl = sides["wout_answer"].get(idx)
+        if bl is None:
+            continue
+        records.append({"idx": idx, "classification": wa["classification"],
+                        "error_steps": wa["error_steps"], "n_steps": wa["n_steps"],
+                        "with_answer": wa, "wout_answer": bl})
+    return V.build_summary(records, model)
+
+
 def add_run(
     model: str,
     api: str,
     n_per_dim: int,
-    summary_file: str,
+    results_base: str,
     note: str = "",
 ) -> None:
-    path = Path(summary_file)
-    # A bare filename resolves against this model's own prmbench directory, then
-    # against any model's — naming a run by its file alone stays unambiguous.
-    if not path.is_absolute() and not path.exists():
-        for candidate in (RESULTS_ROOT / model / "prmbench" / path,
-                          *sorted(RESULTS_ROOT.glob(f"*/prmbench/{path}"))):
-            if candidate.exists():
-                path = candidate
-                break
-    if not path.exists():
-        raise FileNotFoundError(f"Summary file not found: {path}")
-
-    with open(path, encoding="utf-8") as f:
-        summary = json.load(f)
+    base = Path(results_base)
+    if not base.is_absolute() and not base.exists():
+        base = RESULTS_ROOT / model / "prmbench" / base
+    summary = summarize_run(model, base)
 
     record: Dict[str, Any] = {
         "model":      model,
@@ -210,19 +233,20 @@ def main() -> None:
     parser.add_argument("--model",        default=None)
     parser.add_argument("--api",          default=None, help="API used (anonymized label)")
     parser.add_argument("--n_per_dim",    type=int, default=None)
-    parser.add_argument("--summary_file", default=None,
-                        help="Path to .summary.json from prmbench_evaluate_verifier.py")
+    parser.add_argument("--results_base", default=None,
+                        help="A run's results named by dimension without the setting "
+                             "suffix, e.g. simplicity (relative → <model>/prmbench/)")
     parser.add_argument("--note",         default="", help="Optional note for this run")
     args = parser.parse_args()
 
     if args.add:
-        if not args.model or not args.summary_file:
-            parser.error("--add requires --model and --summary_file")
+        if not args.model or not args.results_base:
+            parser.error("--add requires --model and --results_base")
         add_run(
             model        = args.model,
             api          = args.api or "unknown",
             n_per_dim    = args.n_per_dim,
-            summary_file = args.summary_file,
+            results_base = args.results_base,
             note         = args.note,
         )
 

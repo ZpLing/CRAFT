@@ -806,13 +806,11 @@ async def run(args):
                 }, ensure_ascii=False) + "\n")
         written.append(path)
 
-    summary_path = out_path.with_name(f"{stem}.summary.json")
-    with open(summary_path, "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
-
+    # No summary file: every number in it — the metrics, the denominators, which
+    # items were dropped — is derived from the per-item scores in the files above,
+    # so build_summary() reproduces it from them whenever it is wanted.
     for path in written:
         logger.info("Saved %d results → %s", len(results), path)
-    logger.info("Summary → %s", summary_path)
     logger.info("=== PRMBench LLM Verifier Comparison ===")
     header = f"{'dim':<12}  {'setting':<12}  {'total_acc':>9}  {'wrong_acc':>9}  {'1st_err':>7}  {'f1':>7}  n"
     logger.info(header)
