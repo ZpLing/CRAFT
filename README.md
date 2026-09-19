@@ -124,7 +124,7 @@ framework of §3.2.
 │   │   └── reasoning_traces_quality/  ReCEval/, ROSCOE/, FineLogic/ (§4)
 │   ├── ablation_study/              the six settings of the ablation table
 │   ├── k_sensitivity/               accuracy and RKG size against K
-│   ├── rkg_robustness/              does the backbone change the extracted graph
+│   ├── rkg_construct_robustness/    does the backbone change the extracted graph
 │   └── results/                     craft_runs/, alignment_comparison/, receval_eval/,
 │                                    baseline_results/<model>/  the 13 main-table baselines
 │                                    detailed_analysis/<model>/ the appendix analyses
@@ -146,7 +146,7 @@ one file per experiment named after the script that wrote it. A baseline takes t
 from its own `--model`; an analysis reads it from the `metadata.model` of the run it is
 reading, so the directory cannot disagree with what actually generated the numbers. The
 two artifacts that belong to no single model — FLD's gold edge annotations and the
-cross-model `rkg_robustness.json` — stay at the top of `detailed_analysis/`.
+cross-model `rkg_construct_robustness.json` — stay at the top of `detailed_analysis/`.
 
 ## Part 1 — Empirical study (§4.1)
 

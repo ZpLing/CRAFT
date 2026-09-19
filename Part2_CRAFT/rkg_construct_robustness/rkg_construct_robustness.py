@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-rkg_robustness.py — does the backbone change the graph Module II extracts?
+rkg_construct_robustness.py — does the backbone change the graph Module II extracts?
 
 Graph construction asks an LLM to name each step's dependencies, so the appendix
 checks that the answer is a property of the traces rather than of the model. Two
@@ -24,7 +24,7 @@ two different numberings and blame the extractor for the mismatch.
 Usage:
     python build_gold_edges.py --dataset FLD_with_proofs.json
     # build an rkg.json from detailed_analysis/gold_traces.json with each backbone, then
-    python rkg_robustness.py \\
+    python rkg_construct_robustness.py \\
         --model "GPT-5.4-nano=detailed_analysis/gpt-5.4-nano/rkg.json" \\
         --model "Gemini-3.1-flash-lite=detailed_analysis/gemini-3.1-flash-lite/rkg.json" \\
         --gold detailed_analysis/gold_edges.json
@@ -121,7 +121,7 @@ def main() -> None:
     ap.add_argument("--gold", default=None,
                     help="Gold edge annotations {sample_id: [[src, dst], ...]}. "
                          "Without it only the pair-wise agreement is reported")
-    ap.add_argument("--output", default="detailed_analysis/rkg_robustness.json",
+    ap.add_argument("--output", default="detailed_analysis/rkg_construct_robustness.json",
                     help="Write the measurements as JSON here. It compares the models "
                          "rather than reporting one, so it is not filed under a model "
                          "directory (relative paths land under the results root)")
