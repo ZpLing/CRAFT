@@ -12,7 +12,7 @@ Prints comparison table against existing Setting E result.
 Usage:
   python run_alignment_comparison.py \
     --cleaned  craft_runs/craft_k5_full_fld_nano/cleaned.json \
-    --original dataset/logical/FLD.json \
+    --original dataset/label_prediction/logical/FLD.json \
     --model gpt-5.4-nano \
     --n_samples 100 \
     --threshold 0.3 \

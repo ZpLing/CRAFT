@@ -17,7 +17,7 @@ predicted labels directly from pipeline output files.
 Usage:
     RUN=craft_runs/craft_k5_full_fld_o4mini
     python evaluation/label_prediction/evaluate_label_accuracy.py \\
-        --datasets dataset/logical/FLD.json dataset/logical/FOLIO.json \\
+        --datasets dataset/label_prediction/logical/FLD.json dataset/label_prediction/logical/FOLIO.json \\
         --k_traces_file    $RUN/k_traces.json \\
         --cleaned_file     $RUN/cleaned.json \\
         --synthesized_step $RUN/synthesized_step_by_step.json \\
