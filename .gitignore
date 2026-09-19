@@ -41,9 +41,9 @@ Thumbs.db
 
 # ── Generated figures — regenerated from results, never pushed ───────
 /Figure/
-# and the script that draws them: it needs matplotlib, which the repo's
-# requirements deliberately leave out, so it stays local beside the stats it reads
-Part1_Pilot Study/experiments/plot_significance_forest.py
+# and plot/, which holds the scripts that draw them: they need matplotlib, which
+# the requirements deliberately leave out, and they read results/ to redraw
+/plot/
 
 # ── Paper source — kept locally, never pushed ─────────────────────────
 /Paper/
