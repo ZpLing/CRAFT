@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-step5_synthesize_trace.py  (CRAFT Pipeline — Step 5: Reference-Guided Topological Synthesis)
-------------------------------------------------------------------------------------------------
+synthesize_trace.py  (Module III — Topology-guided Trace Synthesis)
+---------------------------------------------------------------------------
 Synthesize a single high-quality reasoning trace from the k cleaned traces.
 
 Pipeline:
@@ -11,7 +11,7 @@ Pipeline:
 4. Autoregressive synthesis: generate one step at a time with reference-guided prompts
 
 Usage:
-    python step5_synthesize_trace.py \
+    python synthesize_trace.py \
         --input cleaned_traces_rkg.json \
         --output synthesized_traces.json \
         --model gpt-4o \
@@ -34,10 +34,10 @@ from tqdm import tqdm
 
 import sys as _sys
 from pathlib import Path as _Path
-_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))
+_sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-# Reuse functions from step2_extract_terms and step3_1_anomaly_filter
-from module1_trace_generation.extract_terms import (
+# Reuse functions from Module I's extract_terms and Module II's anomaly_filter
+from framework.module1_generation_filtering.extract_terms import (
     tokenize_text,
     calculate_tf,
     calculate_idf,
@@ -48,7 +48,7 @@ from module1_trace_generation.extract_terms import (
     COMMON_LOGICAL_WORDS,
     MATH_COMMON_WORDS,
 )
-from module2_rkg_filtering.anomaly_filter import (
+from framework.module1_generation_filtering.anomaly_filter import (
     parse_steps_from_trace,
     build_global_df_table,
     STEP_PATTERN,
@@ -64,7 +64,7 @@ def _normalise_math_pred(s: Optional[str]) -> Optional[str]:
     """Normalize a math pred_label before storing — delegates to evaluate_direct_accuracy."""
     try:
         import sys as _sys
-        _eval_dir = str(_pl.Path(__file__).resolve().parent)
+        _eval_dir = str(_pl.Path(__file__).resolve().parents[2] / "evaluation" / "label_prediction")
         if _eval_dir not in _sys.path:
             _sys.path.insert(0, _eval_dir)
         from evaluate_direct_accuracy import normalise_math_answer
@@ -90,7 +90,7 @@ def _normalise_math_pred(s: Optional[str]) -> Optional[str]:
     except (ValueError, OverflowError):
         pass
     return s if s else None
-_cfg_path = _pl.Path(__file__).resolve().parents[1] / "config.py"
+_cfg_path = _pl.Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_root_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
 
@@ -1798,6 +1798,115 @@ async def synthesize_traces_for_dataset(
     print(f"\nResults saved to: {output_file}")
 
 
+def _load_records(path: Path) -> List[Dict[str, Any]]:
+    """Read a pipeline JSON that may be a bare list or a {"results": [...]} envelope."""
+    with open(path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    if isinstance(data, dict):
+        return data.get('results', [data])
+    return data if isinstance(data, list) else []
+
+
+async def retry_failed_synthesis(
+    synth_file: Path,
+    input_file: Path,
+    rkg_file: Path,
+    model: str = DEFAULT_MODEL,
+    concurrency: int = 4,
+    domain: str = "logical",
+    anchor_conclusion: bool = False,
+    no_mv: bool = False,
+    idf_scope: str = "sample",
+    idf_norm: str = "raw",
+    df_table_path: Optional[Path] = None,
+    in_place: bool = False,
+) -> None:
+    """Re-synthesize only the samples a prior run left without a pred_label.
+
+    Reads the finished synthesis file, finds the samples that failed, runs RKG
+    synthesis again for those alone, and merges the recovered ones back in. The
+    IRF settings must match the original run, otherwise the retried samples are
+    scored on a different term weighting than the ones beside them in the file.
+    """
+    synth_records = _load_records(synth_file)
+    failed_sids = {r["sample_id"] for r in synth_records
+                   if "sample_id" in r and not r.get("pred_label")}
+    print(f"Failed samples to retry: {len(failed_sids)}")
+    if not failed_sids:
+        print("Nothing to retry.")
+        return
+
+    rkg_lookup     = {r["sample_id"]: r for r in _load_records(rkg_file) if "sample_id" in r}
+    cleaned_lookup = {s["sample_id"]: s for s in _load_records(input_file) if "sample_id" in s}
+
+    # A retry only sees the failed subset, so a sample-local corpus would differ from the
+    # original run's; the global table has to come from the file that run saved.
+    df_table = None
+    if idf_scope == "global":
+        if df_table_path is None or not Path(df_table_path).exists():
+            raise ValueError(
+                "--idf_scope global needs --df_table pointing at the table the original run "
+                "saved; a retry sees only the failed subset and cannot rebuild that corpus"
+            )
+        df_table = DocFreqTable.load(Path(df_table_path))
+        print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
+        check_df_table(df_table, domain, idf_norm == "log_n")
+    elif idf_scope == "none":
+        df_table = FlatDocFreqTable()
+        print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
+    else:
+        print("IRF scope: sample (IDF computed within each sample's own steps)")
+    print(f"IDF scale: {idf_norm}")
+
+    semaphore = asyncio.Semaphore(concurrency)
+    recovered: Dict[str, Dict[str, Any]] = {}
+    connector = aiohttp.TCPConnector(limit=concurrency * 3)
+
+    async with aiohttp.ClientSession(connector=connector) as session:
+        async def worker(sid: str):
+            async with semaphore:
+                sample, rkg = cleaned_lookup.get(sid), rkg_lookup.get(sid)
+                if not sample or not rkg:
+                    return sid, {"sample_id": sid, "error": "missing_input",
+                                 "synthesized_trace": None}
+                try:
+                    return sid, await synthesize_trace_rkg(
+                        session, sample, rkg, model=model, domain=domain,
+                        anchor_conclusion=anchor_conclusion, no_mv=no_mv,
+                        df_table=df_table, idf_norm=(idf_norm == "log_n"),
+                    )
+                except Exception as e:
+                    return sid, {"sample_id": sid, "error": f"retry_failed: {e}",
+                                 "synthesized_trace": None}
+
+        tasks = [asyncio.create_task(worker(sid)) for sid in failed_sids]
+        for done, coro in enumerate(asyncio.as_completed(tasks), start=1):
+            sid, result = await coro
+            recovered[sid] = result
+            print(f"  [{done}/{len(failed_sids)}] {sid} pred={result.get('pred_label')!r} "
+                  f"err={(result.get('error') or '')[:60]!r}")
+
+    merged = [recovered[r["sample_id"]]
+              if r.get("sample_id") in recovered and recovered[r["sample_id"]].get("pred_label")
+              else r
+              for r in synth_records]
+
+    out_path = Path(synth_file)
+    if in_place:
+        backup = out_path.with_suffix(".bak.json")
+        out_path.rename(backup)
+        print(f"Backup: {backup}")
+    else:
+        out_path = out_path.with_name(out_path.stem + "_retried.json")
+    with open(out_path, 'w', encoding='utf-8') as f:
+        json.dump({"results": merged}, f, indent=2, ensure_ascii=False)
+
+    n_recovered = sum(1 for r in recovered.values() if r.get("pred_label"))
+    print(f"\nWrote: {out_path}")
+    print(f"Total: {len(merged)}, with pred_label: "
+          f"{sum(1 for r in merged if r.get('pred_label'))}, recovered: {n_recovered}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate a high-quality reasoning trace by combining terms from multiple traces"
@@ -1910,7 +2019,7 @@ def main():
         "--rkg_file",
         type=str,
         default=None,
-        help="RKG JSON file path (required for synthesis_strategy=rkg; from step3_2_build_rkg.py)",
+        help="RKG JSON file path (required for synthesis_strategy=rkg; from build_rkg.py)",
     )
     parser.add_argument(
         "--anchor_conclusion",
@@ -1930,6 +2039,23 @@ def main():
         action="store_true",
         default=False,
         help="Ablation: disable majority-vote closed-loop verification in RKG synthesis.",
+    )
+
+    # Repair mode: re-run only the samples a finished run left without a pred_label.
+    parser.add_argument(
+        "--retry_failed",
+        action="store_true",
+        default=False,
+        help="Repair a finished run: re-synthesize the samples in --output that have no "
+             "pred_label, reading problem text from --input and graphs from --rkg_file, "
+             "and merge the recovered ones back. Pass the same IRF flags the run used.",
+    )
+    parser.add_argument(
+        "--in_place",
+        action="store_true",
+        default=False,
+        help="--retry_failed: overwrite --output (the original is kept as *.bak.json) "
+             "instead of writing a *_retried.json beside it",
     )
 
     args = parser.parse_args()
@@ -1955,7 +2081,31 @@ def main():
         raise FileNotFoundError(f"Input file not found: {input_path}")
     
     output_path = _cfg.resolve_output(args.output)
-    
+
+    if args.retry_failed:
+        if args.rkg_file is None:
+            parser.error("--retry_failed requires --rkg_file (the RKG the original run synthesized from)")
+        synth_path = _cfg.resolve_input(args.output)
+        if not synth_path.exists():
+            raise FileNotFoundError(f"--retry_failed needs an existing synthesis file: {synth_path}")
+        asyncio.run(
+            retry_failed_synthesis(
+                synth_file=synth_path,
+                input_file=input_path,
+                rkg_file=_cfg.resolve_input(args.rkg_file),
+                model=args.model,
+                concurrency=args.concurrency,
+                domain=args.domain,
+                anchor_conclusion=args.anchor_conclusion,
+                no_mv=args.no_mv,
+                idf_scope=args.idf_scope,
+                idf_norm=args.idf_norm,
+                df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
+                in_place=args.in_place,
+            )
+        )
+        return
+
     original_path = _cfg.resolve_input(args.original_file) if args.original_file else None
 
     # Auto-detect original_file (k_traces) in the same directory as input

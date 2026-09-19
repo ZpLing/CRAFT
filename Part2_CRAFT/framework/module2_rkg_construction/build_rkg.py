@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-step3_2_build_rkg.py  (CRAFT Pipeline — Step 3.2: Consensus RKG Construction)
+build_rkg.py  (Module II — Consensus RKG Construction)
 ------------------------------------------------------------------------------
 Build a Reasoning Knowledge Graph (RKG) for each reasoning trace, then construct
 a label-weighted consensus RKG via edge-frequency voting across k traces.
@@ -66,15 +66,15 @@ except ImportError:
 
 import sys as _sys
 from pathlib import Path as _Path
-_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))
+_sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from module2_rkg_filtering.anomaly_filter import parse_steps_from_trace, STEP_PATTERN
+from framework.module1_generation_filtering.anomaly_filter import parse_steps_from_trace, STEP_PATTERN
 
 #########################
 # Configuration — loaded from root config.py; change models there
 #########################
 import importlib.util as _ilu, pathlib as _pl
-_cfg_path = _pl.Path(__file__).resolve().parents[1] / "config.py"
+_cfg_path = _pl.Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_root_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
 
@@ -593,7 +593,7 @@ def build_consensus_rkg(
     trace_rkgs: List[Dict[str, Any]],
     consensus_threshold: float = 0.3,
     node_threshold: Optional[float] = None,
-    term_overlap_weight: float = 0.3,
+    term_overlap_weight: float = 0.3,   # lambda, the edge-weight balance
     proved_threshold: Optional[float] = None,
     weight_by: str = "uniform",   # "uniform" | "step_count"
 ) -> Dict[str, Any]:
@@ -608,7 +608,8 @@ def build_consensus_rkg(
     Args:
         trace_dags:            k trace RKG list (one per trace)
         consensus_threshold:   edge frequency threshold (edges >= this value are included in consensus)
-        term_overlap_weight:   weight of term overlap in confidence fusion (default 0.3)
+        term_overlap_weight:   lambda, the edge-weight balance between the LLM's confidence
+                               and the term-overlap score (paper: 0.3)
 
     Returns:
         {
@@ -1038,6 +1039,82 @@ async def build_rkgs_for_dataset(
 
 
 #########################
+# Offline consensus rebuild
+#########################
+
+def rebuild_consensus(
+    input_file: Path,
+    consensus_threshold: float = 0.3,
+    proved_threshold: Optional[float] = None,
+    weight_by: str = "uniform",
+    gt_file: Optional[Path] = None,
+) -> None:
+    """Recompute consensus_dag in an existing RKG file from its cached trace_dags.
+
+    No LLM calls: the per-trace graphs are already stored, so a changed voting rule
+    can be applied to a finished run without paying for extraction again. Rewrites
+    the file in place, and with --gt_file reports how often the consensus conclusion
+    node carries the right label.
+    """
+    import copy
+
+    with open(input_file) as f:
+        raw = json.load(f)
+    results = raw.get("results", raw) if isinstance(raw, dict) else raw
+
+    gt_map: Dict[str, Any] = {}
+    if gt_file and Path(gt_file).exists():
+        with open(gt_file) as f:
+            gt_raw = json.load(f)
+        gt_rows = gt_raw.get("results", gt_raw) if isinstance(gt_raw, dict) else gt_raw
+        gt_map = {s["sample_id"]: s.get("target_answer") for s in gt_rows}
+
+    correct = total = no_conclusion = 0
+    matrix: Counter = Counter()
+
+    for r in results:
+        valid = [copy.deepcopy(t) for t in r.get("trace_dags", [])
+                 if t.get("extraction_method") != "error"]
+        if not valid:
+            r["consensus_dag"] = {"nodes": [], "edges": []}
+            continue
+        consensus = build_consensus_rkg(
+            valid,
+            consensus_threshold=consensus_threshold,
+            proved_threshold=proved_threshold,
+            weight_by=weight_by,
+        )
+        r["consensus_dag"] = consensus
+
+        if not gt_map:
+            continue
+        label = None
+        for n in consensus.get("nodes", []):
+            if n.get("type") != "conclusion":
+                continue
+            text = n.get("text", "")
+            if "__PROVED__" in text:
+                label = "__PROVED__"; break
+            if "__DISPROVED__" in text:
+                label = "__DISPROVED__"; break
+        gt = gt_map.get(r.get("sample_id"))
+        if not label:
+            no_conclusion += 1
+        elif gt:
+            total += 1
+            correct += label == gt
+            matrix[(label, gt)] += 1
+
+    with open(input_file, "w") as f:
+        json.dump({"results": results} if isinstance(raw, dict) and "results" in raw else results, f)
+    print(f"Wrote: {input_file}")
+    if total:
+        print(f"Conclusion-node accuracy: {correct}/{total} = {correct / total:.3f}")
+        print(f"No conclusion: {no_conclusion}")
+        print(f"Matrix: {dict(matrix)}")
+
+
+#########################
 # CLI Entry Point
 #########################
 
@@ -1056,7 +1133,29 @@ def main() -> None:
     parser.add_argument("--node_threshold", type=float, default=None,
                         help="Node frequency threshold beta (default: same as --consensus_threshold)")
     parser.add_argument("--max_samples", type=int, default=None)
+
+    # Offline mode: re-vote an existing RKG file's cached trace_dags, no LLM calls.
+    parser.add_argument("--rebuild_consensus", action="store_true",
+                        help="Recompute consensus_dag in --input in place from its cached "
+                             "trace_dags (no LLM calls); --output is ignored")
+    parser.add_argument("--proved_threshold", type=float, default=None,
+                        help="--rebuild_consensus: asymmetric voting tau; predict PROVED when the "
+                             "PROVED weight ratio >= tau (default: plain majority vote)")
+    parser.add_argument("--weight_by", choices=["uniform", "step_count"], default="uniform",
+                        help="--rebuild_consensus: trace weighting; 'step_count' favors longer traces")
+    parser.add_argument("--gt_file", default=None,
+                        help="--rebuild_consensus: cleaned_with_problem.json, for conclusion-label diagnostics")
     args = parser.parse_args()
+
+    if args.rebuild_consensus:
+        rebuild_consensus(
+            input_file=_cfg.resolve_input(args.input),
+            consensus_threshold=args.consensus_threshold,
+            proved_threshold=args.proved_threshold,
+            weight_by=args.weight_by,
+            gt_file=_cfg.resolve_input(args.gt_file) if args.gt_file else None,
+        )
+        return
 
     global OPENAI_API_KEY, OPENAI_BASE_URL, CHAT_URL, HEADERS
     if args.api_key:

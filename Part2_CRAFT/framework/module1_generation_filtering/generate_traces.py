@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-step1_generate_traces.py  (CRAFT Pipeline — Step 1: Generate K Diverse Reasoning Traces)
-------------------------------------------------------------------------------------------
+generate_traces.py  (Module I — Multi-Trace Generation)
+---------------------------------------------------------------------------
+Rolls out the K candidate traces the rest of CRAFT reaches consensus over.
 Generate k diverse reasoning traces per sample from FLD/FOLIO datasets.
 
 Key features:
@@ -66,7 +67,7 @@ if tqdm is None:
 # OpenAI configuration — loaded from root config.py; switch models by editing config.py only
 #########################
 import importlib.util as _ilu, pathlib as _pl
-_cfg_path = _pl.Path(__file__).resolve().parents[1] / "config.py"
+_cfg_path = _pl.Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_root_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
 
@@ -82,7 +83,7 @@ REASONING_VISIBLE_TOKENS: int   = int(os.getenv("REASONING_VISIBLE_TOKENS", "409
 
 # Relative — resolved under the results root by _cfg.resolve_output()
 DEFAULT_OUTPUT_PATH = Path("generated_k_traces_reasoning.json")
-DEFAULT_DATASET_PATH = _cfg.DATASET_ROOT / "FLD.json"
+DEFAULT_DATASET_PATH = _cfg.DATASET_ROOT / "logical" / "FLD.json"
 
 HEADERS = {
     "Authorization": f"Bearer {OPENAI_API_KEY or ''}",
@@ -306,7 +307,7 @@ def extract_reasoning_steps(text: str) -> List[str]:
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     steps = [line for line in lines if STEP_PATTERN.match(line)]
     if steps:
-        # Retain Final Conclusion lines so the DAG can detect the conclusion node
+        # Retain Final Conclusion lines so the RKG can detect the conclusion node
         conclusion_lines = [l for l in lines if FINAL_CONCLUSION_PATTERN.search(l) or LABEL_TOKEN_PATTERN.search(l)]
         # Avoid duplicating lines already in steps
         for cl in conclusion_lines:
@@ -706,8 +707,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--k",
         type=int,
-        default=3,
-        help="Number of reasoning traces to generate per item",
+        default=5,
+        help="Number of reasoning traces to generate per item (paper: K=5)",
     )
     parser.add_argument(
         "--temperature",

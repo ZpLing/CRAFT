@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-step3_1_anomaly_filter.py  (CRAFT Pipeline — Step 3.1: Group Relative Anomaly Filtering)
-------------------------------------------------------------------------------------------
+anomaly_filter.py  (Module I — Z-score Steps Filtering)
+---------------------------------------------------------------------------
+Scores each step by its Jaccard overlap with T_Con, z-normalizes within the K
+traces, and drops the steps below gamma. The --method rkg pass belongs to the
+same stage but runs after Module II, pruning steps against the consensus graph.
 Detect and remove anomalous reasoning steps using GRPO-inspired z-score filtering.
 
 Two detection methods are provided:
@@ -16,13 +19,13 @@ Method 2: unsupervised (cross-position comparison, GRPO-style)
 - Uses group relative policy optimization (GRPO) style relative comparison
 
 Core functionality:
-1. Extract important terms per step (via step2_extract_terms.py)
+1. Extract important terms per step (via extract_terms.py)
 2. Compare steps across traces within the same sample to detect anomalies
 3. Flag steps whose term composition deviates significantly (z-score < threshold)
 4. Remove anomalous steps; report before/after step counts
 
 Also supports method="rkg" (RKG structural + edge-frequency anomaly detection),
-which requires output from step3_2_build_rkg.py.
+which requires output from build_rkg.py.
 """
 
 from __future__ import annotations
@@ -38,15 +41,15 @@ import numpy as np
 
 import sys as _sys
 from pathlib import Path as _Path
-_sys.path.insert(0, str(_Path(__file__).resolve().parent.parent))
+_sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 import importlib.util as _ilu
-_cfg_path = _Path(__file__).resolve().parents[1] / "config.py"
+_cfg_path = _Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_part_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
 
-# Reuse functions from step2_extract_terms.py (Step 2: TF-IDF Term Extraction)
-from module1_trace_generation.extract_terms import (
+# Reuse functions from extract_terms.py (Step 2: TF-IDF Term Extraction)
+from framework.module1_generation_filtering.extract_terms import (
     tokenize_text,
     calculate_tf,
     calculate_idf,
@@ -624,7 +627,7 @@ def detect_anomalous_steps_unsupervised(
     similarity_threshold: float = 0.3,
     min_similar_steps: int = 2,
     use_grpo_optimization: bool = True,
-    z_score_threshold: float = -1.5,
+    z_score_threshold: float = -1.0,
     consensus_threshold: float = 0.3,
     use_weighted_similarity: bool = True,
     domain: str = "logical",
@@ -644,7 +647,7 @@ def detect_anomalous_steps_unsupervised(
         similarity_threshold: similarity threshold (fallback when not using GRPO optimization)
         min_similar_steps: minimum number of similar steps required to be considered normal
         use_grpo_optimization: whether to use GRPO optimization (default True)
-        z_score_threshold: z-score threshold; steps below this are flagged as anomalous (default -1.5)
+        z_score_threshold: z-score cutoff gamma; steps below this are flagged as anomalous (paper: -1.0)
         consensus_threshold: consensus core threshold (default 0.3, i.e. term appears in >= 30% of steps)
         use_weighted_similarity: whether to use weighted Jaccard similarity (default True)
         domain: "logical" or "math"
@@ -1095,7 +1098,7 @@ def process_sample(
     method: str = "supervised",
     min_similar_steps: int = 2,
     use_grpo_optimization: bool = True,
-    z_score_threshold: float = -1.5,
+    z_score_threshold: float = -1.0,
     consensus_threshold: float = 0.3,
     use_weighted_similarity: bool = True,
     domain: str = "logical",
@@ -1110,7 +1113,7 @@ def process_sample(
     Args:
         sample: sample data dict
         method: "supervised" | "unsupervised" | "rkg"
-        sample_rkg: required when method="rkg"; RKG data for this sample (from step3_2_build_rkg.py)
+        sample_rkg: required when method="rkg"; RKG data for this sample (from build_rkg.py)
         domain: "logical" or "math"
         df_table: global IRF corpus from build_global_df_table(); None keeps IDF within the sample
         idf_norm: divide IDF by log(N) so thresholds mean the same under either corpus
@@ -1187,7 +1190,7 @@ def process_sample(
 
     elif method == "rkg":
         if sample_rkg is None:
-            raise ValueError("method='rkg' requires sample_rkg argument (from step3_2_build_rkg.py output)")
+            raise ValueError("method='rkg' requires sample_rkg argument (from build_rkg.py output)")
         trace_rkgs    = sample_rkg.get("trace_dags", [])
         consensus_rkg = sample_rkg.get("consensus_dag", {})
         anomalous_rkg, underthinking_traces = detect_anomalous_steps_rkg(
@@ -1311,7 +1314,9 @@ def main():
         "--min_tfidf",
         type=float,
         default=0.0,
-        help="Minimum TF-IDF score threshold; only terms above this are considered semantically rich (default 0.0, i.e. no filtering)",
+        help="TF-IRF importance floor; 0.0 (default) applies no floor, which is how the "
+             "reported runs scored terms here. The paper's alpha=0.01 is applied at "
+             "synthesis (Module III --min_tfidf)",
     )
     parser.add_argument(
         "--similarity_threshold",
@@ -1322,15 +1327,17 @@ def main():
     parser.add_argument(
         "--method",
         type=str,
-        default="supervised",
+        default="unsupervised",
         choices=["supervised", "unsupervised", "rkg"],
-        help="Detection method: supervised | unsupervised | rkg (RKG structural+edge-frequency filter, requires --rkg_file)",
+        help="Detection method: unsupervised (default; the paper's z-score step filtering, "
+             "the only method that honours --z_score_threshold) | supervised (same-step "
+             "pairwise similarity) | rkg (structural + edge-frequency filter, requires --rkg_file)",
     )
     parser.add_argument(
         "--rkg_file",
         type=str,
         default=None,
-        help="RKG JSON file path (required for method=rkg; output from step3_2_build_rkg.py)",
+        help="RKG JSON file path (required for method=rkg; output from build_rkg.py)",
     )
     parser.add_argument(
         "--min_similar_steps",
@@ -1353,8 +1360,8 @@ def main():
     parser.add_argument(
         "--z_score_threshold",
         type=float,
-        default=-1.5,
-        help="Z-score threshold; steps below this are flagged as anomalous (GRPO optimization only, default -1.5)",
+        default=-1.0,
+        help="Z-score cutoff gamma; steps below this are flagged as anomalous (--method unsupervised only; paper: -1.0)",
     )
     parser.add_argument(
         "--consensus_threshold",
@@ -1464,7 +1471,7 @@ def main():
             method=args.method,
             min_similar_steps=args.min_similar_steps,
             use_grpo_optimization=args.use_grpo_optimization if args.method == "unsupervised" else False,
-            z_score_threshold=args.z_score_threshold if args.method == "unsupervised" else -1.5,
+            z_score_threshold=args.z_score_threshold if args.method == "unsupervised" else -1.0,
             consensus_threshold=args.consensus_threshold,
             use_weighted_similarity=args.use_weighted_similarity if args.method == "unsupervised" else False,
             domain=args.domain,

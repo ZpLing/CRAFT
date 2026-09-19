@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-step2_extract_terms.py  (CRAFT Pipeline — Step 2: TF-IDF Term Extraction)
+extract_terms.py  (Module I — TF-IRF Consensus Terms T_Con)
 ---------------------------------------------------------------------------
 Extract important logical terms and domain-specific vocabulary from reasoning traces.
 
-This module is used internally by Step 3.1 (anomaly filter) and Step 5 (synthesis).
+Called internally by anomaly_filter.py (Module I) and synthesize_trace.py (Module III);
+run directly it just dumps the term table for inspection.
 It implements TF-IDF term extraction: terms that appear frequently within a single
 sample's traces but rarely across other samples' traces are considered important.
 
@@ -51,7 +52,7 @@ except Exception:          # SymPy is optional; without it equations keep their 
     _SYMPY_OK = False
 
 import importlib.util as _ilu
-_cfg_path = Path(__file__).resolve().parents[1] / "config.py"
+_cfg_path = Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_part_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
 
@@ -953,7 +954,9 @@ def main():
         "--min_tfidf",
         type=float,
         default=0.0,
-        help="Minimum TF-IDF score threshold; only terms above this are considered semantically rich (default 0.0, i.e. no filtering)",
+        help="TF-IRF importance floor; 0.0 (default) applies no floor, which is how the "
+             "reported runs scored terms here. The paper's alpha=0.01 is applied at "
+             "synthesis (Module III --min_tfidf)",
     )
     parser.add_argument(
         "--no_prioritize_logical",
