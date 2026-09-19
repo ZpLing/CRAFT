@@ -50,7 +50,7 @@ BENCHMARK_SECTIONS = {
     "prmbench": ("prmbench", "prmbench_metrics", "prmbench_dims_combined"),
     "roscoe":   ("roscoe", "roscoe_combined"),
 }
-STATS_FILENAME = "significance_results.json"
+STATS_FILENAME = "significance_testing_results.json"
 
 
 def model_stats_path(model_name: str, benchmark: str) -> Path:
