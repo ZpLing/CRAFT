@@ -146,7 +146,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--input",     required=True)
     p.add_argument("--n_samples", type=int, default=10)
-    p.add_argument("--model",     default="gpt-4.1-mini")
+    p.add_argument("--model",     default="gemini-3.1-flash-lite")
     p.add_argument("--threshold", type=float, default=0.3)
     p.add_argument("--output",    default="alignment_eval.json",
                    help="Relative paths resolve under the results root")

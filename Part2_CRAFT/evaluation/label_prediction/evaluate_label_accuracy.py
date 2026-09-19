@@ -15,14 +15,14 @@ predicted labels directly from pipeline output files.
   E: + RKG-guided synthesis       (Step 5 RKG pred_label; no LLM call)
 
 Usage:
-    RUN=craft_runs/craft_k5_full_fld_o4mini
+    RUN=craft_runs/craft_k5_full_fld_gemini
     python evaluation/label_prediction/evaluate_label_accuracy.py \\
         --datasets dataset/label_prediction/logical/FLD.json dataset/label_prediction/logical/FOLIO.json \\
         --k_traces_file    $RUN/k_traces.json \\
         --cleaned_file     $RUN/cleaned.json \\
         --synthesized_step $RUN/synthesized_step_by_step.json \\
         --synthesized_rkg  $RUN/synthesized.json \\
-        --model o4-mini \\
+        --model gemini-3.1-flash-lite \\
         --output $RUN/ablation_results.json
 """
 
@@ -55,7 +55,7 @@ except ImportError:
     resolve_input = resolve_output = Path
     OPENAI_API_KEY  = os.getenv("OPENAI_API_KEY", "")
     OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-    DEFAULT_MODEL   = os.getenv("OPENAI_MODEL", "o4-mini")
+    DEFAULT_MODEL   = os.getenv("OPENAI_MODEL", "gemini-3.1-flash-lite")
     REQUEST_TIMEOUT = int(os.getenv("OPENAI_REQUEST_TIMEOUT", "180"))
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")

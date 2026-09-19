@@ -22,7 +22,7 @@ and per-trace stats are averaged across all k traces.
 Usage:
     # Single file
     python evaluation/label_prediction/evaluate_direct_accuracy.py \\
-        --input craft_runs/craft_k5_full_fld_o4mini/synthesized.json \\
+        --input craft_runs/craft_k5_full_fld_gemini/synthesized.json \\
         --source synthesized
 
     # Ablation: compare multiple pipeline outputs side-by-side

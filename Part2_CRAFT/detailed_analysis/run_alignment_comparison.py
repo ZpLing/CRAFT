@@ -42,7 +42,7 @@ from framework.module3_synthesis.synthesize_trace import synthesize_traces_for_d
 # Explicit rather than via OPENAI_* so a stray env var cannot redirect these runs.
 PINNED_KEY, PINNED_URL = require_pinned_endpoint()
 
-EXISTING_SETTING_E = {"accuracy": 0.560, "macro_f1": 0.494, "label": "E: RKG (gpt54nano, old pipeline)"}
+EXISTING_SETTING_E = {"accuracy": 0.560, "macro_f1": 0.494, "label": "E: RKG (gpt-5.4-nano, old pipeline)"}
 
 
 def patch_credentials():
@@ -298,7 +298,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--cleaned",     required=True)
     p.add_argument("--original",    default=None, help="Original dataset (FLD.json) for problem text")
-    p.add_argument("--model",       default="gpt-5.4-nano")
+    p.add_argument("--model",       default="gemini-3.1-flash-lite")
     p.add_argument("--n_samples",   type=int, default=100)
     p.add_argument("--threshold",   type=float, default=0.3)
     p.add_argument("--concurrency", type=int, default=5)
