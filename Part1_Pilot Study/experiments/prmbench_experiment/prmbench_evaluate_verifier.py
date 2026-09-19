@@ -141,14 +141,45 @@ def build_prompt_wout_answer(question: str, steps: list[str]) -> str:
 # ---------------------------------------------------------------------------
 # Answer extraction
 # ---------------------------------------------------------------------------
+def _boxed_content(text: str) -> str | None:
+    """The content of the last \\boxed{...}, counting braces so nesting survives."""
+    start = text.rfind("\\boxed{")
+    if start < 0:
+        return None
+    i, depth = start + len("\\boxed{"), 1
+    while i < len(text) and depth:
+        if text[i] == "{":
+            depth += 1
+        elif text[i] == "}":
+            depth -= 1
+        i += 1
+    return text[start + len("\\boxed{"): i - 1].strip() if depth == 0 else None
+
+
 def extract_final_answer(process: list[str]) -> str:
+    """The answer a correct solution arrived at, for the w/ Answer setting.
+
+    These solutions are PRM800K's, so the answer is usually inside \\boxed{},
+    which is taken first and taken whole. Failing that, the text after "answer
+    is" is the answer if it is short enough to be one. Anything else returns the
+    final step entire: a complete sentence that states the answer is worth more
+    to the model than a fragment, and splitting on the last "=" produced exactly
+    that — half a matrix, or the tail of an equation, announced as the answer.
+    """
     if not process:
         return ""
-    last = process[-1]
-    match = re.search(r"(?:answer is|=)\s*(.+?)\.?\s*$", last, re.IGNORECASE)
+    last = process[-1].strip()
+
+    for text in (last, " ".join(process)):
+        boxed = _boxed_content(text)
+        if boxed:
+            return boxed
+
+    match = re.search(r"answer is[:\s]+(.{1,60}?)\.?\s*$", last, re.IGNORECASE)
     if match:
         return match.group(1).strip()
-    return last.strip()
+
+    return last
 
 
 # ---------------------------------------------------------------------------

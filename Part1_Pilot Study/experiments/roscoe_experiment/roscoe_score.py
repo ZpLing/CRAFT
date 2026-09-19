@@ -279,6 +279,43 @@ def run_roscoe_evaluation(
     return all_results
 
 
+def merge_shards_when_complete(export_dir: Path) -> Path | None:
+    """Fold the per-dataset summaries into one as soon as they are all present.
+
+    Splitting a model across datasets means four jobs write four shards into one
+    directory, and whichever finishes last can see that the set is complete and
+    merge it — so a run ends with the summary it would have had if one job had
+    done the work, and nobody has to remember a merge step. Concurrent jobs may
+    both find the set complete and both merge: the inputs are the same, so the
+    result is too, and the write goes through a temporary file to keep a reader
+    from seeing a half-written one.
+    """
+    datasets = sorted({f.stem.rsplit("_", 2)[0]
+                       for f in export_dir.glob("*_answer.jsonl")})
+    if not datasets:
+        return None
+    shards = {ds: export_dir / f"evaluation_results.{ds}.json" for ds in datasets}
+    if not all(p.exists() and p.stat().st_size for p in shards.values()):
+        return None
+
+    merged: dict = {"datasets": {}, "meta": {}}
+    for ds, path in shards.items():
+        part = json.loads(path.read_text(encoding="utf-8"))
+        merged["datasets"].update(part.get("datasets", {}))
+        merged["meta"] = part.get("meta", {})
+    merged["meta"]["n_datasets"] = len(merged["datasets"])
+    merged["meta"]["metrics"] = sorted({m for d in merged["datasets"].values()
+                                        for side in d["metrics"].values() for m in side})
+
+    out = export_dir / "evaluation_results.json"
+    tmp = out.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(merged, indent=2, ensure_ascii=False), encoding="utf-8")
+    tmp.replace(out)
+    for path in shards.values():
+        path.unlink(missing_ok=True)
+    return out
+
+
 def build_evaluation_summary(scores: dict, export_dir: Path) -> dict:
     """Write what ROSCOE measured: each metric, per dataset, per setting.
 
@@ -428,6 +465,10 @@ def main() -> None:
                              indent=2, ensure_ascii=False)
         out.write_text(summary, encoding="utf-8")
         logger.info("Summary → %s", out)
+        if suffix:
+            merged = merge_shards_when_complete(export_dir)
+            if merged:
+                logger.info("All datasets scored — merged → %s", merged)
 
 
 if __name__ == "__main__":
