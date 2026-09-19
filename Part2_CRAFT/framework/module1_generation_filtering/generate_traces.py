@@ -229,9 +229,17 @@ def build_reasoning_prompt_math(problem: str) -> List[Dict[str, str]]:
 # OpenAI API wrapper
 #########################
 
+# Every LLM request this module makes passes through one function, so counting
+# there is the number of calls actually paid for — retries included — rather than
+# the number a run was expected to need. Stages write it into their metadata, and
+# detailed_analysis/compute_cost reads it back.
+API_CALLS = {"count": 0}
+
+
 @with_backoff
 async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str, str]], temperature: float = None) -> str:
     """Call the Chat Completions endpoint and return the response text."""
+    API_CALLS["count"] += 1
     if aiohttp is None:
         raise RuntimeError("Missing aiohttp dependency")
 
@@ -609,6 +617,7 @@ async def generate_k_traces_dataset(
             "model": MODEL_NAME,
             "temperature": base_temperature,
             "k": k,
+            "api_calls": API_CALLS["count"],
             "statistics": statistics,
         },
         "results": resolved,

@@ -232,14 +232,24 @@ def _apply_reasoning_budget(payload: dict, model: str) -> dict:
     return payload
 
 
+# Every LLM request this module makes passes through one function, so counting
+# there is the number of calls actually paid for — retries included — rather than
+# the number a run was expected to need. Stages write it into their metadata, and
+# detailed_analysis/compute_cost reads it back.
+API_CALLS = {"count": 0}
+
+
 @backoff.on_exception(
     backoff.expo,
     (aiohttp.ClientError, asyncio.TimeoutError, RuntimeError),
     max_tries=5,
     factor=2,
 )
+
+
 async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str) -> Optional[Dict]:
     """Call the LLM and parse the JSON response. Returns None on failure."""
+    API_CALLS["count"] += 1
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
@@ -1031,6 +1041,7 @@ async def build_rkgs_for_dataset(
             "node_threshold": consensus_threshold if node_threshold is None else node_threshold,
             "total_samples": len(samples),
             "successful": sum(1 for r in results if r and "error" not in r),
+            "api_calls": API_CALLS["count"],
         },
         "results": [r for r in results if r is not None],
     }

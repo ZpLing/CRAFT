@@ -551,6 +551,13 @@ def _apply_reasoning_budget(payload: dict, model: str) -> dict:
     return payload
 
 
+# Every LLM request this module makes passes through one function, so counting
+# there is the number of calls actually paid for — retries included — rather than
+# the number a run was expected to need. Stages write it into their metadata, and
+# detailed_analysis/compute_cost reads it back.
+API_CALLS = {"count": 0}
+
+
 @backoff.on_exception(
     backoff.expo,
     (aiohttp.ClientError, asyncio.TimeoutError, RuntimeError),
@@ -564,6 +571,7 @@ async def generate_reasoning_trace(
     max_tokens: Optional[int] = None,
 ) -> str:
     """Call the model to generate a reasoning trace."""
+    API_CALLS["count"] += 1
     payload = {
         "model": model,
         "messages": [
@@ -1782,6 +1790,7 @@ async def synthesize_traces_for_dataset(
             "min_tfidf": min_tfidf,
             "total_samples": len(samples),
             "successful_samples": sum(1 for r in results if r.get("synthesized_trace")),
+            "api_calls": API_CALLS["count"],
         },
         "results": results,
     }

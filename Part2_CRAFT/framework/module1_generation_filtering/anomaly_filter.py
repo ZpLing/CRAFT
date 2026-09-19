@@ -982,7 +982,7 @@ def detect_anomalous_steps_rkg(
     consensus_threshold: float = 0.3,
     underthinking_threshold: float = 0.3,
     domain: str = "logical",
-) -> Tuple[Set[Tuple[int, str]], Set[int]]:
+) -> Tuple[Set[Tuple[int, str]], Set[int], Dict[Tuple[int, str], str]]:
     """RKG-based anomaly detection entry point.
 
     Handles two categories of issues simultaneously:
@@ -998,8 +998,13 @@ def detect_anomalous_steps_rkg(
         - anomalous_steps     : Set of (trace_idx, node_id) — specific steps to remove
         - underthinking_traces: Set of trace_idx — traces with overall insufficient steps
                                 (marked for down-weighting)
+        - phase_of            : which filter removed each step — "nodes" for the
+                                structural pass (isolated, zero in/out-degree),
+                                "edges" for the frequency vote, "math" for a SymPy
+                                refutation. Appendix Table rkg_stats is this split.
     """
     anomalous: Set[Tuple[int, str]] = set()
+    phase_of: Dict[Tuple[int, str], str] = {}
 
     # Phase 0: Underthinking detection
     underthinking_traces = detect_underthinking_traces(
@@ -1019,6 +1024,7 @@ def detect_anomalous_steps_rkg(
         )
 
         combined = structural | freq_based
+        math_refuted: Set[str] = set()
 
         # Phase 3: math domain SymPy validation (forceful override)
         if domain == "math" and _SYMPY_AVAILABLE:
@@ -1029,13 +1035,23 @@ def detect_anomalous_steps_rkg(
                 result = verify_step_math(node.get("text", ""))
                 if result is False:
                     combined.add(nid)
+                    math_refuted.add(nid)
                 elif result is True and nid in combined:
                     combined.discard(nid)
 
         for nid in combined:
             anomalous.add((trace_idx, nid))
+            # A step caught by more than one pass is attributed to the first that
+            # would have removed it, so the breakdown sums to the total.
+            if nid in structural:
+                phase = "nodes"
+            elif nid in freq_based:
+                phase = "edges"
+            else:
+                phase = "math"
+            phase_of[(trace_idx, nid)] = phase
 
-    return anomalous, underthinking_traces
+    return anomalous, underthinking_traces, phase_of
 
 
 def remove_anomalous_steps_rkg(
@@ -1194,7 +1210,7 @@ def process_sample(
         # Runs written before the keys were renamed to the paper's RKG still say dag.
         trace_rkgs    = sample_rkg.get("trace_rkgs") or sample_rkg.get("trace_dags") or []
         consensus_rkg = sample_rkg.get("consensus_rkg") or sample_rkg.get("consensus_dag") or {}
-        anomalous_rkg, underthinking_traces = detect_anomalous_steps_rkg(
+        anomalous_rkg, underthinking_traces, phase_of = detect_anomalous_steps_rkg(
             trace_rkgs, consensus_rkg,
             consensus_threshold=consensus_threshold,
             underthinking_threshold=underthinking_threshold,
@@ -1213,6 +1229,7 @@ def process_sample(
                 "node_id":   node_id,
                 "step_text": node.get("text", "") if node else "",
                 "diagnosis": "overthinking_or_error",
+                "filter": phase_of.get((trace_idx, node_id)),
                 "step_number": node.get("step_number") if node else None,
             })
         # Also record underthinking traces
@@ -1246,6 +1263,9 @@ def process_sample(
         "num_underthinking_traces": n_underthinking if method == "rkg" else 0,
         "method": method,
     }
+    if method == "rkg":
+        stats["removed_by_filter"] = dict(Counter(
+            a["filter"] for a in anomalous_info if a.get("filter")))
 
     return {
         "sample_id": sample.get("sample_id"),
