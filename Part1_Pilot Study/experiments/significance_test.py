@@ -238,8 +238,8 @@ def load_roscoe(model_name):
     base = RESULTS_ROOT / MODELS[model_name] / "roscoe" / "roscoe_scores"
     result = {}
     for ds in ROSCOE_DATASETS:
-        path_with  = base / f"scores_{ds}_with_answer.tsv"
-        path_wout  = base / f"scores_{ds}_wout_answer.tsv"
+        path_with  = base / f"scores_{ds}_traces_with_answer.tsv"
+        path_wout  = base / f"scores_{ds}_traces_wout_answer.tsv"
         if not path_with.exists() or not path_wout.exists():
             continue
         df_with = pd.read_csv(path_with, sep=r"\s+", engine="python")
@@ -287,8 +287,8 @@ def load_roscoe_combined(model_name):
     base = RESULTS_ROOT / MODELS[model_name] / "roscoe" / "roscoe_scores"
     result = {}
     for ds in ROSCOE_DATASETS:
-        path_with = base / f"scores_{ds}_with_answer.tsv"
-        path_wout = base / f"scores_{ds}_wout_answer.tsv"
+        path_with = base / f"scores_{ds}_traces_with_answer.tsv"
+        path_wout = base / f"scores_{ds}_traces_wout_answer.tsv"
         if not path_with.exists() or not path_wout.exists():
             continue
         df_with = pd.read_csv(path_with, sep=r"\s+", engine="python")

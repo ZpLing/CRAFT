@@ -37,8 +37,8 @@ Output format (both modes):
     }]
 
 Export for ROSCOE roscoe.py (via --export_dir):
-    roscoe_results/with_answer.jsonl  — each line: {premise, hypothesis, gpt-3}
-    roscoe_results/wout_answer.jsonl        — each line: {premise, hypothesis, gpt-3}
+    roscoe_results/{dataset}_traces_with_answer.jsonl  — each line: {premise, hypothesis, gpt-3}
+    roscoe_results/{dataset}_traces_wout_answer.jsonl  — each line: {premise, hypothesis, gpt-3}
     (field 'gpt-3' = our generated reasoning trace, matching ROSCOE's expected key)
 
 Then score with:
@@ -289,14 +289,15 @@ def export_for_roscoe(results: list[dict], export_dir: str) -> None:
             ... dataset-specific extras (e-SNLI: explanation_1/2/3)
         }
 
-    We write two files:
-        {export_dir}/with_answer.json   — traces generated with ground truth label
-        {export_dir}/wout_answer.json         — traces generated without label
+    We write two files per dataset:
+        {export_dir}/{dataset}_traces_with_answer.jsonl  — generated with the label
+        {export_dir}/{dataset}_traces_wout_answer.jsonl  — generated without it
 
-    Files are named {dataset}_{setting}.jsonl: the content is newline-delimited
-    JSON, and saying so keeps editors from reporting every file after the first
-    line as malformed. ROSCOE's own roscoe.py matches on the dataset-name prefix
-    and takes the extension from --suffix, so it reads these with `-s jsonl`.
+    Files are named {dataset}_traces_{setting}.jsonl: the content is
+    newline-delimited JSON, and saying so keeps editors from reporting every file
+    after the first line as malformed. ROSCOE's own roscoe.py matches on the
+    dataset-name prefix and takes the extension from --suffix, so it reads these
+    with `-s jsonl`.
     """
     out = Path(export_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -310,7 +311,7 @@ def export_for_roscoe(results: list[dict], export_dir: str) -> None:
             by_dataset.setdefault(ds, []).append(r)
 
         for ds, items in by_dataset.items():
-            path = out / f"{ds}_{setting}.jsonl"
+            path = out / f"{ds}_traces_{setting}.jsonl"
             with open(path, "w", encoding="utf-8") as f:
                 for r in items:
                     trace_steps = r[setting]["steps"]

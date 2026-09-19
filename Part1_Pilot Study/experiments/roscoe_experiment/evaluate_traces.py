@@ -75,6 +75,21 @@ def set_model_cache(cache_dir: str | None) -> None:
     logger.info("Model cache → %s", path)
 
 
+def split_export_name(stem: str) -> tuple:
+    """Split an export file's stem into (dataset, setting).
+
+    generate_traces.py writes {dataset}_traces_{setting}.jsonl, so the dataset is
+    everything before "_traces_". Splitting on a fixed number of underscores
+    instead would hand back "gsm8k_traces" and the scores would be filed under a
+    dataset that does not exist. Returns (None, None) for a name of another shape.
+    """
+    for setting in ("with_answer", "wout_answer"):
+        suffix = f"_traces_{setting}"
+        if stem.endswith(suffix):
+            return stem[: -len(suffix)], setting
+    return None, None
+
+
 def run_roscoe_evaluation(
     export_dir: str,
     roscoe_dir: str,
@@ -91,7 +106,7 @@ def run_roscoe_evaluation(
     Only uses sentence_transformer mode (no simcse required).
 
     Args:
-        export_dir:         Directory containing {dataset}_{setting}.json files
+        export_dir:         Directory containing {dataset}_traces_{setting}.jsonl files
         roscoe_dir:         Path to ParlAI/projects/roscoe/ directory
         transformer_model:  Sentence transformer model (default: all-mpnet-base-v2)
         scores_output_dir:  Where to save TSV score files (default: export_dir/scores/)
@@ -181,24 +196,18 @@ def run_roscoe_evaluation(
     if datasets:
         wanted = set(datasets)
         json_files = [f for f in json_files
-                      if f.stem.rsplit("_", 2)[0] in wanted]
+                      if split_export_name(f.stem)[0] in wanted]
 
     if not json_files:
         logger.warning("No .json files found in %s", export_path)
         return {}
 
     for json_file in json_files:
-        fname = json_file.name  # e.g. "drop_with_answer.json"
-        # Parse dataset name and setting from filename
-        # Filename format: {dataset}_{setting}.json  (setting = with_answer or wout_answer)
-        stem = json_file.stem  # "drop_with_answer"
-        if stem.endswith("_with_answer"):
-            dataset = stem[: -len("_with_answer")]
-            setting = "with_answer"
-        elif stem.endswith("_wout_answer"):
-            dataset = stem[: -len("_wout_answer")]
-            setting = "wout_answer"
-        else:
+        fname = json_file.name  # e.g. "drop_traces_with_answer.jsonl"
+        # Filename format: {dataset}_traces_{setting}.jsonl
+        stem = json_file.stem  # "drop_traces_with_answer"
+        dataset, setting = split_export_name(stem)
+        if dataset is None:
             logger.warning("Skipping unrecognized filename: %s", fname)
             continue
 
@@ -331,7 +340,7 @@ def build_evaluation_summary(scores: dict, export_dir: Path) -> dict:
     for ds in datasets:
         counts = {}
         for setting in settings:
-            path = export_dir / f"{ds}_{setting}.jsonl"
+            path = export_dir / f"{ds}_traces_{setting}.jsonl"
             # Traces carry curly quotes and the like; a machine whose locale is
             # ASCII decodes them only if the encoding is named.
             counts[setting] = (sum(1 for _ in path.open(encoding="utf-8"))
