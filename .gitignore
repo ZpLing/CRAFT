@@ -8,10 +8,10 @@ secrets.*
 # ── Run logs (may contain API keys / local paths) ─────────────────────
 *.log
 
-# ── Experiment data — kept locally, never pushed ──────────────────────
-# Each part now keeps its own results next to its code.
+# ── Experiment data ───────────────────────────────────────────────────
+# Part 1's results are the pilot study's evidence and are small enough to track
+# (11 MB); Part 2's craft_runs are 3.2 GB and stay local.
 /results/
-Part1_Pilot Study/results/
 Part2_CRAFT/results/
 
 # ── Local-only tooling (not part of the released pipeline) ───────────
@@ -20,6 +20,7 @@ Part1_Pilot Study/experiments/prmbench_experiment/retry_failed.py
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/
 Part2_CRAFT/eval_receval/ReCEval/
+Part1_Pilot Study/experiments/roscoe_experiment/ParlAI/
 
 # ── Python cache ─────────────────────────────────────────────────────
 __pycache__/
@@ -41,6 +42,9 @@ ENV/
 # ── OS artefacts ─────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+
+# ── Generated figures — regenerated from results, never pushed ───────
+/Figure/
 
 # ── Paper source — kept locally, never pushed ─────────────────────────
 /Paper/

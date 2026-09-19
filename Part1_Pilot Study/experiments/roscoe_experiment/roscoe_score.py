@@ -5,6 +5,8 @@ Imports ROSCOE's Evaluator out of a ParlAI checkout directly rather than shellin
 out to its CLI, and runs it in sentence_transformer mode, so the checkout needs no
 patching: the simcse import upstream insists on is stubbed out below.
 """
+from __future__ import annotations
+
 import json
 import logging
 import os
@@ -14,6 +16,65 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
+# ---------------------------------------------------------------------------
+# ROSCOE's scorer lives in the ParlAI repository, not in the pip package, and the
+# repository is far too large to vendor for two files. They are fetched on first
+# use into the directory --roscoe_parlai_dir points at, which is gitignored: the
+# scorer is upstream's code, pinned by URL rather than copied into this one.
+# ---------------------------------------------------------------------------
+_ROSCOE_RAW = "https://raw.githubusercontent.com/facebookresearch/ParlAI/main/projects/roscoe"
+_ROSCOE_FILES = ("score.py", "utils.py")
+
+
+def ensure_roscoe_sources(roscoe_dir: Path) -> None:
+    """Make `projects.roscoe` importable from roscoe_dir's parent tree.
+
+    Downloads score.py and utils.py when absent. Both are plain torch/numpy/nltk
+    code — nothing in them needs ParlAI itself installed — and the __init__.py
+    files are what let them win over the `projects` package that ships with the
+    parlai wheel.
+    """
+    import urllib.request
+
+    roscoe_dir = Path(roscoe_dir)
+    missing = [f for f in _ROSCOE_FILES if not (roscoe_dir / f).exists()]
+    if missing:
+        roscoe_dir.mkdir(parents=True, exist_ok=True)
+        for name in missing:
+            url = f"{_ROSCOE_RAW}/{name}"
+            logger.info("Fetching ROSCOE %s from ParlAI", name)
+            try:
+                with urllib.request.urlopen(url, timeout=120) as r:
+                    (roscoe_dir / name).write_bytes(r.read())
+            except Exception as e:
+                raise RuntimeError(
+                    f"Could not fetch {url}: {e}\n"
+                    f"Clone ParlAI and point --roscoe_parlai_dir at it instead."
+                ) from e
+    for pkg in (roscoe_dir, roscoe_dir.parent):
+        init = pkg / "__init__.py"
+        if not init.exists():
+            init.touch()
+
+
+def set_model_cache(cache_dir: str | None) -> None:
+    """Point every model download at one directory, before anything loads a model.
+
+    ROSCOE pulls roughly 5 GB — all-mpnet-base-v2 and its mpnet-base tokenizer,
+    gpt2-large for perplexity, roberta-large-cola for grammar — and the libraries
+    each read a different variable for where to put it. Setting them here keeps
+    the weights off the machine's default cache and on whatever volume the run
+    was given, which matters when the run is on a shared server.
+    """
+    if not cache_dir:
+        return
+    path = str(Path(cache_dir).expanduser().resolve())
+    for var in ("HF_HOME", "HUGGINGFACE_HUB_CACHE", "TRANSFORMERS_CACHE",
+                "SENTENCE_TRANSFORMERS_HOME", "TORCH_HOME"):
+        os.environ[var] = path
+    logger.info("Model cache → %s", path)
+
+
 def run_roscoe_evaluation(
     export_dir: str,
     roscoe_dir: str,
@@ -21,6 +82,7 @@ def run_roscoe_evaluation(
     scores_output_dir: str = None,
     discourse_batch: int = 64,
     coherence_batch: int = 16,
+    model_cache_dir: str = None,
 ) -> dict:
     """Run ROSCOE scoring on the exported traces.
 
@@ -42,7 +104,9 @@ def run_roscoe_evaluation(
     import os as _os
     import types as _types
 
+    set_model_cache(model_cache_dir or os.environ.get("CRAFT_MODEL_CACHE"))
     roscoe_dir = Path(roscoe_dir).resolve()
+    ensure_roscoe_sources(roscoe_dir)
     parlai_root = roscoe_dir.parent.parent  # ParlAI/
     _sys.path.insert(0, str(parlai_root))
 
@@ -251,3 +315,68 @@ def print_roscoe_results(all_results: dict) -> None:
                 sign  = "+" if delta > 0 else ""
                 print(f"  {sign+f'{delta:.4f}':>10}", end="")
             print()
+
+
+# ---------------------------------------------------------------------------
+# CLI — score traces that were generated earlier, without re-generating them.
+# Generation needs an API and scoring needs ~5 GB of local models, so the two
+# halves usually run on different machines; this entry point is the second half.
+# ---------------------------------------------------------------------------
+def main() -> None:
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Score ROSCOE exports (<model>/roscoe/<dataset>_<setting>.jsonl).")
+    parser.add_argument("--export_dir", nargs="+", required=True,
+                        help="One or more directories of exports. A relative path "
+                             "resolves under this part's results root.")
+    parser.add_argument("--roscoe_parlai_dir",
+                        default=str(Path(__file__).resolve().parent / "ParlAI"),
+                        help="Tree holding projects/roscoe/; fetched there if absent")
+    parser.add_argument("--model_cache_dir", default=None,
+                        help="Where the scoring models are downloaded "
+                             "(default: CRAFT_MODEL_CACHE, else the HF cache)")
+    parser.add_argument("--roscoe_model", default="all-mpnet-base-v2")
+    parser.add_argument("--discourse_batch", type=int, default=64)
+    parser.add_argument("--coherence_batch", type=int, default=16)
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO,
+                        format="%(asctime)s %(levelname)s %(message)s")
+
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+        from config import RESULTS_ROOT
+    except ImportError:
+        RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results"
+
+    roscoe_dir = Path(args.roscoe_parlai_dir) / "projects" / "roscoe"
+    for raw in args.export_dir:
+        export_dir = Path(raw)
+        if not export_dir.is_absolute() and not export_dir.exists():
+            export_dir = RESULTS_ROOT / raw
+        if not export_dir.exists():
+            logger.error("No such export directory: %s", export_dir)
+            continue
+
+        logger.info("=== Scoring %s ===", export_dir)
+        scores = run_roscoe_evaluation(
+            export_dir=str(export_dir),
+            roscoe_dir=str(roscoe_dir),
+            transformer_model=args.roscoe_model,
+            scores_output_dir=str(export_dir / "roscoe_scores"),
+            discourse_batch=args.discourse_batch,
+            coherence_batch=args.coherence_batch,
+            model_cache_dir=args.model_cache_dir,
+        )
+        if not scores:
+            continue
+        print_roscoe_results(scores)
+        out = export_dir / "roscoe_aggregate_scores.json"
+        with out.open("w", encoding="utf-8") as f:
+            json.dump(scores, f, indent=2, ensure_ascii=False)
+        logger.info("Aggregate scores → %s", out)
+
+
+if __name__ == "__main__":
+    main()

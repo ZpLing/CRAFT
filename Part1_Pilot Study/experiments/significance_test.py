@@ -23,6 +23,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.transforms import blended_transform_factory
+from matplotlib.ticker import MaxNLocator, FormatStrFormatter
 
 BENCH_DIR    = Path(__file__).resolve().parent    # Part1_Pilot Study/experiments/
 PART_ROOT    = BENCH_DIR.parent                   # Part1_Pilot Study/
@@ -398,6 +399,11 @@ def _fill_metric_ax(ax, model_stat_dict, title, x_lo, x_hi,
     ax.set_yticklabels(ylabels, fontsize=4.5)
     ax.axvline(0, color="#333", lw=0.7, ls="--", zorder=1)
     ax.set_xlim(x_lo, x_hi)
+    # Two decimals on the axis, and ticks only where two decimals are the exact
+    # value: steps of 0.01/0.02/0.05/0.10 print as written rather than as a
+    # rounded stand-in for 0.025.
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=5, steps=[1, 2, 5, 10]))
+    ax.xaxis.set_major_formatter(FormatStrFormatter("%.2f"))
     ax.set_ylim(-(n - 1) * ROW_H - 0.55, 0.55)
     ax.grid(axis="x", lw=0.3, alpha=0.35, ls="--", zorder=0)
     ax.set_axisbelow(True)

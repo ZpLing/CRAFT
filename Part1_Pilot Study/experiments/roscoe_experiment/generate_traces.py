@@ -510,6 +510,7 @@ async def run_roscoe(args: argparse.Namespace) -> None:
                 roscoe_dir=str(roscoe_dir),
                 transformer_model=args.roscoe_model,
                 scores_output_dir=str(Path(args.export_dir) / "roscoe_scores"),
+                model_cache_dir=args.model_cache_dir,
             )
             if all_scores:
                 print_roscoe_results(all_scores)
@@ -676,6 +677,10 @@ def main() -> None:
     parser.add_argument("--roscoe_parlai_dir",
                         default=str(Path(__file__).resolve().parent / "ParlAI"),
                         help="Path to the ParlAI root directory (contains projects/roscoe/)")
+    parser.add_argument("--model_cache_dir", default=None,
+                        help="Where ROSCOE's ~5 GB of scoring models are downloaded "
+                             "(default: the CRAFT_MODEL_CACHE env var, else the "
+                             "machine's Hugging Face cache)")
     parser.add_argument("--roscoe_model", default="all-mpnet-base-v2",
                         help="Sentence transformer model for ROSCOE scoring "
                              "(default: all-mpnet-base-v2)")
