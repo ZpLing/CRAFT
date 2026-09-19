@@ -33,8 +33,6 @@ RESULTS_ROOT = PART_ROOT / "results"             # <results>/<model>/{prmbench,r
 # Every figure in the repo lands in one place, whatever produced it.
 FIGURE_DIR = REPO_ROOT / "Figure"
 # and a copy goes where the paper reads it from: section_files/4_Experiment.tex
-# includes significance_forest.pdf by bare name, which resolves against the tex root.
-LATEX_DIR  = REPO_ROOT / "paper"
 # A model's stats live with that model's runs — <results>/<model>/ already holds
 # everything else it produced — so there is no separate directory of aggregates to
 # keep in step with them. The LaTeX table spans all four models and is paper
@@ -547,11 +545,7 @@ def make_forest_plot(stats, out_path):
     print(f"Saved: {out_path}")
 
     import shutil
-    # Copy to LaTeX directory (primary destination)
-    latex_dst = LATEX_DIR / Path(out_path).name
-    shutil.copy(out_path, latex_dst)
-    print(f"Copied to LaTeX: {latex_dst}")
-    # Also copy to Downloads for quick preview
+    # The figure lives in Figure/; this copy is only so it opens for a look.
     dl_dst = Path.home() / "Downloads" / Path(out_path).name
     shutil.copy(out_path, dl_dst)
     subprocess.Popen(["open", str(dl_dst)])
@@ -648,11 +642,8 @@ if __name__ == "__main__":
     plot_path = FIGURE_DIR / "significance_testing_forest.pdf"
     make_forest_plot(stats, plot_path)
 
-    # LaTeX table
-    tex = make_latex_table(stats)
-    tex_path = LATEX_DIR / "significance_testing_table.tex"
-    with open(tex_path, "w") as f:
-        f.write(tex)
-    print(f"Saved: {tex_path}")
-    print("\nLaTeX table snippet:\n")
-    print(tex[:600], "...")
+    # The LaTeX table is printed, not written: it is one rendering of the stats
+    # above for whoever is editing the paper, and a copy on disk would be a third
+    # place for the same numbers to go stale.
+    print("\nLaTeX table:\n")
+    print(make_latex_table(stats))
