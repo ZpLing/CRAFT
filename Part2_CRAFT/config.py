@@ -32,18 +32,18 @@ REQUEST_TIMEOUT = int(os.getenv("OPENAI_REQUEST_TIMEOUT", "180"))
 # Scripts that must reach one specific endpoint read these instead of
 # OPENAI_API_KEY / OPENAI_BASE_URL, which a stray env var can redirect.
 # Defined only in the gitignored repo-root config.py — never hardcode them here.
-BOSCH_API_KEY  = getattr(_m, "BOSCH_API_KEY",  None) if _ROOT.exists() else None
-BOSCH_BASE_URL = getattr(_m, "BOSCH_BASE_URL", None) if _ROOT.exists() else None
+PINNED_API_KEY  = getattr(_m, "PINNED_API_KEY",  None) if _ROOT.exists() else None
+PINNED_BASE_URL = getattr(_m, "PINNED_BASE_URL", None) if _ROOT.exists() else None
 
 
-def require_bosch() -> tuple:
+def require_pinned_endpoint() -> tuple:
     """Return (api_key, base_url) for the pinned endpoint, or explain what's missing."""
-    if not BOSCH_API_KEY or not BOSCH_BASE_URL:
+    if not PINNED_API_KEY or not PINNED_BASE_URL:
         raise RuntimeError(
-            "BOSCH_API_KEY / BOSCH_BASE_URL are not set. Define them in the repo-root "
+            "PINNED_API_KEY / PINNED_BASE_URL are not set. Define them in the repo-root "
             "config.py (gitignored) — they are deliberately absent from tracked files."
         )
-    return BOSCH_API_KEY, BOSCH_BASE_URL
+    return PINNED_API_KEY, PINNED_BASE_URL
 
 # ── Part-local locations ─────────────────────────────────────────────────────
 # This part is self-contained: its datasets live in Part2_CRAFT/dataset/ and every

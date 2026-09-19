@@ -33,23 +33,23 @@ import aiohttp
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import require_bosch, resolve_input, resolve_output
+from config import require_pinned_endpoint, resolve_input, resolve_output
 import module2_rkg_filtering.build_rkg as _rkg_mod
 from module2_rkg_filtering.build_rkg import build_rkgs_for_sample
 from module3_synthesis.synthesize_trace import synthesize_traces_for_dataset
 
 # Pinned endpoint, read from the gitignored repo-root config.py.
 # Explicit rather than via OPENAI_* so a stray env var cannot redirect these runs.
-BOSCH_KEY, BOSCH_URL = require_bosch()
+PINNED_KEY, PINNED_URL = require_pinned_endpoint()
 
 EXISTING_SETTING_E = {"accuracy": 0.560, "macro_f1": 0.494, "label": "E: DAG (gpt54nano, old pipeline)"}
 
 
 def patch_credentials():
-    _rkg_mod.OPENAI_API_KEY  = BOSCH_KEY
-    _rkg_mod.OPENAI_BASE_URL = BOSCH_URL
-    _rkg_mod.CHAT_URL        = BOSCH_URL.rstrip("/") + "/chat/completions"
-    _rkg_mod.HEADERS         = {"Authorization": f"Bearer {BOSCH_KEY}",
+    _rkg_mod.OPENAI_API_KEY  = PINNED_KEY
+    _rkg_mod.OPENAI_BASE_URL = PINNED_URL
+    _rkg_mod.CHAT_URL        = PINNED_URL.rstrip("/") + "/chat/completions"
+    _rkg_mod.HEADERS         = {"Authorization": f"Bearer {PINNED_KEY}",
                                 "Content-Type": "application/json"}
     _rkg_mod.REQUEST_TIMEOUT = 60     # tighter than default 120
 
@@ -199,12 +199,12 @@ async def main_async(args: argparse.Namespace):
 
     # Patch synthesize_trace credentials (must match exact variable names)
     import module3_synthesis.synthesize_trace as _synth_mod
-    _synth_mod.OPENAI_API_KEY        = BOSCH_KEY
-    _synth_mod.OPENAI_BASE_URL       = BOSCH_URL
-    _synth_mod.CHAT_COMPLETIONS_URL  = BOSCH_URL.rstrip("/") + "/chat/completions"
-    _synth_mod.HEADERS["Authorization"] = f"Bearer {BOSCH_KEY}"
+    _synth_mod.OPENAI_API_KEY        = PINNED_KEY
+    _synth_mod.OPENAI_BASE_URL       = PINNED_URL
+    _synth_mod.CHAT_COMPLETIONS_URL  = PINNED_URL.rstrip("/") + "/chat/completions"
+    _synth_mod.HEADERS["Authorization"] = f"Bearer {PINNED_KEY}"
     _synth_mod.DEFAULT_MODEL         = args.model
-    _synth_mod.REQUEST_TIMEOUT       = 60     # tighter (was 180) — Bosch can hang for hours
+    _synth_mod.REQUEST_TIMEOUT       = 60     # tighter (was 180) — the pinned endpoint can hang for hours
     # Replace generate_reasoning_trace with a low-retry version (default has max_tries=7)
     import aiohttp as _aiohttp, asyncio as _asyncio, backoff as _backoff
     @_backoff.on_exception(_backoff.expo, (_aiohttp.ClientError, _asyncio.TimeoutError, RuntimeError),

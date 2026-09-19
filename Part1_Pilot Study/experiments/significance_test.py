@@ -161,11 +161,24 @@ def prm_items(model_name):
     """
     base = RESULTS_ROOT / MODELS[model_name] / "prmbench"
     for dim in ("simplicity", "soundness", "sensitivity"):
-        for path in sorted(base.glob(f"{dim}_*_results.jsonl")):
+        sides = {}
+        for setting in ("with_answer", "wout_answer"):
+            path = base / f"{dim}_{setting}.jsonl"
+            if not path.exists():
+                continue
             with path.open() as f:
-                for line in f:
-                    if line.strip():
-                        yield dim, json.loads(line)
+                sides[setting] = {json.loads(l)["idx"]: json.loads(l)
+                                  for l in f if l.strip()}
+        if len(sides) != 2:
+            continue
+        # The two settings are separate files; an item is whatever both hold for
+        # the same idx, so a comparison never pairs one item with another's score.
+        for idx, wa in sides["with_answer"].items():
+            bl = sides["wout_answer"].get(idx)
+            if bl is None:
+                continue
+            yield dim, {"idx": idx, "classification": wa.get("classification"),
+                        "with_answer": wa, "wout_answer": bl}
 
 
 def load_prm(model_name):

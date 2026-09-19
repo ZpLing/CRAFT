@@ -36,12 +36,12 @@ from typing import Any, Dict, List
 import aiohttp
 
 sys.path.insert(0, str(Path(__file__).parent))
-from config import require_bosch, resolve_input, resolve_output
+from config import require_pinned_endpoint, resolve_input, resolve_output
 from module2_rkg_filtering.build_rkg import build_rkgs_for_sample, OPENAI_API_KEY, OPENAI_BASE_URL
 
 # Pinned endpoint, read from the gitignored repo-root config.py.
 # Explicit rather than via OPENAI_* so a stray env var cannot redirect these runs.
-BOSCH_KEY, BOSCH_URL = require_bosch()
+PINNED_KEY, PINNED_URL = require_pinned_endpoint()
 
 
 def rkg_stats(consensus: Dict[str, Any]) -> Dict[str, float]:
@@ -91,10 +91,10 @@ async def run_sample(
 
 async def main_async(args: argparse.Namespace) -> None:
     import module2_rkg_filtering.build_rkg as _rkg
-    _rkg.OPENAI_API_KEY  = BOSCH_KEY
-    _rkg.OPENAI_BASE_URL = BOSCH_URL
-    _rkg.CHAT_URL        = BOSCH_URL.rstrip("/") + "/chat/completions"
-    _rkg.HEADERS         = {"Authorization": f"Bearer {BOSCH_KEY}",
+    _rkg.OPENAI_API_KEY  = PINNED_KEY
+    _rkg.OPENAI_BASE_URL = PINNED_URL
+    _rkg.CHAT_URL        = PINNED_URL.rstrip("/") + "/chat/completions"
+    _rkg.HEADERS         = {"Authorization": f"Bearer {PINNED_KEY}",
                             "Content-Type": "application/json"}
 
     with open(resolve_input(args.input)) as f:

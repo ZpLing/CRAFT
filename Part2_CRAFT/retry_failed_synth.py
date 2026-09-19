@@ -27,7 +27,7 @@ import backoff
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import require_bosch, resolve_input
+from config import require_pinned_endpoint, resolve_input
 import module3_synthesis.synthesize_trace as _synth_mod
 from module1_trace_generation.extract_terms import (
     DocFreqTable,
@@ -38,14 +38,14 @@ from module1_trace_generation.extract_terms import (
 from module3_synthesis.synthesize_trace import synthesize_trace_rkg
 
 # Pinned endpoint, read from the gitignored repo-root config.py.
-BOSCH_KEY, BOSCH_URL = require_bosch()
+PINNED_KEY, PINNED_URL = require_pinned_endpoint()
 
 
 def patch_creds(model: str):
-    _synth_mod.OPENAI_API_KEY        = BOSCH_KEY
-    _synth_mod.OPENAI_BASE_URL       = BOSCH_URL
-    _synth_mod.CHAT_COMPLETIONS_URL  = BOSCH_URL.rstrip("/") + "/chat/completions"
-    _synth_mod.HEADERS["Authorization"] = f"Bearer {BOSCH_KEY}"
+    _synth_mod.OPENAI_API_KEY        = PINNED_KEY
+    _synth_mod.OPENAI_BASE_URL       = PINNED_URL
+    _synth_mod.CHAT_COMPLETIONS_URL  = PINNED_URL.rstrip("/") + "/chat/completions"
+    _synth_mod.HEADERS["Authorization"] = f"Bearer {PINNED_KEY}"
     _synth_mod.DEFAULT_MODEL         = model
     _synth_mod.REQUEST_TIMEOUT       = 60
 

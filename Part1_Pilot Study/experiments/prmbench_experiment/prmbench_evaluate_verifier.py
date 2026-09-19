@@ -153,7 +153,7 @@ def extract_final_answer(process: list[str]) -> str:
 # ---------------------------------------------------------------------------
 # Gateway word filter
 # ---------------------------------------------------------------------------
-# The Bosch gateway screens the request text against a word list and answers
+# The API gateway screens the request text against a word list and answers
 # 400 "Invalid input: Sensitive word(gcd) detected in request message." without
 # ever reaching the model. It is the gateway refusing, not the model: the same
 # items score normally on the route that has no filter, and the word is the
@@ -784,17 +784,34 @@ async def run(args):
 
     summary = build_summary(results, args.model)
 
+    # One file per setting, named for the dimension and the setting it holds —
+    # the same shape the ROSCOE side writes. The item keys stay in both files so
+    # the pair can be rejoined; the summary spans them, because the comparison
+    # this study makes is between them.
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        for r in results:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    stem = out_path.name[: -len(".jsonl")] if out_path.name.endswith(".jsonl") else out_path.stem
+    written = []
+    for setting in ("with_answer", "wout_answer"):
+        path = out_path.with_name(f"{stem}_{setting}.jsonl")
+        with open(path, "w", encoding="utf-8") as f:
+            for r in results:
+                f.write(json.dumps({
+                    "idx":            r["idx"],
+                    "classification": r["classification"],
+                    "error_steps":    r["error_steps"],
+                    "n_steps":        r["n_steps"],
+                    "setting":        setting,
+                    **r[setting],
+                }, ensure_ascii=False) + "\n")
+        written.append(path)
 
-    summary_path = out_path.with_suffix(".summary.json")
+    summary_path = out_path.with_name(f"{stem}.summary.json")
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
-    logger.info("Saved %d results → %s", len(results), out_path)
+    for path in written:
+        logger.info("Saved %d results → %s", len(results), path)
     logger.info("Summary → %s", summary_path)
     logger.info("=== PRMBench LLM Verifier Comparison ===")
     header = f"{'dim':<12}  {'setting':<12}  {'total_acc':>9}  {'wrong_acc':>9}  {'1st_err':>7}  {'f1':>7}  n"
@@ -819,18 +836,14 @@ def main():
     parser = argparse.ArgumentParser(
         description=(
             "PRMBench — LLM-as-Verifier (with_answer vs wout_answer).\n"
-            "Output files are auto-named as <model>/prmbench/<dimension>_<api>_results.jsonl\n"
-            "under the results root when --output is omitted. "
-            "Use --api_name to label the API in the filename."
+            "Output files are auto-named as <model>/prmbench/<dimension>_<setting>.jsonl\n"
+            "under the results root when --output is omitted."
         )
     )
     parser.add_argument("--input",       required=True, help="PRMBench JSONL input file")
     parser.add_argument("--output",      default=None,
                         help="Output JSONL path. Relative paths resolve under the results "
                              "root; if omitted, auto-generated in <model>/prmbench/")
-    parser.add_argument("--api_name",    default=None,
-                        help="API label for filename. "
-                             "Derived from a short hash of base_url if omitted.")
     parser.add_argument("--model",       default=DEFAULT_MODEL)
     parser.add_argument("--base_url",    default=OPENAI_BASE_URL)
     parser.add_argument("--api_key",     default=OPENAI_API_KEY)
@@ -847,11 +860,6 @@ def main():
 
     # Auto-generate output path if not specified
     if args.output is None:
-        # Derive api_name from a short hash of base_url if not given
-        api_label = args.api_name
-        if not api_label:
-            url = (args.base_url or "").strip().lower()
-            api_label = "api_" + hashlib.md5(url.encode("utf-8")).hexdigest()[:6] if url else "api"
         model_safe = args.model.replace("/", "-").replace(":", "-")
         # One directory per model, one file per dimension: the input's own name
         # ("simplicity" / "soundness" / "sensitivity") carries through to the output,
@@ -859,7 +867,7 @@ def main():
         stem = Path(args.input).stem
         if args.max_samples:
             stem = f"{stem}_{args.max_samples}"
-        args.output = f"{model_safe}/prmbench/{stem}_{api_label}_results.jsonl"
+        args.output = f"{model_safe}/prmbench/{stem}.jsonl"
     args.output = str(resolve_output(args.output))
     logger.info("Output path: %s", args.output)
 
