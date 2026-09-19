@@ -39,12 +39,13 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# ── Generated figures — regenerated from results, never pushed ───────
-# chart/ is what the scripts draw into, plot/ is the scripts themselves: they
-# need matplotlib, which the requirements deliberately leave out, and they
-# redraw from results/ on demand.
+# ── Figures and the scripts that draw them — kept local, never pushed ─
+# chart/ holds one script per experiment setting; figure/ is what they write.
+# They need matplotlib, which the requirements deliberately leave out, and
+# every figure is redrawn from results/ on demand.
 /chart/
-/plot/
+/figure/
+/Figure/
 
 # ── Paper source — kept locally, never pushed ─────────────────────────
 /Paper/
