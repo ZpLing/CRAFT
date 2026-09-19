@@ -43,7 +43,7 @@ python "$P1"/experiments/prmbench_experiment/prmbench_evaluate_verifier.py --inp
 python "$P1"/experiments/prmbench_experiment/prmbench_results_summary.py   --add --model <model> --summary_file <run.summary.json>
 
 # → $P1/results/<model>/roscoe/
-python "$P1"/experiments/roscoe_experiment/receval_generate_traces.py --model <model> --concurrency 10
+python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --concurrency 10
 ```
 
 `dataset/prmbench/{simplicity,soundness,sensitivity}.jsonl` hold 200 items each, sampled with
@@ -65,12 +65,13 @@ reproducing the reported runs does not.
 
 ROSCOE's scorer is not vendored here: it needs a ParlAI checkout passed via
 `--roscoe_parlai_dir`, plus its corpora (`bash projects/roscoe/roscoe_data/download_annotated.sh`).
-Apply `Part1_Pilot Study/experiments/roscoe_experiment/parlai_simcse_optional.patch` to it first — upstream
-`score.py` hard-fails on a missing `simcse`, which the default `all-mpnet-base-v2` scorer never
-uses. The patch changes no scoring math.
+The checkout needs no patching — upstream `score.py` hard-fails on a missing `simcse`, which the
+default `all-mpnet-base-v2` scorer never uses, so the scoring code stubs that import out before
+loading it. Asking for the `sim_sce` model type still raises rather than silently substituting.
 
-`receval_generate_traces.py` keeps its historical name: despite the prefix it is the
-pilot study's trace generator (w/ Answer + w/o Answer), and ReCEval scoring lives in Part 2.
+The generator splits across three files: `prompts.py` holds every prompt as a
+w/ Answer / w/o Answer pair, `generate_traces.py` samples and generates, and
+`roscoe_score.py` scores the exports. ReCEval scoring is Part 2's, not this study's.
 
 ## Part 2 — CRAFT (§3.2)
 

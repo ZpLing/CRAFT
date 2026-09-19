@@ -1,5 +1,5 @@
 """
-receval_generate_traces.py
+generate_traces.py
 ---------------------------
 ReCEval — Reasoning Trace Quality: with_answer vs wout_answer
 
@@ -9,7 +9,7 @@ higher-quality reasoning traces than letting it reason freely?
 Supports two modes:
 
 Mode 1 — Entailment Bank (original):
-    python receval_generate_traces.py \\
+    python generate_traces.py \\
         --input ReCEval/entailment_bank/.../test.jsonl \\
         --output receval_traces.json \\
         --model gpt-4.1-mini --concurrency 10
@@ -18,7 +18,7 @@ Mode 2 — ROSCOE datasets:
     Sample items from each of drop / esnli / cosmos / gsm8k,
     generate with_answer + wout_answer traces, export for ROSCOE evaluation.
 
-    python receval_generate_traces.py \\
+    python generate_traces.py \\
         --roscoe_mode \\
         --roscoe_data_dir ParlAI/projects/roscoe/roscoe_data/generated \\
         --output roscoe_traces.json \\
@@ -69,9 +69,11 @@ import aiohttp
 # ---------------------------------------------------------------------------
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
-    from config import (OPENAI_API_KEY, OPENAI_BASE_URL, DEFAULT_MODEL, REQUEST_TIMEOUT,
+    from config import (DATASET_ROOT,
+                        OPENAI_API_KEY, OPENAI_BASE_URL, DEFAULT_MODEL, REQUEST_TIMEOUT,
                         resolve_input, resolve_output)
 except ImportError:
+    DATASET_ROOT = Path(__file__).resolve().parents[2] / "dataset"
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
     OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
     DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
@@ -81,148 +83,17 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Prompts — Entailment Bank (original, logical reasoning)
-# ---------------------------------------------------------------------------
-SYSTEM_WITH_ANSWER = (
-    "You are an expert at logical reasoning. "
-    "Given a set of premises and a known conclusion, write a clear numbered "
-    "step-by-step reasoning chain that derives the conclusion from the premises. "
-    "Each step must be a single sentence and logically follow from prior steps or premises."
+from prompts import (
+    SYSTEM_WITH_ANSWER, SYSTEM_WOUT_ANSWER,
+    build_prompt_with_answer, build_prompt_wout_answer,
+    SYSTEM_RC_WITH_ANSWER, SYSTEM_RC_WOUT_ANSWER,
+    SYSTEM_NLI_WITH_ANSWER, SYSTEM_NLI_WOUT_ANSWER,
+    SYSTEM_MATH_WITH_ANSWER, SYSTEM_MATH_WOUT_ANSWER,
+    _rc_with_answer_prompt, _rc_wout_answer_prompt,
+    _nli_with_answer_prompt, _nli_wout_answer_prompt,
+    _math_with_answer_prompt, _math_wout_answer_prompt,
 )
-
-SYSTEM_WOUT_ANSWER = (
-    "You are an expert at logical reasoning. "
-    "Given a set of premises and a hypothesis, reason step-by-step to decide "
-    "whether the hypothesis is proved or disproved based solely on the premises. "
-    "Each step must be a single sentence. "
-    "End the last line with exactly one of: __PROVED__ or __DISPROVED__."
-)
-
-
-def build_prompt_with_answer(hypothesis: str, premises: list[str], proof_label: str) -> str:
-    prem_block = "\n".join(f"- {p}" for p in premises)
-    return (
-        f"Premises:\n{prem_block}\n\n"
-        f"Conclusion: {hypothesis}\n"
-        f"(This conclusion is verified as: {proof_label})\n\n"
-        "Write a numbered step-by-step reasoning chain that logically derives "
-        "this conclusion from the premises."
-    )
-
-
-def build_prompt_wout_answer(hypothesis: str, premises: list[str]) -> str:
-    prem_block = "\n".join(f"- {p}" for p in premises)
-    return (
-        f"Premises:\n{prem_block}\n\n"
-        f"Hypothesis: {hypothesis}\n\n"
-        "Write a numbered step-by-step reasoning chain. "
-        "On the very last line, write exactly one of: __PROVED__ or __DISPROVED__."
-    )
-
-
-# ---------------------------------------------------------------------------
-# Prompts — ROSCOE datasets (domain-specific, NEW)
-# ---------------------------------------------------------------------------
-
-# DROP / CosmosQA: reading comprehension + commonsense
-SYSTEM_RC_WITH_ANSWER = (
-    "You are an expert at reading comprehension and reasoning. "
-    "Given a passage and a question with a known correct answer, write a clear numbered "
-    "step-by-step reasoning chain that derives the answer from the passage. "
-    "Each step must be a single sentence."
-)
-
-SYSTEM_RC_WOUT_ANSWER = (
-    "You are an expert at reading comprehension and reasoning. "
-    "Given a passage and a question, reason step-by-step to find the answer. "
-    "Each step must be a single sentence. "
-    "End with a final sentence stating your answer."
-)
-
-# e-SNLI: natural language inference
-SYSTEM_NLI_WITH_ANSWER = (
-    "You are an expert at natural language inference. "
-    "Given two sentences (premise and hypothesis) and the known relationship between them, "
-    "write a clear numbered step-by-step explanation of why the relationship holds. "
-    "Each step must be a single sentence."
-)
-
-SYSTEM_NLI_WOUT_ANSWER = (
-    "You are an expert at natural language inference. "
-    "Given two sentences (premise and hypothesis), reason step-by-step to determine "
-    "whether the hypothesis is entailed, contradicted, or neutral with respect to the premise. "
-    "Each step must be a single sentence. "
-    "End with a final sentence stating your conclusion (entailment / contradiction / neutral)."
-)
-
-# GSM8K: math word problems
-SYSTEM_MATH_WITH_ANSWER = (
-    "You are an expert at solving math word problems. "
-    "Given a math problem and its correct final answer, write a clear numbered "
-    "step-by-step solution that shows how to reach the answer. "
-    "Each step must be a single sentence showing one calculation or logical deduction."
-)
-
-SYSTEM_MATH_WOUT_ANSWER = (
-    "You are an expert at solving math word problems. "
-    "Given a math problem, solve it step by step. "
-    "Each step must be a single sentence showing one calculation or logical deduction. "
-    "End with a final sentence stating the numeric answer."
-)
-
-
-def _rc_with_answer_prompt(premise: str, hypothesis: str, answer: str) -> str:
-    return (
-        f"Passage:\n{premise}\n\n"
-        f"Question: {hypothesis}\n"
-        f"Correct answer: {answer}\n\n"
-        "Write a numbered step-by-step reasoning chain that derives the answer from the passage."
-    )
-
-
-def _rc_wout_answer_prompt(premise: str, hypothesis: str) -> str:
-    return (
-        f"Passage:\n{premise}\n\n"
-        f"Question: {hypothesis}\n\n"
-        "Write a numbered step-by-step reasoning chain to answer the question."
-    )
-
-
-def _nli_with_answer_prompt(premise: str, hypothesis: str, answer: str) -> str:
-    # answer in e-SNLI is 'yes'=entailment, 'no'=contradiction, 'maybe'=neutral
-    label_map = {"yes": "entailment", "no": "contradiction", "maybe": "neutral"}
-    label = label_map.get(answer.lower(), answer)
-    return (
-        f"Premise: {premise}\n"
-        f"Hypothesis: {hypothesis}\n"
-        f"Relationship: {label}\n\n"
-        "Write a numbered step-by-step explanation of why this relationship holds."
-    )
-
-
-def _nli_wout_answer_prompt(premise: str, hypothesis: str) -> str:
-    return (
-        f"Premise: {premise}\n"
-        f"Hypothesis: {hypothesis}\n\n"
-        "Write a numbered step-by-step reasoning chain to determine the relationship "
-        "(entailment / contradiction / neutral) between premise and hypothesis."
-    )
-
-
-def _math_with_answer_prompt(premise: str, answer: str) -> str:
-    return (
-        f"Problem: {premise}\n"
-        f"Answer: {answer}\n\n"
-        "Write a numbered step-by-step solution showing how to reach this answer."
-    )
-
-
-def _math_wout_answer_prompt(premise: str) -> str:
-    return (
-        f"Problem: {premise}\n\n"
-        "Write a numbered step-by-step solution."
-    )
+from roscoe_score import run_roscoe_evaluation, print_roscoe_results
 
 
 # ---------------------------------------------------------------------------
@@ -507,17 +378,19 @@ async def run_roscoe(args: argparse.Namespace) -> None:
     else:
         # Fresh sampling (saves to --sampled_output if specified)
         data_dir = Path(args.roscoe_data_dir)
+        # One file per dataset, named after it. .jsonl is this repo's sampled set;
+        # .json is what a ParlAI roscoe_data/generated/ checkout calls the same thing.
         datasets = {
-            "drop":   data_dir / "drop.json",
-            "esnli":  data_dir / "esnli.json",
-            "cosmos": data_dir / "cosmos.json",
-            "gsm8k":  data_dir / "gsm8k.json",
+            name: next((p for p in (data_dir / f"{name}.jsonl", data_dir / f"{name}.json")
+                        if p.exists()), data_dir / f"{name}.jsonl")
+            for name in ("drop", "esnli", "cosmos", "gsm8k")
         }
         for name, path in datasets.items():
             if not path.exists():
                 raise FileNotFoundError(
                     f"ROSCOE dataset not found: {path}\n"
-                    f"Run: bash ParlAI/projects/roscoe/roscoe_data/download_annotated.sh"
+                    f"Expected one file per dataset in {data_dir}\n"
+                    f"(bash ParlAI/projects/roscoe/roscoe_data/download_annotated.sh rebuilds them)"
                 )
         all_items = []
         for name, path in datasets.items():
@@ -720,219 +593,6 @@ async def run_generate(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------------------
-# ROSCOE Inline Evaluation
-# ---------------------------------------------------------------------------
-
-def run_roscoe_evaluation(
-    export_dir: str,
-    roscoe_dir: str,
-    transformer_model: str = "all-mpnet-base-v2",
-    scores_output_dir: str = None,
-    discourse_batch: int = 64,
-    coherence_batch: int = 16,
-) -> dict:
-    """Run ROSCOE scoring on the exported traces.
-
-    Imports ROSCOE's Evaluator directly (no subprocess, no ParlAI CLI).
-    Only uses sentence_transformer mode (no simcse required).
-
-    Args:
-        export_dir:         Directory containing {dataset}_{setting}.json files
-        roscoe_dir:         Path to ParlAI/projects/roscoe/ directory
-        transformer_model:  Sentence transformer model (default: all-mpnet-base-v2)
-        scores_output_dir:  Where to save TSV score files (default: export_dir/scores/)
-        discourse_batch:    Batch size for discourse metrics
-        coherence_batch:    Batch size for coherence metrics
-
-    Returns:
-        dict: {setting: {dataset: {metric: mean_score}}}
-    """
-    import sys as _sys
-    import os as _os
-
-    roscoe_dir = Path(roscoe_dir).resolve()
-    parlai_root = roscoe_dir.parent.parent  # ParlAI/
-    _sys.path.insert(0, str(parlai_root))
-
-    try:
-        from projects.roscoe.score import (
-            Evaluator,
-            UNSUPERVISED_SCORES,
-            REASONING_SCORES,
-            SENT_TRANS,
-            Chain,
-        )
-        from projects.roscoe.utils import split_gsm8k_gpt3_generations_to_steps
-        from nltk.tokenize import sent_tokenize
-    except ImportError as e:
-        logger.error("Cannot import ROSCOE modules: %s", e)
-        logger.error("Make sure ParlAI is installed: pip install parlai")
-        return {}
-
-    export_path = Path(export_dir)
-    if scores_output_dir is None:
-        scores_output_dir = str(export_path / "roscoe_scores")
-    Path(scores_output_dir).mkdir(parents=True, exist_ok=True)
-
-    # ── Inline ReasoningSteps (replicates roscoe.py's class) ───────────────
-    class ReasoningSteps(Chain):
-        def __init__(self, line: str, chain_type: str = "regular") -> None:
-            self.chain = self._parse(line, chain_type)
-
-        def _parse(self, chain: str, chain_type: str) -> list:
-            if chain_type == "gsm8k_ref":
-                return chain.split("IGNORE THIS. Ground truth here for reference. ")[1].split("\n")
-            elif chain_type == "gsm8k_hypo":
-                return split_gsm8k_gpt3_generations_to_steps(reasoning=chain)
-            else:
-                return sent_tokenize(chain)
-
-    # ── Build evaluator once (model is loaded once and reused) ─────────────
-    logger.info("Loading ROSCOE sentence transformer: %s", transformer_model)
-    evaluator = Evaluator(
-        hypos=[],
-        context=[],
-        references=[],
-        model_type=SENT_TRANS,
-        transformer_model=transformer_model,
-        discourse_batch=discourse_batch,
-        coherence_batch=coherence_batch,
-    )
-
-    all_results: dict = {}
-    json_files = sorted(export_path.glob("*.json"))
-
-    if not json_files:
-        logger.warning("No .json files found in %s", export_path)
-        return {}
-
-    for json_file in json_files:
-        fname = json_file.name  # e.g. "drop_with_answer.json"
-        # Parse dataset name and setting from filename
-        # Filename format: {dataset}_{setting}.json  (setting = with_answer or wout_answer)
-        stem = json_file.stem  # "drop_with_answer"
-        if stem.endswith("_with_answer"):
-            dataset = stem[: -len("_with_answer")]
-            setting = "with_answer"
-        elif stem.endswith("_wout_answer"):
-            dataset = stem[: -len("_wout_answer")]
-            setting = "wout_answer"
-        else:
-            logger.warning("Skipping unrecognized filename: %s", fname)
-            continue
-
-        logger.info("Scoring %s / %s ...", dataset, setting)
-
-        # ── Load items and build Chain objects ─────────────────────────────
-        hypotheses, contexts, refs = [], [], []
-        with open(json_file, encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                jline = json.loads(line)
-                trace = jline.get("gpt-3", "")
-                premise = jline.get("premise", "")
-                hypo = jline.get("hypothesis", "")
-
-                if dataset == "gsm8k":
-                    h_chain = ReasoningSteps(line=trace, chain_type="gsm8k_hypo")
-                    ctx = ReasoningSteps(line=premise)
-                    ref_text = jline.get("hypothesis", "")
-                    r_chain = ReasoningSteps(line=ref_text, chain_type="gsm8k_ref")
-                    refs.append(r_chain)
-                else:
-                    h_chain = ReasoningSteps(line=trace)
-                    ctx = ReasoningSteps(line=premise + " " + hypo)
-                    if dataset == "esnli":
-                        ref_text = " ".join(filter(None, [
-                            jline.get("explanation_1", ""),
-                            jline.get("explanation_2", ""),
-                            jline.get("explanation_3", ""),
-                        ]))
-                        refs.append(ReasoningSteps(line=ref_text))
-
-                hypotheses.append(h_chain)
-                contexts.append(ctx)
-
-        # ── Choose score types (reference-based only when refs available) ──
-        has_refs = len(refs) == len(hypotheses)
-        score_types = REASONING_SCORES if has_refs else UNSUPERVISED_SCORES
-
-        # ── Feed into evaluator ────────────────────────────────────────────
-        evaluator.set_hypos(hypotheses)
-        evaluator.set_context(contexts)
-        evaluator.set_references(refs if has_refs else [])
-
-        scores = evaluator.evaluate(score_types=score_types)
-
-        # ── Save TSV ───────────────────────────────────────────────────────
-        tsv_path = _os.path.join(scores_output_dir, f"scores_{stem}.tsv")
-        score_list = list(scores.keys())
-        with open(tsv_path, "w") as tf:
-            header = "{:<8} ".format("ID") + " ".join("{:<15}".format(s) for s in score_list)
-            tf.write(header + "\n")
-            n = len(scores[score_list[0]])
-            for i in range(n):
-                row = "{:<8} ".format(i) + " ".join("{:<15}".format(scores[s][i]) for s in score_list)
-                tf.write(row + "\n")
-        logger.info("Scores saved → %s", tsv_path)
-
-        # ── Compute per-metric mean (ignore "N/A") ─────────────────────────
-        mean_scores = {}
-        for metric, vals in scores.items():
-            numeric = [v for v in vals if v != "N/A"]
-            mean_scores[metric] = round(float(sum(numeric) / len(numeric)), 4) if numeric else None
-
-        all_results.setdefault(setting, {})[dataset] = mean_scores
-
-    return all_results
-
-
-def print_roscoe_results(all_results: dict) -> None:
-    """Print a comparison table: with_answer vs wout_answer per dataset and metric."""
-    if not all_results:
-        return
-
-    settings = list(all_results.keys())
-    datasets  = sorted({ds for s in all_results.values() for ds in s})
-    all_metrics = sorted({m for s in all_results.values()
-                          for ds_scores in s.values()
-                          for m in ds_scores})
-
-    print()
-    print("=" * 90)
-    print("  ROSCOE EVALUATION RESULTS  (with_answer vs wout_answer)")
-    print("=" * 90)
-
-    for dataset in datasets:
-        print(f"\n  [{dataset.upper()}]")
-        print(f"  {'Metric':<35}", end="")
-        for s in settings:
-            print(f"  {s:>14}", end="")
-        if len(settings) == 2:
-            print(f"  {'Δ(A-B)':>10}", end="")
-        print()
-        print("  " + "─" * (35 + len(settings) * 16 + 12))
-
-        for metric in all_metrics:
-            vals = []
-            for s in settings:
-                v = all_results.get(s, {}).get(dataset, {}).get(metric)
-                vals.append(v)
-            if all(v is None for v in vals):
-                continue
-            print(f"  {metric:<35}", end="")
-            for v in vals:
-                print(f"  {f'{v:.4f}' if v is not None else 'N/A':>14}", end="")
-            if len(vals) == 2 and vals[0] is not None and vals[1] is not None:
-                delta = vals[0] - vals[1]
-                sign  = "+" if delta > 0 else ""
-                print(f"  {sign+f'{delta:.4f}':>10}", end="")
-            print()
-
-
-# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -950,8 +610,11 @@ def main() -> None:
 
     # ROSCOE mode args
     parser.add_argument("--roscoe_data_dir",
-                        default="ParlAI/projects/roscoe/roscoe_data/generated",
-                        help="Path to ROSCOE generated/ data directory")
+                        default=str(DATASET_ROOT / "roscoe"),
+                        help="Directory holding one file per ROSCOE dataset "
+                             "(cosmos/drop/esnli/gsm8k). Defaults to this part's "
+                             "dataset/roscoe/, whose files are already sampled; point it "
+                             "at a ParlAI roscoe_data/generated/ to sample fresh instead.")
     parser.add_argument("--samples_per_dataset", type=int, default=None,
                         help="Items to sample from each ROSCOE dataset")
     parser.add_argument("--seed", type=int, default=42,

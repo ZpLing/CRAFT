@@ -210,57 +210,81 @@ async def call_llm(
     return None
 
 
-def parse_scores(raw: str, n_steps: int) -> tuple[list[float] | None, list[float] | None]:
-    """
-    Parse the JSON output: {"validity": [...], "redundancy": [...]}.
-    Returns (validity_scores, redundancy_scores) or (None, None) on failure.
+def _remove_json_comments(json_string: str) -> str:
+    """Strip // and # comments — models add them inside the JSON they emit."""
+    return re.sub(r"//.*?$|#.*?$", "", json_string, flags=re.MULTILINE)
 
-    Handles:
-    - Plain JSON object
-    - JSON wrapped in ```json ... ``` code fences (Gemini-style)
-    - Truncated JSON arrays (partial output due to token limits)
+
+def extract_nested_json(text: str):
+    """Return the first complete brace-balanced JSON object in text, or None.
+
+    Ported from PRMBench's mr_eval/utils/model_utils.py so a reply is read the way
+    the benchmark's own critics read it: a brace stack finds the whole object even
+    when it nests or when prose surrounds it, where a non-greedy regex would stop
+    at the first closing brace and hand back a fragment.
+    """
+    stack, start = [], -1
+    for i, char in enumerate(text):
+        if char == "{":
+            if not stack:
+                start = i
+            stack.append("{")
+        elif char == "}":
+            if not stack:
+                continue
+            stack.pop()
+            if not stack:
+                try:
+                    return json.loads(_remove_json_comments(text[start:i + 1]))
+                except json.JSONDecodeError:
+                    continue
+    return None
+
+
+def parse_scores(raw: str, n_steps: int) -> tuple[list[float] | None, list[float] | None]:
+    """Parse {"validity": [...], "redundancy": [...]} into two lists of n_steps floats.
+
+    Returns (None, None) when the arrays do not hold exactly one score per step.
+    PRMBench's own scorer iterates over whatever the model returned, so a reply
+    scoring 55 steps of a 45-step solution is counted as 55 steps; here the extra
+    or missing entries cannot be matched to steps, and shifting them would move
+    every later score onto the wrong step and with it the first-error position —
+    so the item is left unscored and re-asked instead.
     """
     if not raw:
         return None, None
 
-    # Strip code fences if present
     text = raw.strip()
     if "```" in text:
-        # Extract content between first ``` and last ```
         inner = re.sub(r"```(?:json)?\s*", "", text).strip().rstrip("`").strip()
         text = inner if inner else text
 
-    # Try to find a complete JSON object first
-    match = re.search(r"\{[\s\S]*?\}", text, re.DOTALL)
-    if match:
+    def as_floats(seq) -> list[float] | None:
+        if not isinstance(seq, list) or len(seq) != n_steps:
+            return None
         try:
-            obj = json.loads(match.group(0))
-            val = obj.get("validity", [])
-            red = obj.get("redundancy", [])
-            if isinstance(val, list) and len(val) == n_steps:
-                val = [float(v) for v in val]
-            else:
-                val = None
-            if isinstance(red, list) and len(red) == n_steps:
-                red = [float(v) for v in red]
-            else:
-                red = None
-            return val, red
-        except (json.JSONDecodeError, ValueError):
-            pass
+            return [float(v) for v in seq]
+        except (TypeError, ValueError):
+            return None
 
-    # Fallback: extract arrays directly from raw text (handles truncated JSON)
+    obj = extract_nested_json(text)
+    if isinstance(obj, dict):
+        val, red = as_floats(obj.get("validity")), as_floats(obj.get("redundancy"))
+        if val is not None:
+            return val, red
+        got = {k: len(v) for k, v in obj.items() if isinstance(v, list)}
+        if got:
+            logger.debug("Score count mismatch: expected %d per array, got %s", n_steps, got)
+
+    # Fallback: pull the arrays straight out of the text, for a reply whose JSON
+    # never closes (truncated tail) but whose numbers are all there.
     def extract_array(key: str) -> list[float] | None:
         m = re.search(rf'"{key}"\s*:\s*\[([^\]]*)', text, re.DOTALL)
         if not m:
             return None
-        nums = re.findall(r"-?\d+(?:\.\d+)?", m.group(1))
-        floats = [float(x) for x in nums]
-        return floats if len(floats) == n_steps else None
+        return as_floats([float(x) for x in re.findall(r"-?\d+(?:\.\d+)?", m.group(1))])
 
-    val = extract_array("validity")
-    red = extract_array("redundancy")
-    return val, red
+    return extract_array("validity"), extract_array("redundancy")
 
 
 # ---------------------------------------------------------------------------
@@ -477,6 +501,29 @@ def aggregate_metrics(metrics_list: list[dict]) -> dict:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+async def call_and_score(session, semaphore, system, prompt, n_steps,
+                         model, api_key, base_url, attempts=5):
+    """Ask for one setting's scores, re-asking until they line up with the steps.
+
+    PRMBench's own critics wrap the call and the parse in one retry loop for the
+    same reason: a model that miscounts the steps usually gets it right when asked
+    again, and temperature is not zero. Only a reply that survives parsing counts,
+    so a retry can recover an item but can never invent one.
+    """
+    raw = None
+    for attempt in range(attempts):
+        ask = prompt if attempt == 0 else (
+            f"{prompt}\n\nYour previous reply did not contain exactly {n_steps} "
+            f"scores in each array. Return exactly {n_steps} per array, one per step."
+        )
+        raw = await call_llm(session, semaphore, system, ask, model, api_key, base_url)
+        if raw:
+            validity, redundancy = parse_scores(raw, n_steps)
+            if validity is not None:
+                return validity, redundancy, raw
+    return None, None, raw
+
+
 async def run(args):
     items = []
     with open(args.input, "r", encoding="utf-8") as f:
@@ -499,17 +546,17 @@ async def run(args):
             steps          = item.get("modified_process", [])
             correct_answer = extract_final_answer(item.get("original_process", []))
 
-            wa_tasks.append(call_llm(
+            wa_tasks.append(call_and_score(
                 session, semaphore,
                 SYSTEM_WITH_ANSWER,
                 build_prompt_with_answer(question, steps, correct_answer),
-                args.model, args.api_key, args.base_url,
+                len(steps), args.model, args.api_key, args.base_url,
             ))
-            bl_tasks.append(call_llm(
+            bl_tasks.append(call_and_score(
                 session, semaphore,
                 SYSTEM_WOUT_ANSWER,
                 build_prompt_wout_answer(question, steps),
-                args.model, args.api_key, args.base_url,
+                len(steps), args.model, args.api_key, args.base_url,
             ))
 
         wa_outputs, bl_outputs = await asyncio.gather(
@@ -520,20 +567,22 @@ async def run(args):
     results = []
     wa_metrics_list, bl_metrics_list = [], []
 
-    for item, wa_raw, bl_raw in zip(items, wa_outputs, bl_outputs):
+    for item, wa_out, bl_out in zip(items, wa_outputs, bl_outputs):
         steps          = item.get("modified_process", [])
         error_steps    = item.get("error_steps", [])      # 1-indexed
         n              = len(steps)
         idx            = item.get("idx", "")
         classification = item.get("classification", "")
 
-        wa_val, wa_red = parse_scores(wa_raw, n) if wa_raw else (None, None)
-        bl_val, bl_red = parse_scores(bl_raw, n) if bl_raw else (None, None)
+        wa_val, wa_red, wa_raw = wa_out
+        bl_val, bl_red, bl_raw = bl_out
 
         if wa_val is None:
-            logger.warning("Parse failed (with_answer) idx=%s | %s", idx, (wa_raw or "")[:100])
+            logger.warning("Unscored after retries (with_answer) idx=%s steps=%d | %s",
+                           idx, n, (wa_raw or "")[:100])
         if bl_val is None:
-            logger.warning("Parse failed (wout_answer) idx=%s | %s", idx, (bl_raw or "")[:100])
+            logger.warning("Unscored after retries (wout_answer) idx=%s steps=%d | %s",
+                           idx, n, (bl_raw or "")[:100])
 
         wa_m = eval_on_hallucination_step(error_steps, wa_val, classification, wa_red) if wa_val else None
         bl_m = eval_on_hallucination_step(error_steps, bl_val, classification, bl_red) if bl_val else None
