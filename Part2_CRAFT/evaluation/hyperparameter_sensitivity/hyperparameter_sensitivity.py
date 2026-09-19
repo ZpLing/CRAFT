@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-k_sensitivity.py — how accuracy and the size of the consensus RKG move with K.
+hyperparameter_sensitivity.py — how accuracy and the size of the consensus RKG move with K.
 
 For each K, reads a finished CRAFT run and records three numbers: label-prediction
 accuracy from its synthesized traces, and the mean node and edge count of the
@@ -10,10 +10,10 @@ that RKG size tracks accuracy.
 One run per K is needed. They are named on the command line, or discovered from a
 directory whose subdirectories end in the K they were run with:
 
-    python k_sensitivity.py --runs 2=craft_runs/fld_k2 3=craft_runs/fld_k3 ...
-    python k_sensitivity.py --glob "craft_runs/fld_k*" --label FLD
+    python hyperparameter_sensitivity.py --runs 2=craft_runs/fld_k2 3=craft_runs/fld_k3 ...
+    python hyperparameter_sensitivity.py --glob "craft_runs/fld_k*" --label FLD
 
-Writes a JSON that k_sensitivity_plot.py renders. Accuracy is scored exactly as
+Writes a JSON the paper's area chart renders from. Accuracy is scored exactly as
 the main table scores it, so a point here and a cell there cannot disagree.
 """
 
@@ -27,17 +27,17 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
     from config import RESULTS_ROOT, resolve_input, resolve_output, run_model
 except ImportError:
-    RESULTS_ROOT = Path(__file__).resolve().parents[1] / "results"
+    RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results"
     resolve_input = resolve_output = Path
 
     def run_model(*paths):  # noqa: D103
         return "unknown-model"
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]
                        / "evaluation" / "label_prediction"))
 try:
     from evaluate_direct_accuracy import normalise_math_answer
@@ -139,7 +139,7 @@ def main() -> None:
     ap.add_argument("--domain", default="logical", choices=["logical", "math"])
     ap.add_argument("--output", default=None,
                     help="Write the measurements as JSON here. Default: "
-                         "detailed_analysis/<model>/k_sensitivity_<label>.json under the "
+                         "detailed_analysis/<model>/hyperparameter_sensitivity_<label>.json under "
                          "results root, with the model read from the run's own metadata")
     args = ap.parse_args()
 
@@ -171,7 +171,7 @@ def main() -> None:
 
     model = run_model(*(d for _, d in pairs))
     out = Path(resolve_output(
-        args.output or f"detailed_analysis/{model}/k_sensitivity_{args.label}.json"))
+        args.output or f"detailed_analysis/{model}/hyperparameter_sensitivity_{args.label}.json"))
     out.write_text(json.dumps({"label": args.label, "domain": args.domain,
                                "series": {str(k): v for k, v in series.items()}},
                               indent=2), encoding="utf-8")

@@ -56,4 +56,4 @@ Thumbs.db
 /baselines/
 
 # ── Filtering statistics — a local check, not part of the pipeline ───
-Part2_CRAFT/filtering_stats/
+Part2_CRAFT/evaluation/filtering_stats/

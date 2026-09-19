@@ -121,10 +121,10 @@ framework of §3.2.
 │   │   └── module3_synthesis/             Module III — topology-guided synthesis over G*
 │   ├── evaluation/
 │   │   ├── label_prediction/          main-table accuracy and its Wilson CIs
-│   │   └── reasoning_traces_quality/  ReCEval/, ROSCOE/, FineLogic/ (§4)
-│   ├── ablation_study/              the six settings of the ablation table
-│   ├── k_sensitivity/               accuracy and RKG size against K
-│   ├── rkg_construct_robustness/    does the backbone change the extracted graph
+│   │   ├── reasoning_traces_quality/  ReCEval/, ROSCOE/, FineLogic/ (§4)
+│   │   ├── ablation_study/            the six settings of the ablation table
+│   │   ├── hyperparameter_sensitivity/  accuracy and RKG size against K
+│   │   └── rkg_construct_robustness/  does the backbone change the extracted graph
 │   └── results/                     craft_runs/, alignment_comparison/, receval_eval/,
 │                                    baseline_results/<model>/  the 13 main-table baselines
 │                                    detailed_analysis/<model>/ the appendix analyses
