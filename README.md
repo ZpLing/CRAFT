@@ -42,24 +42,46 @@ MODEL_TRACE_GEN = MODEL_RKG_BUILD = MODEL_SYNTHESIS = "o4-mini"
 REQUEST_TIMEOUT = 180
 ```
 
-Two third-party scorers are not vendored and are cloned separately: ParlAI for ROSCOE
-(Part 1) and ReCEval for Part 2.
+ParlAI, the ROSCOE scorer used in Part 1, is not vendored and is cloned separately.
+Part 2 keeps only the one ReCEval file it scores with, under the upstream MIT license.
 
 ## Quick start
 
-One full CRAFT run. Each module writes a JSON file the next one reads, and naming the
-run directory in every path keeps one experiment together.
+One full CRAFT run. Each stage writes a JSON file the next one reads, and naming the
+run directory in every path keeps one experiment together. Module I's step filter runs
+twice — once on terms alone, then again against the consensus RKG once Module II has
+built it. Every default below is the paper's (§4.6), so this runs the reported
+configuration as written.
 
 ```bash
 cd Part2_CRAFT
 RUN=craft_runs/fld_o4mini_100
+M1=framework/module1_generation_filtering
 
-python module1_trace_generation/generate_traces.py --datasets dataset/FLD.json --k 5 --output $RUN/k_traces.json
-python module1_trace_generation/extract_terms.py   --input  $RUN/k_traces.json  --output $RUN/terms.json
-python module2_rkg_filtering/anomaly_filter.py     --input  $RUN/k_traces.json  --output $RUN/cleaned.json
-python module2_rkg_filtering/build_rkg.py          --input  $RUN/cleaned.json   --output $RUN/rkg.json
-python module3_synthesis/synthesize_trace.py       --input  $RUN/cleaned.json --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
+# Module I — Multi-Trace Generation: K=5 traces at T=0.7
+python $M1/generate_traces.py --datasets dataset/logical/FLD.json \
+    --k 5 --temperature 0.7 --output $RUN/k_traces.json
+
+# Module I — Steps Filtering: z-score cutoff over the TF-IRF consensus terms
+python $M1/anomaly_filter.py --input $RUN/k_traces.json \
+    --method unsupervised --z_score_threshold -1.0 --consensus_threshold 0.3 --output $RUN/cleaned_z.json
+
+# Module II — Consensus RKG Construction: per-trace graphs, edge/node filtering, aggregation
+python framework/module2_rkg_construction/build_rkg.py --input $RUN/cleaned_z.json \
+    --consensus_threshold 0.3 --output $RUN/rkg.json
+
+# Module I again — the same step filter, now pruning against G*
+python $M1/anomaly_filter.py --input $RUN/cleaned_z.json \
+    --method rkg --rkg_file $RUN/rkg.json --output $RUN/cleaned.json
+
+# Module III — Topology-guided Trace Synthesis: one step generated per node of G*
+python framework/module3_synthesis/synthesize_trace.py --input $RUN/cleaned.json \
+    --synthesis_strategy rkg --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
 ```
+
+GSM8K and OlympiadBench take `--domain math` on every stage. `extract_terms.py` is not a
+pipeline stage — it dumps the TF-IRF terms for inspection, and the filters call its
+functions directly.
 
 ## Repository layout
 
@@ -77,11 +99,17 @@ framework of §3.2.
 │   │   └── roscoe_experiment/       trace quality — Faithfulness, Informativeness, Grammar
 │   └── results/<model>/             prmbench/ and roscoe/, one directory per model
 ├── Part2_CRAFT/                     § 3.2  The CRAFT framework
-│   ├── dataset/                     FLD, FOLIO, GSM8K, OlympiadBench
-│   ├── module1_trace_generation/    Module I   — roll out K traces, TF-IRF consensus terms
-│   ├── module2_rkg_filtering/       Module II  — z-score step filtering, consensus RKG G*
-│   ├── module3_synthesis/           Module III — topology-guided trace synthesis over G*
-│   ├── eval_receval/                ReCEval scoring of CRAFT traces (§4)
+│   ├── dataset/
+│   │   ├── logical/                 FLD, FOLIO
+│   │   └── math/                    GSM8K, OlympiadBench
+│   ├── framework/                     one package per module of §3.2
+│   │   ├── module1_generation_filtering/  Module I   — K traces, TF-IRF terms, z-score filter
+│   │   ├── module2_rkg_construction/      Module II  — per-trace RKGs, consensus RKG G*
+│   │   └── module3_synthesis/             Module III — topology-guided synthesis over G*
+│   ├── evaluation/
+│   │   ├── label_prediction/          main-table accuracy + the A–E ablation
+│   │   └── reasoning_traces_quality/  ReCEval scoring of CRAFT traces (§4)
+│   ├── detailed_analysis/           cross-trace step alignment study
 │   └── results/                     craft_runs/, alignment_comparison/, receval_eval/
 └── config.py                        API credentials (local only, git-ignored)
 ```
@@ -114,17 +142,29 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 
 ## Part 2 — CRAFT (§3.2)
 
-The five modules of the Quick start above run in order. Trace quality is then scored with
-ReCEval (§4), which expects the upstream repo vendored at
-`Part2_CRAFT/eval_receval/ReCEval/` (cloned separately, git-ignored):
+The stages of the Quick start above run in order. Trace quality is then scored with
+ReCEval (§4). `Part2_CRAFT/evaluation/reasoning_traces_quality/ReCEval/` holds our three
+scripts and the one upstream file they score with (`evaluate_receval.py`, MIT, kept
+under its own LICENSE); the PVI checkpoints it loads are downloaded separately.
 
 ```bash
-python eval_receval/receval_evaluate_traces.py --input $RUN/synthesized.json \
-    --output receval_eval/receval_scores/<run>.json
+RTQ=evaluation/reasoning_traces_quality/ReCEval
+
+# label prediction — the main table, and the A–E ablation
+python evaluation/label_prediction/evaluate_direct_accuracy.py --input $RUN/synthesized.json --source synthesized
+
+# reasoning trace quality — pair raw CoT with the CRAFT trace, score, tabulate
+python $RTQ/receval_adapter_craft.py   --craft_dir $RUN --source dataset/logical/FLD.json \
+    --output receval_eval/receval_inputs/<run>.json
+python $RTQ/receval_evaluate_traces.py --input receval_eval/receval_inputs/<run>.json \
+    --score_keys entail contradict --K 0 --output receval_eval/receval_scores/<run>.json
+python $RTQ/receval_build_table.py     --scores "FLD / o4-mini:receval_eval/receval_scores/<run>.json" \
+    --metrics entail contradict --latex_out receval_eval/receval_scores/receval_craft_table.tex
 ```
 
-Hyperparameters fixed across all experiments (§4.6): `K=5`, TF-IRF threshold `β=0.3`,
-edge consensus threshold `θ=0.3`, z-score cutoff `γ=-1.0`, temperature `T=0.7`.
+Hyperparameters fixed across all experiments (§4.6): Module I `K=5`, `T=0.7`,
+`β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. These are the
+CLI defaults, so a stage run without flags uses them.
 
 ## Configuration
 
