@@ -126,8 +126,14 @@ def wilcoxon(a, b):
 
 
 def fmt2(x, signed=True):
-    """Two decimals, rounded — the table's number format."""
-    return f"{x:+.2f}" if signed else f"{x:.2f}"
+    """Two decimals, rounded — the table's number format.
+
+    A value that rounds to zero is printed unsigned: at two decimals there is no
+    direction left in it, and "$-0.00$" only looks like a typo.
+    """
+    if not signed or round(x, 2) == 0:
+        return f"{abs(x):.2f}" if round(x, 2) == 0 else f"{x:.2f}"
+    return f"{x:+.2f}"
 
 
 def fmt_p(p):
@@ -516,7 +522,7 @@ def make_latex_table(stats):
         r"\midrule",
     ]
     for model in MODELS:
-        short = model.replace("GPT-", "").replace("Gemini-3-Flash", "Gemini")
+        short = MODEL_DISPLAY.get(model, model).replace("\n", "")
         # PRMBench total
         row = stats["prmbench"].get(model, {}).get("total")
         if row:
