@@ -25,8 +25,8 @@ traces score higher under ROSCOE, ReCEval and FineLogic.
 ## Installation
 
 ```bash
-git clone git@github.com:ZpLing/EMNLP2026_CRAFT.git
-cd EMNLP2026_CRAFT
+git clone git@github.com:ZpLing/CRAFT.git
+cd CRAFT
 pip install openai aiohttp backoff tqdm numpy scipy pandas matplotlib nltk sympy torch transformers datasets
 ```
 

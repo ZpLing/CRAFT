@@ -83,6 +83,7 @@ def run_roscoe_evaluation(
     discourse_batch: int = 64,
     coherence_batch: int = 16,
     model_cache_dir: str = None,
+    datasets: list = None,
 ) -> dict:
     """Run ROSCOE scoring on the exported traces.
 
@@ -177,6 +178,10 @@ def run_roscoe_evaluation(
     # .jsonl is what this pipeline writes; .json is what a ParlAI roscoe_data
     # checkout calls the same newline-delimited content.
     json_files = sorted(list(export_path.glob("*.jsonl")) + list(export_path.glob("*.json")))
+    if datasets:
+        wanted = set(datasets)
+        json_files = [f for f in json_files
+                      if f.stem.rsplit("_", 2)[0] in wanted]
 
     if not json_files:
         logger.warning("No .json files found in %s", export_path)
@@ -369,6 +374,11 @@ def main() -> None:
     parser.add_argument("--model_cache_dir", default=None,
                         help="Where the scoring models are downloaded "
                              "(default: CRAFT_MODEL_CACHE, else the HF cache)")
+    parser.add_argument("--datasets", nargs="+", default=None,
+                        help="Score only these datasets (default: all in the directory). "
+                             "A subset writes evaluation_results.<dataset>.json, so "
+                             "jobs splitting one model across datasets cannot overwrite "
+                             "each other's summary; merge them once all have run.")
     parser.add_argument("--roscoe_model", default="all-mpnet-base-v2")
     parser.add_argument("--discourse_batch", type=int, default=64)
     parser.add_argument("--coherence_batch", type=int, default=16)
@@ -401,11 +411,13 @@ def main() -> None:
             discourse_batch=args.discourse_batch,
             coherence_batch=args.coherence_batch,
             model_cache_dir=args.model_cache_dir,
+            datasets=args.datasets,
         )
         if not scores:
             continue
         print_roscoe_results(scores)
-        out = export_dir / "evaluation_results.json"
+        suffix = f".{args.datasets[0]}" if args.datasets and len(args.datasets) == 1 else ""
+        out = export_dir / f"evaluation_results{suffix}.json"
         with out.open("w", encoding="utf-8") as f:
             json.dump(build_evaluation_summary(scores, export_dir), f,
                       indent=2, ensure_ascii=False)
