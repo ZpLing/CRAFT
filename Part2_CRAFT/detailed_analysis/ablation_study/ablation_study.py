@@ -41,9 +41,12 @@ from typing import Any, Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
-    from config import resolve_input, resolve_output
+    from config import resolve_input, resolve_output, run_model
 except ImportError:
     resolve_input = resolve_output = Path
+
+    def run_model(*paths):  # noqa: D103
+        return "unknown-model"
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]
                        / "evaluation" / "label_prediction"))
@@ -82,9 +85,10 @@ def main() -> None:
                     help=f"Synthesis output for one of: {', '.join(VARIANT_ROWS)}. Repeatable")
     ap.add_argument("--synth_file", default=None,
                     help="The full run's synthesis output (default: synthesized*.json in --craft_dir)")
-    ap.add_argument("--output", default="detailed_analysis/ablation_study.json",
-                    help="Write the table as JSON here (relative paths land "
-                         "under the results root)")
+    ap.add_argument("--output", default=None,
+                    help="Write the table as JSON here. Default: "
+                         "detailed_analysis/<model>/ablation_study.json under the results "
+                         "root, with the model read from the run's own metadata")
     args = ap.parse_args()
 
     run_dir = Path(resolve_input(args.craft_dir))
@@ -134,7 +138,9 @@ def main() -> None:
         print("  w/o Weighted Edges Fusion: build_rkg --edge_lambda 0, then synthesize.")
         print("  w/o CRAFT: pass --zero_shot.")
 
-    out = Path(resolve_output(args.output))
+    model = run_model(synth_path, k_path)
+    out = Path(resolve_output(args.output
+                              or f"detailed_analysis/{model}/ablation_study.json"))
     out.write_text(json.dumps(
         {"craft_dir": str(run_dir), "full_accuracy": full_acc,
          "settings": {n: {**rows[n],

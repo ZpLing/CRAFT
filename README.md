@@ -127,8 +127,8 @@ framework of §3.2.
 │   │   ├── k_sensitivity/           accuracy and RKG size against K
 │   │   └── rkg_robustness/          does the backbone change the extracted graph
 │   └── results/                     craft_runs/, alignment_comparison/, receval_eval/,
-│                                    baseline_results/ (the 13 main-table baselines),
-│                                    detailed_analysis/ (the appendix analyses, flat)
+│                                    baseline_results/<model>/  the 13 main-table baselines
+│                                    detailed_analysis/<model>/ the appendix analyses
 └── config.py                        API credentials (local only, git-ignored)
 ```
 
@@ -140,6 +140,14 @@ directory and falls back to the same results root, which is what lets one stage 
 previous stage's output by bare name. Absolute paths always pass through untouched, and
 `CRAFT_RESULTS_ROOT` overrides one part's results location. Results and credentials are
 git-ignored and stay local.
+
+A run belongs to the model that produced it, so Part 2 files its baselines and appendix
+analyses the way Part 1 files its benchmarks: `results/<area>/<model>/<experiment>.json`,
+one file per experiment named after the script that wrote it. A baseline takes the model
+from its own `--model`; an analysis reads it from the `metadata.model` of the run it is
+reading, so the directory cannot disagree with what actually generated the numbers. The
+two artifacts that belong to no single model — FLD's gold edge annotations and the
+cross-model `rkg_robustness.json` — stay at the top of `detailed_analysis/`.
 
 ## Part 1 — Empirical study (§4.1)
 

@@ -5,7 +5,9 @@ All values can be overridden at runtime via --api_key / --base_url / --model CLI
 or the OPENAI_API_KEY / OPENAI_BASE_URL / OPENAI_MODEL env vars.
 """
 import importlib.util
+import json
 import os
+import re
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1] / "config.py"
@@ -79,3 +81,42 @@ def resolve_input(path) -> Path:
         return p
     candidate = RESULTS_ROOT / p
     return candidate if candidate.exists() else p
+
+
+# ── One directory per backbone ───────────────────────────────────────────────
+# Part 1 already files its runs as results/<model>/<benchmark>/, and Part 2 does
+# the same: a baseline run and an appendix analysis both belong to the model that
+# produced the traces, so both land under results/<area>/<model>/. The model is
+# read from the run's own metadata rather than passed again, so the directory
+# cannot disagree with what actually generated the file.
+UNKNOWN_MODEL = "unknown-model"
+
+
+def model_slug(model) -> str:
+    """Directory name for one backbone: its id, lowercased and path-safe."""
+    slug = re.sub(r"[^a-z0-9._-]+", "-", str(model or "").strip().lower()).strip("-.")
+    return slug or UNKNOWN_MODEL
+
+
+def run_model(*paths) -> str:
+    """The backbone a run was produced with, from the first metadata.model found.
+
+    Accepts run files or run directories, in the order they should be tried, and
+    falls back to UNKNOWN_MODEL so a stray run still lands somewhere obvious
+    instead of failing an analysis that has already done its work.
+    """
+    for path in paths:
+        if not path:
+            continue
+        p = Path(path)
+        files = sorted(p.glob("*.json")) if p.is_dir() else [p]
+        for f in files:
+            try:
+                with open(f, encoding="utf-8") as fh:
+                    raw = json.load(fh)
+            except (OSError, ValueError):
+                continue
+            model = (raw.get("metadata") or {}).get("model") if isinstance(raw, dict) else None
+            if model:
+                return model_slug(model)
+    return UNKNOWN_MODEL

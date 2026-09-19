@@ -25,11 +25,13 @@ Usage:
     python build_gold_edges.py --dataset FLD_with_proofs.json
     # build an rkg.json from detailed_analysis/gold_traces.json with each backbone, then
     python rkg_robustness.py \\
-        --model "GPT-5.4-nano=detailed_analysis/rkg_nano.json" \\
-        --model "Gemini-3.1-flash-lite=detailed_analysis/rkg_gemini.json" \\
+        --model "GPT-5.4-nano=detailed_analysis/gpt-5.4-nano/rkg.json" \\
+        --model "Gemini-3.1-flash-lite=detailed_analysis/gemini-3.1-flash-lite/rkg.json" \\
         --gold detailed_analysis/gold_edges.json
 
-Everything it reads and writes sits flat in <results root>/detailed_analysis/.
+The graphs it reads are each one model's, so they sit in that model's directory.
+This measurement spans them, and the gold annotations belong to no model, so both
+stay at the top of <results root>/detailed_analysis/ rather than under one of them.
 """
 
 from __future__ import annotations
@@ -120,8 +122,9 @@ def main() -> None:
                     help="Gold edge annotations {sample_id: [[src, dst], ...]}. "
                          "Without it only the pair-wise agreement is reported")
     ap.add_argument("--output", default="detailed_analysis/rkg_robustness.json",
-                    help="Write the measurements as JSON here (relative paths land "
-                         "under the results root)")
+                    help="Write the measurements as JSON here. It compares the models "
+                         "rather than reporting one, so it is not filed under a model "
+                         "directory (relative paths land under the results root)")
     args = ap.parse_args()
 
     per_model: Dict[str, Dict[str, Dict[int, Set[Edge]]]] = {}

@@ -29,10 +29,13 @@ from typing import Any, Dict, List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
-    from config import RESULTS_ROOT, resolve_input, resolve_output
+    from config import RESULTS_ROOT, resolve_input, resolve_output, run_model
 except ImportError:
     RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results"
     resolve_input = resolve_output = Path
+
+    def run_model(*paths):  # noqa: D103
+        return "unknown-model"
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]
                        / "evaluation" / "label_prediction"))
@@ -136,7 +139,8 @@ def main() -> None:
     ap.add_argument("--domain", default="logical", choices=["logical", "math"])
     ap.add_argument("--output", default=None,
                     help="Write the measurements as JSON here. Default: "
-                         "detailed_analysis/k_sensitivity_<label>.json under the results root")
+                         "detailed_analysis/<model>/k_sensitivity_<label>.json under the "
+                         "results root, with the model read from the run's own metadata")
     args = ap.parse_args()
 
     if args.runs:
@@ -165,8 +169,9 @@ def main() -> None:
         print(f"  {k:>3} {acc:>8} {nod:>8} {edg:>8} {m['n_scored']:>6} {m['n_missing']:>8}")
     print()
 
-    out = Path(resolve_output(args.output
-                              or f"detailed_analysis/k_sensitivity_{args.label}.json"))
+    model = run_model(*(d for _, d in pairs))
+    out = Path(resolve_output(
+        args.output or f"detailed_analysis/{model}/k_sensitivity_{args.label}.json"))
     out.write_text(json.dumps({"label": args.label, "domain": args.domain,
                                "series": {str(k): v for k, v in series.items()}},
                               indent=2), encoding="utf-8")
