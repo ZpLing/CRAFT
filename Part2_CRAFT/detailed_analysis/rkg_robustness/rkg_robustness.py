@@ -22,12 +22,14 @@ are positional, so scoring a generated trace against FLD's proof would compare
 two different numberings and blame the extractor for the mismatch.
 
 Usage:
-    python build_gold_edges.py --dataset FLD_with_proofs.json --output_dir gold/
-    # build an rkg.json from gold/gold_traces.json with each backbone, then
+    python build_gold_edges.py --dataset FLD_with_proofs.json
+    # build an rkg.json from detailed_analysis/gold_traces.json with each backbone, then
     python rkg_robustness.py \\
-        --model "GPT-5.4-nano=rkg_robustness/nano.json" \\
-        --model "Gemini-3.1-flash-lite=rkg_robustness/gemini.json" \\
-        --gold gold/gold_edges.json --output rkg_robustness.json
+        --model "GPT-5.4-nano=detailed_analysis/rkg_nano.json" \\
+        --model "Gemini-3.1-flash-lite=detailed_analysis/rkg_gemini.json" \\
+        --gold detailed_analysis/gold_edges.json
+
+Everything it reads and writes sits flat in <results root>/detailed_analysis/.
 """
 
 from __future__ import annotations
@@ -117,7 +119,9 @@ def main() -> None:
     ap.add_argument("--gold", default=None,
                     help="Gold edge annotations {sample_id: [[src, dst], ...]}. "
                          "Without it only the pair-wise agreement is reported")
-    ap.add_argument("--output", default=None, help="Write the measurements as JSON here")
+    ap.add_argument("--output", default="detailed_analysis/rkg_robustness.json",
+                    help="Write the measurements as JSON here (relative paths land "
+                         "under the results root)")
     args = ap.parse_args()
 
     per_model: Dict[str, Dict[str, Dict[int, Set[Edge]]]] = {}
@@ -205,10 +209,9 @@ def main() -> None:
         print("\n  No --gold given, so edge extraction F1 and its Pearson r are not reported.")
     print()
 
-    if args.output:
-        out = Path(resolve_output(args.output))
-        out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-        print(f"  Saved: {out}")
+    out = Path(resolve_output(args.output))
+    out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    print(f"  Saved: {out}")
 
 
 if __name__ == "__main__":

@@ -27,15 +27,15 @@ whose antecedent list is empty by design — that step introduces an assumption
 instead of deriving anything, so it has no incoming edges. `int` and `assump`
 are separate numbering schemes, and int1 is not assump1.
 
-Two files come out:
-    <out>/gold_traces.json   k_traces schema, one trace per sample, for build_rkg
-    <out>/gold_edges.json    {sample_id: [[src, dst], ...]}
+Two files come out, into <results root>/detailed_analysis/ by default:
+    gold_traces.json   k_traces schema, one trace per sample, for build_rkg
+    gold_edges.json    {sample_id: [[src, dst], ...]}
 
 Usage:
-    python build_gold_edges.py --dataset FLD_with_proofs.json --output_dir rkg_robustness/gold
+    python build_gold_edges.py --dataset FLD_with_proofs.json
     python ../../framework/module2_rkg_construction/build_rkg.py \\
-        --input rkg_robustness/gold/gold_traces.json --model <backbone> \\
-        --output rkg_robustness/<backbone>.json
+        --input detailed_analysis/gold_traces.json --model <backbone> \\
+        --output detailed_analysis/rkg_<backbone>.json
 """
 
 from __future__ import annotations
@@ -222,8 +222,9 @@ def main() -> None:
     ap.add_argument("--dataset", default=None,
                     help="An FLD file carrying `proofs` (fetch_fld_proofs.py adds it) "
                          "or the older nl_solution. Default: the repo's FLD.json")
-    ap.add_argument("--output_dir", required=True,
-                    help="Where gold_traces.json and gold_edges.json are written")
+    ap.add_argument("--output_dir", default="detailed_analysis",
+                    help="Where gold_traces.json and gold_edges.json are written "
+                         "(relative paths land under the results root)")
     ap.add_argument("--max_samples", type=int, default=None)
     ap.add_argument("--id_prefix", default="FLD", help="Prefix for the generated sample ids")
     args = ap.parse_args()

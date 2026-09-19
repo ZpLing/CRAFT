@@ -134,7 +134,9 @@ def main() -> None:
                      help="Directory pattern whose names end in K, e.g. 'craft_runs/fld_k*'")
     ap.add_argument("--label", default="FLD", help="Dataset name for the output and the plot")
     ap.add_argument("--domain", default="logical", choices=["logical", "math"])
-    ap.add_argument("--output", default=None, help="Write the measurements as JSON here")
+    ap.add_argument("--output", default=None,
+                    help="Write the measurements as JSON here. Default: "
+                         "detailed_analysis/k_sensitivity_<label>.json under the results root")
     args = ap.parse_args()
 
     if args.runs:
@@ -163,12 +165,12 @@ def main() -> None:
         print(f"  {k:>3} {acc:>8} {nod:>8} {edg:>8} {m['n_scored']:>6} {m['n_missing']:>8}")
     print()
 
-    if args.output:
-        out = Path(resolve_output(args.output))
-        out.write_text(json.dumps({"label": args.label, "domain": args.domain,
-                                   "series": {str(k): v for k, v in series.items()}},
-                                  indent=2), encoding="utf-8")
-        print(f"  Saved: {out}")
+    out = Path(resolve_output(args.output
+                              or f"detailed_analysis/k_sensitivity_{args.label}.json"))
+    out.write_text(json.dumps({"label": args.label, "domain": args.domain,
+                               "series": {str(k): v for k, v in series.items()}},
+                              indent=2), encoding="utf-8")
+    print(f"  Saved: {out}")
 
 
 if __name__ == "__main__":

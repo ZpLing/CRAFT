@@ -82,7 +82,9 @@ def main() -> None:
                     help=f"Synthesis output for one of: {', '.join(VARIANT_ROWS)}. Repeatable")
     ap.add_argument("--synth_file", default=None,
                     help="The full run's synthesis output (default: synthesized*.json in --craft_dir)")
-    ap.add_argument("--output", default=None, help="Write the table as JSON here")
+    ap.add_argument("--output", default="detailed_analysis/ablation_study.json",
+                    help="Write the table as JSON here (relative paths land "
+                         "under the results root)")
     args = ap.parse_args()
 
     run_dir = Path(resolve_input(args.craft_dir))
@@ -132,16 +134,15 @@ def main() -> None:
         print("  w/o Weighted Edges Fusion: build_rkg --edge_lambda 0, then synthesize.")
         print("  w/o CRAFT: pass --zero_shot.")
 
-    if args.output:
-        out = Path(resolve_output(args.output))
-        out.write_text(json.dumps(
-            {"craft_dir": str(run_dir), "full_accuracy": full_acc,
-             "settings": {n: {**rows[n],
-                              "delta": None if n == FULL
-                              else round(rows[n]["accuracy"] - full_acc, 1)}
-                          for n in ROW_ORDER if n in rows},
-             "not_run": absent}, indent=2), encoding="utf-8")
-        print(f"  Saved: {out}")
+    out = Path(resolve_output(args.output))
+    out.write_text(json.dumps(
+        {"craft_dir": str(run_dir), "full_accuracy": full_acc,
+         "settings": {n: {**rows[n],
+                          "delta": None if n == FULL
+                          else round(rows[n]["accuracy"] - full_acc, 1)}
+                      for n in ROW_ORDER if n in rows},
+         "not_run": absent}, indent=2), encoding="utf-8")
+    print(f"  Saved: {out}")
 
 
 if __name__ == "__main__":
