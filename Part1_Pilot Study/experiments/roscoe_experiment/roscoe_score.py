@@ -274,6 +274,39 @@ def run_roscoe_evaluation(
     return all_results
 
 
+def build_evaluation_summary(scores: dict, export_dir: Path) -> dict:
+    """Write what ROSCOE measured: each metric, per dataset, per setting.
+
+    Nothing derived goes in here. Comparing the two settings is the significance
+    test's job and lands in significance_testing_results.json beside this file;
+    the per-item scores stay in roscoe_scores/. What this adds to the scorer's
+    own output is the item count each mean rests on.
+    """
+    settings = ("with_answer", "wout_answer")
+    datasets = sorted({ds for s in scores.values() for ds in s})
+
+    per_dataset = {}
+    for ds in datasets:
+        counts = {}
+        for setting in settings:
+            path = export_dir / f"{ds}_{setting}.jsonl"
+            counts[setting] = sum(1 for _ in path.open()) if path.exists() else 0
+        per_dataset[ds] = {
+            "n_traces": counts,
+            "metrics": {st: scores.get(st, {}).get(ds, {}) for st in settings},
+        }
+
+    return {
+        "datasets": per_dataset,
+        "meta": {
+            "settings": list(settings),
+            "n_datasets": len(datasets),
+            "metrics": sorted({m for s in scores.values()
+                               for ds_scores in s.values() for m in ds_scores}),
+        },
+    }
+
+
 def print_roscoe_results(all_results: dict) -> None:
     """Print a comparison table: with_answer vs wout_answer per dataset and metric."""
     if not all_results:
@@ -372,10 +405,11 @@ def main() -> None:
         if not scores:
             continue
         print_roscoe_results(scores)
-        out = export_dir / "roscoe_aggregate_scores.json"
+        out = export_dir / "evaluation_results.json"
         with out.open("w", encoding="utf-8") as f:
-            json.dump(scores, f, indent=2, ensure_ascii=False)
-        logger.info("Aggregate scores → %s", out)
+            json.dump(build_evaluation_summary(scores, export_dir), f,
+                      indent=2, ensure_ascii=False)
+        logger.info("Summary → %s", out)
 
 
 if __name__ == "__main__":
