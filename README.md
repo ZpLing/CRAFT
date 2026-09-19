@@ -125,7 +125,6 @@ framework of §3.2.
 │   ├── detailed_analysis/             the appendix analyses
 │   │   ├── ablation_study/          the six settings of the ablation table
 │   │   ├── k_sensitivity/           accuracy and RKG size against K
-│   │   ├── filtering_stats/         what each filtering pass removes, and why
 │   │   └── rkg_robustness/          does the backbone change the extracted graph
 │   └── results/                     craft_runs/, alignment_comparison/, receval_eval/
 └── config.py                        API credentials (local only, git-ignored)

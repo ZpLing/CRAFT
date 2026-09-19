@@ -16,16 +16,18 @@ backbones under the same prompt:
                        same question from the other side: models that agree with
                        each other cannot be adding model-specific noise.
 
-Gold annotations are a JSON object mapping a sample id to its edge list,
-{"FLD_0": [["Step1", "Step3"], ...]}. FLD as shipped here carries the premises
-and the conclusion but not the proof tree, so the gold file comes from the
-upstream annotations rather than from dataset/.
+Gold annotations and the traces they describe both come from build_gold_edges.py,
+which renders FLD's own proofs. They have to come from the same place: step ids
+are positional, so scoring a generated trace against FLD's proof would compare
+two different numberings and blame the extractor for the mismatch.
 
 Usage:
+    python build_gold_edges.py --dataset FLD_with_proofs.json --output_dir gold/
+    # build an rkg.json from gold/gold_traces.json with each backbone, then
     python rkg_robustness.py \\
-        --model "GPT-5.4-nano=craft_runs/fld_nano/rkg.json" \\
-        --model "Gemini-3.1-flash-lite=craft_runs/fld_gemini/rkg.json" \\
-        --gold fld_gold_edges.json --output rkg_robustness.json
+        --model "GPT-5.4-nano=rkg_robustness/nano.json" \\
+        --model "Gemini-3.1-flash-lite=rkg_robustness/gemini.json" \\
+        --gold gold/gold_edges.json --output rkg_robustness.json
 """
 
 from __future__ import annotations
@@ -53,21 +55,29 @@ def load_records(path: Path) -> List[Dict[str, Any]]:
     return raw.get("results", raw) if isinstance(raw, dict) else raw
 
 
-def edges_of(sample: Dict[str, Any]) -> Set[Edge]:
-    """Every edge the model extracted for this sample, across its K per-trace RKGs.
+def edges_by_trace(sample: Dict[str, Any]) -> Dict[int, Set[Edge]]:
+    """{trace_idx: the edges the model extracted from that trace}.
 
-    The union rather than the consensus: this asks what the extraction prompt
-    produced, and consensus is a later stage that would hide a disagreement by
-    voting it away.
+    Per trace, not pooled across them. Step ids are positional within a trace, so
+    "Step3" of trace 0 and "Step3" of trace 1 are different steps; pooling would
+    compare a set of ids that mean several things at once. Comparing trace 0 of
+    one model against trace 0 of another is well defined, because both graphed
+    the same text.
+
+    The per-trace graphs rather than the consensus: this asks what the extraction
+    prompt produced, and consensus is a later stage that would hide a
+    disagreement by voting it away.
     """
-    out: Set[Edge] = set()
+    out: Dict[int, Set[Edge]] = {}
     for rkg in (sample.get("trace_rkgs") or sample.get("trace_dags") or []):
         if rkg.get("extraction_method") == "error":
             continue
-        for e in rkg.get("edges", []):
-            src, dst = e.get("src"), e.get("dst")
-            if src and dst:
-                out.add((str(src), str(dst)))
+        idx = rkg.get("trace_idx")
+        if idx is None:
+            continue
+        edges = {(str(e["src"]), str(e["dst"])) for e in rkg.get("edges", [])
+                 if e.get("src") and e.get("dst")}
+        out[int(idx)] = edges
     return out
 
 
@@ -110,12 +120,12 @@ def main() -> None:
     ap.add_argument("--output", default=None, help="Write the measurements as JSON here")
     args = ap.parse_args()
 
-    per_model: Dict[str, Dict[str, Set[Edge]]] = {}
+    per_model: Dict[str, Dict[str, Dict[int, Set[Edge]]]] = {}
     for spec in args.model:
         if "=" not in spec:
             raise SystemExit(f"--model takes LABEL=RKG_JSON, got {spec!r}")
         label, raw = (s.strip() for s in spec.split("=", 1))
-        per_model[label] = {r["sample_id"]: edges_of(r)
+        per_model[label] = {r["sample_id"]: edges_by_trace(r)
                             for r in load_records(Path(resolve_input(raw)))
                             if "sample_id" in r}
     if len(per_model) < 2:
@@ -136,21 +146,32 @@ def main() -> None:
             gold_raw = json.load(f)
         gold = {sid: {(str(a), str(b)) for a, b in edges}
                 for sid, edges in gold_raw.items()}
-        scored = [sid for sid in shared_ids if sid in gold]
+        # Every model must have graphed at least one trace of a scored sample.
+        # Otherwise one model's score list is shorter than another's, and the
+        # pair-wise correlation below would pair up different samples.
+        scored = [sid for sid in shared_ids
+                  if sid in gold and all(per_model[m][sid] for m in per_model)]
         if not scored:
-            raise SystemExit("No sample id in --gold matches the RKG files")
+            raise SystemExit("No sample id in --gold was graphed by every model")
         print(f"  {len(scored)} of them have gold annotations\n")
         print(f"  {'Model':<28} {'P':>7} {'R':>7} {'F1':>7}")
         print("  " + "-" * 52)
         summary = {}
         for label, by_id in per_model.items():
-            rows = [prf(by_id[sid], gold[sid]) for sid in scored]
+            rows = []
+            for sid in scored:
+                # A sample's score is the mean over its traces, so a sample with
+                # more traces does not weigh more than one with fewer.
+                per_trace = [prf(edges, gold[sid]) for edges in by_id[sid].values()]
+                rows.append({k: mean(r[k] for r in per_trace)
+                             for k in ("precision", "recall", "f1")})
             per_sample_f1[label] = [r["f1"] for r in rows]
             summary[label] = {k: round(mean(r[k] for r in rows), 4)
                               for k in ("precision", "recall", "f1")}
             summary[label]["n"] = len(rows)
             s = summary[label]
-            print(f"  {label:<28} {s['precision']:>7.4f} {s['recall']:>7.4f} {s['f1']:>7.4f}")
+            print(f"  {label:<28} {s['precision']:>7.4f} "
+                  f"{s['recall']:>7.4f} {s['f1']:>7.4f}")
         payload["edge_extraction"] = summary
         payload["n_gold_samples"] = len(scored)
 
@@ -167,8 +188,15 @@ def main() -> None:
     print("  " + "-" * 59)
     agreement = {}
     for a, b in combinations(per_model, 2):
-        vals = [j for sid in shared_ids
-                if (j := jaccard(per_model[a][sid], per_model[b][sid])) is not None]
+        vals = []
+        for sid in shared_ids:
+            ta, tb = per_model[a][sid], per_model[b][sid]
+            # Only traces both models graphed: a trace one of them failed on has
+            # no counterpart to agree or disagree with.
+            per_trace = [j for idx in sorted(set(ta) & set(tb))
+                         if (j := jaccard(ta[idx], tb[idx])) is not None]
+            if per_trace:
+                vals.append(mean(per_trace))
         m = round(mean(vals), 4) if vals else None
         agreement[f"{a} vs {b}"] = m
         print(f"  {a + ' vs ' + b:<44} {'—' if m is None else f'{m:.4f}':>13}")

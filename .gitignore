@@ -49,3 +49,6 @@ Thumbs.db
 
 # ── Baselines — kept locally, never pushed ───────────────────────────
 /baselines/
+
+# ── Filtering statistics — a local check, not part of the pipeline ───
+Part2_CRAFT/detailed_analysis/filtering_stats/
