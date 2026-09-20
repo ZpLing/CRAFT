@@ -73,10 +73,45 @@ MULTI_STEP_RANGE_RE = re.compile(r"\bsteps?\s*(\d+)\s*[-–]\s*(\d+)\b", re.I)
 MULTI_STEP_LIST_RE  = re.compile(r"\bsteps?\s*([\d,\s]*(?:\band\b\s*\d+)?)\b", re.I)
 
 # ---- Final-answer markers (marks a step as "final", always necessary) ----
+# Each domain closes a trace its own way, and reading only the logical one left
+# every mathematical trace with no step marked final: measured on the synthesized
+# traces, the logical marker matches all of the logical samples and none of the
+# mathematical ones, where \boxed{} matches all of them.
 FINAL_MARKER_RE = re.compile(
-    r"(final\s+conclusion|__\s*PROVED\s*__|__\s*DISPROVED\s*__|__\s*UNKNOWN\s*__|therefore,\s*the\s*hypothesis)",
+    r"(final\s+conclusion"
+    r"|__\s*PROVED\s*__|__\s*DISPROVED\s*__|__\s*UNKNOWN\s*__"
+    r"|therefore,\s*the\s*hypothesis"
+    r"|\\boxed\s*\{"
+    r"|the\s+(?:final\s+)?answer\s+is)",
     re.I,
 )
+
+
+# ---- How a step is described to the judge, per domain ----
+# Valid and Atomic mean the same thing in both domains, but a judge reads the
+# question through the words it is asked in: a competition-maths step has no
+# "problem facts" to follow from and applies an operation rather than an
+# inference rule. The criterion is held fixed and only its wording moves.
+DOMAIN_WORDING = {
+    "logical": {
+        "context_header": "Problem facts",
+        "valid_question": ("Does step{n} logically follow from the problem facts and "
+                           "previously established steps?"),
+        "atomic_question": ("Does this step consist of a single atomic inference (one "
+                            "inference rule applied once), rather than combining "
+                            "multiple inferences or skipping intermediate steps?"),
+    },
+    "math": {
+        "context_header": "Problem",
+        "valid_question": ("Does step{n} follow correctly from the problem and the "
+                           "previously established steps — is every calculation and "
+                           "deduction it makes correct?"),
+        "atomic_question": ("Does this step consist of a single derivation (one "
+                            "operation or inference applied once), rather than "
+                            "combining several or skipping intermediate work?"),
+    },
+}
+DOMAIN_WORDING[""] = DOMAIN_WORDING["logical"]   # unlabelled runs read as before
 
 
 ############################################
@@ -124,7 +159,13 @@ def normalise_ref(s: str) -> str:
 
 
 def parse_facts_from_input(problem_input: str) -> dict:
-    """Extract {factN: <text>} from the problem_input (which always lists Fact1: ...)."""
+    """{factN: <text>} from a problem that numbers its premises that way.
+
+    The logical sets all do — FLD and ProofWriter both open every sample with
+    "Fact1: ..." — and the mathematical sets never do, since a competition
+    problem is one piece of prose. An empty result is that second case, and the
+    caller puts the problem itself in front of the judge instead.
+    """
     ref = {}
     if not problem_input:
         return ref
@@ -193,7 +234,12 @@ def split_steps_nl(text: str):
     # Optimization #1: dedup consecutive "bare Final Conclusion" marker-only steps
     # A step is "bare marker" if body is essentially just "Final Conclusion: __X__" with
     # no substantive reasoning (len <= 50 chars stripped, or matches only the marker).
-    BARE_RE = re.compile(r"^\s*(?:final\s+conclusion\s*[:\.]?\s*)?__\s*(proved|disproved|unknown)\s*__\s*\.?\s*$", re.I)
+    BARE_RE = re.compile(
+        r"^\s*(?:final\s+conclusion\s*[:\.]?\s*)?"
+        r"(?:__\s*(?:proved|disproved|unknown)\s*__"
+        r"|\\boxed\s*\{[^{}]*\})\s*\.?\s*$",
+        re.I,
+    )
     steps = []
     for st in raw_steps:
         is_bare = bool(BARE_RE.match(st["body"])) or (
@@ -229,7 +275,7 @@ def is_necessary_nl(step, later_steps):
 # Core evaluation (same Valid/Atomic logic) #
 ############################################
 
-async def eval_step_nl(session, step, ref, later_steps, all_steps, facts_text):
+async def eval_step_nl(session, step, ref, later_steps, all_steps, facts_text, domain=""):
     """Evaluate a single step.
 
     Optimisations vs strict FineLogic:
@@ -266,14 +312,14 @@ async def eval_step_nl(session, step, ref, later_steps, all_steps, facts_text):
     concl_text = step["body"][:800]
 
     # VALID: show full context (facts + prior steps + cited), ask if step follows
+    wording = DOMAIN_WORDING.get(domain, DOMAIN_WORDING[""])
     v_prompt = [{"role": "user", "content":
-        "You are judging the logical soundness of ONE step in a reasoning trace.\n\n"
-        f"[Problem facts]\n{facts_text}\n\n"
+        "You are judging the soundness of ONE step in a reasoning trace.\n\n"
+        f"[{wording['context_header']}]\n{facts_text}\n\n"
         f"[Previously established steps]\n{prior_text}\n\n"
         f"[Step being evaluated, step{n}]\n{concl_text}\n\n"
         f"[Step's own cited premises]\n{cited_text}\n\n"
-        "Does step"+str(n)+" logically follow from the problem facts and previously "
-        "established steps? Answer true or false only."}]
+        + wording["valid_question"].format(n=n) + " Answer true or false only."}]
     valid = await ask_bool(session, v_prompt)
 
     # Necessary: last step always necessary; else check if my step id is referenced later
@@ -284,9 +330,7 @@ async def eval_step_nl(session, step, ref, later_steps, all_steps, facts_text):
         a_prompt = [{"role": "user", "content":
             f"[Step body]\n{concl_text}\n\n"
             f"[Cited premises, if any]\n{cited_text}\n\n"
-            "Does this step consist of a single atomic inference (one inference rule applied once), "
-            "rather than combining multiple inferences or skipping intermediate steps? "
-            "Answer true or false only."}]
+            + wording["atomic_question"] + " Answer true or false only."}]
         atomic = await ask_bool(session, a_prompt)
 
     return {
@@ -317,19 +361,26 @@ async def analyse_sample(session, sample, sid):
         steps[-1]["is_final"] = True
 
     # Build facts_text once per sample from problem input
+    # Numeric order, so the judge sees fact2 before fact10.
     facts_only = {k: v for k, v in ref.items() if k.startswith("fact")}
-    facts_text = "\n".join(f"{k}: {v[:300]}" for k, v in sorted(facts_only.items()))
+    def _fact_no(item):
+        hit = re.search(r"\d+", item[0])
+        return int(hit.group()) if hit else 0
+    facts_text = "\n".join(f"{k}: {v[:300]}" for k, v in sorted(facts_only.items(), key=_fact_no))
     if not facts_text:
         facts_text = sample["problem"].get("input", "")[:2000]
 
+    domain = sample.get("_domain", "")
     results = {
         "sample_id": sid,
+        "dataset": sample.get("_dataset", ""),
+        "domain": domain,
         "num_steps": len(steps),
         "ground_truth_steps": ground_truth_steps,
         "steps": []
     }
     for i, st in enumerate(steps):
-        res = await eval_step_nl(session, st, ref, steps[i + 1:], steps, facts_text)
+        res = await eval_step_nl(session, st, ref, steps[i + 1:], steps, facts_text, domain)
         results["steps"].append(res)
     return results
 

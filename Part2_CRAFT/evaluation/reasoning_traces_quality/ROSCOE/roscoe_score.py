@@ -79,6 +79,27 @@ def set_model_cache(cache_dir: str | None) -> None:
     logger.info("Model cache → %s", path)
 
 
+def reference_text(record: dict) -> str:
+    """The record's own reference chain, or "" when it annotates none.
+
+    ROSCOE's supervised metrics score a trace against a reference chain someone
+    wrote for that sample. A set that carries one says so in the record: as a
+    `reference` field, or as the numbered explanations eSNLI ships. None of the
+    four benchmark datasets carries either, which is why they are scored with
+    the reference-free metrics; a set added later that does carry one is picked
+    up here without naming it anywhere.
+    """
+    direct = record.get("reference")
+    if isinstance(direct, str) and direct.strip():
+        return direct.strip()
+    if isinstance(direct, list):
+        joined = " ".join(str(x) for x in direct if x)
+        if joined.strip():
+            return joined.strip()
+    numbered = [record.get(f"explanation_{i}", "") for i in (1, 2, 3)]
+    return " ".join(x for x in numbered if x).strip()
+
+
 def run_roscoe_evaluation(
     export_dir: str,
     roscoe_dir: str,
@@ -220,21 +241,22 @@ def run_roscoe_evaluation(
                 premise = jline.get("premise", "")
                 hypo = jline.get("hypothesis", "")
 
+                # Whether a reference chain exists is a property of the record,
+                # not of the dataset's name. A set that annotates one gets the
+                # reference-based metrics; one that does not gets the rest,
+                # decided below by what was actually collected here.
                 if dataset == "gsm8k":
+                    # ROSCOE's own GSM8K stores its reference solution in
+                    # `hypothesis` and needs upstream's splitter to step it.
                     h_chain = ReasoningSteps(line=trace, chain_type="gsm8k_hypo")
                     ctx = ReasoningSteps(line=premise)
-                    ref_text = jline.get("hypothesis", "")
-                    r_chain = ReasoningSteps(line=ref_text, chain_type="gsm8k_ref")
-                    refs.append(r_chain)
+                    refs.append(ReasoningSteps(line=jline.get("hypothesis", ""),
+                                               chain_type="gsm8k_ref"))
                 else:
                     h_chain = ReasoningSteps(line=trace)
                     ctx = ReasoningSteps(line=premise + " " + hypo)
-                    if dataset == "esnli":
-                        ref_text = " ".join(filter(None, [
-                            jline.get("explanation_1", ""),
-                            jline.get("explanation_2", ""),
-                            jline.get("explanation_3", ""),
-                        ]))
+                    ref_text = reference_text(jline)
+                    if ref_text:
                         refs.append(ReasoningSteps(line=ref_text))
 
                 hypotheses.append(h_chain)

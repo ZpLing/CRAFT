@@ -94,9 +94,12 @@ def main() -> None:
 
     loaded = [(label, load_summary(path)) for label, path in map(parse_spec, args.summaries)]
 
-    wanted = args.datasets or DATASET_ORDER
-    present = [d for d in wanted
-               if any(d in s.get("datasets", {}) for _, s in loaded)]
+    # Datasets the summaries hold that DATASET_ORDER does not name still belong in
+    # the table: a dataset added later should show up rather than disappear into a
+    # list it was never added to.
+    scored = {d for _, s in loaded for d in s.get("datasets", {})}
+    wanted = args.datasets or (DATASET_ORDER + sorted(scored - set(DATASET_ORDER)))
+    present = [d for d in wanted if d in scored]
     if not present:
         raise SystemExit("None of the requested datasets appear in these summaries")
 

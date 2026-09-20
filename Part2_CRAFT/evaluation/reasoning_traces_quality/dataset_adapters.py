@@ -19,6 +19,9 @@ The shape every adapter returns:
     answer           the gold answer or label
     reference_steps  the gold proof's length, or None where the dataset has no
                      such thing, which is both mathematical sets
+    domain           "logical" or "math" — what a step in this dataset looks
+                     like, which is what decides how a trace is read and how a
+                     judge is asked about it
 
 `hypothesis` and `answer` are reference fields for the scorers; Module I's loader
 is what keeps them out of generation.
@@ -40,6 +43,7 @@ class Problem:
     answer: str
     reference_steps: Optional[int] = None
     dataset: str = ""
+    domain: str = ""
 
 
 def as_text(value: Any) -> str:
@@ -85,6 +89,7 @@ def adapt_fld(sample: Dict[str, Any]) -> Problem:
         answer=as_text(sample.get("proof_label")),
         reference_steps=fld_proof_steps(sample.get("proofs")),
         dataset="FLD",
+        domain="logical",
     )
 
 
@@ -96,6 +101,7 @@ def adapt_proofwriter(sample: Dict[str, Any]) -> Problem:
         answer=as_text(sample.get("proof_label")),
         reference_steps=_int_or_none(sample.get("QDep")),
         dataset="ProofWriter",
+        domain="logical",
     )
 
 
@@ -112,6 +118,7 @@ def adapt_olympiadbench(sample: Dict[str, Any]) -> Problem:
         answer=as_text(sample.get("answer")),
         reference_steps=None,
         dataset="OlympiadBench",
+        domain="math",
     )
 
 
@@ -123,8 +130,20 @@ def adapt_omnimath(sample: Dict[str, Any]) -> Problem:
         answer=as_text(sample.get("answer")),
         reference_steps=None,
         dataset="OmniMATH",
+        domain="math",
     )
 
+
+# What a step looks like in each set, which the downstream scorers need before
+# they can read one: the logical sets state their premises as "Fact1: ..." and
+# close with a __PROVED__/__DISPROVED__ marker, the mathematical ones state a
+# problem in prose and close with \boxed{}.
+DOMAIN: Dict[str, str] = {
+    "FLD": "logical",
+    "ProofWriter": "logical",
+    "OlympiadBench": "math",
+    "OmniMATH": "math",
+}
 
 ADAPTERS: Dict[str, Callable[[Dict[str, Any]], Problem]] = {
     "FLD": adapt_fld,
@@ -157,6 +176,11 @@ def dataset_name(raw: Any) -> str:
         return ""
     stem = Path(text).stem.strip()
     return _ALIASES.get(stem.lower(), "")
+
+
+def domain_of(dataset: Any) -> str:
+    """"logical" or "math" for a dataset, or "" when the name is not one of ours."""
+    return DOMAIN.get(dataset_name(dataset), "")
 
 
 def adapt(sample: Dict[str, Any], dataset: Any = None) -> Problem:

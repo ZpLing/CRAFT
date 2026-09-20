@@ -39,7 +39,7 @@ except ImportError:
     resolve_input = resolve_output = Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from dataset_adapters import adapt
+from dataset_adapters import adapt, domain_of
 
 
 def load_records(path: Path) -> List[Dict[str, Any]]:
@@ -72,6 +72,13 @@ def original_data_for(source: Optional[Dict[str, Any]],
 def record(problem_input: str, label: Any, source: Optional[Dict[str, Any]],
            response: str, model: str, prompt_style: str, sample_id: Any,
            dataset: str = "") -> Dict[str, Any]:
+    """One record for the step evaluator.
+
+    `_domain` travels with the sample because a step evaluator cannot read one
+    without knowing what kind it is: a logical set states its premises as
+    "Fact1: ..." and closes on a __PROVED__ marker, a mathematical one states a
+    problem in prose and closes on \\boxed{}.
+    """
     return {
         "problem": {
             "input": problem_input,
@@ -80,6 +87,8 @@ def record(problem_input: str, label: Any, source: Optional[Dict[str, Any]],
         },
         "responses": [{"model": model, "prompt_style": prompt_style, "response": response}],
         "_sample_id": sample_id,
+        "_dataset": Path(str(dataset)).stem,
+        "_domain": domain_of(dataset),
     }
 
 
