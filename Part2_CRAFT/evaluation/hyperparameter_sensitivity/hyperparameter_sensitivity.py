@@ -139,7 +139,7 @@ def main() -> None:
     ap.add_argument("--domain", default="logical", choices=["logical", "math"])
     ap.add_argument("--output", default=None,
                     help="Write the measurements as JSON here. Default: "
-                         "detailed_analysis/<model>/hyperparameter_sensitivity_<label>.json under "
+                         "CRAFT_evaluation_results/hyperparameter_sensitivity/<model>/hyperparameter_sensitivity_<label>.json "
                          "results root, with the model read from the run's own metadata")
     args = ap.parse_args()
 
@@ -171,7 +171,7 @@ def main() -> None:
 
     model = run_model(*(d for _, d in pairs))
     out = Path(resolve_output(
-        args.output or f"detailed_analysis/{model}/hyperparameter_sensitivity_{args.label}.json"))
+        args.output or f"CRAFT_evaluation_results/hyperparameter_sensitivity/{model}/hyperparameter_sensitivity_{args.label}.json"))
     out.write_text(json.dumps({"label": args.label, "domain": args.domain,
                                "series": {str(k): v for k, v in series.items()}},
                               indent=2), encoding="utf-8")

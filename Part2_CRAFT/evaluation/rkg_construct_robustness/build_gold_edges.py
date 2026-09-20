@@ -27,7 +27,8 @@ whose antecedent list is empty by design — that step introduces an assumption
 instead of deriving anything, so it has no incoming edges. `int` and `assump`
 are separate numbering schemes, and int1 is not assump1.
 
-Two files come out, into <results root>/detailed_analysis/ by default. They are
+Two files come out, into <results root>/CRAFT_evaluation_results/rkg_construct_robustness/ by default.
+They are
 FLD's annotations rather than any model's output, so they sit above the per-model
 directories:
     gold_traces.json   k_traces schema, one trace per sample, for build_rkg
@@ -36,8 +37,8 @@ directories:
 Usage:
     python build_gold_edges.py --dataset FLD_with_proofs.json
     python ../../framework/module2_rkg_construction/build_rkg.py \\
-        --input detailed_analysis/gold_traces.json --model <backbone> \\
-        --output detailed_analysis/<backbone>/rkg.json
+        --input CRAFT_evaluation_results/rkg_construct_robustness/gold_traces.json --model <backbone> \\
+        --output CRAFT_evaluation_results/rkg_construct_robustness/<backbone>/rkg.json
 """
 
 from __future__ import annotations
@@ -224,7 +225,7 @@ def main() -> None:
     ap.add_argument("--dataset", default=None,
                     help="An FLD file carrying `proofs` (fetch_fld_proofs.py adds it) "
                          "or the older nl_solution. Default: the repo's FLD.json")
-    ap.add_argument("--output_dir", default="detailed_analysis",
+    ap.add_argument("--output_dir", default="CRAFT_evaluation_results/rkg_construct_robustness",
                     help="Where gold_traces.json and gold_edges.json are written "
                          "(relative paths land under the results root)")
     ap.add_argument("--max_samples", type=int, default=None)

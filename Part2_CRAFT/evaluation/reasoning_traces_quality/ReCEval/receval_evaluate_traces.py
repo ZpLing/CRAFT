@@ -434,7 +434,7 @@ def main():
     parser.add_argument("--input",  required=True,
                         help="receval_traces.json from generate script "
                              "(relative paths resolve under the results root)")
-    parser.add_argument("--output", required=True,
+    parser.add_argument("--output", default="CRAFT_evaluation_results/reasoning_traces_quality/ReCEval/receval_scores.json",
                         help="Output JSON with scores "
                              "(relative paths resolve under the results root)")
     parser.add_argument(

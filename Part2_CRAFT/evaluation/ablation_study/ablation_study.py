@@ -87,7 +87,7 @@ def main() -> None:
                     help="The full run's synthesis output (default: synthesized*.json in --craft_dir)")
     ap.add_argument("--output", default=None,
                     help="Write the table as JSON here. Default: "
-                         "detailed_analysis/<model>/ablation_study.json under the results "
+                         "CRAFT_evaluation_results/ablation_study/<model>/ablation_study.json under the results "
                          "root, with the model read from the run's own metadata")
     args = ap.parse_args()
 
@@ -140,7 +140,7 @@ def main() -> None:
 
     model = run_model(synth_path, k_path)
     out = Path(resolve_output(args.output
-                              or f"detailed_analysis/{model}/ablation_study.json"))
+                              or f"CRAFT_evaluation_results/ablation_study/{model}/ablation_study.json"))
     out.write_text(json.dumps(
         {"craft_dir": str(run_dir), "full_accuracy": full_acc,
          "settings": {n: {**rows[n],

@@ -125,9 +125,12 @@ framework of §3.2.
 │   │   ├── ablation_study/            the six settings of the ablation table
 │   │   ├── hyperparameter_sensitivity/  accuracy and RKG size against K
 │   │   └── rkg_construct_robustness/  does the backbone change the extracted graph
-│   └── results/                     craft_runs/, alignment_comparison/, receval_eval/,
-│                                    baseline_results/<model>/  the 13 main-table baselines
-│                                    detailed_analysis/<model>/ the appendix analyses
+│   └── results/
+│       ├── baseline_results/<model>/<baseline>/  the 13 main-table baselines,
+│       │                            one directory each: results.json and traces.jsonl
+│       └── CRAFT_evaluation_results/  mirrors evaluation/ above, one directory
+│                                    per experiment, so a result sits where its
+│                                    code does
 └── config.py                        API credentials (local only, git-ignored)
 ```
 
@@ -141,12 +144,13 @@ previous stage's output by bare name. Absolute paths always pass through untouch
 git-ignored and stay local.
 
 A run belongs to the model that produced it, so Part 2 files its baselines and appendix
-analyses the way Part 1 files its benchmarks: `results/<area>/<model>/<experiment>.json`,
-one file per experiment named after the script that wrote it. A baseline takes the model
+analyses the way Part 1 files its benchmarks, and `CRAFT_evaluation_results/` mirrors
+`evaluation/` directory for directory, so a result is found where its code is. A baseline takes the model
 from its own `--model`; an analysis reads it from the `metadata.model` of the run it is
 reading, so the directory cannot disagree with what actually generated the numbers. The
 two artifacts that belong to no single model — FLD's gold edge annotations and the
-cross-model `rkg_construct_robustness.json` — stay at the top of `detailed_analysis/`.
+cross-model `rkg_construct_robustness.json` — stay at the top of that experiment's
+directory rather than under one model.
 
 ## Part 1 — Empirical study (§4.1)
 

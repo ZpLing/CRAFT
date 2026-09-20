@@ -1430,7 +1430,10 @@ def main() -> None:
     parser.add_argument("--concurrency", type=int, default=50)
 
     # Output
-    parser.add_argument("--output", default="ablation_results.json")
+    parser.add_argument("--output",
+                        default="CRAFT_evaluation_results/ablation_study/ablation_results.json",
+                        help="the A-E ablation is its own experiment, so its results sit "
+                             "under ablation_study/ rather than with the main table's")
 
     args = parser.parse_args()
 
