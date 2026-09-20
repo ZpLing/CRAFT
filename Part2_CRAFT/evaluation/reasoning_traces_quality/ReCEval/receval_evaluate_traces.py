@@ -108,6 +108,13 @@ def load_receval_components():
 
 
 # ---- Model loading (mirrors evaluate_receval.py lines 37–93 exactly) ----
+# The models load on demand rather than at import. Upstream loads all four
+# unconditionally, which makes a run of the two metrics the paper reports
+# (entail, contradict) depend on the two PVI checkpoints and GPT-2-XL, neither
+# of which it needs: PVI is downloaded separately and is absent here, so the
+# import raised before the first sample was ever scored. Each loader below
+# fills the same module-level names the scoring functions already read, so the
+# functions themselves are still upstream's, unchanged.
 
 from allennlp.predictors.predictor import Predictor
 import allennlp_models.tagging
@@ -118,20 +125,27 @@ from transformers import (
 from datasets import Dataset
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-logger.info("Loading models on %s ...", device)
 
-# NLI model
-ent_model_name = "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli"
-ent_tokenizer = AutoTokenizer.from_pretrained(ent_model_name)
-ent_model = AutoModelForSequenceClassification.from_pretrained(ent_model_name).to(device)
-ent_model.eval()
-
-# SRL predictor
-srl_predictor = Predictor.from_path(
-    "https://storage.googleapis.com/allennlp-public-models/structured-prediction-srl-bert.2020.12.15.tar.gz"
+# NLI model — entail and contradict.
+# AllenNLP pins transformers 4.20, which reads the Hub's redirect to a relative
+# Location header as if it were a URL and so cannot download anything from
+# huggingface.co any more. The weights are therefore fetched once with a current
+# transformers (any environment with one) and read from disk here. RECEVAL_NLI_MODEL
+# overrides the location; the Hub id is still the default, for a machine whose
+# transformers can reach it.
+_LOCAL_NLI = RECEVAL_DIR.parent / ".models" / "deberta-v3-large-mnli"
+ent_model_name = os.getenv("RECEVAL_NLI_MODEL") or (
+    str(_LOCAL_NLI) if (_LOCAL_NLI / "config.json").exists()
+    else "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli"
 )
+ent_tokenizer = ent_model = None
 
-# PVI models (fine-tuned T5 from ReCEval)
+# SRL predictor — RCU extraction, needed by every metric
+SRL_MODEL_URL = ("https://storage.googleapis.com/allennlp-public-models/"
+                 "structured-prediction-srl-bert.2020.12.15.tar.gz")
+srl_predictor = None
+
+# PVI models (fine-tuned T5 from ReCEval) — the pvi metric only
 inp_model_dir     = str(RECEVAL_DIR / "PVI/inp_models/")
 no_inp_model_dir  = str(RECEVAL_DIR / "PVI/noinp_models/")
 info_gain_model_dir = str(RECEVAL_DIR / "PVI/infogain_models/")
@@ -142,23 +156,81 @@ padding = "max_length"
 pad_token = "<pad>"
 prefix = "Generate entailed sentence: "
 
-inp_tokenizer  = AutoTokenizer.from_pretrained(inp_model_dir)
-inp_config     = AutoConfig.from_pretrained(inp_model_dir)
-inp_model      = AutoModelForSeq2SeqLM.from_pretrained(inp_model_dir, config=inp_config).to(device).eval()
+inp_tokenizer = inp_config = inp_model = None
+no_inp_tokenizer = no_inp_config = no_inp_model = None
 
-no_inp_tokenizer = AutoTokenizer.from_pretrained(no_inp_model_dir)
-no_inp_config    = AutoConfig.from_pretrained(no_inp_model_dir)
-no_inp_model     = AutoModelForSeq2SeqLM.from_pretrained(no_inp_model_dir, config=no_inp_config).to(device).eval()
-
-# Info-gain model: GPT-2-XL (default in evaluate_receval.py)
+# Info-gain model: GPT-2-XL (default in evaluate_receval.py) — the ll-info metric only
 info_gain_mname = "gpt2"
-ll_tokenizer = AutoTokenizer.from_pretrained("gpt2")
-ll_model     = AutoModelForCausalLM.from_pretrained("gpt2-xl").eval().to(device)
-ll_tokenizer.padding_side = "left"
-ll_tokenizer.pad_token    = ll_tokenizer.eos_token
-ll_model.config.pad_token_id = ll_model.config.eos_token_id
+ll_tokenizer = ll_model = None
 
-logger.info("All models loaded.")
+
+def load_nli() -> None:
+    """DeBERTa NLI, behind entail and contradict."""
+    global ent_tokenizer, ent_model
+    if ent_model is not None:
+        return
+    logger.info("Loading NLI model %s on %s ...", ent_model_name, device)
+    ent_tokenizer = AutoTokenizer.from_pretrained(ent_model_name)
+    ent_model = AutoModelForSequenceClassification.from_pretrained(ent_model_name).to(device)
+    ent_model.eval()
+
+
+def load_srl() -> None:
+    """AllenNLP SRL, behind get_phrases(), which every metric goes through."""
+    global srl_predictor
+    if srl_predictor is not None:
+        return
+    logger.info("Loading SRL predictor ...")
+    srl_predictor = Predictor.from_path(SRL_MODEL_URL)
+
+
+def load_pvi() -> None:
+    """The two fine-tuned T5 checkpoints, behind pvi."""
+    global inp_tokenizer, inp_config, inp_model
+    global no_inp_tokenizer, no_inp_config, no_inp_model
+    if inp_model is not None:
+        return
+    missing = [d for d in (inp_model_dir, no_inp_model_dir) if not Path(d).is_dir()]
+    if missing:
+        raise FileNotFoundError(
+            "The pvi metric needs ReCEval's fine-tuned T5 checkpoints, which are "
+            "downloaded separately and are not in this tree: "
+            + ", ".join(missing)
+            + ". Drop them there, or leave 'pvi' out of --score_keys."
+        )
+    logger.info("Loading PVI models on %s ...", device)
+    inp_tokenizer = AutoTokenizer.from_pretrained(inp_model_dir)
+    inp_config    = AutoConfig.from_pretrained(inp_model_dir)
+    inp_model     = AutoModelForSeq2SeqLM.from_pretrained(inp_model_dir, config=inp_config).to(device).eval()
+
+    no_inp_tokenizer = AutoTokenizer.from_pretrained(no_inp_model_dir)
+    no_inp_config    = AutoConfig.from_pretrained(no_inp_model_dir)
+    no_inp_model     = AutoModelForSeq2SeqLM.from_pretrained(no_inp_model_dir, config=no_inp_config).to(device).eval()
+
+
+def load_ll() -> None:
+    """GPT-2-XL, behind ll-info."""
+    global ll_tokenizer, ll_model
+    if ll_model is not None:
+        return
+    logger.info("Loading %s / gpt2-xl on %s ...", info_gain_mname, device)
+    ll_tokenizer = AutoTokenizer.from_pretrained("gpt2")
+    ll_model     = AutoModelForCausalLM.from_pretrained("gpt2-xl").eval().to(device)
+    ll_tokenizer.padding_side = "left"
+    ll_tokenizer.pad_token    = ll_tokenizer.eos_token
+    ll_model.config.pad_token_id = ll_model.config.eos_token_id
+
+
+def load_models(score_keys) -> None:
+    """Load exactly the models the requested metrics use."""
+    load_srl()
+    if {"entail", "contradict"} & set(score_keys):
+        load_nli()
+    if "pvi" in score_keys:
+        load_pvi()
+    if "ll-info" in score_keys:
+        load_ll()
+    logger.info("Models loaded for metrics: %s", ", ".join(score_keys))
 
 # ---- Scoring functions (copied verbatim from evaluate_receval.py) ----
 
@@ -233,10 +305,46 @@ def extract_frame(tags, words, desc):
     sent = detokenize(words[start: end + 1]).rstrip(".")
     return sent
 
+# SRL's encoder is BERT, so a step longer than its 512 positions overflows the
+# position embeddings and takes the whole run down with it. The logical sets'
+# steps never come close; a competition-maths step does, because a block of
+# LaTeX is many wordpieces per word. Halving is used rather than a word cap
+# because no word count predicts how a formula tokenises.
+SRL_SHRINK_TRIES = 4
+SRL_MIN_WORDS = 8
+
+
+def srl_parse(sent: str):
+    """(srl_out, the text it parsed), or (None, sent) if SRL could not parse it.
+
+    A step that will not fit is cut down until it does, and the caller scores the
+    part that fitted. One that still will not parse is treated as a single unit,
+    which is what get_phrases already does for a sentence SRL finds no frame in.
+    """
+    text = sent
+    for _ in range(SRL_SHRINK_TRIES):
+        try:
+            return srl_predictor.predict(text), text
+        except RuntimeError as exc:
+            if "size of tensor" not in str(exc):
+                raise
+            words = text.split()
+            if len(words) < 2 * SRL_MIN_WORDS:
+                break
+            text = " ".join(words[: len(words) // 2])
+            logger.warning("Step too long for SRL; retrying on its leading %d words",
+                           len(text.split()))
+    logger.warning("SRL could not parse a %d-word step; treating it as one unit",
+                   len(sent.split()))
+    return None, sent
+
+
 def get_phrases(sent):
     phrases = []
     history = ""
-    srl_out = srl_predictor.predict(sent)
+    srl_out, sent = srl_parse(sent)
+    if srl_out is None:
+        return [sent.rstrip(".")]
     words   = srl_out["words"]
     frames  = [s["tags"]        for s in srl_out["verbs"]]
     descs   = [s["description"] for s in srl_out["verbs"]]
@@ -456,6 +564,7 @@ def main():
     if args.max_samples:
         items = items[: args.max_samples]
     logger.info("Scoring %d items with metrics: %s", len(items), args.score_keys)
+    load_models(args.score_keys)
 
     wa_results, bl_results = [], []
 

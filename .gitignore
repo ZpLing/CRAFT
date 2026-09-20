@@ -33,6 +33,12 @@ Part2_CRAFT/dataset/_source/
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/
 Part1_Pilot Study/experiments/roscoe_experiment/ParlAI/
+Part2_CRAFT/evaluation/reasoning_traces_quality/ROSCOE/ParlAI/
+
+# ── Scoring model weights (downloaded on first use) ───────────────────
+# ReCEval's NLI checkpoint has to be read from disk: AllenNLP pins transformers
+# 4.20, which can no longer download from the Hub.
+Part2_CRAFT/evaluation/reasoning_traces_quality/.models/
 
 # ── Python cache ─────────────────────────────────────────────────────
 __pycache__/
