@@ -30,13 +30,4 @@ sentence-transformers>=2.2
 nltk>=3.8
 datasets>=2.14
 
-# ── ReCEval's SRL path — install separately, NOT in this environment ──────────
-# receval_evaluate_traces.py imports upstream evaluate_receval.py, which needs
-# AllenNLP at import time. AllenNLP's last release pins transformers 4.20 and
-# torch 1.10, which cannot coexist with the sentence-transformers above, so it
-# gets its own environment:
-#
-#   conda create -n receval python=3.9 && conda activate receval
-#   pip install allennlp==2.10.1 allennlp-models==2.10.1 supar transformers==4.20.1
-#
-# Everything else in the repo runs in the single environment this file describes.
+# Everything in this part runs in the single environment this file describes.

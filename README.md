@@ -20,7 +20,7 @@ traces, drops the steps they disagree on, aggregates the survivors into a consen
 | o4-mini | **CRAFT** | **75.6** | **88.8** | 98.0 | **73.2** |
 
 Label-prediction accuracy (%). CRAFT also wins on average steps, and its post-processed
-traces score higher under ROSCOE, ReCEval and FineLogic.
+traces score higher under ROSCOE and FineLogic.
 
 > These numbers are from the previous benchmark. FOLIO and GSM8K have since been
 > replaced — both backbones had run out of room on them, a median 49/50 on GSM8K
@@ -56,8 +56,6 @@ python -m nltk.downloader punkt averaged_perceptron_tagger
 ```
 
 ROSCOE's scorer is two files fetched from ParlAI on first use rather than vendored.
-ReCEval's is one file kept here under the upstream MIT license, and its AllenNLP SRL
-path needs an environment of its own — `requirements.txt` says how.
 
 ## Quick start
 
@@ -130,7 +128,7 @@ framework of §3.2.
 │   ├── evaluation/
 │   │   ├── label_prediction/          main-table accuracy and its Wilson CIs
 │   │   │                              answer_match.py — one adapter per dataset
-│   │   ├── reasoning_traces_quality/  ReCEval/, ROSCOE/, FineLogic/ (§4)
+│   │   ├── reasoning_traces_quality/  ROSCOE/, FineLogic/ (§4)
 │   │   │                              dataset_adapters.py — the same four, for traces
 │   │   ├── ablation_study/            the six settings of the ablation table
 │   │   ├── hyperparameter_sensitivity/  accuracy and RKG size against K
@@ -208,25 +206,32 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 
 ## Part 2 — CRAFT (§3.2)
 
-The stages of the Quick start above run in order. Trace quality is then scored three
+The stages of the Quick start above run in order. Trace quality is then scored two
 ways (§4), each directory holding the same three roles — adapt a CRAFT run into the
 scorer's schema, score raw CoT against the synthesized trace, tabulate the result:
 
 | | scores | metrics |
 |---|---|---|
-| `ReCEval/` | entailment between steps | Entail, Contradict |
 | `FineLogic/` | each step, by LLM judge | All Valid, All Relevant, All Atomic |
 | `ROSCOE/` | trace quality | Grammar, Rep-Step, Rep-Word |
 
-All three are metrics rather than benchmarks — they score whatever traces they are
-given — so all three score the same traces, on the same four datasets, and this
-part introduces no data beyond them. The rollout that gives the main table its
-accuracy is the one they read: its first candidate trace is the raw CoT and its
-synthesized trace is CRAFT's, so `--dataset` is simply the `dataset/` file that
-run was generated from. ROSCOE's own annotated sets are not used here; its
-reference-based metrics need a reference chain none of these four carries, and
-the scorer drops them on its own, leaving the three reference-free ones the paper
-reports.
+Both are metrics rather than benchmarks — they score whatever traces they are
+given — so both score the same traces, on the same four datasets, and this part
+introduces no data beyond them. The rollout that gives the main table its accuracy
+is the one they read: its first candidate trace is the raw CoT and its synthesized
+trace is CRAFT's, so `--dataset` is simply the `dataset/` file that run was
+generated from. ROSCOE's own annotated sets are not used here; its reference-based
+metrics need a reference chain none of these four carries, and the scorer drops
+them on its own, leaving the three reference-free ones we report.
+
+ReCEval was the third and is not used. Its Entail and Contradict are computed over
+reasoning units an SRL parser extracts from each step, and that parser is a BERT
+whose 512 positions a competition-maths step overruns: a third of the steps CRAFT
+synthesizes on Omni-MATH and OlympiadBench are longer than it can encode, against
+none of the steps on either logical set. Scoring the raw side whole and the CRAFT
+side truncated would have compared the two under different treatment, on the half
+of the benchmark where an NLI model has the least to say about whether one step
+follows from another.
 
 The four benchmark datasets disagree about how a problem is stored — ProofWriter's
 facts are a list where FLD's are one string, and the mathematical two name their
@@ -234,15 +239,14 @@ answer `answer` where the logical two name it `proof_label` — so each has an
 adapter, the way `label_prediction/answer_match.py` already gives each one a way
 to compare an answer. `reasoning_traces_quality/dataset_adapters.py` is that layer
 for traces: it hands every scorer the same four fields (premises, hypothesis,
-answer, the gold step count), and the three adapters beside it dispatch on the
+answer, the gold step count), and both adapters beside it dispatch on the
 dataset a run recorded rather than guessing from the fields present. Only the two
 logical sets annotate a step count — FLD in its proof string, ProofWriter in
 `QDep` — so FineLogic's step-band rows cover those two and its overall row covers
 all four. FLD's own proofs run 1–7 steps, so the [10, 20] band FineLogic's paper
-reports on is empty on this selection and [1–9] is the one that covers it. ReCEval's one upstream file is
-vendored (MIT, notice in the file) and its PVI checkpoints download separately;
-ROSCOE fetches upstream's two scoring files on first use; FineLogic's step evaluator
-is our natural-language adaptation of upstream's, and judges with
+reports on is empty on this selection and [1–9] is the one that covers it. ROSCOE
+fetches upstream's two scoring files on first use; FineLogic's step evaluator is
+our natural-language adaptation of upstream's, and judges with
 Gemini-3.1-flash-lite.
 
 ```bash
@@ -250,20 +254,11 @@ RTQ=evaluation/reasoning_traces_quality
 
 # label prediction — the main table, and the A–E ablation
 python evaluation/label_prediction/evaluate_accuracy.py score --input $RUN/synthesized.json --source synthesized
-
-# reasoning trace quality — pair raw CoT with the CRAFT trace, score, tabulate
-python $RTQ/ReCEval/receval_adapter_craft.py   --craft_dir $RUN \
-    --dataset dataset/FLD.json \
-    --output receval_eval/receval_inputs/<run>.json
-python $RTQ/ReCEval/receval_evaluate_traces.py --input receval_eval/receval_inputs/<run>.json \
-    --score_keys entail contradict --K 0 --output receval_eval/receval_scores/<run>.json
-python $RTQ/ReCEval/receval_build_table.py     --scores "FLD / Gemini-3.1-flash-lite:receval_eval/receval_scores/<run>.json" \
-    --metrics entail contradict --latex_out receval_eval/receval_scores/receval_craft_table.tex
 ```
 
-ROSCOE reads the same run, and the same three steps follow — adapt, score, tabulate.
-Scoring needs about 5 GB of local models, so it is the half that usually runs
-elsewhere:
+Trace quality pairs the raw CoT with the CRAFT trace and scores both. ROSCOE reads
+the run directly — adapt, score, tabulate. Scoring needs about 5 GB of local
+models, so it is the half that usually runs elsewhere:
 
 ```bash
 ROS=$RTQ/ROSCOE
@@ -275,7 +270,7 @@ python $ROS/roscoe_build_table.py   --summaries "Gemini-3.1-flash-lite:$RUN/rosc
     --latex_out $RUN/roscoe_craft_table.tex
 ```
 
-FineLogic follows the same three steps over a CRAFT run on FLD:
+FineLogic follows the same three steps over a CRAFT run on any of the four:
 
 ```bash
 FL=$RTQ/FineLogic

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""One adapter per benchmark dataset, shared by the three trace-quality evaluations.
+"""One adapter per benchmark dataset, shared by both trace-quality evaluations.
 
 The four datasets do not agree on how a problem is stored. FLD keeps its facts in
 one string and ProofWriter keeps them in a list; the logical two name the answer
 `proof_label` and the mathematical two name it `answer`; only the logical two
-record how long the gold proof is, and they record it two different ways. ReCEval,
-FineLogic and ROSCOE each need the same few fields out of whichever dataset a run
-was generated from, so the per-dataset knowledge lives here once rather than as a
-fall-through guess repeated in three adapters — which is what let a ProofWriter
-run hand the scorer a list where it expected a string, and a maths run hand it an
+record how long the gold proof is, and they record it two different ways. ROSCOE
+and FineLogic each need the same few fields out of whichever dataset a run was
+generated from, so the per-dataset knowledge lives here once rather than as a
+fall-through guess repeated in each adapter — which is what let a ProofWriter run
+hand the scorer a list where it expected a string, and a maths run hand it an
 empty hypothesis.
 
 The shape every adapter returns:
