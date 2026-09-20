@@ -17,6 +17,9 @@ Part2_CRAFT/results/*
 # results.json is the data, traces.jsonl the generations behind it, which is what
 # lets the table be re-scored without paying for the runs again.
 !Part2_CRAFT/results/baseline_results/
+# The analyses behind the appendix are small — kilobytes — and are what the
+# appendix numbers are read from, so they are tracked too.
+!Part2_CRAFT/results/CRAFT_evaluation_results/
 
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/

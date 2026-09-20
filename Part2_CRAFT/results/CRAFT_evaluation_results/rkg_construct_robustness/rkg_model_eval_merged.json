@@ -1,0 +1,2890 @@
+{
+  "models": [
+    "o4-mini",
+    "gpt-5.4",
+    "gpt-5.4-nano"
+  ],
+  "n_samples": 100,
+  "results": [
+    {
+      "model": "o4-mini",
+      "n_valid": 95,
+      "precision": 0.5768,
+      "recall": 0.5831,
+      "f1": 0.5619,
+      "f1_std": 0.2803,
+      "per_sample": [
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 16,
+          "extracted": 16,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 927
+        },
+        {
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "f1": 0.8,
+          "tp": 2,
+          "extracted": 3,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 989
+        },
+        {
+          "precision": 0.2857142857142857,
+          "recall": 0.4,
+          "f1": 0.3333333333333333,
+          "tp": 2,
+          "extracted": 7,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 854
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 121
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.36363636363636365,
+          "f1": 0.34782608695652173,
+          "tp": 8,
+          "extracted": 24,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1553
+        },
+        {
+          "precision": 0.48,
+          "recall": 0.5454545454545454,
+          "f1": 0.5106382978723404,
+          "tp": 12,
+          "extracted": 25,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1697
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 305
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.5,
+          "f1": 0.4444444444444445,
+          "tp": 6,
+          "extracted": 15,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 158
+        },
+        {
+          "precision": 0.46153846153846156,
+          "recall": 0.6,
+          "f1": 0.5217391304347826,
+          "tp": 6,
+          "extracted": 13,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 628
+        },
+        {
+          "precision": 0.35714285714285715,
+          "recall": 0.45454545454545453,
+          "f1": 0.4,
+          "tp": 5,
+          "extracted": 14,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 436
+        },
+        {
+          "precision": 0.5172413793103449,
+          "recall": 0.5555555555555556,
+          "f1": 0.5357142857142857,
+          "tp": 15,
+          "extracted": 29,
+          "gold": 27,
+          "extraction_method": "llm",
+          "sample_id": 1761
+        },
+        {
+          "precision": 0.9090909090909091,
+          "recall": 0.37037037037037035,
+          "f1": 0.5263157894736842,
+          "tp": 10,
+          "extracted": 11,
+          "gold": 27,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1993
+        },
+        {
+          "precision": 0.6666666666666666,
+          "recall": 0.3076923076923077,
+          "f1": 0.42105263157894735,
+          "tp": 4,
+          "extracted": 6,
+          "gold": 13,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1343
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 16,
+          "extracted": 16,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 296
+        },
+        {
+          "precision": 0.2857142857142857,
+          "recall": 0.5,
+          "f1": 0.36363636363636365,
+          "tp": 4,
+          "extracted": 14,
+          "gold": 8,
+          "extraction_method": "llm",
+          "sample_id": 316
+        },
+        {
+          "precision": 0.375,
+          "recall": 0.46153846153846156,
+          "f1": 0.41379310344827586,
+          "tp": 6,
+          "extracted": 16,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 993
+        },
+        {
+          "precision": 0.7142857142857143,
+          "recall": 0.2631578947368421,
+          "f1": 0.3846153846153846,
+          "tp": 5,
+          "extracted": 7,
+          "gold": 19,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1693
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 1027
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 791
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 12,
+          "extracted": 12,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 588
+        },
+        {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "extracted": 9,
+          "gold": 3,
+          "extraction_method": "llm",
+          "sample_id": 486
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.46153846153846156,
+          "f1": 0.42857142857142855,
+          "tp": 6,
+          "extracted": 15,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 198
+        },
+        {
+          "precision": 0.42857142857142855,
+          "recall": 0.5,
+          "f1": 0.4615384615384615,
+          "tp": 6,
+          "extracted": 14,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 483
+        },
+        {
+          "precision": 0.4782608695652174,
+          "recall": 0.55,
+          "f1": 0.5116279069767442,
+          "tp": 11,
+          "extracted": 23,
+          "gold": 20,
+          "extraction_method": "llm",
+          "sample_id": 1321
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.46153846153846156,
+          "f1": 0.42857142857142855,
+          "tp": 6,
+          "extracted": 15,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 897
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 557
+        },
+        {
+          "precision": 0.23076923076923078,
+          "recall": 0.42857142857142855,
+          "f1": 0.3,
+          "tp": 3,
+          "extracted": 13,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 726
+        },
+        {
+          "precision": 0.3,
+          "recall": 0.42857142857142855,
+          "f1": 0.3529411764705882,
+          "tp": 3,
+          "extracted": 10,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 823
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 12,
+          "extracted": 12,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 425
+        },
+        {
+          "precision": 0.47619047619047616,
+          "recall": 0.5555555555555556,
+          "f1": 0.5128205128205129,
+          "tp": 10,
+          "extracted": 21,
+          "gold": 18,
+          "extraction_method": "llm",
+          "sample_id": 1270
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 4,
+          "extracted": 4,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 56
+        },
+        {
+          "precision": 0.3888888888888889,
+          "recall": 0.4666666666666667,
+          "f1": 0.42424242424242425,
+          "tp": 7,
+          "extracted": 18,
+          "gold": 15,
+          "extraction_method": "llm",
+          "sample_id": 839
+        },
+        {
+          "precision": 0.5217391304347826,
+          "recall": 0.631578947368421,
+          "f1": 0.5714285714285715,
+          "tp": 12,
+          "extracted": 23,
+          "gold": 19,
+          "extraction_method": "llm",
+          "sample_id": 1335
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 945
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 113
+        },
+        {
+          "precision": 0.625,
+          "recall": 0.22727272727272727,
+          "f1": 0.3333333333333333,
+          "tp": 5,
+          "extracted": 8,
+          "gold": 22,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1687
+        },
+        {
+          "precision": 0.48,
+          "recall": 0.5454545454545454,
+          "f1": 0.5106382978723404,
+          "tp": 12,
+          "extracted": 25,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1691
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 789
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.4,
+          "f1": 0.3076923076923077,
+          "tp": 2,
+          "extracted": 8,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 427
+        },
+        {
+          "precision": 0.4642857142857143,
+          "recall": 0.52,
+          "f1": 0.49056603773584906,
+          "tp": 13,
+          "extracted": 28,
+          "gold": 25,
+          "extraction_method": "llm",
+          "sample_id": 1272
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 918
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 3,
+          "extracted": 3,
+          "gold": 3,
+          "extraction_method": "llm",
+          "sample_id": 997
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.42857142857142855,
+          "f1": 0.375,
+          "tp": 3,
+          "extracted": 9,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 267
+        },
+        {
+          "precision": 0.32142857142857145,
+          "recall": 0.4090909090909091,
+          "f1": 0.36000000000000004,
+          "tp": 9,
+          "extracted": 28,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1751
+        },
+        {
+          "precision": 0.8333333333333334,
+          "recall": 0.2631578947368421,
+          "f1": 0.39999999999999997,
+          "tp": 5,
+          "extracted": 6,
+          "gold": 19,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1726
+        },
+        {
+          "precision": 0.375,
+          "recall": 0.4090909090909091,
+          "f1": 0.3913043478260869,
+          "tp": 9,
+          "extracted": 24,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1649
+        },
+        {
+          "precision": 0.3870967741935484,
+          "recall": 0.41379310344827586,
+          "f1": 0.39999999999999997,
+          "tp": 12,
+          "extracted": 31,
+          "gold": 29,
+          "extraction_method": "llm",
+          "sample_id": 1891
+        },
+        {
+          "precision": 0.25925925925925924,
+          "recall": 0.3333333333333333,
+          "f1": 0.2916666666666667,
+          "tp": 7,
+          "extracted": 27,
+          "gold": 21,
+          "extraction_method": "llm",
+          "sample_id": 1732
+        },
+        {
+          "precision": 0.23529411764705882,
+          "recall": 0.3333333333333333,
+          "f1": 0.27586206896551724,
+          "tp": 4,
+          "extracted": 17,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 1194
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.5,
+          "f1": 0.3333333333333333,
+          "tp": 3,
+          "extracted": 12,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 535
+        },
+        {
+          "precision": 0.42857142857142855,
+          "recall": 0.6666666666666666,
+          "f1": 0.5217391304347826,
+          "tp": 6,
+          "extracted": 14,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 713
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 10,
+          "extracted": 10,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 543
+        },
+        {
+          "precision": 0.3793103448275862,
+          "recall": 0.4782608695652174,
+          "f1": 0.4230769230769231,
+          "tp": 11,
+          "extracted": 29,
+          "gold": 23,
+          "extraction_method": "llm",
+          "sample_id": 1916
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 861
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 10,
+          "extracted": 10,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 986
+        },
+        {
+          "precision": 0.35,
+          "recall": 0.4666666666666667,
+          "f1": 0.4,
+          "tp": 7,
+          "extracted": 20,
+          "gold": 15,
+          "extraction_method": "llm",
+          "sample_id": 1362
+        },
+        {
+          "precision": 0.1111111111111111,
+          "recall": 0.25,
+          "f1": 0.15384615384615383,
+          "tp": 1,
+          "extracted": 9,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 634
+        },
+        {
+          "precision": 0.5142857142857142,
+          "recall": 0.5625,
+          "f1": 0.5373134328358209,
+          "tp": 18,
+          "extracted": 35,
+          "gold": 32,
+          "extraction_method": "llm",
+          "sample_id": 1994
+        },
+        {
+          "precision": 0.16666666666666666,
+          "recall": 0.25,
+          "f1": 0.2,
+          "tp": 1,
+          "extracted": 6,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 485
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 533
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 260
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 302
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 855
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 689
+        },
+        {
+          "precision": 0.23076923076923078,
+          "recall": 0.42857142857142855,
+          "f1": 0.3,
+          "tp": 3,
+          "extracted": 13,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 880
+        },
+        {
+          "precision": 0.4838709677419355,
+          "recall": 0.5357142857142857,
+          "f1": 0.5084745762711865,
+          "tp": 15,
+          "extracted": 31,
+          "gold": 28,
+          "extraction_method": "llm",
+          "sample_id": 1871
+        },
+        {
+          "precision": 0.7777777777777778,
+          "recall": 0.3333333333333333,
+          "f1": 0.4666666666666666,
+          "tp": 7,
+          "extracted": 9,
+          "gold": 21,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1302
+        },
+        {
+          "precision": 0.8,
+          "recall": 0.34782608695652173,
+          "f1": 0.48484848484848486,
+          "tp": 8,
+          "extracted": 10,
+          "gold": 23,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1803
+        },
+        {
+          "precision": 0.46153846153846156,
+          "recall": 0.5454545454545454,
+          "f1": 0.4999999999999999,
+          "tp": 6,
+          "extracted": 13,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 418
+        },
+        {
+          "precision": 0.75,
+          "recall": 0.3,
+          "f1": 0.4285714285714285,
+          "tp": 3,
+          "extracted": 4,
+          "gold": 10,
+          "extraction_method": "regex_fallback",
+          "sample_id": 344
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 197
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4375,
+          "f1": 0.37837837837837834,
+          "tp": 7,
+          "extracted": 21,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 1462
+        },
+        {
+          "precision": 0.5,
+          "recall": 0.5555555555555556,
+          "f1": 0.5263157894736842,
+          "tp": 15,
+          "extracted": 30,
+          "gold": 27,
+          "extraction_method": "llm",
+          "sample_id": 1936
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "regex_fallback",
+          "sample_id": 593
+        },
+        {
+          "precision": 0.2,
+          "recall": 0.3333333333333333,
+          "f1": 0.25,
+          "tp": 2,
+          "extracted": 10,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 272
+        },
+        {
+          "precision": 0.36363636363636365,
+          "recall": 0.6666666666666666,
+          "f1": 0.4705882352941177,
+          "tp": 4,
+          "extracted": 11,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 477
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 690
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.5714285714285714,
+          "f1": 0.47058823529411764,
+          "tp": 4,
+          "extracted": 10,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 779
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4166666666666667,
+          "f1": 0.3703703703703704,
+          "tp": 5,
+          "extracted": 15,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 632
+        },
+        {
+          "precision": 0.375,
+          "recall": 0.6,
+          "f1": 0.4615384615384615,
+          "tp": 3,
+          "extracted": 8,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 73
+        },
+        {
+          "precision": 0.391304347826087,
+          "recall": 0.42857142857142855,
+          "f1": 0.4090909090909091,
+          "tp": 9,
+          "extracted": 23,
+          "gold": 21,
+          "extraction_method": "llm",
+          "sample_id": 1581
+        },
+        {
+          "precision": 0.22727272727272727,
+          "recall": 0.29411764705882354,
+          "f1": 0.25641025641025644,
+          "tp": 5,
+          "extracted": 22,
+          "gold": 17,
+          "extraction_method": "llm",
+          "sample_id": 1285
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.3125,
+          "f1": 0.2777777777777778,
+          "tp": 5,
+          "extracted": 20,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 1576
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 31
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 9,
+          "extracted": 9,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 391
+        },
+        {
+          "precision": 0.35294117647058826,
+          "recall": 0.42857142857142855,
+          "f1": 0.3870967741935484,
+          "tp": 6,
+          "extracted": 17,
+          "gold": 14,
+          "extraction_method": "llm",
+          "sample_id": 1052
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.4444444444444444,
+          "f1": 0.4210526315789474,
+          "tp": 8,
+          "extracted": 20,
+          "gold": 18,
+          "extraction_method": "llm",
+          "sample_id": 1180
+        },
+        {
+          "precision": 1.0,
+          "recall": 0.38461538461538464,
+          "f1": 0.5555555555555556,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 13,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1295
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 11,
+          "extracted": 11,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 330
+        },
+        {
+          "precision": 0.5,
+          "recall": 0.18181818181818182,
+          "f1": 0.26666666666666666,
+          "tp": 2,
+          "extracted": 4,
+          "gold": 11,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1213
+        },
+        {
+          "precision": 0.8,
+          "recall": 0.34782608695652173,
+          "f1": 0.48484848484848486,
+          "tp": 8,
+          "extracted": 10,
+          "gold": 23,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1627
+        },
+        {
+          "precision": 0.26666666666666666,
+          "recall": 0.3076923076923077,
+          "f1": 0.28571428571428575,
+          "tp": 4,
+          "extracted": 15,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 773
+        },
+        {
+          "precision": 0.38461538461538464,
+          "recall": 0.45454545454545453,
+          "f1": 0.41666666666666663,
+          "tp": 10,
+          "extracted": 26,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1747
+        },
+        {
+          "precision": 0.4375,
+          "recall": 0.4827586206896552,
+          "f1": 0.4590163934426229,
+          "tp": 14,
+          "extracted": 32,
+          "gold": 29,
+          "extraction_method": "llm",
+          "sample_id": 1784
+        },
+        {
+          "precision": 0.6,
+          "recall": 0.21428571428571427,
+          "f1": 0.3157894736842105,
+          "tp": 3,
+          "extracted": 5,
+          "gold": 14,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1286
+        }
+      ]
+    },
+    {
+      "model": "gpt-5.4",
+      "n_valid": 95,
+      "precision": 0.5274,
+      "recall": 0.5983,
+      "f1": 0.5569,
+      "f1_std": 0.2879,
+      "per_sample": [
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 989
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 121
+        },
+        {
+          "precision": 0.2857142857142857,
+          "recall": 0.4,
+          "f1": 0.3333333333333333,
+          "tp": 2,
+          "extracted": 7,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 854
+        },
+        {
+          "precision": 0.46153846153846156,
+          "recall": 0.6,
+          "f1": 0.5217391304347826,
+          "tp": 6,
+          "extracted": 13,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 628
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.36363636363636365,
+          "f1": 0.34782608695652173,
+          "tp": 8,
+          "extracted": 24,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1553
+        },
+        {
+          "precision": 0.48,
+          "recall": 0.5454545454545454,
+          "f1": 0.5106382978723404,
+          "tp": 12,
+          "extracted": 25,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1697
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.5,
+          "f1": 0.4444444444444445,
+          "tp": 6,
+          "extracted": 15,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 158
+        },
+        {
+          "precision": 0.5333333333333333,
+          "recall": 0.5925925925925926,
+          "f1": 0.5614035087719299,
+          "tp": 16,
+          "extracted": 30,
+          "gold": 27,
+          "extraction_method": "llm",
+          "sample_id": 1993
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 16,
+          "extracted": 16,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 927
+        },
+        {
+          "precision": 0.35714285714285715,
+          "recall": 0.45454545454545453,
+          "f1": 0.4,
+          "tp": 5,
+          "extracted": 14,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 436
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 305
+        },
+        {
+          "precision": 0.21052631578947367,
+          "recall": 0.3076923076923077,
+          "f1": 0.25,
+          "tp": 4,
+          "extracted": 19,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 1343
+        },
+        {
+          "precision": 0.2857142857142857,
+          "recall": 0.5,
+          "f1": 0.36363636363636365,
+          "tp": 4,
+          "extracted": 14,
+          "gold": 8,
+          "extraction_method": "llm",
+          "sample_id": 316
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 16,
+          "extracted": 16,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 296
+        },
+        {
+          "precision": 0.375,
+          "recall": 0.46153846153846156,
+          "f1": 0.41379310344827586,
+          "tp": 6,
+          "extracted": 16,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 993
+        },
+        {
+          "precision": 0.4782608695652174,
+          "recall": 0.55,
+          "f1": 0.5116279069767442,
+          "tp": 11,
+          "extracted": 23,
+          "gold": 20,
+          "extraction_method": "llm",
+          "sample_id": 1321
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 791
+        },
+        {
+          "precision": 0.5,
+          "recall": 0.5555555555555556,
+          "f1": 0.5263157894736842,
+          "tp": 15,
+          "extracted": 30,
+          "gold": 27,
+          "extraction_method": "llm",
+          "sample_id": 1761
+        },
+        {
+          "precision": 0.42857142857142855,
+          "recall": 0.5,
+          "f1": 0.4615384615384615,
+          "tp": 6,
+          "extracted": 14,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 483
+        },
+        {
+          "precision": 0.2916666666666667,
+          "recall": 0.3684210526315789,
+          "f1": 0.32558139534883723,
+          "tp": 7,
+          "extracted": 24,
+          "gold": 19,
+          "extraction_method": "llm",
+          "sample_id": 1693
+        },
+        {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "extracted": 9,
+          "gold": 3,
+          "extraction_method": "llm",
+          "sample_id": 486
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.46153846153846156,
+          "f1": 0.42857142857142855,
+          "tp": 6,
+          "extracted": 15,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 198
+        },
+        {
+          "precision": 0.23076923076923078,
+          "recall": 0.42857142857142855,
+          "f1": 0.3,
+          "tp": 3,
+          "extracted": 13,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 726
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 12,
+          "extracted": 12,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 588
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.46153846153846156,
+          "f1": 0.42857142857142855,
+          "tp": 6,
+          "extracted": 15,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 897
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 557
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 1027
+        },
+        {
+          "precision": 0.3888888888888889,
+          "recall": 0.4666666666666667,
+          "f1": 0.42424242424242425,
+          "tp": 7,
+          "extracted": 18,
+          "gold": 15,
+          "extraction_method": "llm",
+          "sample_id": 839
+        },
+        {
+          "precision": 0.3,
+          "recall": 0.42857142857142855,
+          "f1": 0.3529411764705882,
+          "tp": 3,
+          "extracted": 10,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 823
+        },
+        {
+          "precision": 0.375,
+          "recall": 0.4090909090909091,
+          "f1": 0.3913043478260869,
+          "tp": 9,
+          "extracted": 24,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1649
+        },
+        {
+          "precision": 0.48,
+          "recall": 0.5454545454545454,
+          "f1": 0.5106382978723404,
+          "tp": 12,
+          "extracted": 25,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1691
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 12,
+          "extracted": 12,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 425
+        },
+        {
+          "precision": 0.47619047619047616,
+          "recall": 0.5555555555555556,
+          "f1": 0.5128205128205129,
+          "tp": 10,
+          "extracted": 21,
+          "gold": 18,
+          "extraction_method": "llm",
+          "sample_id": 1270
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 945
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 113
+        },
+        {
+          "precision": 0.5217391304347826,
+          "recall": 0.631578947368421,
+          "f1": 0.5714285714285715,
+          "tp": 12,
+          "extracted": 23,
+          "gold": 19,
+          "extraction_method": "llm",
+          "sample_id": 1335
+        },
+        {
+          "precision": 0.23076923076923078,
+          "recall": 0.2727272727272727,
+          "f1": 0.24999999999999994,
+          "tp": 6,
+          "extracted": 26,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1687
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 4,
+          "extracted": 4,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 56
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 789
+        },
+        {
+          "precision": 0.4642857142857143,
+          "recall": 0.52,
+          "f1": 0.49056603773584906,
+          "tp": 13,
+          "extracted": 28,
+          "gold": 25,
+          "extraction_method": "llm",
+          "sample_id": 1272
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 918
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 3,
+          "extracted": 3,
+          "gold": 3,
+          "extraction_method": "llm",
+          "sample_id": 997
+        },
+        {
+          "precision": 0.32142857142857145,
+          "recall": 0.4090909090909091,
+          "f1": 0.36000000000000004,
+          "tp": 9,
+          "extracted": 28,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1751
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.4,
+          "f1": 0.3076923076923077,
+          "tp": 2,
+          "extracted": 8,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 427
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.42857142857142855,
+          "f1": 0.375,
+          "tp": 3,
+          "extracted": 9,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 267
+        },
+        {
+          "precision": 0.2916666666666667,
+          "recall": 0.3684210526315789,
+          "f1": 0.32558139534883723,
+          "tp": 7,
+          "extracted": 24,
+          "gold": 19,
+          "extraction_method": "llm",
+          "sample_id": 1726
+        },
+        {
+          "precision": 0.25925925925925924,
+          "recall": 0.3333333333333333,
+          "f1": 0.2916666666666667,
+          "tp": 7,
+          "extracted": 27,
+          "gold": 21,
+          "extraction_method": "llm",
+          "sample_id": 1732
+        },
+        {
+          "precision": 0.3870967741935484,
+          "recall": 0.41379310344827586,
+          "f1": 0.39999999999999997,
+          "tp": 12,
+          "extracted": 31,
+          "gold": 29,
+          "extraction_method": "llm",
+          "sample_id": 1891
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.5,
+          "f1": 0.3333333333333333,
+          "tp": 3,
+          "extracted": 12,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 535
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 10,
+          "extracted": 10,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 986
+        },
+        {
+          "precision": 0.1,
+          "recall": 0.25,
+          "f1": 0.14285714285714288,
+          "tp": 1,
+          "extracted": 10,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 634
+        },
+        {
+          "precision": 0.23529411764705882,
+          "recall": 0.3333333333333333,
+          "f1": 0.27586206896551724,
+          "tp": 4,
+          "extracted": 17,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 1194
+        },
+        {
+          "precision": 0.42857142857142855,
+          "recall": 0.6666666666666666,
+          "f1": 0.5217391304347826,
+          "tp": 6,
+          "extracted": 14,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 713
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 10,
+          "extracted": 10,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 543
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 861
+        },
+        {
+          "precision": 0.16666666666666666,
+          "recall": 0.25,
+          "f1": 0.2,
+          "tp": 1,
+          "extracted": 6,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 485
+        },
+        {
+          "precision": 0.3793103448275862,
+          "recall": 0.4782608695652174,
+          "f1": 0.4230769230769231,
+          "tp": 11,
+          "extracted": 29,
+          "gold": 23,
+          "extraction_method": "llm",
+          "sample_id": 1916
+        },
+        {
+          "precision": 0.5142857142857142,
+          "recall": 0.5625,
+          "f1": 0.5373134328358209,
+          "tp": 18,
+          "extracted": 35,
+          "gold": 32,
+          "extraction_method": "llm",
+          "sample_id": 1994
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.5,
+          "f1": 0.4,
+          "tp": 5,
+          "extracted": 15,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 344
+        },
+        {
+          "precision": 0.35,
+          "recall": 0.4666666666666667,
+          "f1": 0.4,
+          "tp": 7,
+          "extracted": 20,
+          "gold": 15,
+          "extraction_method": "llm",
+          "sample_id": 1362
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 533
+        },
+        {
+          "precision": 0.4782608695652174,
+          "recall": 0.5238095238095238,
+          "f1": 0.5,
+          "tp": 11,
+          "extracted": 23,
+          "gold": 21,
+          "extraction_method": "llm",
+          "sample_id": 1302
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 302
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 689
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 855
+        },
+        {
+          "precision": 0.4838709677419355,
+          "recall": 0.5357142857142857,
+          "f1": 0.5084745762711865,
+          "tp": 15,
+          "extracted": 31,
+          "gold": 28,
+          "extraction_method": "llm",
+          "sample_id": 1871
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 260
+        },
+        {
+          "precision": 0.5,
+          "recall": 0.5555555555555556,
+          "f1": 0.5263157894736842,
+          "tp": 15,
+          "extracted": 30,
+          "gold": 27,
+          "extraction_method": "llm",
+          "sample_id": 1936
+        },
+        {
+          "precision": 0.375,
+          "recall": 0.6,
+          "f1": 0.4615384615384615,
+          "tp": 3,
+          "extracted": 8,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 73
+        },
+        {
+          "precision": 0.46153846153846156,
+          "recall": 0.5454545454545454,
+          "f1": 0.4999999999999999,
+          "tp": 6,
+          "extracted": 13,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 418
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4375,
+          "f1": 0.37837837837837834,
+          "tp": 7,
+          "extracted": 21,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 1462
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 197
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "regex_fallback",
+          "sample_id": 593
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.42857142857142855,
+          "f1": 0.3157894736842105,
+          "tp": 3,
+          "extracted": 12,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 880
+        },
+        {
+          "precision": 0.2,
+          "recall": 0.3333333333333333,
+          "f1": 0.25,
+          "tp": 2,
+          "extracted": 10,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 272
+        },
+        {
+          "precision": 0.36363636363636365,
+          "recall": 0.6666666666666666,
+          "f1": 0.4705882352941177,
+          "tp": 4,
+          "extracted": 11,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 477
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.5714285714285714,
+          "f1": 0.47058823529411764,
+          "tp": 4,
+          "extracted": 10,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 779
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 690
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4166666666666667,
+          "f1": 0.3703703703703704,
+          "tp": 5,
+          "extracted": 15,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 632
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.391304347826087,
+          "f1": 0.36,
+          "tp": 9,
+          "extracted": 27,
+          "gold": 23,
+          "extraction_method": "llm",
+          "sample_id": 1803
+        },
+        {
+          "precision": 0.391304347826087,
+          "recall": 0.42857142857142855,
+          "f1": 0.4090909090909091,
+          "tp": 9,
+          "extracted": 23,
+          "gold": 21,
+          "extraction_method": "llm",
+          "sample_id": 1581
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.3125,
+          "f1": 0.2777777777777778,
+          "tp": 5,
+          "extracted": 20,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 1576
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 31
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 9,
+          "extracted": 9,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 391
+        },
+        {
+          "precision": 0.34615384615384615,
+          "recall": 0.391304347826087,
+          "f1": 0.36734693877551017,
+          "tp": 9,
+          "extracted": 26,
+          "gold": 23,
+          "extraction_method": "llm",
+          "sample_id": 1627
+        },
+        {
+          "precision": 0.23809523809523808,
+          "recall": 0.29411764705882354,
+          "f1": 0.2631578947368421,
+          "tp": 5,
+          "extracted": 21,
+          "gold": 17,
+          "extraction_method": "llm",
+          "sample_id": 1285
+        },
+        {
+          "precision": 0.4375,
+          "recall": 0.4827586206896552,
+          "f1": 0.4590163934426229,
+          "tp": 14,
+          "extracted": 32,
+          "gold": 29,
+          "extraction_method": "llm",
+          "sample_id": 1784
+        },
+        {
+          "precision": 0.4444444444444444,
+          "recall": 0.6153846153846154,
+          "f1": 0.5161290322580646,
+          "tp": 8,
+          "extracted": 18,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 1295
+        },
+        {
+          "precision": 0.38461538461538464,
+          "recall": 0.45454545454545453,
+          "f1": 0.41666666666666663,
+          "tp": 10,
+          "extracted": 26,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1747
+        },
+        {
+          "precision": 0.35294117647058826,
+          "recall": 0.42857142857142855,
+          "f1": 0.3870967741935484,
+          "tp": 6,
+          "extracted": 17,
+          "gold": 14,
+          "extraction_method": "llm",
+          "sample_id": 1052
+        },
+        {
+          "precision": 0.26666666666666666,
+          "recall": 0.3076923076923077,
+          "f1": 0.28571428571428575,
+          "tp": 4,
+          "extracted": 15,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 773
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.4444444444444444,
+          "f1": 0.4210526315789474,
+          "tp": 8,
+          "extracted": 20,
+          "gold": 18,
+          "extraction_method": "llm",
+          "sample_id": 1180
+        },
+        {
+          "precision": 0.23529411764705882,
+          "recall": 0.36363636363636365,
+          "f1": 0.2857142857142857,
+          "tp": 4,
+          "extracted": 17,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 1213
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 11,
+          "extracted": 11,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 330
+        },
+        {
+          "precision": 0.2222222222222222,
+          "recall": 0.2857142857142857,
+          "f1": 0.25,
+          "tp": 4,
+          "extracted": 18,
+          "gold": 14,
+          "extraction_method": "llm",
+          "sample_id": 1286
+        }
+      ]
+    },
+    {
+      "model": "gpt-5.4-nano",
+      "n_valid": 95,
+      "precision": 0.5271,
+      "recall": 0.5851,
+      "f1": 0.548,
+      "f1_std": 0.2845,
+      "per_sample": [
+        {
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "f1": 0.8,
+          "tp": 2,
+          "extracted": 3,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 989
+        },
+        {
+          "precision": 0.2857142857142857,
+          "recall": 0.4,
+          "f1": 0.3333333333333333,
+          "tp": 2,
+          "extracted": 7,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 854
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 121
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 16,
+          "extracted": 16,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 927
+        },
+        {
+          "precision": 0.30434782608695654,
+          "recall": 0.3181818181818182,
+          "f1": 0.31111111111111117,
+          "tp": 7,
+          "extracted": 23,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1553
+        },
+        {
+          "precision": 0.4583333333333333,
+          "recall": 0.5,
+          "f1": 0.4782608695652174,
+          "tp": 11,
+          "extracted": 24,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1697
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.5,
+          "f1": 0.4444444444444445,
+          "tp": 6,
+          "extracted": 15,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 158
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 305
+        },
+        {
+          "precision": 0.23529411764705882,
+          "recall": 0.3076923076923077,
+          "f1": 0.26666666666666666,
+          "tp": 4,
+          "extracted": 17,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 1343
+        },
+        {
+          "precision": 0.5172413793103449,
+          "recall": 0.5555555555555556,
+          "f1": 0.5357142857142857,
+          "tp": 15,
+          "extracted": 29,
+          "gold": 27,
+          "extraction_method": "llm",
+          "sample_id": 1993
+        },
+        {
+          "precision": 0.9411764705882353,
+          "recall": 1.0,
+          "f1": 0.9696969696969697,
+          "tp": 16,
+          "extracted": 17,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 296
+        },
+        {
+          "precision": 0.375,
+          "recall": 0.46153846153846156,
+          "f1": 0.41379310344827586,
+          "tp": 6,
+          "extracted": 16,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 993
+        },
+        {
+          "precision": 0.4827586206896552,
+          "recall": 0.5185185185185185,
+          "f1": 0.5,
+          "tp": 14,
+          "extracted": 29,
+          "gold": 27,
+          "extraction_method": "llm",
+          "sample_id": 1761
+        },
+        {
+          "precision": 0.42857142857142855,
+          "recall": 0.5,
+          "f1": 0.4615384615384615,
+          "tp": 6,
+          "extracted": 14,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 483
+        },
+        {
+          "precision": 0.35714285714285715,
+          "recall": 0.45454545454545453,
+          "f1": 0.4,
+          "tp": 5,
+          "extracted": 14,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 436
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 791
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 1027
+        },
+        {
+          "precision": 0.3076923076923077,
+          "recall": 0.5,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 13,
+          "gold": 8,
+          "extraction_method": "llm",
+          "sample_id": 316
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 12,
+          "extracted": 12,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 588
+        },
+        {
+          "precision": 0.4782608695652174,
+          "recall": 0.55,
+          "f1": 0.5116279069767442,
+          "tp": 11,
+          "extracted": 23,
+          "gold": 20,
+          "extraction_method": "llm",
+          "sample_id": 1321
+        },
+        {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "extracted": 9,
+          "gold": 3,
+          "extraction_method": "llm",
+          "sample_id": 486
+        },
+        {
+          "precision": 0.3181818181818182,
+          "recall": 0.3684210526315789,
+          "f1": 0.3414634146341463,
+          "tp": 7,
+          "extracted": 22,
+          "gold": 19,
+          "extraction_method": "llm",
+          "sample_id": 1693
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.42857142857142855,
+          "f1": 0.3157894736842105,
+          "tp": 3,
+          "extracted": 12,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 726
+        },
+        {
+          "precision": 0.46153846153846156,
+          "recall": 0.6,
+          "f1": 0.5217391304347826,
+          "tp": 6,
+          "extracted": 13,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 628
+        },
+        {
+          "precision": 0.35714285714285715,
+          "recall": 0.38461538461538464,
+          "f1": 0.3703703703703704,
+          "tp": 5,
+          "extracted": 14,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 198
+        },
+        {
+          "precision": 0.3,
+          "recall": 0.42857142857142855,
+          "f1": 0.3529411764705882,
+          "tp": 3,
+          "extracted": 10,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 823
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 557
+        },
+        {
+          "precision": 0.1,
+          "recall": 0.06666666666666667,
+          "f1": 0.08,
+          "tp": 1,
+          "extracted": 10,
+          "gold": 15,
+          "extraction_method": "llm",
+          "sample_id": 839
+        },
+        {
+          "precision": 0.375,
+          "recall": 0.4090909090909091,
+          "f1": 0.3913043478260869,
+          "tp": 9,
+          "extracted": 24,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1649
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.46153846153846156,
+          "f1": 0.42857142857142855,
+          "tp": 6,
+          "extracted": 15,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 897
+        },
+        {
+          "precision": 0.4583333333333333,
+          "recall": 0.5,
+          "f1": 0.4782608695652174,
+          "tp": 11,
+          "extracted": 24,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1691
+        },
+        {
+          "precision": 0.47619047619047616,
+          "recall": 0.5555555555555556,
+          "f1": 0.5128205128205129,
+          "tp": 10,
+          "extracted": 21,
+          "gold": 18,
+          "extraction_method": "llm",
+          "sample_id": 1270
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 4,
+          "extracted": 4,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 56
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 945
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 12,
+          "extracted": 12,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 425
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 789
+        },
+        {
+          "precision": 0.2857142857142857,
+          "recall": 0.4,
+          "f1": 0.3333333333333333,
+          "tp": 2,
+          "extracted": 7,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 427
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 113
+        },
+        {
+          "precision": 0.5217391304347826,
+          "recall": 0.631578947368421,
+          "f1": 0.5714285714285715,
+          "tp": 12,
+          "extracted": 23,
+          "gold": 19,
+          "extraction_method": "llm",
+          "sample_id": 1335
+        },
+        {
+          "precision": 0.4642857142857143,
+          "recall": 0.52,
+          "f1": 0.49056603773584906,
+          "tp": 13,
+          "extracted": 28,
+          "gold": 25,
+          "extraction_method": "llm",
+          "sample_id": 1272
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 3,
+          "extracted": 3,
+          "gold": 3,
+          "extraction_method": "llm",
+          "sample_id": 997
+        },
+        {
+          "precision": 0.24,
+          "recall": 0.2727272727272727,
+          "f1": 0.2553191489361702,
+          "tp": 6,
+          "extracted": 25,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1687
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 918
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.42857142857142855,
+          "f1": 0.375,
+          "tp": 3,
+          "extracted": 9,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 267
+        },
+        {
+          "precision": 0.30434782608695654,
+          "recall": 0.3684210526315789,
+          "f1": 0.3333333333333333,
+          "tp": 7,
+          "extracted": 23,
+          "gold": 19,
+          "extraction_method": "llm",
+          "sample_id": 1726
+        },
+        {
+          "precision": 0.28,
+          "recall": 0.3333333333333333,
+          "f1": 0.30434782608695654,
+          "tp": 7,
+          "extracted": 25,
+          "gold": 21,
+          "extraction_method": "llm",
+          "sample_id": 1732
+        },
+        {
+          "precision": 0.3870967741935484,
+          "recall": 0.41379310344827586,
+          "f1": 0.39999999999999997,
+          "tp": 12,
+          "extracted": 31,
+          "gold": 29,
+          "extraction_method": "llm",
+          "sample_id": 1891
+        },
+        {
+          "precision": 0.32142857142857145,
+          "recall": 0.4090909090909091,
+          "f1": 0.36000000000000004,
+          "tp": 9,
+          "extracted": 28,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1751
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.5,
+          "f1": 0.3333333333333333,
+          "tp": 3,
+          "extracted": 12,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 535
+        },
+        {
+          "precision": 0.42857142857142855,
+          "recall": 0.6666666666666666,
+          "f1": 0.5217391304347826,
+          "tp": 6,
+          "extracted": 14,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 713
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 10,
+          "extracted": 10,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 986
+        },
+        {
+          "precision": 0.125,
+          "recall": 0.25,
+          "f1": 0.16666666666666666,
+          "tp": 1,
+          "extracted": 8,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 634
+        },
+        {
+          "precision": 0.35,
+          "recall": 0.4666666666666667,
+          "f1": 0.4,
+          "tp": 7,
+          "extracted": 20,
+          "gold": 15,
+          "extraction_method": "llm",
+          "sample_id": 1362
+        },
+        {
+          "precision": 0.23529411764705882,
+          "recall": 0.3333333333333333,
+          "f1": 0.27586206896551724,
+          "tp": 4,
+          "extracted": 17,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 1194
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 5,
+          "extracted": 5,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 861
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 533
+        },
+        {
+          "precision": 0.4857142857142857,
+          "recall": 0.53125,
+          "f1": 0.5074626865671641,
+          "tp": 17,
+          "extracted": 35,
+          "gold": 32,
+          "extraction_method": "llm",
+          "sample_id": 1994
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 10,
+          "extracted": 10,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 543
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.5,
+          "f1": 0.4,
+          "tp": 5,
+          "extracted": 15,
+          "gold": 10,
+          "extraction_method": "llm",
+          "sample_id": 344
+        },
+        {
+          "precision": 0.6153846153846154,
+          "recall": 0.34782608695652173,
+          "f1": 0.4444444444444444,
+          "tp": 8,
+          "extracted": 13,
+          "gold": 23,
+          "extraction_method": "llm",
+          "sample_id": 1916
+        },
+        {
+          "precision": 0.16666666666666666,
+          "recall": 0.25,
+          "f1": 0.2,
+          "tp": 1,
+          "extracted": 6,
+          "gold": 4,
+          "extraction_method": "llm",
+          "sample_id": 485
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 260
+        },
+        {
+          "precision": 0.23076923076923078,
+          "recall": 0.42857142857142855,
+          "f1": 0.3,
+          "tp": 3,
+          "extracted": 13,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 880
+        },
+        {
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "tp": 1,
+          "extracted": 2,
+          "gold": 1,
+          "extraction_method": "llm",
+          "sample_id": 302
+        },
+        {
+          "precision": 0.4782608695652174,
+          "recall": 0.5238095238095238,
+          "f1": 0.5,
+          "tp": 11,
+          "extracted": 23,
+          "gold": 21,
+          "extraction_method": "llm",
+          "sample_id": 1302
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 689
+        },
+        {
+          "precision": 0.46875,
+          "recall": 0.5357142857142857,
+          "f1": 0.5,
+          "tp": 15,
+          "extracted": 32,
+          "gold": 28,
+          "extraction_method": "llm",
+          "sample_id": 1871
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.4444444444444444,
+          "f1": 0.380952380952381,
+          "tp": 4,
+          "extracted": 12,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 855
+        },
+        {
+          "precision": 0.3333333333333333,
+          "recall": 0.391304347826087,
+          "f1": 0.36,
+          "tp": 9,
+          "extracted": 27,
+          "gold": 23,
+          "extraction_method": "llm",
+          "sample_id": 1803
+        },
+        {
+          "precision": 0.5,
+          "recall": 0.5555555555555556,
+          "f1": 0.5263157894736842,
+          "tp": 15,
+          "extracted": 30,
+          "gold": 27,
+          "extraction_method": "llm",
+          "sample_id": 1936
+        },
+        {
+          "precision": 0.46153846153846156,
+          "recall": 0.5454545454545454,
+          "f1": 0.4999999999999999,
+          "tp": 6,
+          "extracted": 13,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 418
+        },
+        {
+          "precision": 0.36363636363636365,
+          "recall": 0.6666666666666666,
+          "f1": 0.4705882352941177,
+          "tp": 4,
+          "extracted": 11,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 477
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 1,
+          "extracted": 1,
+          "gold": 1,
+          "extraction_method": "regex_fallback",
+          "sample_id": 593
+        },
+        {
+          "precision": 0.42857142857142855,
+          "recall": 0.6,
+          "f1": 0.5,
+          "tp": 3,
+          "extracted": 7,
+          "gold": 5,
+          "extraction_method": "llm",
+          "sample_id": 73
+        },
+        {
+          "precision": 0.5714285714285714,
+          "recall": 0.4444444444444444,
+          "f1": 0.5,
+          "tp": 4,
+          "extracted": 7,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 197
+        },
+        {
+          "precision": 0.7142857142857143,
+          "recall": 0.3125,
+          "f1": 0.43478260869565216,
+          "tp": 5,
+          "extracted": 7,
+          "gold": 16,
+          "extraction_method": "regex_fallback",
+          "sample_id": 1462
+        },
+        {
+          "precision": 0.2,
+          "recall": 0.3333333333333333,
+          "f1": 0.25,
+          "tp": 2,
+          "extracted": 10,
+          "gold": 6,
+          "extraction_method": "llm",
+          "sample_id": 272
+        },
+        {
+          "precision": 0.36363636363636365,
+          "recall": 0.38095238095238093,
+          "f1": 0.37209302325581395,
+          "tp": 8,
+          "extracted": 22,
+          "gold": 21,
+          "extraction_method": "llm",
+          "sample_id": 1581
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.5714285714285714,
+          "f1": 0.47058823529411764,
+          "tp": 4,
+          "extracted": 10,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 779
+        },
+        {
+          "precision": 0.23809523809523808,
+          "recall": 0.29411764705882354,
+          "f1": 0.2631578947368421,
+          "tp": 5,
+          "extracted": 21,
+          "gold": 17,
+          "extraction_method": "llm",
+          "sample_id": 1285
+        },
+        {
+          "precision": 0.2857142857142857,
+          "recall": 0.3333333333333333,
+          "f1": 0.30769230769230765,
+          "tp": 4,
+          "extracted": 14,
+          "gold": 12,
+          "extraction_method": "llm",
+          "sample_id": 632
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 7,
+          "extracted": 7,
+          "gold": 7,
+          "extraction_method": "llm",
+          "sample_id": 690
+        },
+        {
+          "precision": 0.34615384615384615,
+          "recall": 0.391304347826087,
+          "f1": 0.36734693877551017,
+          "tp": 9,
+          "extracted": 26,
+          "gold": 23,
+          "extraction_method": "llm",
+          "sample_id": 1627
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 9,
+          "extracted": 9,
+          "gold": 9,
+          "extraction_method": "llm",
+          "sample_id": 391
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 2,
+          "extracted": 2,
+          "gold": 2,
+          "extraction_method": "llm",
+          "sample_id": 31
+        },
+        {
+          "precision": 0.38461538461538464,
+          "recall": 0.45454545454545453,
+          "f1": 0.41666666666666663,
+          "tp": 10,
+          "extracted": 26,
+          "gold": 22,
+          "extraction_method": "llm",
+          "sample_id": 1747
+        },
+        {
+          "precision": 0.47058823529411764,
+          "recall": 0.6153846153846154,
+          "f1": 0.5333333333333333,
+          "tp": 8,
+          "extracted": 17,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 1295
+        },
+        {
+          "precision": 0.75,
+          "recall": 0.41379310344827586,
+          "f1": 0.5333333333333333,
+          "tp": 12,
+          "extracted": 16,
+          "gold": 29,
+          "extraction_method": "llm",
+          "sample_id": 1784
+        },
+        {
+          "precision": 0.25,
+          "recall": 0.3125,
+          "f1": 0.2777777777777778,
+          "tp": 5,
+          "extracted": 20,
+          "gold": 16,
+          "extraction_method": "llm",
+          "sample_id": 1576
+        },
+        {
+          "precision": 0.2222222222222222,
+          "recall": 0.2857142857142857,
+          "f1": 0.25,
+          "tp": 4,
+          "extracted": 18,
+          "gold": 14,
+          "extraction_method": "llm",
+          "sample_id": 1286
+        },
+        {
+          "precision": 0.4,
+          "recall": 0.4444444444444444,
+          "f1": 0.4210526315789474,
+          "tp": 8,
+          "extracted": 20,
+          "gold": 18,
+          "extraction_method": "llm",
+          "sample_id": 1180
+        },
+        {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "tp": 11,
+          "extracted": 11,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 330
+        },
+        {
+          "precision": 0.3125,
+          "recall": 0.35714285714285715,
+          "f1": 0.3333333333333333,
+          "tp": 5,
+          "extracted": 16,
+          "gold": 14,
+          "extraction_method": "llm",
+          "sample_id": 1052
+        },
+        {
+          "precision": 0.26666666666666666,
+          "recall": 0.3076923076923077,
+          "f1": 0.28571428571428575,
+          "tp": 4,
+          "extracted": 15,
+          "gold": 13,
+          "extraction_method": "llm",
+          "sample_id": 773
+        },
+        {
+          "precision": 0.26666666666666666,
+          "recall": 0.36363636363636365,
+          "f1": 0.30769230769230765,
+          "tp": 4,
+          "extracted": 15,
+          "gold": 11,
+          "extraction_method": "llm",
+          "sample_id": 1213
+        }
+      ]
+    }
+  ]
+}
