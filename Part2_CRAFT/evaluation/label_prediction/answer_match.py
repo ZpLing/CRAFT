@@ -537,19 +537,8 @@ def match_olympiadbench(pred: str, gold: str, answer_type: Optional[str] = None)
     return _scalar_equal(vp, vg)
 
 
-def normalise_label(label: Optional[str]) -> Optional[str]:
-    if not label:
-        return None
-    up = str(label).strip().upper()
-    if up in VALID_LABELS:
-        return up
-    if "DISPROVED" in up:
-        return "__DISPROVED__"
-    if "PROVED" in up:
-        return "__PROVED__"
-    return None
-
-
+# The label reader is shared with everything else that reads one.
+from extract_label import normalise_label  # noqa: E402
 def match_label(pred: str, gold: str, answer_type: Optional[str] = None) -> bool:
     """FLD / FOLIO: the answer is a label."""
     p, g = normalise_label(pred), normalise_label(gold)
