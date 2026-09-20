@@ -234,7 +234,7 @@ def main() -> None:
 
     dataset = (args.dataset if args.dataset
                else Path(__file__).resolve().parents[2]
-               / "dataset" / "label_prediction" / "logical" / "FLD.json")
+               / "dataset" / "FLD.json")
     with open(resolve_input(dataset), encoding="utf-8") as f:
         raw = json.load(f)
     rows = raw.get("results", raw) if isinstance(raw, dict) else raw

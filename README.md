@@ -26,7 +26,7 @@ traces score higher under ROSCOE, ReCEval and FineLogic.
 > replaced — both backbones had run out of room on them, a median 49/50 on GSM8K
 > and 46/50 on FOLIO, where no method can show a difference — by ProofWriter
 > depth-5 and Omni-MATH. The table is regenerated from the runs over the four
-> datasets now in `dataset/label_prediction/`.
+> datasets now in `dataset/`.
 
 ## Installation
 
@@ -69,15 +69,16 @@ configuration as written.
 
 ```bash
 cd Part2_CRAFT
-RUN=craft_runs/fld_gemini_100
+RUN=craft_runs/fld_gemini
 M1=framework/module1_generation_filtering
+K_TRACES=$RUN/k_traces_500_samples.json   # the name every downstream glob looks for
 
 # Module I — Multi-Trace Generation: K=5 traces at T=0.7
-python $M1/generate_traces.py --datasets dataset/label_prediction/logical/FLD.json \
-    --k 5 --temperature 0.7 --output $RUN/k_traces.json
+python $M1/generate_traces.py --datasets dataset/FLD.json \
+    --k 5 --temperature 0.7 --output $K_TRACES
 
 # Module I — Steps Filtering: z-score cutoff over the TF-IRF consensus terms
-python $M1/anomaly_filter.py --input $RUN/k_traces.json \
+python $M1/anomaly_filter.py --input $K_TRACES \
     --method unsupervised --z_score_threshold -1.0 --consensus_threshold 0.3 --output $RUN/cleaned_z.json
 
 # Module II — Consensus RKG Construction: per-trace graphs, edge/node filtering, aggregation
@@ -93,9 +94,13 @@ python framework/module3_synthesis/synthesize_trace.py --input $RUN/cleaned.json
     --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
 ```
 
-Omni-MATH and OlympiadBench take `--domain math` on every stage. `extract_terms.py` is not a
-pipeline stage — it dumps the TF-IRF terms for inspection, and the filters call its
-functions directly.
+One run directory holds one dataset: every stage after generation takes a single
+`--domain`, so Omni-MATH and OlympiadBench are run separately with `--domain math`
+on each. The file names above are the ones the evaluations glob for — a run
+directory is found by `k_traces_*_samples.json`, `cleaned_z*.json`, `cleaned.json`,
+`rkg*.json` and `synthesized.json` — so a stage renamed is a stage the evaluations
+cannot see. `extract_terms.py` is not a pipeline stage: it dumps the TF-IRF terms
+for inspection, and the filters call its functions directly.
 
 ## Repository layout
 
@@ -113,21 +118,20 @@ framework of §3.2.
 │   │   └── roscoe_experiment/       trace quality — Faithfulness, Informativeness, Grammar
 │   └── results/<model>/             prmbench/ and roscoe/, one directory per model
 ├── Part2_CRAFT/                     § 3.2  The CRAFT framework
-│   ├── dataset/                       mirrors evaluation/ below
-│   │   ├── label_prediction/
-│   │   │   ├── logical/             FLD (with its published proofs), ProofWriter
-│   │   │   └── math/                Omni-MATH, OlympiadBench
-│   │   └── reasoning_traces_quality/
-│   │       ├── roscoe/              CosmosQA, DROP, eSNLI, GSM8K (125 each)
-│   │       ├── receval/             FLD, FOLIO — the traces ReCEval scores
-│   │       └── finelogic/           FLD, FOLIO — the traces FineLogic scores
+│   ├── dataset/                       the four sets, flat — every experiment in
+│   │   ├── FLD.json                 this part runs on these and only these
+│   │   ├── ProofWriter.json         (logical; FLD carries its published proofs)
+│   │   ├── OmniMATH.json            (mathematical)
+│   │   └── OlympiadBench.json
 │   ├── framework/                     one package per module of §3.2
 │   │   ├── module1_generation_filtering/  Module I   — K traces, TF-IRF terms, z-score filter
 │   │   ├── module2_rkg_construction/      Module II  — per-trace RKGs, consensus RKG G*
 │   │   └── module3_synthesis/             Module III — topology-guided synthesis over G*
 │   ├── evaluation/
 │   │   ├── label_prediction/          main-table accuracy and its Wilson CIs
+│   │   │                              answer_match.py — one adapter per dataset
 │   │   ├── reasoning_traces_quality/  ReCEval/, ROSCOE/, FineLogic/ (§4)
+│   │   │                              dataset_adapters.py — the same four, for traces
 │   │   ├── ablation_study/            the six settings of the ablation table
 │   │   ├── hyperparameter_sensitivity/  accuracy and RKG size against K
 │   │   └── rkg_construct_robustness/  does the backbone change the extracted graph
@@ -208,16 +212,34 @@ The stages of the Quick start above run in order. Trace quality is then scored t
 ways (§4), each directory holding the same three roles — adapt a CRAFT run into the
 scorer's schema, score raw CoT against the synthesized trace, tabulate the result:
 
-| | scores | on | metrics |
-|---|---|---|---|
-| `ReCEval/` | entailment between steps | CRAFT's FLD / FOLIO traces | Entail, Contradict |
-| `FineLogic/` | each step, by LLM judge | CRAFT's FLD / FOLIO traces | All Valid, All Relevant, All Atomic |
-| `ROSCOE/` | trace quality | its own four sets | Grammar, Rep-Step, Rep-Word |
+| | scores | metrics |
+|---|---|---|
+| `ReCEval/` | entailment between steps | Entail, Contradict |
+| `FineLogic/` | each step, by LLM judge | All Valid, All Relevant, All Atomic |
+| `ROSCOE/` | trace quality | Grammar, Rep-Step, Rep-Word |
 
-ReCEval and FineLogic are metrics rather than benchmarks: they take whatever traces
-they are given, so `dataset/reasoning_traces_quality/{receval,finelogic}/` holds the
-FLD and FOLIO the traces are generated from, and the runs sample from those. ROSCOE
-brings its own annotated sets, so those are the data. ReCEval's one upstream file is
+All three are metrics rather than benchmarks — they score whatever traces they are
+given — so all three score the same traces, on the same four datasets, and this
+part introduces no data beyond them. The rollout that gives the main table its
+accuracy is the one they read: its first candidate trace is the raw CoT and its
+synthesized trace is CRAFT's, so `--dataset` is simply the `dataset/` file that
+run was generated from. ROSCOE's own annotated sets are not used here; its
+reference-based metrics need a reference chain none of these four carries, and
+the scorer drops them on its own, leaving the three reference-free ones the paper
+reports.
+
+The four benchmark datasets disagree about how a problem is stored — ProofWriter's
+facts are a list where FLD's are one string, and the mathematical two name their
+answer `answer` where the logical two name it `proof_label` — so each has an
+adapter, the way `label_prediction/answer_match.py` already gives each one a way
+to compare an answer. `reasoning_traces_quality/dataset_adapters.py` is that layer
+for traces: it hands every scorer the same four fields (premises, hypothesis,
+answer, the gold step count), and the three adapters beside it dispatch on the
+dataset a run recorded rather than guessing from the fields present. Only the two
+logical sets annotate a step count — FLD in its proof string, ProofWriter in
+`QDep` — so FineLogic's step-band rows cover those two and its overall row covers
+all four. FLD's own proofs run 1–7 steps, so the [10, 20] band FineLogic's paper
+reports on is empty on this selection and [1–9] is the one that covers it. ReCEval's one upstream file is
 vendored (MIT, notice in the file) and its PVI checkpoints download separately;
 ROSCOE fetches upstream's two scoring files on first use; FineLogic's step evaluator
 is our natural-language adaptation of upstream's, and judges with
@@ -231,7 +253,7 @@ python evaluation/label_prediction/evaluate_accuracy.py score --input $RUN/synth
 
 # reasoning trace quality — pair raw CoT with the CRAFT trace, score, tabulate
 python $RTQ/ReCEval/receval_adapter_craft.py   --craft_dir $RUN \
-    --dataset dataset/reasoning_traces_quality/receval/FLD.json \
+    --dataset dataset/FLD.json \
     --output receval_eval/receval_inputs/<run>.json
 python $RTQ/ReCEval/receval_evaluate_traces.py --input receval_eval/receval_inputs/<run>.json \
     --score_keys entail contradict --K 0 --output receval_eval/receval_scores/<run>.json
@@ -239,29 +261,26 @@ python $RTQ/ReCEval/receval_build_table.py     --scores "FLD / Gemini-3.1-flash-
     --metrics entail contradict --latex_out receval_eval/receval_scores/receval_craft_table.tex
 ```
 
-ROSCOE scores its own four sets, so CRAFT runs on those first and the same three
-steps follow — adapt, score, tabulate:
+ROSCOE reads the same run, and the same three steps follow — adapt, score, tabulate.
+Scoring needs about 5 GB of local models, so it is the half that usually runs
+elsewhere:
 
 ```bash
 ROS=$RTQ/ROSCOE
-RRUN=roscoe_craft/gemini
 
-python $M1/generate_traces.py --datasets dataset/reasoning_traces_quality/roscoe/*.jsonl \
-    --k 5 --temperature 0.7 --output $RRUN/k_traces.json
-# ... the same Module I/II/III stages as the Quick start ...
-
-python $ROS/roscoe_adapter_craft.py --craft_dir $RRUN --output_dir $RRUN/roscoe_export
-python $ROS/roscoe_score.py         --export_dir $RRUN/roscoe_export
-python $ROS/roscoe_build_table.py   --summaries "Gemini-3.1-flash-lite:$RRUN/roscoe_export/evaluation_results.json" \
-    --latex_out $RRUN/roscoe_craft_table.tex
+python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json \
+    --output_dir $RUN/roscoe_export
+python $ROS/roscoe_score.py         --export_dir $RUN/roscoe_export
+python $ROS/roscoe_build_table.py   --summaries "Gemini-3.1-flash-lite:$RUN/roscoe_export/evaluation_results.json" \
+    --latex_out $RUN/roscoe_craft_table.tex
 ```
 
-FineLogic follows the same three steps over a CRAFT run on FLD or FOLIO:
+FineLogic follows the same three steps over a CRAFT run on FLD:
 
 ```bash
 FL=$RTQ/FineLogic
 python $FL/finelogic_adapter_craft.py --craft_dir $RUN \
-    --dataset dataset/reasoning_traces_quality/finelogic/FLD.json \
+    --dataset dataset/FLD.json \
     --output_dir finelogic/<run> --max_samples 50
 for side in raw craft; do
   python $FL/finelogic_eval_steps.py --input finelogic/<run>/FLD_$side.json \

@@ -38,8 +38,9 @@ METRICS: List[Tuple[str, str, bool]] = [
     ("Rep-Word", "repetition_word", False),
 ]
 
-DATASET_LABEL = {"cosmos": "CosmosQA", "drop": "DROP", "esnli": "eSNLI", "gsm8k": "GSM8k"}
-DATASET_ORDER = ["cosmos", "drop", "esnli", "gsm8k"]
+DATASET_LABEL = {"FLD": "FLD", "ProofWriter": "ProofWriter",
+                 "OmniMATH": "Omni-MATH", "OlympiadBench": "OlympiadBench"}
+DATASET_ORDER = ["FLD", "ProofWriter", "OmniMATH", "OlympiadBench"]
 
 
 def load_summary(path: Path) -> Dict[str, Any]:
@@ -86,7 +87,7 @@ def main() -> None:
     ap.add_argument("--summaries", nargs="+", required=True,
                     help="One 'Model label:evaluation_results.json' per model, in table order")
     ap.add_argument("--datasets", nargs="+", default=None,
-                    help="Datasets to include (default: cosmos drop esnli gsm8k, those present)")
+                    help="Datasets to include (default: the benchmark's four, those present)")
     ap.add_argument("--latex_out", default=None,
                     help="Also write the LaTeX table body here")
     args = ap.parse_args()

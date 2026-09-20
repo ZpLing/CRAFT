@@ -13,8 +13,8 @@ Example:
         --scores \\
             "FLD / GPT-5.4-nano:scores/fld_nano.json" \\
             "FLD / Gemini-3.1-flash-lite:scores/fld_gemini.json" \\
-            "FOLIO / GPT-5.4-nano:scores/folio_nano.json" \\
-            "FOLIO / Gemini-3.1-flash-lite:scores/folio_gemini.json" \\
+            "ProofWriter / GPT-5.4-nano:scores/proofwriter_nano.json" \\
+            "ProofWriter / Gemini-3.1-flash-lite:scores/proofwriter_gemini.json" \\
         --metrics entail contradict \\
         --latex_out receval_table.tex
 """

@@ -394,7 +394,7 @@ _BARE_EQUATION = re.compile(
 )
 
 
-# Logical predicate applications: Pred(arg), optionally negated. FLD and FOLIO carry a
+# Logical predicate applications: Pred(arg), optionally negated. FLD and ProofWriter carry a
 # step's content in these -- 33% of logical steps contain at least one -- and the word
 # tokenizer below either breaks the binding (can_read(Mike) becomes can_read plus mike, so
 # it collides with took_bar(Mike)) or loses the term outright when the predicate or the

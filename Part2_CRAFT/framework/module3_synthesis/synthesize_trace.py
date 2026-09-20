@@ -2045,7 +2045,7 @@ def main():
         help=(
             "For logical domain RKG synthesis: use the RKG consensus node_text "
             "directly for conclusion nodes instead of LLM re-generation. "
-            "Recommended for complex FOL tasks (FOLIO) where synthesis accuracy "
+            "Recommended for complex FOL tasks where synthesis accuracy "
             "falls below MV baseline. NOT recommended for FLD where synthesis "
             "already beats MV through reference-guided intermediate steps."
         ),

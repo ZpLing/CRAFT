@@ -3,7 +3,7 @@
 generate_traces.py  (Module I — Multi-Trace Generation)
 ---------------------------------------------------------------------------
 Rolls out the K candidate traces the rest of CRAFT reaches consensus over.
-Generate k diverse reasoning traces per sample from FLD/FOLIO datasets.
+Generate k diverse reasoning traces per sample from the benchmark datasets.
 
 Key features:
 - Loads unified-format logical reasoning datasets
@@ -83,7 +83,7 @@ REASONING_VISIBLE_TOKENS: int   = int(os.getenv("REASONING_VISIBLE_TOKENS", "409
 
 # Relative — resolved under the results root by _cfg.resolve_output()
 DEFAULT_OUTPUT_PATH = Path("generated_k_traces_reasoning.json")
-DEFAULT_DATASET_PATH = _cfg.DATASET_ROOT / "label_prediction" / "logical" / "FLD.json"
+DEFAULT_DATASET_PATH = _cfg.DATASET_ROOT / "FLD.json"
 
 HEADERS = {
     "Authorization": f"Bearer {OPENAI_API_KEY or ''}",

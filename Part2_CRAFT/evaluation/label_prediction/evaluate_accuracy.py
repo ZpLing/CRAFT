@@ -30,7 +30,7 @@ Two entry points remain, because they are two questions:
         --input craft_runs/<run>/synthesized.json --source synthesized
 
     python evaluate_accuracy.py ablation \\
-        --datasets dataset/label_prediction/logical/FLD.json \\
+        --datasets dataset/FLD.json \\
         --k_traces_file $RUN/k_traces.json --synthesized_rkg $RUN/synthesized.json
 """
 
@@ -131,7 +131,7 @@ def compute_metrics(samples: List[Dict]) -> Dict[str, Any]:
         precision = correct / total_predicted if total_predicted > 0 else 0.0
         # No F1 on the math datasets: there are no classes to average over,
         # and 2PA/(P+A) equals the accuracy whenever every sample is answered.
-        # FLD and FOLIO keep a real macro-F1 over PROVED/DISPROVED.
+        # FLD and ProofWriter keep a real macro-F1 over PROVED/DISPROVED.
         return {
             "accuracy":    round(accuracy, 4),
             "macro_f1":    None,
@@ -238,7 +238,7 @@ def print_metrics(m: Dict, label: str = "", indent: str = "") -> None:
         print(f"{indent}  Metric           : exact-match on numeric answer")
     else:
         if m.get("macro_f1") is None:
-            print(f"{indent}  Macro-F1         : FLD/FOLIO only")
+            print(f"{indent}  Macro-F1         : logical datasets only")
         else:
             print(f"{indent}  Macro-F1         : {m['macro_f1']:.4f}")
     print(f"{indent}  Avg steps/trace  : {m['avg_steps']:.2f} ± {m['std_steps']:.2f}")
@@ -264,8 +264,8 @@ def print_metrics(m: Dict, label: str = "", indent: str = "") -> None:
 def _infer_dataset(sample_id: str) -> str:
     if "FLD" in sample_id or "Dataset1" in sample_id or "dataset1" in sample_id:
         return "FLD"
-    if "FOLIO" in sample_id or "Dataset2" in sample_id or "dataset2" in sample_id:
-        return "FOLIO"
+    if "ProofWriter" in sample_id or "Dataset2" in sample_id or "dataset2" in sample_id:
+        return "ProofWriter"
     return "unknown"
 
 
@@ -541,7 +541,7 @@ Examples:
 def load_raw_dataset(paths: List[Path], seed: int = 42, per_dataset: int = 250) -> List[Dict]:
     """Load datasets with domain-aware handling.
 
-    Logical domain (FLD/FOLIO):
+    Logical domain (FLD/ProofWriter):
       - Balance to per_dataset/2 PROVED + per_dataset/2 DISPROVED per file.
 
     Math domain (GSM8K, detected via 'domain'=='math' or 'answer' field present):
