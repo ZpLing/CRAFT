@@ -449,9 +449,9 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--input", required=True,
                    help="Adapted samples from finelogic_adapter_craft.py")
-    p.add_argument("--output_detail", default="CRAFT_evaluation_results/reasoning_traces_quality/FineLogic/step_detail.json",
+    p.add_argument("--output_detail", default="CRAFT_results/reasoning_traces_quality/FineLogic/step_detail.json",
                    help="Per-step judgements; relative paths resolve under the results root")
-    p.add_argument("--output_summary", default="CRAFT_evaluation_results/reasoning_traces_quality/FineLogic/step_summary.json")
+    p.add_argument("--output_summary", default="CRAFT_results/reasoning_traces_quality/FineLogic/step_summary.json")
     p.add_argument("--judge", nargs="+", default=None,
                    help=f"Judge models in preference order (default: {' '.join(MODELS)})")
     p.add_argument("--concurrency", type=int, default=50)

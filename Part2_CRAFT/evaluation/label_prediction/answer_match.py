@@ -156,6 +156,24 @@ _FUNCS = {
 _IDENT_RE = re.compile(r"\b([A-Za-z][A-Za-z0-9_]*)\b")
 
 
+class _InertFactorial(sympy.Function):
+    """factorial that does not compute itself.
+
+    sympy evaluates factorial(1009) while the expression is being constructed,
+    inside Function.__new__ — parse_expr's evaluate=False does not reach it,
+    because that flag governs arithmetic and not function construction. The
+    value is some 2600 digits obtained by recursive swinging, and deciding
+    whether two answers match never needs a digit of it. Left inert, two
+    factorials compare by their arguments, which is the right comparison and is
+    immediate.
+    """
+    nargs = 1
+
+    @classmethod
+    def eval(cls, n):
+        return None          # never evaluate
+
+
 def _symbol_dict(text: str) -> dict:
     """Bind every identifier that is not a function to a plain Symbol.
 
@@ -164,8 +182,12 @@ def _symbol_dict(text: str) -> dict:
     holds for E, I, S, O, beta, gamma and zeta, all of which appear in this
     dataset as ordinary variables.
     """
-    return {name: sympy.Symbol(name)
-            for name in set(_IDENT_RE.findall(text)) if name not in _FUNCS}
+    d = {name: sympy.Symbol(name)
+         for name in set(_IDENT_RE.findall(text)) if name not in _FUNCS}
+    # standard_transformations turns "1009!" into factorial(1009); bind the name
+    # so the parser builds the inert one.
+    d["factorial"] = _InertFactorial
+    return d
 
 
 def _resolve_logbase(s: str) -> str:
@@ -344,19 +366,40 @@ def _scalar_equal(a, b, gold_text: Optional[str] = None) -> bool:
     """Same number, or the same expression written differently."""
     if a is None or b is None:
         return False
-    # Exact first. It settles the values a float cannot hold, and it is what
-    # decides two unevaluated expressions that are structurally the same.
+    # Structural equality is free and settles most matches.
     try:
         if a == b:
             return True
-        if sympy.simplify(a - b) == 0:
-            return True
-        # Not equal exactly is not the answer: gold is sometimes a rounded
-        # decimal and the numeric comparison below is what forgives that. Only
-        # equality is settled here.
     except Exception:
         pass
+
     fa, fb = _num(a), _num(b)
+
+    # Two numbers are decided numerically. Handing them to simplify instead
+    # costs a symbolic pass to learn what subtraction already knew, and that
+    # pass is the expensive one — it is what made a comparison take seconds.
+    if fa is None or fb is None:
+        both_numeric = False
+        try:
+            both_numeric = bool(getattr(a, "is_number", False) and getattr(b, "is_number", False))
+        except Exception:
+            both_numeric = False
+        if both_numeric:
+            # Values a float cannot hold: subtract exactly, which is cheap for
+            # integers and factorials left inert.
+            try:
+                with _deadline(1.0):
+                    return bool((a - b).simplify() == 0)
+            except Exception:
+                return False
+        # Symbolic on at least one side: simplify is the only way to tell
+        # n(n-1) from n**2-n, and it is bounded so it cannot stall a run.
+        try:
+            with _deadline(1.0):
+                return bool(sympy.simplify(a - b) == 0)
+        except Exception:
+            return False
+
     if fa is not None and fb is not None:
         if fa == fb:
             return True
@@ -368,16 +411,6 @@ def _scalar_equal(a, b, gold_text: Optional[str] = None) -> bool:
         if d is not None and round(fa, d) == round(fb, d):
             return True
         return False
-    if fa is None and fb is None:
-        try:
-            if a == b:
-                return True
-            d = sympy.simplify(a - b)
-            if d == 0:
-                return True
-            return bool(sympy.simplify(sympy.Eq(a, b)) is sympy.true)
-        except Exception:
-            return False
     return False
 
 
@@ -542,13 +575,13 @@ class _Stalled(Exception):
     pass
 
 
-def _deadline(seconds: float = 5.0):
+def _deadline(seconds: float = 2.0):
     """Stop a comparison that will not finish.
 
-    Symbolic work on an adversarial expression has no useful bound — a factorial
-    of a four-digit number, a deeply nested radical — and a scorer that does not
-    return stops the run that called it. Five seconds is far past anything a
-    real answer needs; what exceeds it is not a close call.
+    Symbolic work on an adversarial expression has no useful bound, and a
+    scorer that does not return stops the run that called it. Two seconds is
+    far past anything a real answer needs — the slowest measured is 50 ms —
+    and it is paid per comparison, so it has to be small.
     """
     import contextlib
     import signal as _sig

@@ -107,7 +107,7 @@ def main() -> None:
                     help="CRAFT run directory (k_traces_*_samples.json + synthesized*.json)")
     ap.add_argument("--dataset", default="dataset/reasoning_traces_quality/roscoe",
                     help="Directory of the ROSCOE .jsonl sets the run was generated from")
-    ap.add_argument("--output_dir", default="CRAFT_evaluation_results/reasoning_traces_quality/ROSCOE",
+    ap.add_argument("--output_dir", default="CRAFT_results/reasoning_traces_quality/ROSCOE",
                     help="Where the {dataset}_{raw,craft}.jsonl pairs are written; "
                          "a relative path resolves under the results root")
     ap.add_argument("--synth_file", default=None,

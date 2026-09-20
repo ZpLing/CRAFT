@@ -19,7 +19,7 @@ Part2_CRAFT/results/*
 !Part2_CRAFT/results/baseline_results/
 # The analyses behind the appendix are small — kilobytes — and are what the
 # appendix numbers are read from, so they are tracked too.
-!Part2_CRAFT/results/CRAFT_evaluation_results/
+!Part2_CRAFT/results/CRAFT_results/
 # Backups the eviction tool leaves behind are working files, not results.
 *.bak
 *.jsonl.bak
@@ -73,3 +73,4 @@ Thumbs.db
 
 # ── Filtering statistics — a local check, not part of the pipeline ───
 Part2_CRAFT/evaluation/filtering_stats/
+Part2_CRAFT/results/CRAFT_results/filtering_stats/
