@@ -31,11 +31,11 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 try:
     from config import DATASET_ROOT
 except ImportError:
-    DATASET_ROOT = Path(__file__).resolve().parents[2] / "dataset"
+    DATASET_ROOT = Path(__file__).resolve().parents[3] / "dataset"
 
 HF_DATASET = "hitachi-nlp/FLD.v2"
 SPLITS = ("train", "validation", "test")

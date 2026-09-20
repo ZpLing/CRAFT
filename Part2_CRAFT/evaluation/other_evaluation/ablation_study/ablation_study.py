@@ -39,7 +39,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 try:
     from config import resolve_input, resolve_output, run_model
 except ImportError:
@@ -48,7 +48,7 @@ except ImportError:
     def run_model(*paths):  # noqa: D103
         return "unknown-model"
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]
                        / "evaluation" / "label_prediction"))
 from evaluate_accuracy import LOADERS, compute_metrics
 
@@ -87,7 +87,7 @@ def main() -> None:
                     help="The full run's synthesis output (default: synthesized*.json in --craft_dir)")
     ap.add_argument("--output", default=None,
                     help="Write the table as JSON here. Default: "
-                         "CRAFT_results/ablation_study/<model>/ablation_study.json under the results "
+                         "CRAFT_results/other_results/ablation_study/<model>/ablation_study.json under the results "
                          "root, with the model read from the run's own metadata")
     args = ap.parse_args()
 
@@ -140,7 +140,7 @@ def main() -> None:
 
     model = run_model(synth_path, k_path)
     out = Path(resolve_output(args.output
-                              or f"CRAFT_results/ablation_study/{model}/ablation_study.json"))
+                              or f"CRAFT_results/other_results/ablation_study/{model}/ablation_study.json"))
     out.write_text(json.dumps(
         {"craft_dir": str(run_dir), "full_accuracy": full_acc,
          "settings": {n: {**rows[n],

@@ -27,7 +27,7 @@ whose antecedent list is empty by design — that step introduces an assumption
 instead of deriving anything, so it has no incoming edges. `int` and `assump`
 are separate numbering schemes, and int1 is not assump1.
 
-Two files come out, into <results root>/CRAFT_results/rkg_construct_robustness/ by default.
+Two files come out, into <results root>/CRAFT_results/other_results/rkg_construct_robustness/ by default.
 They are
 FLD's annotations rather than any model's output, so they sit above the per-model
 directories:
@@ -37,8 +37,8 @@ directories:
 Usage:
     python build_gold_edges.py --dataset FLD_with_proofs.json
     python ../../framework/module2_rkg_construction/build_rkg.py \\
-        --input CRAFT_results/rkg_construct_robustness/gold_traces.json --model <backbone> \\
-        --output CRAFT_results/rkg_construct_robustness/<backbone>/rkg.json
+        --input CRAFT_results/other_results/rkg_construct_robustness/gold_traces.json --model <backbone> \\
+        --output CRAFT_results/other_results/rkg_construct_robustness/<backbone>/rkg.json
 """
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 try:
     from config import resolve_input, resolve_output
 except ImportError:
@@ -225,7 +225,7 @@ def main() -> None:
     ap.add_argument("--dataset", default=None,
                     help="An FLD file carrying `proofs` (fetch_fld_proofs.py adds it) "
                          "or the older nl_solution. Default: the repo's FLD.json")
-    ap.add_argument("--output_dir", default="CRAFT_results/rkg_construct_robustness",
+    ap.add_argument("--output_dir", default="CRAFT_results/other_results/rkg_construct_robustness",
                     help="Where gold_traces.json and gold_edges.json are written "
                          "(relative paths land under the results root)")
     ap.add_argument("--max_samples", type=int, default=None)
@@ -233,7 +233,7 @@ def main() -> None:
     args = ap.parse_args()
 
     dataset = (args.dataset if args.dataset
-               else Path(__file__).resolve().parents[2]
+               else Path(__file__).resolve().parents[3]
                / "dataset" / "FLD.json")
     with open(resolve_input(dataset), encoding="utf-8") as f:
         raw = json.load(f)

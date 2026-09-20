@@ -130,15 +130,19 @@ framework of §3.2.
 │   │   │                              answer_match.py — one adapter per dataset
 │   │   ├── reasoning_traces_quality/  ROSCOE/, FineLogic/ (§4)
 │   │   │                              dataset_adapters.py — the same four, for traces
-│   │   ├── ablation_study/            the six settings of the ablation table
-│   │   ├── hyperparameter_sensitivity/  accuracy and RKG size against K
-│   │   └── rkg_construct_robustness/  does the backbone change the extracted graph
+│   │   ├── filtering_stats/           how much each filtering pass removes
+│   │   └── other_evaluation/          the analyses behind the appendix
+│   │       ├── ablation_study/        the six settings of the ablation table
+│   │       ├── hyperparameter_sensitivity/  accuracy and RKG size against K
+│   │       └── rkg_construct_robustness/  does the backbone change the graph
 │   └── results/
 │       ├── baseline_results/<model>/<baseline>/  the 13 main-table baselines,
 │       │                            one directory each: results.json and traces.jsonl
 │       └── CRAFT_results/  mirrors evaluation/ above, one directory
-│                                    per experiment, so a result sits where its
-│                                    code does
+│           ├── label_prediction/     per experiment, so a result sits where its
+│           ├── reasoning_traces_quality/  code does — including other_results/,
+│           ├── filtering_stats/      which mirrors other_evaluation/
+│           └── other_results/
 └── config.py                        API credentials (local only, git-ignored)
 ```
 
