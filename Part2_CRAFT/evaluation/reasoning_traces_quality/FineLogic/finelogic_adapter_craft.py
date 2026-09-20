@@ -12,13 +12,15 @@ which is what finelogic_eval_steps.py reads. Each record is
     {"problem": {"input", "proof_label", "original_data"},
      "responses": [{"model", "prompt_style", "response"}]}
 
-`original_data.steps` is the dataset's own step count, which the table builder
-uses to restrict to the 10–20 step band FineLogic reports on.
+`original_data.steps` is the dataset's own gold step count, which the table
+builder uses to restrict to a step band. Each dataset records it differently —
+FLD in the proof string, ProofWriter in QDep, and the two mathematical sets not
+at all — so dataset_adapters.py reads it, one adapter per dataset.
 
 Usage:
     python finelogic_adapter_craft.py \\
         --craft_dir  craft_runs/fld_nano \\
-        --dataset    dataset/reasoning_traces_quality/finelogic/FLD.json \\
+        --dataset    dataset/FLD.json \\
         --output_dir finelogic/fld_nano
 """
 
@@ -36,6 +38,9 @@ try:
 except ImportError:
     resolve_input = resolve_output = Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from dataset_adapters import adapt
+
 
 def load_records(path: Path) -> List[Dict[str, Any]]:
     with open(path, encoding="utf-8") as f:
@@ -43,24 +48,35 @@ def load_records(path: Path) -> List[Dict[str, Any]]:
     return raw.get("results", raw) if isinstance(raw, dict) else raw
 
 
-def original_data_for(source: Optional[Dict[str, Any]]) -> Dict[str, Any]:
-    """FineLogic reads the reference step count from here; FLD stores it as a string."""
+def original_data_for(source: Optional[Dict[str, Any]],
+                      dataset: str = "") -> Dict[str, Any]:
+    """FineLogic reads the gold step count from here.
+
+    A dataset that records one has it read by its own adapter: FLD's is the
+    number of derivations in its proof string, ProofWriter's is QDep. The two
+    mathematical sets annotate no step count, and report "unknown" rather than a
+    number guessed from the reference solution — the table builder drops those
+    from the step-band rows and still counts them in the overall row.
+    """
     od = (source or {}).get("original_data")
-    if isinstance(od, dict):
-        if "steps" not in od:
-            od = {**od, "steps": "unknown"}
+    if isinstance(od, dict) and od.get("steps") is not None:
         return od
     steps = (source or {}).get("steps")
-    return {"steps": steps if steps is not None else "unknown"}
+    if steps is None and source is not None:
+        steps = adapt(source, dataset).reference_steps
+    base = dict(od) if isinstance(od, dict) else {}
+    base["steps"] = steps if steps is not None else "unknown"
+    return base
 
 
 def record(problem_input: str, label: Any, source: Optional[Dict[str, Any]],
-           response: str, model: str, prompt_style: str, sample_id: Any) -> Dict[str, Any]:
+           response: str, model: str, prompt_style: str, sample_id: Any,
+           dataset: str = "") -> Dict[str, Any]:
     return {
         "problem": {
             "input": problem_input,
             "proof_label": label,
-            "original_data": original_data_for(source),
+            "original_data": original_data_for(source, dataset),
         },
         "responses": [{"model": model, "prompt_style": prompt_style, "response": response}],
         "_sample_id": sample_id,
@@ -82,7 +98,8 @@ def main() -> None:
     ap.add_argument("--craft_dir", required=True,
                     help="CRAFT run directory (k_traces_*_samples.json + synthesized*.json)")
     ap.add_argument("--dataset", required=True,
-                    help="The FLD.json / ProofWriter.json the run was generated from")
+                    help="The dataset JSON the run was generated from; its name picks "
+                         "the adapter that reads the gold step count")
     ap.add_argument("--output_dir", default="CRAFT_results/reasoning_traces_quality/FineLogic",
                     help="Where the {dataset}_{raw,craft}.json pair is written; "
                          "a relative path resolves under the results root")
@@ -143,10 +160,11 @@ def main() -> None:
             break
 
         label = rec.get("target_answer")
+        dataset = rec.get("source_dataset") or args.dataset
         raw_out.append(record(problem_input, label, source, raw_text,
-                              gen_model, "raw_cot", sid))
+                              gen_model, "raw_cot", sid, dataset))
         craft_out.append(record(problem_input, synth.get("ground_truth", label), source,
-                                craft_text, gen_model, "rkg_synthesis", sid))
+                                craft_text, gen_model, "rkg_synthesis", sid, dataset))
 
     stem = dataset_path.stem
     out_dir = Path(resolve_output(args.output_dir))

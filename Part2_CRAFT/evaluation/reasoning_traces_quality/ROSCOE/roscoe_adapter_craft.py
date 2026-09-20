@@ -12,16 +12,20 @@ which is what roscoe_score.py reads. Each line carries ROSCOE's own fields —
 `premise`, `hypothesis`, `gpt-3` (the trace it scores) — plus the step
 boundaries the generator used, so step-level analysis need not guess them back.
 
-ROSCOE's sets are built for verifying a shipped trace, so `hypothesis` is the
-correct answer for CosmosQA and DROP and the reference solution for GSM8K. It is
-copied through for the scorer's reference-based metrics, never into the prompt;
-Module I's loader is what keeps it out of generation.
+`premise` and `hypothesis` are read by the dataset's own adapter in
+dataset_adapters.py, since none of the benchmark's four sets stores that pair the
+way ROSCOE's own sets did. They are the scorer's reference fields and never enter
+a prompt; Module I's loader is what keeps them out of generation.
+
+The three metrics the paper reports — Grammar, Rep-Step, Rep-Word — are
+reference-free and defined on any trace, and the scorer selects them on its own
+when a set carries no reference chain, which none of these four does.
 
 Usage:
     python roscoe_adapter_craft.py \\
-        --craft_dir  results/roscoe_craft/nano \\
-        --dataset    dataset/reasoning_traces_quality/roscoe \\
-        --output_dir roscoe_craft/nano
+        --craft_dir  results/craft_runs/fld_nano \\
+        --dataset    dataset/FLD.json \\
+        --output_dir roscoe_craft/fld_nano
 """
 
 from __future__ import annotations
@@ -39,6 +43,9 @@ try:
     from config import resolve_input, resolve_output
 except ImportError:  # running outside the part
     resolve_input = resolve_output = Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from dataset_adapters import adapt
 
 
 _STEP_RE = re.compile(r"(?m)^\s*Step\s*\d+\s*[:.\-]\s*")
@@ -69,24 +76,57 @@ def load_records(path: Path) -> List[Dict[str, Any]]:
     return raw.get("results", raw) if isinstance(raw, dict) else raw
 
 
-def load_source(source_dir: Path) -> Dict[str, List[Dict[str, Any]]]:
-    """{dataset name -> its records}, indexed the way Module I enumerated them."""
+def index_by_text(rows: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    """{problem text -> its record}, over whichever field the set states it in."""
+    out: Dict[str, Dict[str, Any]] = {}
+    for row in rows:
+        for key in ("input", "premise", "question"):
+            text = row.get(key)
+            if isinstance(text, str) and text:
+                out.setdefault(text, row)
+                break
+    return out
+
+
+def load_source(source: Path) -> Dict[str, List[Dict[str, Any]]]:
+    """{dataset name -> its records}, indexed the way Module I enumerated them.
+
+    Takes ROSCOE's directory of .jsonl sets, the benchmark's .json ones, or a
+    single file of either kind, so one run directory can be exported whichever
+    data it was generated from.
+    """
     out: Dict[str, List[Dict[str, Any]]] = {}
-    for path in sorted(source_dir.glob("*.jsonl")):
+    if source.is_dir():
+        paths = sorted(source.glob("*.jsonl")) + sorted(source.glob("*.json"))
+    else:
+        paths = [source]
+    for path in paths:
         out[path.stem] = load_records(path)
     if not out:
-        raise FileNotFoundError(f"No ROSCOE .jsonl files in {source_dir}")
+        raise FileNotFoundError(f"No .jsonl or .json dataset files in {source}")
     return out
 
 
 def build_entry(src: Dict[str, Any], dataset: str, steps: List[str],
                 setting: str, sample_id: str) -> Dict[str, Any]:
-    """One ROSCOE line. `gpt-3` is the field the scorer reads the trace from."""
+    """One ROSCOE line. `gpt-3` is the field the scorer reads the trace from.
+
+    ROSCOE's own sets already carry `premise` / `hypothesis`; a benchmark set
+    does not, and its adapter is what says which of its fields play those parts.
+    """
+    if "premise" in src or "hypothesis" in src:
+        premise, hypothesis, answer = (src.get("premise", ""),
+                                       src.get("hypothesis", ""),
+                                       src.get("answer", ""))
+    else:
+        problem = adapt(src, dataset)
+        premise, hypothesis, answer = (problem.premises, problem.hypothesis,
+                                       problem.answer)
     entry: Dict[str, Any] = {
         "key":        src.get("key", sample_id),
-        "premise":    src.get("premise", ""),
-        "hypothesis": src.get("hypothesis", ""),
-        "answer":     src.get("answer", ""),
+        "premise":    premise,
+        "hypothesis": hypothesis,
+        "answer":     answer,
         "gpt-3":      " ".join(steps),
         "steps":      steps,
         "dataset":    dataset,
@@ -105,8 +145,9 @@ def main() -> None:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--craft_dir", required=True,
                     help="CRAFT run directory (k_traces_*_samples.json + synthesized*.json)")
-    ap.add_argument("--dataset", default="dataset/reasoning_traces_quality/roscoe",
-                    help="Directory of the ROSCOE .jsonl sets the run was generated from")
+    ap.add_argument("--dataset", default="dataset",
+                    help="The data the run was generated from: the dataset directory "
+                         "or a single file in it")
     ap.add_argument("--output_dir", default="CRAFT_results/reasoning_traces_quality/ROSCOE",
                     help="Where the {dataset}_{raw,craft}.jsonl pairs are written; "
                          "a relative path resolves under the results root")
@@ -135,16 +176,29 @@ def main() -> None:
     export_dir = Path(resolve_output(args.output_dir))
     export_dir.mkdir(parents=True, exist_ok=True)
 
+    # Two files can hold the same samples in a different order, so a sample is
+    # found by its problem text first and only then by the position the run
+    # recorded — matching by position alone pairs a trace with someone else's
+    # problem and reports nothing missing.
+    by_text = {name: index_by_text(rows) for name, rows in source.items()}
+
     pairs: Dict[str, List[tuple]] = defaultdict(list)
-    n_raw_empty = n_craft_empty = n_src_missing = 0
+    n_raw_empty = n_craft_empty = n_src_missing = n_by_position = 0
 
     for rec in k_records:
         dataset = Path(str(rec.get("source_dataset", ""))).stem
         rows = source.get(dataset)
-        idx = rec.get("source_index")
-        if rows is None or idx is None or idx >= len(rows):
+        if rows is None:
             n_src_missing += 1
             continue
+        src_row = by_text.get(dataset, {}).get(rec.get("problem_text") or "")
+        if src_row is None:
+            idx = rec.get("source_index")
+            if idx is None or idx >= len(rows):
+                n_src_missing += 1
+                continue
+            src_row = rows[idx]
+            n_by_position += 1
 
         raw_steps = first_nonempty_trace(rec.get("traces"))
         if not raw_steps:
@@ -159,7 +213,7 @@ def main() -> None:
             continue
         if args.max_samples and len(pairs[dataset]) >= args.max_samples:
             continue
-        pairs[dataset].append((rows[idx], raw_steps, craft_steps, rec["sample_id"]))
+        pairs[dataset].append((src_row, raw_steps, craft_steps, rec["sample_id"]))
 
     for dataset, items in sorted(pairs.items()):
         for setting, which in (("raw", 1), ("craft", 2)):
@@ -176,6 +230,9 @@ def main() -> None:
     print(f"[adapter] wrote {total} pairs across {len(pairs)} datasets → {export_dir}")
     print(f"[adapter] skipped: raw_empty={n_raw_empty} craft_empty={n_craft_empty} "
           f"src_missing={n_src_missing}")
+    if n_by_position:
+        print(f"[adapter] WARNING: {n_by_position} samples matched by position, not by "
+              f"problem text — check that --dataset is the data the run was generated from")
 
 
 if __name__ == "__main__":

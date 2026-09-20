@@ -17,9 +17,13 @@ adapters beside this one.
 Usage:
     python receval_adapter_craft.py \\
         --craft_dir results/craft_runs/craft_fld_gemini_100 \\
-        --dataset   dataset/reasoning_traces_quality/receval/FLD.json \\
+        --dataset   dataset/FLD.json \\
         --output    receval_inputs/fld_gemini.json \\
         [--raw_mode first|majority]
+
+Which dataset a sample came from decides how its hypothesis and premises are
+read; dataset_adapters.py beside this file holds one adapter per dataset, so all
+four of the benchmark's sets go through the same path here.
 """
 
 from __future__ import annotations
@@ -37,26 +41,23 @@ try:
 except ImportError:
     resolve_input = resolve_output = Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from dataset_adapters import adapt
+
 
 # ---------------------------------------------------------------------------
-# Source dataset field extraction (FLD / FOLIO / math)
+# Source dataset field extraction
 # ---------------------------------------------------------------------------
 
-def extract_hypothesis_and_premises(sample: dict) -> tuple[str, str]:
-    """Return (hypothesis, premises_text) from an FLD/FOLIO/math sample."""
-    # FOLIO: has ori_conclusion + ori_premises list
-    if "ori_conclusion" in sample and "ori_premises" in sample:
-        hyp = sample["ori_conclusion"]
-        prem = " ".join(sample["ori_premises"])
-        return hyp, prem
-    # FLD: has Conclusion + Facts
-    if "Conclusion" in sample and "Facts" in sample:
-        return sample["Conclusion"], sample["Facts"]
-    # GSM8K / Olympiad style
-    if "question" in sample and "answer" in sample:
-        return str(sample["answer"]), sample["question"]
-    # Fallback — use input as premises, proof_label as hypothesis marker
-    return sample.get("proof_label", ""), sample.get("input", "")
+def extract_hypothesis_and_premises(sample: dict, dataset: str = "") -> tuple[str, str]:
+    """(hypothesis, premises_text), read the way `dataset` stores them.
+
+    Both come back as strings whichever set they came from, which ReCEval's
+    scorer requires: it sentence-splits the premises, and ProofWriter stores
+    them as a list of facts rather than one string.
+    """
+    problem = adapt(sample, dataset)
+    return problem.hypothesis, problem.premises
 
 
 # ---------------------------------------------------------------------------
@@ -154,25 +155,34 @@ def main():
     with open(resolve_input(args.dataset)) as f:
         src_data = json.load(f)
 
-    # Index source by original_index / metadata for FOLIO, by source_index for FLD
-    src_by_idx: dict[int, dict] = {}
-    for i, s in enumerate(src_data):
-        src_by_idx[i] = s
+    # Look the source sample up by its problem text, not by the position the run
+    # recorded. Two files can hold the same samples in a different order, and
+    # indexing by position then pairs every trace with someone else's problem
+    # while reporting nothing missing. The position stays as a fallback for a
+    # sample whose text was rewritten between the run and now.
+    src_by_text: dict[str, dict] = {s["input"]: s for s in src_data if s.get("input")}
+    src_by_idx: dict[int, dict] = dict(enumerate(src_data))
 
     synth_rows = synth_data.get("results", synth_data) if isinstance(synth_data, dict) else synth_data
     synth_by_id = {r["sample_id"]: r for r in synth_rows if "sample_id" in r}
 
     out_items: list[dict] = []
-    n_raw_empty = n_synth_empty = n_src_missing = 0
+    n_raw_empty = n_synth_empty = n_src_missing = n_by_position = 0
 
     for rec in k_data["results"]:
         sid = rec["sample_id"]
-        src_idx = rec.get("source_index")
-        source = src_by_idx.get(src_idx)
+        source = src_by_text.get(rec.get("problem_text") or "")
+        if source is None:
+            source = src_by_idx.get(rec.get("source_index"))
+            if source is not None:
+                n_by_position += 1
         if source is None:
             n_src_missing += 1
             continue
-        hyp, prem = extract_hypothesis_and_premises(source)
+        # The run records which set each sample came from, so a run over more
+        # than one dataset still reads each sample the way its own set stores it.
+        hyp, prem = extract_hypothesis_and_premises(
+            source, rec.get("source_dataset") or args.dataset)
 
         raw_steps = pick_raw_trace(rec.get("traces") or [], args.raw_mode)
         if not raw_steps:
@@ -208,6 +218,9 @@ def main():
 
     print(f"[adapter] wrote {len(out_items)} paired items → {out_path}")
     print(f"[adapter] skipped: raw_empty={n_raw_empty}  synth_empty={n_synth_empty}  src_missing={n_src_missing}")
+    if n_by_position:
+        print(f"[adapter] WARNING: {n_by_position} samples matched by position, not by "
+              f"problem text — check that --dataset is the file the run was generated from")
 
 
 if __name__ == "__main__":
