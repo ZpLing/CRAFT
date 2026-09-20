@@ -24,8 +24,8 @@ are, so `(3,2),(-3,2)` matches the same pair of points written in the other
 order, and does not match `(3,2),(3,-2)`.
 
 Datasets differ in what an answer is, so the entry point dispatches on the
-dataset: GSM8K's answers are integers and are compared as integers, FLD's and
-FOLIO's are labels and are compared as labels, and OlympiadBench's carry an
+dataset: FLD's and ProofWriter's answers are labels and are compared as labels,
+and OlympiadBench's and Omni-MATH's carry an
 `answer_type` that says which of the four shapes to expect.
 """
 
@@ -446,6 +446,51 @@ def _elem_equal(x, y) -> bool:
 # Per-dataset adapters
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# An answer matches itself
+# ---------------------------------------------------------------------------
+
+_UNIT_RE = re.compile(r"\\(?:mathrm|text|textrm|mbox|operatorname)\s*\{[^{}]*\}")
+_SPACER_RE = re.compile(r"\\(?:quad|qquad|;|,|!|:)|[~\s]+")
+_WORDS_ONLY = re.compile(r"^[A-Za-z][A-Za-z\s]+$")   # two letters or more: "No", not "N"
+
+
+def _same_text(pred: str, gold: str) -> bool:
+    """True when the two are the same answer written the same way.
+
+    match_olympiadbench parses both sides and gives up when either side will
+    not parse, which made an answer fail against an identical copy of itself:
+    `15 \\mathrm{~km} / \\mathrm{h}`, `12:13` and `|V|^{2016}` are all things
+    sympy will not read, and all three were scored wrong against themselves.
+    Whatever else is true of a comparison, an answer matches itself.
+
+    Case is ignored only when both sides are words — `No` against `no` is the
+    same answer, `N` against `n` is not.
+    """
+    a, b = str(pred).strip().strip("$").strip(), str(gold).strip().strip("$").strip()
+    if not a or not b:
+        return False
+    na, nb = _SPACER_RE.sub("", a), _SPACER_RE.sub("", b)
+    if na == nb:
+        return True
+    if _WORDS_ONLY.match(a) and _WORDS_ONLY.match(b):
+        return na.lower() == nb.lower()
+    return False
+
+
+def _strip_units(text: str) -> str:
+    """The answer without the unit it is quoted in.
+
+    OlympiadBench writes a gold answer as `273 \\mathrm{~km}` where the model
+    writes `273`, and as `45` where the model writes `45 \\text{ minutes}`. The
+    unit belongs to the question; carrying it on one side only made the two
+    unequal.
+    """
+    out = _UNIT_RE.sub("", str(text))
+    out = re.sub(r"\\(?:degree|circ)", "", out)
+    return out.strip().strip("$").strip() or str(text)
+
+
 def _parse_any(text: str, answer_type: Optional[str] = None):
     """Parse an answer into the object it denotes, whatever shape that is.
 
@@ -488,7 +533,7 @@ def _parse_any(text: str, answer_type: Optional[str] = None):
     return ("scalar", expr)
 
 
-def match_olympiadbench(pred: str, gold: str, answer_type: Optional[str] = None) -> bool:
+def _match_ob(pred: str, gold: str, answer_type: Optional[str] = None) -> bool:
     """OlympiadBench: four answer shapes, each compared as what it is.
 
     Numerical    a number, possibly exact (`\\frac{2}{7}\\sqrt{53}`); compared
@@ -537,10 +582,34 @@ def match_olympiadbench(pred: str, gold: str, answer_type: Optional[str] = None)
     return _scalar_equal(vp, vg)
 
 
+
+def match_olympiadbench(pred: str, gold: str, answer_type: Optional[str] = None) -> bool:
+    """The parse-and-compare above, with two things it cannot do on its own.
+
+    An answer matches itself. _match_ob gives up when either side will not
+    parse, so `15 \\mathrm{~km} / \\mathrm{h}`, `12:13` and `|V|^{2016}` were
+    each scored wrong against an identical copy — sympy reads none of them.
+
+    A unit on one side only is not a disagreement. OlympiadBench writes gold as
+    `273 \\mathrm{~km}` where the model writes `273`, and as `45` where the
+    model writes `45 \\text{ minutes}`; the unit belongs to the question. Both
+    sides are stripped and compared again, and only if that also fails is the
+    answer wrong.
+    """
+    if _same_text(pred, gold):
+        return True
+    if _match_ob(pred, gold, answer_type):
+        return True
+    up, ug = _strip_units(pred), _strip_units(gold)
+    if (up, ug) == (str(pred).strip().strip("$").strip(), str(gold).strip().strip("$").strip()):
+        return False
+    return _same_text(up, ug) or _match_ob(up, ug, answer_type)
+
+
 # The label reader is shared with everything else that reads one.
 from extract_label import normalise_label  # noqa: E402
 def match_label(pred: str, gold: str, answer_type: Optional[str] = None) -> bool:
-    """FLD / FOLIO: the answer is a label."""
+    """FLD / ProofWriter: the answer is a label."""
     p, g = normalise_label(pred), normalise_label(gold)
     return p is not None and p == g
 
@@ -622,7 +691,7 @@ def canonical(text, dataset: Optional[str] = None,
     a canonical form cannot represent `n(n-1)` and `n**2-n` as one string
     without a normal form that does not exist for the general case.
     """
-    if dataset in ("FLD", "FOLIO"):
+    if dataset in ("FLD", "ProofWriter"):
         return normalise_label(text)
     parsed = _parse_any(text, answer_type) if text is not None else None
     if parsed is None:
