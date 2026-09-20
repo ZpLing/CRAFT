@@ -204,11 +204,20 @@ def _to_sympy(text: str) -> Optional[Any]:
     t = t.strip()
     if not t:
         return None
+    # A factorial in an answer — "1009! \\cdot 1010!" is a real Omni-MATH gold —
+    # is evaluated during parsing when evaluate=True, and sympy computes it: a
+    # 2600-digit number by recursive swinging, which does not return. Parsing
+    # without evaluation keeps the expression symbolic; the comparison below
+    # evaluates only when it needs a number, and under a time limit.
     try:
-        expr = parse_expr(t, transformations=_TRANSFORMS, evaluate=True,
+        expr = parse_expr(t, transformations=_TRANSFORMS, evaluate=False,
                           local_dict=_symbol_dict(t))
     except Exception:
-        return None
+        try:
+            expr = parse_expr(t, transformations=standard_transformations,
+                              evaluate=False, local_dict=_symbol_dict(t))
+        except Exception:
+            return None
     if isinstance(expr, sympy.logic.boolalg.BooleanAtom):
         return None
     return expr
@@ -290,12 +299,21 @@ def _parse_interval(s: str) -> Optional[Tuple]:
 # ---------------------------------------------------------------------------
 
 def _num(expr) -> Optional[float]:
+    """The value as a float, or None when it has none that is usable.
+
+    A value too large for a float becomes inf, and inf equals inf: 2000! and
+    1009! would compare equal, being different answers. Anything not finite is
+    refused here and settled exactly instead.
+    """
     try:
         if expr is None or not expr.is_number:
             return None
-        return float(expr.evalf())
-    except (TypeError, ValueError, AttributeError):
+        f = float(expr.evalf())
+    except (TypeError, ValueError, AttributeError, OverflowError):
         return None
+    if f != f or f in (float("inf"), float("-inf")):
+        return None
+    return f
 
 
 _DECIMAL_RE = re.compile(r"(?<![\d.])\d*\.(\d+)(?![\d.])")
@@ -326,6 +344,18 @@ def _scalar_equal(a, b, gold_text: Optional[str] = None) -> bool:
     """Same number, or the same expression written differently."""
     if a is None or b is None:
         return False
+    # Exact first. It settles the values a float cannot hold, and it is what
+    # decides two unevaluated expressions that are structurally the same.
+    try:
+        if a == b:
+            return True
+        if sympy.simplify(a - b) == 0:
+            return True
+        # Not equal exactly is not the answer: gold is sometimes a rounded
+        # decimal and the numeric comparison below is what forgives that. Only
+        # equality is settled here.
+    except Exception:
+        pass
     fa, fb = _num(a), _num(b)
     if fa is not None and fb is not None:
         if fa == fb:
@@ -508,6 +538,38 @@ ADAPTERS = {
 }
 
 
+class _Stalled(Exception):
+    pass
+
+
+def _deadline(seconds: float = 5.0):
+    """Stop a comparison that will not finish.
+
+    Symbolic work on an adversarial expression has no useful bound — a factorial
+    of a four-digit number, a deeply nested radical — and a scorer that does not
+    return stops the run that called it. Five seconds is far past anything a
+    real answer needs; what exceeds it is not a close call.
+    """
+    import contextlib
+    import signal as _sig
+
+    @contextlib.contextmanager
+    def guard():
+        if not hasattr(_sig, "SIGALRM"):
+            yield
+            return
+        def _fire(signum, frame):
+            raise _Stalled()
+        old = _sig.signal(_sig.SIGALRM, _fire)
+        _sig.setitimer(_sig.ITIMER_REAL, seconds)
+        try:
+            yield
+        finally:
+            _sig.setitimer(_sig.ITIMER_REAL, 0)
+            _sig.signal(_sig.SIGALRM, old)
+    return guard()
+
+
 def answers_match(pred, gold, dataset: Optional[str] = None,
                   answer_type: Optional[str] = None, domain: Optional[str] = None) -> bool:
     """Is `pred` the same answer as `gold`?
@@ -522,7 +584,10 @@ def answers_match(pred, gold, dataset: Optional[str] = None,
     if fn is None:
         fn = match_label if domain == "logical" else match_olympiadbench
     try:
-        return bool(fn(str(pred), str(gold), answer_type))
+        with _deadline():
+            return bool(fn(str(pred), str(gold), answer_type))
+    except _Stalled:
+        return False
     except Exception:
         return False
 
