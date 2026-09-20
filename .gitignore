@@ -25,6 +25,11 @@ Part2_CRAFT/results/*
 *.jsonl.bak
 *.json.bak
 
+# ── Dataset sources — the raw downloads the benchmark was built from ──
+# dataset/label_prediction/ holds the benchmark itself, 500 curated samples
+# per file. What they were cut from is large and stays local.
+Part2_CRAFT/dataset/_source/
+
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/
 Part1_Pilot Study/experiments/roscoe_experiment/ParlAI/

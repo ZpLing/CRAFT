@@ -163,7 +163,7 @@
  "traces_file": "traces.jsonl",
  "predictions": [
   {
-   "sample_id": "FLD_76",
+   "sample_id": "FLD_0",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -173,7 +173,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_195",
+   "sample_id": "FLD_1",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -183,7 +183,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_381",
+   "sample_id": "FLD_2",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -193,7 +193,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_262",
+   "sample_id": "FLD_3",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -203,7 +203,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_257",
+   "sample_id": "FLD_4",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -213,7 +213,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_348",
+   "sample_id": "FLD_5",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -223,7 +223,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_13",
+   "sample_id": "FLD_6",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -233,7 +233,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_364",
+   "sample_id": "FLD_7",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -243,7 +243,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_397",
+   "sample_id": "FLD_8",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -253,7 +253,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_231",
+   "sample_id": "FLD_9",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -263,7 +263,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_4",
+   "sample_id": "FLD_10",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -273,7 +273,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_90",
+   "sample_id": "FLD_11",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -283,7 +283,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_26",
+   "sample_id": "FLD_12",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -293,7 +293,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_173",
+   "sample_id": "FLD_13",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -303,7 +303,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_426",
+   "sample_id": "FLD_14",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -313,7 +313,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_167",
+   "sample_id": "FLD_15",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -323,7 +323,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_235",
+   "sample_id": "FLD_16",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -333,7 +333,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_37",
+   "sample_id": "FLD_17",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": null,
@@ -344,7 +344,7 @@
    "gateway_blocked": true
   },
   {
-   "sample_id": "FLD_213",
+   "sample_id": "FLD_18",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -354,7 +354,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_219",
+   "sample_id": "FLD_19",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -364,7 +364,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_401",
+   "sample_id": "FLD_20",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -374,7 +374,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_485",
+   "sample_id": "FLD_21",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -384,7 +384,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_107",
+   "sample_id": "FLD_22",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -394,7 +394,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_51",
+   "sample_id": "FLD_23",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -404,7 +404,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_269",
+   "sample_id": "FLD_24",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -414,7 +414,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_131",
+   "sample_id": "FLD_25",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -424,7 +424,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_408",
+   "sample_id": "FLD_26",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -434,7 +434,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_330",
+   "sample_id": "FLD_27",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -444,7 +444,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_346",
+   "sample_id": "FLD_28",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -454,7 +454,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_423",
+   "sample_id": "FLD_29",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -464,7 +464,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_190",
+   "sample_id": "FLD_30",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -474,7 +474,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_295",
+   "sample_id": "FLD_31",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -484,7 +484,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_427",
+   "sample_id": "FLD_32",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -494,7 +494,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_153",
+   "sample_id": "FLD_33",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -504,7 +504,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_361",
+   "sample_id": "FLD_34",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -514,7 +514,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_360",
+   "sample_id": "FLD_35",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -524,7 +524,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_130",
+   "sample_id": "FLD_36",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -534,7 +534,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_67",
+   "sample_id": "FLD_37",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
@@ -544,7 +544,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_294",
+   "sample_id": "FLD_38",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -554,7 +554,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_139",
+   "sample_id": "FLD_39",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -564,7 +564,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_488",
+   "sample_id": "FLD_40",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -574,7 +574,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_303",
+   "sample_id": "FLD_41",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -584,7 +584,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_490",
+   "sample_id": "FLD_42",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -594,7 +594,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_187",
+   "sample_id": "FLD_43",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -604,7 +604,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_365",
+   "sample_id": "FLD_44",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -614,7 +614,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_250",
+   "sample_id": "FLD_45",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -624,7 +624,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_116",
+   "sample_id": "FLD_46",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -634,7 +634,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_86",
+   "sample_id": "FLD_47",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -644,7 +644,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_142",
+   "sample_id": "FLD_48",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -654,7 +654,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_237",
+   "sample_id": "FLD_49",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -662,1006 +662,6 @@
    "response_steps": 8.0,
    "response_tokens": 645.0,
    "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_408",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "**Key facts and rules:**\n1. **Fact1:** All students who attend the conference in person have registered for the conference.  \n   (This does not constrain whether someone attends in person.)\n2. **Fact2:** Every student attends **either** in person **or** remotely.  \n   (No third option; exactly one of the two.)\n3. **Fact3:** No students from China attend the conference remotely.  \n   (So Chinese students must attend in person, if they attend at all.)\n4. **Fact4:** James attends the conference, and he does **not** attend remotely.  \n   (So James must attend in person by Fact2.)\n5. **Fact5:** Jack attends the conference, and Jack is a student from China.  \n   (So Jack is a Chinese student who attends the conference.)\n\n**Reasoning:**\n- From **Fact5**, Jack attends the conference and is from China.\n- From **Fact3**, Chinese students do **not** attend remotely.\n- Since **Fact2** says students attend either in person or remotely, and Jack cannot attend remotely, Jack must attend **in person**.\n\nTherefore, the hypothesis “Jack attends the conference in person” follows directly from Facts 2, 3, and 5.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 172.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_238",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "**Key facts/rules:**\n1. **No low-scoring players are top players in the league.**\n2. **Every basketball player is either** (a) a top player in the league **or** (b) successfully shoots a high percentage of 3-pointers.\n3. **All high-3P successful players** are solid at shooting 2-pointers.\n4. **No solid 2P shooters are bad at mid-range shots.** (Equivalently: solid 2P ⇒ not bad at mid-range.)\n5. **Candace is either** (a) a low-scoring player **or** (b) successfully shoots a high percentage of 3-pointers.\n6. **Hypothesis:** Candace is either (a) a high-3P shooter or (b) bad at mid-range shots.\n\n---\n\n### Step-by-step reasoning\n1. From Fact5: Candace is **either** low-scoring **or** a high-3P shooter.\n2. Consider the **low-scoring** possibility for Candace.\n3. From Fact2: any player is either **top** or **high-3P**.  \n   Candace is low-scoring, so she **cannot** be a top player (Fact1: no low-scoring players are top players).\n4. Therefore, if Candace is low-scoring, she must satisfy the other option in Fact2: she **must** be a **high-3P shooter**.\n5. So in **all cases** consistent with the facts, Candace ends up being a **high-3P shooter**.\n6. Since being a high-3P shooter implies solid 2-point shooting (Fact3), and solid 2-point shooting implies **not** bad at mid-range (Fact4), the “bad at mid-range” alternative is not needed to make the hypothesis true.\n\n---\n\n### Conclusion\nCandace is **always** a successful high-3P shooter, which means the hypothesis (“either high-3P or bad at mid-range”) holds.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 12.0,
-   "response_tokens": 236.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_236",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n\n1. **Fact1:** Anyone subscribed to **AMC** is available to watch **3 movies every week without additional fees**.\n   - Symbolically: `AMC → 3MoviesFree`\n2. **Fact2:** Some customers go to cinemas every week.\n   - (Existential; does not specify James.)\n3. **Fact3:** Every customer is either **subscribed to AMC** or **subscribed to HBO** (exclusive not required, but at least one).\n   - Symbolically: `Customer → AMC ∨ HBO`\n4. **Fact4:** Customers who **prefer TV series more** and **will not watch TV series in cinemas**.\n   - This is a bit awkwardly stated, but it can be read as: `TVPreferMore → NotWatchTVInCinemas`\n5. **Fact5:** Anyone who subscribes to **HBO** **prefers TV series to movies**.\n   - Symbolically: `HBO → TVPreferMore`\n6. **Fact6:** **James watches TV series in cinemas**.\n   - Symbolically: `James → WatchTVInCinemas`\n\nHypothesis to test:\n\n> If James does **not** both (i) go to cinemas every week and (ii) subscribe to HBO,  \n> then James is either (A) `3MoviesFree` or (B) “he prefers TV more”.\n\nLet:\n- `C` = James goes to cinemas every week\n- `H` = James subscribes to HBO\n- Conclusion needs: `3MoviesFree ∨ TVPreferMore`\n\nStep-by-step:\n\n1. The hypothesis has the form:  \n   `¬(C ∧ H) → (3MoviesFree ∨ TVPreferMore)`\n\n2. We use **Fact6**: `James → WatchTVInCinemas`.\n\n3. Combine **Fact4** (if TV-prefer more, then they will not watch TV in cinemas):\n   - `TVPreferMore → NotWatchTVInCinemas`\n   - Contrapositive: `WatchTVInCinemas → Not(TVPreferMore)`\n   - So from Fact6, James **cannot** prefer TV series more:\n     - `¬TVPreferMore` for James.\n\n4. Then the disjunction `3MoviesFree ∨ TVPreferMore` can only be satisfied by:\n   - `3MoviesFree` must be true for James.\n\n5. Now check whether `3MoviesFree` is forced by the premise `¬(C ∧ H)`:\n   - The premise `¬(C ∧ H)` means: either `¬C` or `¬H` (or both).\n   - But **we are not given either C or H directly** for James.\n\n6. We do have **Fact3**: James must be on AMC or HBO:\n   - `AMC ∨ HBO`.\n\n7. If James were on HBO, then by **Fact5** he would prefer TV series more (`HBO → TVPreferMore`), contradicting step 3 (`¬TVPreferMore`).\n   - Therefore, James **cannot** be on HBO:\n     - `¬H`.\n\n8. Since James must be subscribed to AMC or HBO, and `¬H`, it follows:\n   - `AMC`.\n\n9. From **Fact1**:\n   - `AMC → 3MoviesFree`\n   - Therefore, `3MoviesFree` holds for James.\n\n10. Thus, regardless of whether the premise `¬(C ∧ H)` holds (it will, because `¬H` is true), the conclusion:\n   - `3MoviesFree ∨ TVPreferMore`\n   is satisfied (specifically by `3MoviesFree`).\n\nTherefore the implication in the hypothesis holds under the given facts.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 16.0,
-   "response_tokens": 419.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_342",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n- Fact1: All vehicle registration plates in Istanbul begin with 34.\n- Fact2: Plates that do not begin with 34 are not from Istanbul.\n- Fact3: Joe's vehicle registration plate is from Istanbul.\n- Fact4: Tom's plate begins with 35.\n- Fact5: If a plate begins with 35, then it does not begin with 34.\n\nStep-by-step reasoning:\n1. From Fact3, Joe's plate is from Istanbul.\n2. From Fact1, every plate from Istanbul begins with 34.\n3. Therefore, Joe's plate begins with 34.\n4. Fact4 and Fact5 are consistent with this (they concern plates starting with 35 and imply they don’t start with 34), but they are not needed to determine Joe's plate.\n\nThus, the hypothesis “Joe's license plate begins with the number 34” follows directly from Facts 1 and 3.\n\nCONCLUSION: PROVED",
-   "response_steps": 4.0,
-   "response_tokens": 136.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_11",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "**Key facts/rules:**\n- **Fact1:** Decorations → cannot pack/move easily  \n  (Not directly needed for the hypothesis.)\n- **Fact2:** High ambitions & future career goals → can pack/move easily  \n  (Not directly needed, but it connects ambitions to outcomes.)\n- **Fact3:** Pop band/singer fans → lots of decorations  \n- **Fact4:** Young teenage girls attending college → pop band/singer fans  \n- **Fact5:** If Sam has high ambitions & future career goals → Sam is a pop band/singer fan\n\n**Hypothesis to test:**\n> If Sam is a young teenage girl who attends college, then Sam either:\n> (a) does not have high ambitions & future career goals, **or**\n> (b) is a big fan of pop bands and singers.\n\n**Step-by-step reasoning:**\n1. Assume the condition of the hypothesis: **Sam is a young teenage girl who attends college**.\n2. By **Fact4**, this implies **Sam is a big fan of pop bands and singers**.\n3. The hypothesis claims: under that condition, Sam is either **not** high-ambitions/goals **or** **is** a big fan.\n4. Since Step 2 already gives that **Sam is a big fan**, the “or” clause is satisfied regardless of whether Sam has high ambitions and future career goals.\n\n**Conclusion:** The hypothesis holds based on Fact4 (and no conflicting facts are given).\n\nCONCLUSION: __PROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 207.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_393",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n1. Mary has the flu.  \n2. Flu and influenza are the same disease. Therefore, “Mary has influenza” follows from “Mary has the flu.”  \n3. Susan doesn’t have influenza.\n\nHypothesis:\n- “Either Mary or Susan has influenza.”\n\nReasoning step by step:\n1. From Fact1 and Fact2: since flu = influenza, Mary has influenza.\n2. Since Mary has influenza, the statement “Either Mary or Susan has influenza” is satisfied regardless of Susan’s status.\n3. Fact3 (Susan doesn’t have influenza) does not conflict with the hypothesis, because the “either/or” can be true due to Mary.\n\nTherefore, the hypothesis is confirmed by the given facts.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 6.0,
-   "response_tokens": 107.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_321",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "### Key facts and rules\n- **Fact1:** Either **block design** or **event-related design**.  \n- **Fact2:** All **event-related designs** are **brain image acquisition**.  \n- **Fact3:** All **brain image acquisition** is **preceded by data processing**.  \n- **Fact4:** **Nothing** preceded by **data processing** acquires data.  \n- **Fact5:** **Picture memory** is either  \n  1) an **event-related design and acquiring data**, or  \n  2) **neither** an event-related design **nor** acquiring data.\n\n### Step-by-step reasoning\n1. From **Fact5**, picture memory has only two possibilities:\n   - **Option A:** picture memory is **event-related design AND acquiring data**.\n   - **Option B:** picture memory is **not** event-related design AND **not** acquiring data.\n\n2. Consider **Option A** (event-related design and acquiring data).\n   - By **Fact2**, event-related design ⇒ **brain image acquisition**.\n   - By **Fact3**, brain image acquisition ⇒ **preceded by data processing**.\n   - So event-related design ⇒ **preceded by data processing**.\n   - Then by **Fact4**, nothing preceded by data processing acquires data.\n   - This contradicts Option A’s requirement that picture memory **acquires data**.\n\n3. Therefore, **Option A is impossible**. So picture memory must be **Option B**:\n   - picture memory is **neither** an event-related design **nor** acquiring data.\n\n4. Now evaluate the hypothesis:  \n   **Hypothesis:** “Picture memory is either a block design or acquiring data.”\n   - We have established from Option B that picture memory is **not** acquiring data.\n   - So for the hypothesis to hold, it must be **a block design**.\n\n5. Use **Fact1**: either block design or event-related design.\n   - Since picture memory is **not** event-related (from Option B), it must be **block design**.\n\n6. Thus the hypothesis (“block design or acquiring data”) is satisfied because picture memory is **block design**.\n\n### Conclusion\nCONCLUSION: __PROVED__",
-   "response_steps": 8.0,
-   "response_tokens": 272.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_50",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n1. Every business is either **sanctioned** or **unsanctioned**.  \n2. **Sanctioned** businesses are **limited**.  \n3. **Unsanctioned** businesses are **free**.  \n4. The **Crude Oil Data Exchange** is a business that **isn't free**.\n\nReasoning:\n1. From Fact 4, the Crude Oil Data Exchange is **not free**.  \n2. By Fact 3, the only type of business that is **free** is **unsanctioned**.  \n3. Therefore, the Crude Oil Data Exchange cannot be **unsanctioned**.  \n4. By Fact 1, it must then be **sanctioned**.  \n5. By Fact 2, **sanctioned** businesses are **limited**.  \n6. Hence, the Crude Oil Data Exchange is **limited**.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 10.0,
-   "response_tokens": 99.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_415",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Step 1: From Fact1 (“All squares have four sides”), it follows that every square is a four-sided thing.  \nStep 2: From Fact2 (“All four-sided things are shapes”), it follows that every four-sided thing is a shape.  \nStep 3: Combining Steps 1 and 2: since every square is four-sided, and every four-sided thing is a shape, every square is a shape.  \n\nCONCLUSION: __PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 62.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_97",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n1. Fact1: Symphony No. 9 is a music piece.\n2. Fact4: Vienna Music Society premiered Symphony No. 9.\n3. Fact5: Vienna Music Society is an orchestra.\n4. Therefore, Vienna Music Society (an orchestra) premiered a music piece (Symphony No. 9).\n5. Hypothesis: Some orchestras premiered music pieces.\n\nStep-by-step reasoning:\n1. From Fact5, Vienna Music Society is an orchestra.\n2. From Fact4, Vienna Music Society premiered Symphony No. 9.\n3. From Fact1, Symphony No. 9 is a music piece.\n4. Hence, there exists at least one orchestra (Vienna Music Society) that premiered at least one music piece (Symphony No. 9).\n5. This directly satisfies the hypothesis: “Some orchestras premiered music pieces.”\n\nCONCLUSION: PROVED",
-   "response_steps": 10.0,
-   "response_tokens": 116.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_182",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts/rules:\n1) Sam is doing a project.  \n2) A project is written either in C++ or in Python.  \n3) If Sam does a project written in Python, he will not use a Mac.  \n4) Sam is using a Mac.  \n5) If Sam uses a Mac, he will play a song.  \n6) If a song is not “Perfect”, Sam will never play it.\n\nReasoning:\n- From Fact4, Sam uses a Mac.  \n- From Fact5, if Sam uses a Mac, he will play a song. So Sam plays some song.  \n- From Fact6, if a song is not “Perfect”, Sam will never play it. Therefore the only possible song he plays is “Perfect”.\n- Now use Facts 3 and 4:  \n  - Fact3 says: If Sam does a project written in Python, he will not use a Mac.  \n  - But Fact4 says Sam is using a Mac.  \n  - Therefore, Sam cannot be doing a Python project.\n- Since a project is either C++ or Python (Fact2) and Python is ruled out, the project must be written in C++.\n\nThus the hypothesis “The project Sam is doing is written in C++” is supported.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 6.0,
-   "response_tokens": 192.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_258",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts and rules (formalized):**\nLet predicates be:\n- \\(I(x)\\): \\(x\\) works in person  \n- \\(H(x)\\): \\(x\\) has a home office setup  \n- \\(C(x)\\): \\(x\\) is a commuter  \n- \\(W(x)\\): \\(x\\) works from home  \n- \\(R(x)\\): \\(x\\) has a relaxed schedule  \n\nFrom the facts:\n1. **Fact1:** Everyone who works in person is a commuter:  \n   \\(\\forall x\\, (I(x) \\rightarrow C(x))\\)\n\n2. **Fact2:** People either work in person or work from home:  \n   \\(\\forall x\\, (I(x) \\lor W(x))\\)\n\n3. **Fact3:** Everyone who works from home has a relaxed schedule:  \n   \\(\\forall x\\, (W(x) \\rightarrow R(x))\\)\n\n4. **Fact4:** George is either a commuter or has a home office setup:  \n   \\(C(G) \\lor H(G)\\)\n\n5. **Fact5:** If George is either a person who works from home or has a home office setup, then George is not a person who works from home and a commuter:  \n   \\[\n   \\big((W(G) \\lor H(G)) \\rightarrow \\neg (W(G)\\land C(G))\\big)\n   \\]\n   Equivalently, if \\(W(G)\\lor H(G)\\) holds, then it is impossible that both \\(W(G)\\) and \\(C(G)\\) hold.\n\n**Hypothesis to test:**\n\\[\n\\Big((H(G)\\land I(G)) \\lor \\neg(H(G)\\lor I(G))\\Big)\\rightarrow (W(G)\\lor R(G))\n\\]\nRewrite the antecedent:\n- \\(\\neg(H(G)\\lor I(G))\\) means \\(\\neg H(G)\\land \\neg I(G)\\)\n\nSo the antecedent is either:\n1) \\(H(G)\\land I(G)\\), **or**\n2) \\(\\neg H(G)\\land \\neg I(G)\\)\n\nWe must check whether, under all constraints, the consequent \\(W(G)\\lor R(G)\\) always follows.\n\n---\n\n## Step-by-step reasoning / countercheck\n\n### Case 1: Antecedent holds via \\(H(G)\\land I(G)\\)\nFrom \\(I(G)\\), by Fact1: \\(C(G)\\).\nSo in this case we have \\(H(G)\\) and \\(W(G)\\lor H(G)\\) is true (because \\(H(G)\\) is true).\n\nThen by Fact5:\n\\[\n(W(G)\\lor H(G)) \\rightarrow \\neg(W(G)\\land C(G))\n\\]\nSince \\(W(G)\\lor H(G)\\) is true, we get:\n\\[\n\\neg(W(G)\\land C(G))\n\\]\nBut we already have \\(C(G)\\). Therefore this implies:\n\\[\n\\neg W(G)\n\\]\nSo \\(W(G)\\) is false in this case.\n\nHowever, the hypothesis only needs \\(W(G)\\lor R(G)\\). Could \\(R(G)\\) still be true?  \nBy Fact3, the only way guaranteed is \\(W(G)\\rightarrow R(G)\\), but the converse is not given. So \\(R(G)\\) could be true even if \\(W(G)\\) is false.\n\nBut do we have any constraint forcing \\(R(G)\\) to be false? None. So Case 1 does **not** immediately refute the hypothesis.\n\n### Case 2: Antecedent holds via \\(\\neg H(G)\\land \\neg I(G)\\)\nWe have \\(\\neg I(G)\\) and \\(\\neg H(G)\\).\n\nBy Fact2, \\(I(G)\\lor W(G)\\) must hold. Since \\(\\neg I(G)\\), it follows that:\n\\[\nW(G)\n\\]\nThen by Fact3:\n\\[\nR(G)\n\\]\nSo the consequent \\(W(G)\\lor R(G)\\) is definitely true in this case.\n\n---\n\n## Does any case allow the antecedent to be true while \\(W(G)\\lor R(G)\\) is false?\nTo falsify the hypothesis, we need:\n- antecedent true, but\n- \\(W(G)\\lor R(G)\\) false, i.e. \\(\\neg W(G)\\land \\neg R(G)\\).\n\nFrom Fact3, \\(\\neg W(G)\\land \\neg R(G)\\) is consistent (since Fact3 only gives \\(W(G)\\rightarrow R(G)\\), not \\(R(G)\\rightarrow W(G)\\)).\n\nSo we need a consistent assignment where:\n- either \\(H(G)\\land I(G)\\) or \\(\\neg H(G)\\land \\neg I(G)\\),\n- and also \\(\\neg W(G)\\) and \\(\\neg R(G)\\).\n\nBut in Case 2, \\(\\neg I(G)\\) forces \\(W(G)\\), contradicting \\(\\neg W(G)\\). So Case 2 cannot be used to falsify.\n\nIn Case 1, \\(H(G)\\land I(G)\\) allows \\(\\neg W(G)\\) (as derived from Fact5 + \\(I(G)\\Rightarrow C(G)\\)), and we can additionally set \\(R(G)\\) to false because no rule forces \\(R(G)\\) when \\(W(G)\\) is false.\n\nLet’s construct a concrete model for Case 1:\n- \\(I(G)=\\text{true}\\)\n- \\(C(G)=\\text{true}\\) (by Fact1)\n- \\(H(G)=\\text{true}\\) (given by antecedent)\n- \\(W(G)=\\text{false}\\) (forced by Fact5 because \\(W(G)\\land C(G)\\) must be impossible)\n- \\(R(G)=\\text{false}\\) (allowed; no rule requires \\(R(G)\\) without \\(W(G)\\))\n\nCheck Facts:\n- Fact1: \\(I(G)\\rightarrow C(G)\\): true.\n- Fact2: \\(I(G)\\lor W(G)\\): true (since \\(I(G)\\) true).\n- Fact3: \\(W(G)\\rightarrow R(G)\\): vacuously true (since \\(W(G)\\) false).\n- Fact4: \\(C(G)\\lor H(G)\\): true.\n- Fact5: \\((W(G)\\lor H(G))\\rightarrow \\neg(W(G)\\land C(G))\\).  \n  Here \\(W(G)\\lor H(G)=\\text{true}\\), and \\(W(G)\\land C(G)=\\text{false}\\), so \\(\\neg(\\text{false})=\\text{true}\\). Satisfied.\n\nIn this model, the antecedent \\((H(G)\\land I(G))\\lor(\\neg H(G)\\land \\neg I(G))\\) is true, but the consequent \\(W(G)\\lor R(G)\\) is false (both false).\n\nTherefore, the hypothesis is **not** logically guaranteed by the facts.\n\n---\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 7.0,
-   "response_tokens": 638.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_166",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts and rules:\n- Fact1: If a person is the leader of a country for life, then that person is in a monarchy.\n- Fact2: Leaders are either a king or a queen.\n- Fact3: Queens are female.\n- Fact4: Kings are male.\n- Fact5: Elizabeth is a queen.\n- Fact6: Elizabeth is a leader.\n\nReasoning:\n1. From Fact6, Elizabeth is a leader.\n2. From Fact5, Elizabeth is a queen.\n3. From the rules (Facts 2–4), a queen is one of the possible forms of a leader, consistent with Elizabeth being a leader.\n4. However, Fact1 requires that Elizabeth be a “leader of a country for life” to conclude she is in a monarchy.\n5. None of the given facts explicitly states that Elizabeth is a leader “for life.” They only state she is a leader and that she is a queen.\n6. Without the “for life” condition, we cannot infer that Elizabeth is in a monarchy from Fact1.\n\nTherefore, the hypothesis is not sufficiently supported by the given information.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 6.0,
-   "response_tokens": 173.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_490",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts/rules:\n1. Daveed Diggs is an actor and film producer.  \n2. Daveed Diggs played two roles in the musical *Hamilton*.  \n3. One of the actors from *Hamilton* won the best actor award.  \n4. The actor playing Thomas Jefferson won the best actor award.  \n5. Daveed Diggs played Thomas Jefferson.  \n6. Musicals are not films.\n\nStep-by-step reasoning:\n1. From Fact5, Daveed Diggs played Thomas Jefferson.  \n2. From Fact4, the actor playing Thomas Jefferson won the best actor award.  \n3. Therefore, Daveed Diggs (who played Thomas Jefferson) won the best actor award.  \n4. Fact6 (“Musicals are not films”) does not contradict the award claim; the hypothesis is about winning an award, not about being a film.\n\nThus, the hypothesis is supported by the given facts.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 10.0,
-   "response_tokens": 126.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_273",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts/rules given:**\n1. **No disposable products** can help slow down global warming.  \n   - Interpreted as: If a product helps slow down global warming, then it is **not disposable**.\n2. **All eco-friendly brands** can help slow down global warming.  \n   - Form: Eco-friendly brand → helps slow down global warming.\n3. **All sustainable fashion brands** are **eco-friendly** brands.  \n   - Form: Sustainable fashion brand → eco-friendly brand.\n4. **All fast fashion products** are **disposable** products.  \n   - Form: Fast fashion product → disposable product.\n5. **If Reformation is not helping slow down global warming, then Reformation is an eco-friendly brand or a sustainable fashion brand.**  \n   - Form: ¬(Reformation helps slow down GW) → (Reformation is eco-friendly) ∨ (Reformation is sustainable fashion).\n\n**Hypothesis to test:**\n- If Reformation produces disposable products, then Reformation produces fast fashion products.  \n  - Form: Disposable products (from Reformation) → Fast fashion products.\n\n---\n\n### Step-by-step reasoning\n1. From Fact 1 and Fact 2:\n   - If something (a brand) helps slow down global warming, it cannot be disposable.\n   - Eco-friendly brands help slow down global warming.\n   - Therefore, **eco-friendly brands cannot produce disposable products**.\n\n2. From Fact 3:\n   - Sustainable fashion brands are eco-friendly.\n   - So sustainable fashion brands also **cannot** produce disposable products.\n\n3. Use Fact 5 (contrapositive reasoning):\n   - Fact 5 says: If Reformation is **not** helping slow down global warming, then Reformation is eco-friendly or sustainable.\n   - But from (1) and (2), eco-friendly or sustainable implies Reformation **would** be helping slow down global warming (because eco-friendly brands help, and sustainable → eco-friendly).\n   - So it is consistent to conclude: Reformation being eco-friendly/sustainable would force it to help slow down GW, not contradict.\n\n4. Now address the hypothesis direction:\n   - We need: If Reformation produces disposable products, then it produces fast fashion products.\n   - Facts 4 only gives one direction: **fast fashion → disposable**.\n   - There is **no fact** stating **disposable → fast fashion**.\n   - In fact, disposable products cannot help slow down global warming (Fact 1), but that still does not imply they are fast fashion—only that they are disposable.\n\n5. Therefore, from the given facts, we cannot deduce that Reformation producing disposable products implies Reformation produces fast fashion products. The hypothesis requires the missing converse of Fact 4.\n\n---\n\nSince the needed implication is not supported (fast fashion → disposable exists, but disposable → fast fashion does not), the hypothesis is not proved.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 10.0,
-   "response_tokens": 399.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_326",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n1. Fact1: Olivia doesn’t prefer warm temperature during the day.  \n2. Fact2: When Olivia sleeps, she prefers cool temperature.  \n3. Fact3: Olivia sleeps during the night.  \n4. Fact4: Olivia works during the day.  \n5. Fact5: Olivia either works or sleeps.  \n6. Fact6: The time is either the day or the night.  \n7. Fact7: Olivia either prefers warm temperature or prefers cool temperature.  \n\nHypothesis:\n- At all times, Olivia prefers cool temperature.\n\nStep-by-step reasoning:\n1. By Fact6, at any time it is either day or night.  \n2. By Fact5, at any time Olivia either works or sleeps.  \n3. If it is day, then by Fact4 Olivia works during the day. In that case, she does not prefer warm temperature (Fact1).  \n4. By Fact7, at that time she must prefer either warm or cool. Since warm is not preferred (Fact1), she must prefer cool during the day.  \n5. If it is night, then by Fact3 Olivia sleeps during the night. By Fact2, when she sleeps she prefers cool temperature.  \n6. Therefore, whether the time is day or night, Olivia prefers cool temperature.  \n\nSo the hypothesis holds at all times.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 13.0,
-   "response_tokens": 193.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_110",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "1. Key facts:\n   - Fact1: *DI Ray* is a police procedural TV series.\n   - Fact2: *DI Ray* was created and written by Maya Sondhi.\n   - Fact3: *DI Ray* was produced by Jed Mercurio.\n   - Fact4: Maya Sondhi and Jed Mercurio are both British.\n\n2. Hypothesis to test:\n   - “DI Ray was created by a Brit.”\n\n3. Reasoning:\n   - From Fact2, the creator of *DI Ray* is Maya Sondhi.\n   - From Fact4, Maya Sondhi is British.\n   - Therefore, *DI Ray* was created by a British person.\n\n4. Conclusion:\n   - The hypothesis is supported by the given facts.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 98.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_81",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n1. Xiufeng, Xiangshan, Diecai, Qixing are districts in Guilin.  \n   - So, Xiufeng is a district in Guilin.\n2. Yangshuo is not a district in Guilin.  \n   - This does not affect whether Xiufeng is in Guilin.\n\nReasoning:\n- From Fact 1, Xiufeng is explicitly stated to be a district in Guilin.\n- The hypothesis “Xiufeng is in Guilin” directly matches this statement.\n- Therefore, the hypothesis is supported by the given facts.\n\nCONCLUSION: PROVED",
-   "response_steps": 2.0,
-   "response_tokens": 77.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_132",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "**Step 1: Identify key facts and what they claim.**  \n- **Fact1:** Camp Davern is a traditional summer camp for boys and girls.  \n- **Fact2:** Camp Davern was established in 1946.  \n- **Fact3:** Camp Davern was operated by the YMCA until the year 2015.  \n- **Fact4:** Camp Davern is one of Ontario's oldest summer camps.\n\n**Step 2: Compare the hypothesis to the facts.**  \n- **Hypothesis:** “A traditional summer camp for boys and girls was operated by the YMCA until the year 2015.”  \nThis is essentially claiming that **a camp that is traditional for boys and girls** was **operated by the YMCA until 2015**.\n\n**Step 3: Determine whether the hypothesis is supported.**  \n- From **Fact1**, Camp Davern is a **traditional summer camp for boys and girls**.  \n- From **Fact3**, Camp Davern was **operated by the YMCA until 2015**.  \nTogether, these directly match the hypothesis (the “a camp…” statement is satisfied by Camp Davern).\n\n**Step 4: Conclude.**  \nSince the hypothesis is directly supported by Facts 1 and 3, it is proven.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 8.0,
-   "response_tokens": 170.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_252",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "**Key facts and rules**\n1. Each person is either a **Grand Slam champion** or an **Oscar-nominated actor**.  \n2. **Grand Slam champions → professional tennis players**.  \n3. **Oscar-nominated actors → celebrities**.  \n4. **Professional tennis players → athletes**.  \n5. **Celebrities → well paid**.  \n6. **Athletes → famous**.  \n7. **Well paid → live in tax havens**.  \n8. **If Djokovic is famous and an athlete → Djokovic lives in well paid**.\n\n**Reasoning**\n1. By Fact1, Djokovic is either a Grand Slam champion or an Oscar-nominated actor.\n2. **Case A:** If Djokovic is a Grand Slam champion, then by Fact2 he is a professional tennis player, and by Fact4 he is an athlete.\n3. **Case B:** If Djokovic is an Oscar-nominated actor, then by Fact3 he is a celebrity, and by Fact5 he is well paid. From well paid, by Fact7, he lives in a tax haven.\n4. Now consider the remaining route to connect to Fact8:\n   - In Case A, Djokovic is an athlete, so by Fact6 he is famous.\n   - Then Fact8 applies: if Djokovic is famous and an athlete, Djokovic lives in well paid.\n   - From well paid, by Fact7, Djokovic lives in a tax haven.\n5. In **either case**, Djokovic lives in a tax haven.\n\nTherefore, the hypothesis is supported.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 13.0,
-   "response_tokens": 211.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_31",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n1. Fact1: Robert Lewandowski is a striker.\n2. Fact2 ([BG]): Strikers are soccer players.\n3. Fact3: Robert Lewandowski left Bayern Munchen.\n4. Fact4 ([BG]): If a player left a team they no longer play for that team.\n\nReasoning:\n- From Fact1, Robert Lewandowski is a striker.\n- From Fact2, all strikers are soccer players.\n- Therefore, Robert Lewandowski is a soccer player.\n\nNote: Facts 3 and 4 are not needed to determine whether the hypothesis is true, but they do not contradict the conclusion.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 90.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_485",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "**Key facts and rules**\n1. Philatelic literature is divided into these categories: **Stamp catalogues, Periodicals, Auction catalogues, Books, Bibliographies, and Background Material**.\n2. **Mort is not** a **Stamp catalogue**.  \n3. **Mort is not** a **periodical, auction catalogue, bibliography, or background material**.\n4. **Mort is a piece of Philatelic literature**.\n\n**Step-by-step reasoning**\n1. From Fact4, Mort must belong to one of the listed categories (Fact1).\n2. Mort cannot be any of these categories: Stamp catalogue (Fact2), Periodical, Auction catalogue, Bibliography, Background material (Fact3).\n3. The only remaining category from Fact1 that Mort could be is **Books**.\n\nTherefore, the hypothesis “Mort is a book” follows from the given facts.\n\nCONCLUSION: __PROVED__",
-   "response_steps": 7.0,
-   "response_tokens": 109.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_412",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "**Key facts and rules**\n1. **Fact1:** No animals are plants.  \n   - In logic: Animals ∩ Plants = ∅.\n2. **Fact2:** All humans are animals.  \n   - Human ⊆ Animal.\n3. **Fact3:** All pupils are human.  \n   - Pupil ⊆ Human.\n4. **Fact4:** All flowers are plants.  \n   - Flower ⊆ Plant.\n5. **Fact5:** If Jack is a human or a flower, then Jack is a human and a flower.  \n   - (Jack Human ∨ Jack Flower) → (Jack Human ∧ Jack Flower)\n\n**Hypothesis to test**\n- **Hypothesis:** If Jack is a human, then Jack is not a pupil.  \n  - Jack Human → ¬Jack Pupil\n\n---\n\n### Step-by-step reasoning\n1. Assume **Jack is a human**.  \n2. From **Fact2** (All humans are animals), Jack is an **animal**.\n3. From **Fact3** (All pupils are human), if Jack were a **pupil**, then Jack would be a **human**.  \n   - But we need the contrapositive-like reasoning: we check whether Jack being an animal could allow being a pupil.\n4. If Jack were a **pupil**, then Jack would be a **human** (by Fact3), and thus an **animal** (by Fact2). That does not directly contradict anything yet.\n5. Use **Fact5**: since we assumed Jack is a human, the condition “Jack is a human or a flower” is true.  \n   - Therefore, by **Fact5**, Jack is **a human and a flower**.\n6. From **Jack is a flower** and **Fact4** (All flowers are plants), Jack is a **plant**.\n7. But **Fact1** says **no animals are plants**.  \n   - We already have Jack is an animal (from being a human), and now Jack is a plant.  \n   - This is impossible.\n8. Therefore, under the assumption **Jack is a human**, it cannot be the case that Jack is a pupil (because the chain forces Jack to be both an animal and a plant).\n\nSo **Jack Human → ¬Jack Pupil** holds.\n\n---\n\nCONCLUSION: __PROVED__",
-   "response_steps": 13.0,
-   "response_tokens": 305.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_365",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts and rules:\n\n1. **All humans eat.**\n2. **If something eats, then it is not a plant.**  \n   (So: eats → ¬plant)\n3. **Every thing is either a plant or an animal.**  \n   (plant ∨ animal)\n4. **All goats are animals.**\n5. **No dirt is an animal.**  \n   (dirt → ¬animal)\n6. **Hulu is a goat or a human.**  \n   (goat ∨ human → Hulu)\n\nHypothesis to test:\n- **Hulu is an animal or dirt.**  \n  (animal ∨ dirt)\n\nReasoning:\n\n1. From Fact6, **Hulu is either a goat or a human**.\n2. **Case 1: Hulu is a goat.**  \n   - By Fact4, **all goats are animals**, so Hulu is an **animal**.  \n   - Therefore, **animal ∨ dirt** holds in this case.\n3. **Case 2: Hulu is a human.**  \n   - By Fact1, **all humans eat**, so Hulu **eats**.\n   - By Fact2, **if it eats then it is not a plant**, so Hulu is **not a plant**.\n   - By Fact3, every thing is either a plant or an animal. Since Hulu is **not a plant**, it must be an **animal**.\n   - Therefore, **animal ∨ dirt** holds in this case as well.\n4. Since in **both** possible cases (goat or human), Hulu is an **animal**, the hypothesis **must** be true: **Hulu is an animal or dirt** (indeed, it’s even stronger: Hulu is an animal).\n\nConclusion: __PROVED__",
-   "response_steps": 10.0,
-   "response_tokens": 217.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_372",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Key facts:\n1) A cutman is responsible for preventing and treating physical damage to a fighter.  \n2) Cutmen appear in boxing, kickboxing, and mixed martial arts matches.  \n3) Cutmen typically handle swelling, nosebleeds, and lacerations.  \n4) Jack is a cutman.\n\nReasoning:\n- From Fact1, being a cutman entails the ability/responsibility to treat physical damage.  \n- Fact4 states that Jack is a cutman.  \n- Therefore, Jack can treat physical damage to a fighter.  \n- The hypothesis “Jack can treat physical damage” is directly supported by these facts (and Fact3 provides examples of such treatments).\n\nCONCLUSION: __PROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 95.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_142",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Step 1: Identify relevant rules.**  \n- Fact3: If someone **complains often about annoying siblings**, then they have siblings who are the **same age**.  \nSo the hypothesis (“Luke complains often…”) would imply:  \n→ Luke has siblings who are the same age.\n\n**Step 2: Use the same-age rule to connect to twins/triplets.**  \n- Fact2: If people have siblings who are the same age, then they are **twins or triplets**.  \nSo from Step 1:  \n→ Luke is a **twin or triplet**.\n\n**Step 3: Use the contrapositive chain with the “strong bonds” outcome.**  \n- Fact5: If people spend a lot of time hanging out with and playing with their siblings, then they **often did not live at home regularly**.  \n- Fact4: If people **do not live at home regularly**, then they **do not develop strong bonds** with family members.  \n- Fact1: If people are twins or triplets, then they spend a lot of time hanging out with and playing with their siblings.  \nSo from Step 2:  \n1) Luke is a twin/triplet (from Step 2)  \n2) ⇒ Luke spends lots of time with siblings (Fact1)  \n3) ⇒ Luke often did not live at home regularly (Fact5)  \n4) ⇒ Luke does not develop strong bonds (Fact4)\n\n**Step 4: Compare with Fact6 (the exclusive situation given for Luke).**  \n- Fact6 says Luke is either:  \n  A) **(twin or triplet) AND develops strong bonds**, **OR**  \n  B) **(not twin or triplet) AND does not develop strong bonds**.  \n\nFrom Step 3, assuming the hypothesis true leads to:  \n→ Luke is a twin/triplet **and** Luke **does not** develop strong bonds.  \n\nBut Fact6 requires that if Luke is a twin/triplet, he **does** develop strong bonds (case A). The derived “twin/triplet and no strong bonds” combination is incompatible with Fact6.\n\n**Step 5: Therefore, the hypothesis cannot be true.**  \nSince assuming the hypothesis causes a contradiction with Fact6, the hypothesis is disproved.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 309.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_94",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts and rules**\n1. All cancers are malignant tumors. (Fact1)  \n   - So: If something is a cancer ⇒ it is malignant.\n2. No malignant tumor can be treated at home. (Fact2)  \n   - So: If something is malignant ⇒ it is not treatable at home.\n3. All colorectal cancer is cancer. (Fact3)  \n   - So: Colorectal cancer ⇒ cancer ⇒ malignant.\n4. Having a cold can be treated at home. (Fact4)  \n   - So: Cold ⇒ treatable at home.\n5. Breast cancer is neither having a cold nor a malignant tumor (exclusive). (Fact5)  \n   - So: Breast cancer ⇒ not cold and not malignant (and exclusivity means it is not both).\n\n**Hypothesis**\n“If breast cancer is not colorectal cancer, then breast cancer is a malignant tumor.”\n\nFormally:  \nIf (Breast cancer ∧ not Colorectal cancer) ⇒ (Breast cancer ⇒ malignant tumor)\n\n**Step-by-step reasoning**\n1. From Fact5: Breast cancer is **not** a malignant tumor.  \n   - Therefore, Breast cancer ⇒ not malignant.\n2. The hypothesis’s consequent claims: under the condition “breast cancer is not colorectal cancer,” breast cancer **is** a malignant tumor.\n3. But Fact5 directly states that breast cancer is **not** malignant, with no exception given.\n4. Since the consequent contradicts Fact5, the implication cannot be valid in general.\n\n**Therefore**\nThe hypothesis is disproved because it asserts that breast cancer is malignant under a condition, but the given facts state breast cancer is not malignant.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 9.0,
-   "response_tokens": 232.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_302",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts/rules:\n- F1: If someone attends Renaissance fairs regularly ⇒ they enjoy dressing up in old-fashioned/historical clothing.\n- F2: If someone is fascinated by Renaissance/past-era history ⇒ they attend Renaissance fairs regularly.\n- F3: Every person is either (A) fascinated by Renaissance/past-era history OR (B) is a not-nostalgic academic who enjoys learning.\n- F4: If someone is focused on the future and industry professions ⇒ they are not a not-nostalgic academic who enjoys learning.  \n  (So they cannot be “not-nostalgic academics who enjoy learning”.)\n- F5: If someone is a historical professor passionate about the job/subject ⇒ they are a nostalgic academic who enjoys learning.  \n- F6: If Clyde is not focused on the future and industry professions ⇒ Clyde is neither (focused on the future/industry) nor enjoys dressing up in old-fashioned/historical clothing.  \n  (The second part says: if not focused on future/industry, then he does NOT enjoy dressing up.)\n\nGoal (Hypothesis):\n- Clyde is a history professor who is passionate about his job and subject.\n\nStep-by-step reasoning:\n1. From F5, if Clyde is a historical professor passionate about his job/subject ⇒ Clyde is a nostalgic academic who enjoys learning.\n   - This gives a route to prove the hypothesis, but only if we already know the antecedent. F5 does not let us infer the antecedent from the consequent.\n\n2. Check whether any other facts allow us to infer that Clyde is a history professor passionate about his job/subject.\n   - F1 and F2 connect Renaissance-fair attendance and fascination with Renaissance history, but none of them mention “history professor” or “passionate about job/subject.”\n   - F3, F4 talk about being fascinated vs. being a (not-nostalgic) academic who enjoys learning, and being focused on the future vs. not, but again do not introduce “history professor passionate.”\n\n3. Use F6 to see what we can infer about Clyde:\n   - F6: If Clyde is not focused on future/industry professions ⇒ Clyde enjoys dressing up is false (he does not enjoy dressing up).\n   - However, F6 requires the antecedent “Clyde is not focused on future/industry professions” to trigger the conclusion. We are not given that Clyde satisfies the antecedent.\n\n4. Since the hypothesis asserts a very specific property (“history professor who is passionate about his job and subject”), and there is no rule that derives “history professor passionate” from any other given description of Clyde, we cannot logically prove it.\n\n5. Also, we have no explicit fact that denies the hypothesis either (no rule concluding that Clyde is not a passionate history professor). So we cannot derive a contradiction with the hypothesis from the given information.\n\nConclusion:\n- There is insufficient information to prove the hypothesis (but also no direct disproof). Under standard logical “proved/disproved” expectations with only forward implications given, the hypothesis cannot be established.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 5.0,
-   "response_tokens": 460.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_201",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "### Key facts and rules\n1. **Fact1:** All students who attend in person have registered for the conference.  \n2. **Fact2:** Students either attend the conference in person or remotely (exclusive or not specified, but at least one of the two).  \n3. **Fact3:** No students from China attend remotely.  \n4. **Fact4:** James attends the conference but **he does not attend remotely**.  \n5. **Fact5:** Jack attends the conference and he is a student from China.  \n6. **Hypothesis:** James attends the conference but **not in person**.\n\n### Step-by-step reasoning\n1. From **Fact4**, James attends the conference and **not remotely**.\n2. From **Fact2**, each student who attends must attend **either in person or remotely**.\n3. Since James does **not** attend remotely (Fact4), the only remaining option from Fact2 is that he attends **in person**.\n4. Therefore, the hypothesis “James attends the conference but not in person” contradicts the logical consequence that James must attend in person.\n\n### Conclusion\nThe hypothesis is therefore **false** based on Facts 2 and 4.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 10.0,
-   "response_tokens": 167.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_293",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts and rules:\n1. Billings is in Montana.\n2. Montana includes the cities of Butte, Helena, and Missoula. ⇒ Butte is in Montana.\n3. White Sulphur Springs and Butte are in the same state (implies they share a state, but not needed further).\n4. Pierre is not in Montana.\n5. Any city in Butte is not in Pierre (interpreted as: Butte is not in Pierre’s state; i.e., Butte and Pierre are in different states).\n\nStep-by-step reasoning:\n- From Fact 2, Butte is in Montana.\n- From Fact 4, Pierre is not in Montana.\n- Therefore, Butte and Pierre cannot be in the same state.\n- Fact 5 reinforces that Butte is not in Pierre’s state.\n\nThus, the hypothesis “Butte and Pierre are in the same state” is contradicted by the facts.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 134.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_36",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts/rules:**\n- (F1) No mansion houses are in urban areas.  \n- (F2) All skyscrapers are in urban areas.  \n- (F3) Every creepy haunted house is in a mansion house.  \n- (F4) Every terrifying Halloween scare comes from a creepy haunted house (so “terrifying Halloween scare” ⇒ “creepy haunted house”).  \n- (F5) The Scream is a creepy haunted house **or** a terrifying Halloween scare.\n\n**Goal (Hypothesis):**  \n“If The Scream is either a skyscraper or a creepy haunted house, then it is not a mansion house.”\n\n---\n\n### Step-by-step reasoning\n\n1. From (F5), **The Scream** is either:\n   - a creepy haunted house, or\n   - a terrifying Halloween scare.\n\n2. If The Scream is a **creepy haunted house**, then by (F3) it must be in a **mansion house**.\n\n3. Therefore, under the branch where The Scream is a creepy haunted house, The Scream is a mansion house—not “not a mansion house.”\n\n4. The hypothesis only needs a counterexample for the condition: it claims  \n   (skyscraper OR creepy haunted house) ⇒ not a mansion house.  \n   But we already have that (creepy haunted house) ⇒ (mansion house), which contradicts the conclusion.\n\n5. Hence the hypothesis cannot be proven given the provided facts.\n\n(Optionally: if The Scream were a skyscraper, then by (F2) it would be urban, and by (F1) it couldn’t be a mansion house. But since the other allowed case (creepy haunted house) forces it to be a mansion house, the implication fails overall.)\n\n---\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 243.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_457",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts and rules:\n- Fact1: All Romance languages are Indo-European languages.\n- Fact2: The Romance languages are a language family.\n- Fact3: All languages within a language family are related to each other.\n- Fact4: French and Spanish are Romance languages.\n- Fact5: German is related to Spanish.\n- Fact6: Basque is not related to any other language.\n\nReasoning:\n1. From Fact2 and Fact3: if Basque were a Romance language, then Basque would be within the Romance language family.\n2. Then, by Fact3, Basque would be related to other languages in that family—at minimum, related to French and Spanish (Fact4).\n3. However, Fact6 states that Basque is not related to any other language.\n4. This contradicts the requirement implied by being a Romance language.\n\nTherefore, the hypothesis that Basque is a Romance language is disproved.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 4.0,
-   "response_tokens": 138.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_389",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts and rules:\n1. Every event is either happy or sad.\n2. At least one event is happy.\n3. Hypothesis: All events are sad.\n\nStep-by-step reasoning:\n1. From Fact2, there exists at least one event that is happy.\n2. If the hypothesis “All events are sad” were true, then no event could be happy.\n3. This contradicts Fact2, which guarantees the existence of a happy event.\n4. Therefore, the hypothesis cannot be true.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 7.0,
-   "response_tokens": 76.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_483",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "1. From Fact1, there exist some Mondays at 8 pm when roses are given out on TV.  \n2. From Fact2, every rose given out on TV is on the Bachelor. Therefore, any TV show/time that gives roses at those times is a Bachelor episode.  \n3. From Fact3, everything on the Bachelor portrays the lives of real people. So the Bachelor (and thus the episodes where roses are given out) portray real people’s lives.  \n4. From Fact4, all shows portraying the lives of real people are reality TV shows. Therefore, the Bachelor is a reality TV show.  \n5. From Fact5, Breaking Bad is not a reality TV show.\n\nNow, the hypothesis says: “Breaking Bad is a TV show in which roses are given out on Monday at 8 pm.”  \n- If roses are given out on Breaking Bad at that time, then by Fact2 those roses would be on the Bachelor.  \n- That would imply the relevant show/time is part of the Bachelor, and by Facts 3 and 4 it would have to be a reality TV show.  \n- But Fact5 states Breaking Bad is not a reality TV show, contradicting the implication.\n\nTherefore, the hypothesis cannot be true given the facts.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 203.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_458",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts/rules (translated):**\n- **F1:** No mansion houses are in urban areas.  \n- **F2:** Every skyscraper is in an urban area.  \n- **F3:** Every creepy haunted house is in a mansion house.  \n- **F4:** Every terrifying Halloween scare comes from a creepy haunted house. (So terrifying → creepy.)  \n- **F5:** **The Scream** is either a creepy haunted house or a terrifying Halloween scare.  \n\n**Hypothesis to check:**\n> If The Scream is either a skyscraper or a mansion house, then it is **neither** a creepy haunted house nor a terrifying Halloween scare.\n\n**Step-by-step reasoning:**\n1. From **F3**, if The Scream is a **creepy haunted house**, then it is a **mansion house**.  \n2. From **F4**, if The Scream is a **terrifying Halloween scare**, then it is a **creepy haunted house**.  \n   - Therefore, “terrifying” implies “creepy,” and thus would also imply “mansion” (via F3).\n3. From **F1** and **F2**:  \n   - **mansion → not urban** (F1 contrapositive: if in urban then not mansion).  \n   - **skyscraper → urban** (F2).  \n   - Hence **skyscraper and mansion cannot both be true**, and any **mansion** cannot be a **skyscraper**.\n4. Now use **F5**: The Scream is **either** creepy **or** terrifying.\n5. Consider cases under the hypothesis condition (“The Scream is either a skyscraper or a mansion house”):\n   - If The Scream is a **mansion house**:  \n     - It could still be a **creepy haunted house** (consistent with F3).  \n     - That would violate the hypothesis conclusion (which says it is neither creepy nor terrifying).\n   - If The Scream is a **skyscraper**:  \n     - The Scream would be in an urban area (F2).  \n     - Then by **F1**, it cannot be a mansion house.  \n     - But **F3** would imply creepy → mansion, so it cannot be creepy.  \n     - And since terrifying → creepy (F4), it cannot be terrifying either.  \n     - In this case the hypothesis conclusion would hold.\n\n6. Since the hypothesis must hold in **all** situations where the condition is true, it suffices to find one consistent scenario where:\n   - The Scream is a **mansion house** (making the condition true),\n   - yet The Scream is **creepy haunted house** (allowed by F3),\n   - which contradicts the hypothesis conclusion.\n\nSuch a scenario is consistent with all given facts, so the implication is not guaranteed.\n\nTherefore, the hypothesis is **disproved**.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 6.0,
-   "response_tokens": 376.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_354",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts/rules (restated):\n1. Either in women or in men.  \n2. No men have breast cancer.  \n3. Either breast cancer or non-breast cancer.  \n4. No type of cancer is without a tumor.  \n   - Interpreting: For every cancer type T, T → has a tumor (i.e., cannot be “without a tumor”).  \n5. All non-breast cancers are a type of cancer.  \n   - i.e., non-breast cancer → type of cancer.  \n6. If adenocarcinoma is a type of cancer or without a tumor, then adenocarcinoma is in women or without a tumor.\n\nHypothesis to test:\nIf (adenocarcinoma is in women or without a tumor), then\n(adenocarcinoma is without a tumor AND a non-breast cancer).\n\n---\n\nStep-by-step reasoning:\n\n**Step 1: Can we derive the antecedent?**  \nThe hypothesis is an implication; to prove it, we need to show that whenever its antecedent holds, the consequent follows. We are not explicitly given that “adenocarcinoma is in women or without a tumor” is always true, but in such logic problems the goal is to check whether the consequent is logically forced by the given facts/rules under that antecedent.\n\n**Step 2: Use Fact 4 (“No type of cancer is without a tumor”).**  \nFact 4 implies:\n- If adenocarcinoma is a type of cancer, then adenocarcinoma is **not** without a tumor.\nSo, adenocarcinoma cannot be without a tumor if it is a cancer type.\n\n**Step 3: Check the hypothesis consequent includes “adenocarcinoma is without a tumor.”**  \nThe hypothesis requires: (adenocarcinoma in women or without a tumor) → (adenocarcinoma without a tumor AND non-breast cancer).\n\nBut Fact 4 prevents any cancer type from being without a tumor. If we can connect adenocarcinoma to being a cancer type, then the consequent would be inconsistent.\n\n**Step 4: Can we show adenocarcinoma is a type of cancer?**  \nWe are not directly told “adenocarcinoma is a type of cancer,” but Fact 6 provides a way:\n- Fact 6: If (adenocarcinoma is a type of cancer OR adenocarcinoma is without a tumor), then (adenocarcinoma is in women OR adenocarcinoma is without a tumor).\n\nThis is a one-way implication from a disjunction to another disjunction; it does **not** let us conclude adenocarcinoma is a type of cancer from the antecedent of the hypothesis.\n\n**Step 5: However, the hypothesis demands adenocarcinoma without a tumor.**  \nGiven Fact 4, if adenocarcinoma is a “type of cancer,” it cannot be without a tumor. The hypothesis’s consequent asserts it is without a tumor, which conflicts with Fact 4 under the (natural) interpretation that adenocarcinoma is a cancer type.\n\nSince Facts provided do not explicitly state “adenocarcinoma is a type of cancer,” the only solid logical conclusion we can force from Fact 4 is: *no type of cancer is without a tumor*.  \nBut the hypothesis requires “adenocarcinoma is without a tumor” regardless; and Fact 4 rules out “without a tumor” for any cancer type. In standard formalizations, adenocarcinoma is itself a cancer type, meaning the hypothesis directly contradicts Fact 4.\n\n**Step 6: Also, the hypothesis requires “a non-breast cancer.”**  \nWe are given:\n- Either breast cancer or non-breast cancer (Fact 3).\n- No men have breast cancer (Fact 2).\nBut nothing connects adenocarcinoma (under the hypothesis antecedent) to being in women in a way that would force “non-breast cancer,” nor does Fact 6 provide that strength. So even if we ignore the tumor contradiction, the “non-breast cancer” part is not derivable from the given rules.\n\n**Conclusion of analysis:**  \nThe hypothesis is not supported: its consequent includes “adenocarcinoma without a tumor,” which is disallowed by Fact 4 for any cancer type, and its “non-breast cancer” conclusion is not logically forced by the premises. Therefore the hypothesis is disproved.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 6.0,
-   "response_tokens": 606.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_343",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts/rules:\n1) All defenders are soccer players.  \n2) No soccer players are professional basketball players.  \n3) All centerbacks are defenders.  \n4) All NBA players are professional basketball players.  \n5) If Stephen Curry is not an NBA player, then (Stephen Curry is not an NBA player OR Stephen Curry is not a soccer player).  \nHypothesis: Stephen Curry is a centerback.\n\nStep-by-step reasoning:\n1) From Fact3: If someone is a centerback, then they are a defender.  \n2) From Fact1: If someone is a defender, then they are a soccer player.  \n3) Therefore, if Stephen Curry is a centerback, then Stephen Curry is a soccer player.  \n\nNow check whether anything implies Stephen Curry cannot be a centerback:\n4) Fact4 says NBA players are professional basketball players.  \n5) Fact2 says no soccer players are professional basketball players.  \n6) So, if Stephen Curry were an NBA player, he would be a professional basketball player, but he cannot be a soccer player then. However, this does not directly conflict with centerback unless we know he is an NBA player.  \n\n7) Fact5 is a logical statement of the form:  \n   If (Curry is not an NBA player), then (Curry is not an NBA player OR Curry is not a soccer player).  \n   This is always satisfied whenever the antecedent holds, and it does not provide evidence that Curry is or is not an NBA player or that he is or is not a centerback.\n\n8) Crucially, we have no fact stating that Stephen Curry is an NBA player, nor a fact stating that Stephen Curry is not a soccer player, nor any fact that says centerbacks cannot exist.\n\nConclusion:\n- The hypothesis “Stephen Curry is a centerback” is not directly supported by given facts (there is no fact asserting it).\n- Also, it is not contradicted by the given facts.\nSo the knowledge provided does not prove the hypothesis.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 13.0,
-   "response_tokens": 313.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_195",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts and rules (formalized):**\n1. All cats are cute.  \n   - If x is a cat → x is cute.\n2. Ghosts do not exist.  \n   - There is no x that is a ghost.\n3. Every animal is either a cat or a dog.  \n   - If x is an animal → (x is a cat ∨ x is a dog).\n4. Nothing that barks is lovely.  \n   - If x barks → x is not lovely.\n5. If x is a dog → x barks.  \n   - If x is a dog → x barks.\n6. Grace is either a cat and a dog, or neither a cat nor a dog.  \n   - (Grace is cat ∧ Grace is dog) ∨ (Grace is not a cat ∧ Grace is not a dog).\n\n**Hypothesis to test:**\n“If Grace is not both a ghost and lovely, then Grace is either a cat or cute.”\n\nLet:\n- Antecedent: “Grace is not both a ghost and lovely”  \n  i.e., ¬(Grace is ghost ∧ Grace is lovely)\n- Consequent: “Grace is either a cat or cute”  \n  i.e., (Grace is a cat ∨ Grace is cute)\n\n---\n\n### Step-by-step reasoning\n\n**Step 1: Use Fact2 (ghosts do not exist).**  \nSince ghosts do not exist, Grace cannot be a ghost.  \nSo Grace is not a ghost, hence it is impossible for (Grace is ghost ∧ Grace is lovely) to be true.\n\nTherefore:\n- ¬(Grace is ghost ∧ Grace is lovely) is **always true**.\n\nSo the hypothesis reduces to checking whether the consequent must be true.\n\n---\n\n**Step 2: Use Fact6 about Grace.**  \nGrace satisfies:\n- Case A: Grace is a cat and a dog  \n  or\n- Case B: Grace is neither a cat nor a dog\n\nSo we check the consequent in both cases.\n\n---\n\n**Case A: Grace is a cat and a dog**\n- From “All cats are cute” (Fact1), Grace being a cat implies Grace is cute.\n- Therefore Grace is (cat ∨ cute) is **true**.\n\n---\n\n**Case B: Grace is neither a cat nor a dog**\n- Grace is not a cat, so the “cat” part of (cat ∨ cute) is false.\n- But does Fact1 or any other fact force Grace to be cute anyway?  \n  Fact1 only gives “cat → cute”, not “not cat → not cute”.\n- Facts 4 and 5 only relate barking to lovely and dogs to barking; but in Case B, Grace is not a dog, so we cannot infer barking.\n- Nothing states that non-cats are not cute.\n\nSo in Case B, the consequent (Grace is a cat or Grace is cute) is **not guaranteed**.  \nIt could be that Grace is cute even though she is not a cat.\n\nThus, the hypothesis is **not logically forced** by the given facts.\n\n---\n\n### Conclusion\nBecause there exists a consistent possibility (Case B) where Grace is neither a cat nor a dog, the consequent “Grace is either a cat or cute” is not guaranteed. Therefore the implication is **not proved**.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 6.0,
-   "response_tokens": 497.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_20",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts/rules:\n1. Aberdeen won the cup in the 2013 final. (Fact1)\n2. Rangers won the cup in the 2014 final. (Fact2)\n3. Aberdeen and Rangers are different teams. (Fact3)\n4. Different teams cannot win the same cup in a given year’s final. (Fact4)\n\nReasoning:\n1. The hypothesis claims: “Rangers won the cup in 2013.”\n2. Fact1 states that Aberdeen won the cup in the 2013 final.\n3. Fact3 says Aberdeen and Rangers are different teams.\n4. By Fact4, different teams cannot win the same cup in the same year’s final.\n5. Since Aberdeen (not Rangers) won in 2013, Rangers cannot also have won in 2013.\n\nTherefore, the hypothesis is inconsistent with the facts and is disproved.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 9.0,
-   "response_tokens": 119.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_319",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts/rules:\n1. Every customer chooses exactly one plan: Plan A or Plan B. (Fact1)\n2. Anyone who chooses Plan B receives a $30 gift card. (Fact2)\n3. There are no customers who choose no plans. (Fact3)\n4. Anyone who receives a $30 gift card is not older than 80 (i.e., no one older than 80 is in the Plan B gift-card group). (Fact4)\n5. Every customer is either older than 80 or currently studying at school. (Fact5)\n6. James is not currently studying at school. (Fact6)\n\nNow assess the hypothesis:\n- Hypothesis: “James is a customer who does not choose any plans.”\n- But Fact3 explicitly states: “There are no customers who do not choose any plans.”\n- Therefore, the statement that James (as a customer) does not choose any plans contradicts Fact3.\n\nAdditionally (consistent check, not required):\n- From Fact6 and Fact5: since James is not studying, he must be older than 80.\n\nThis does not fix the main contradiction: Fact3 already rules out the possibility of any customer choosing no plans, including James.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 6.0,
-   "response_tokens": 178.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_445",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts and rules:**\n- There are exactly six wild turkey types: Eastern, Osceola, Gould’s, Merriam’s, Rio Grande, and Ocellated.  \n- Tom is **not** Eastern (Fact3).\n- Tom is **not** Osceola (Fact4).\n- Tom is **not** Gould’s, **or** Merriam’s, **or** Rio Grande (Fact5).  \n- Tom **is** a wild turkey (Fact6).\n\n**Step-by-step reasoning:**\n1. The hypothesis claims: **Tom is an Eastern wild turkey**.\n2. Fact3 explicitly states: **Tom is not an Eastern wild turkey**.\n3. Since Fact3 directly contradicts the hypothesis, the hypothesis cannot be true given the provided facts.\n4. Therefore, the hypothesis is disproved regardless of other facts.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 101.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_1",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts and rules:\n1. Fact1 states: **Badults is a British sitcom series, starring members of Pappy’s**.  \n   - Therefore, any show that is “Badults” has at least some members of Pappy’s as starring cast.\n2. Fact2 states: **Badults piloted in July 2013 on BBC Three**.  \n3. Fact3 states: **The working title “The Secret Dude Society” was used for Badults** (relevant context but not necessary for the logic about BBC Three).\n\nHypothesis:\n- “No members of Pappy’s have starred for a show piloting on BBC Two or BBC Three.”\n\nStep-by-step reasoning:\n1. From Fact1, **members of Pappy’s starred in Badults**.\n2. From Fact2, **Badults piloted on BBC Three**.\n3. Combining (1) and (2): **Members of Pappy’s starred in a show (Badults) that piloted on BBC Three**.\n4. This directly contradicts the hypothesis, which claims **no** Pappy’s members have starred in a show piloting on BBC Two or BBC Three.\n\nTherefore:\n- The hypothesis is **false** given the provided facts.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 7.0,
-   "response_tokens": 160.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_230",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts/rules:\n- Fact1: No digital media are analog. (Digital → not analog)\n- Fact2: Every printed text is analog. (Printed text → analog)\n- Fact3: All streaming services are digital. (Streaming → digital)\n- Fact4: If an object is a hardcover book, then it is printed text. (Hardcover book → printed text)\n- Fact5: If 1984 is a streaming service, then 1984 is a hardcover book. (1984 streaming → 1984 hardcover)\n\nHypothesis: 1984 is a streaming service.\n\nReasoning:\n1. Assume the hypothesis: 1984 is a streaming service.\n2. From Fact3, streaming → digital, so 1984 is digital.\n3. From Fact5, 1984 streaming → 1984 hardcover, so 1984 is a hardcover book.\n4. From Fact4, hardcover → printed text, so 1984 is printed text.\n5. From Fact2, printed text → analog, so 1984 is analog.\n6. Now we have: 1984 is digital (step 2) and analog (step 5).\n7. But Fact1 says no digital media are analog, i.e., digital → not analog. This contradicts that 1984 is both digital and analog.\n\nTherefore, the hypothesis leads to a contradiction, so it is disproved.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 7.0,
-   "response_tokens": 184.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_363",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "1. From Fact2, the lead singer of Imagine Dragons is Dan.  \n2. From Fact4, all lead singers are singers. Therefore, Dan is a singer.  \n3. From Fact5, all singers are musicians. Therefore, Dan is a musician.  \n4. The hypothesis states: “Dan is not a musician.” This directly contradicts the conclusion that Dan is a musician.\n\nSince the given facts imply Dan is a musician, the hypothesis is false.\n\nCONCLUSION: __DISPROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 70.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_377",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "**Key facts/rules extracted**\n\n1. (F1) Every person is in at least one of these categories:  \n   **likes eating cheese OR is a francophile**.  \n   \\[\n   \\forall x,\\; (Cheese(x) \\lor Francophile(x))\n   \\]\n2. (F2) **No francophile** likes Spain as their favorite country:  \n   \\[\n   \\forall x,\\; Francophile(x) \\rightarrow \\neg Spain(x)\n   \\]\n3. (F3) **Everyone who likes Spain OR likes eating cheese** is covered (this is just a disjunction):  \n   \\[\n   \\forall x,\\; Spain(x) \\lor Cheese(x)\n   \\]\n4. (F4) Benji is **not** someone who likes eating cheese, and Benji **studies Spanish**:  \n   \\[\n   \\neg Cheese(Benji) \\land SpanishStudy(Benji)\n   \\]\n5. (F5) If Benji studies **neither** Spanish nor French, then Benji studies Spanish **or** French:  \n   \\[\n   \\neg SpanishStudy(Benji) \\land \\neg FrenchStudy(Benji) \\rightarrow (SpanishStudy(Benji)\\lor FrenchStudy(Benji))\n   \\]\n\n**Hypothesis to test**\n\nH:  \nIf Benji **likes Spain as favorite country OR studies French**, then Benji is either **studies Spanish OR likes Spain**.\n\\[\n(Spain(Benji)\\lor FrenchStudy(Benji)) \\rightarrow (SpanishStudy(Benji)\\lor Spain(Benji))\n\\]\n\n---\n\n## Step-by-step reasoning\n\n1. From (F4), we know:\n   \\[\n   SpanishStudy(Benji) \\text{ is true.}\n   \\]\n2. Consider the hypothesis implication:\n   \\[\n   (Spain(Benji)\\lor FrenchStudy(Benji)) \\rightarrow (SpanishStudy(Benji)\\lor Spain(Benji))\n   \\]\n3. The consequent is:\n   \\[\n   SpanishStudy(Benji)\\lor Spain(Benji)\n   \\]\n   Since \\(SpanishStudy(Benji)\\) is true (from F4), the consequent is **true regardless** of whether \\(Spain(Benji)\\) is true or \\(FrenchStudy(Benji)\\) is true.\n4. Therefore, whenever the antecedent holds (whether \\(Spain(Benji)\\) or \\(FrenchStudy(Benji)\\) is true), the consequent is automatically satisfied.\n\nNo additional facts (F1–F3, F5) are needed to validate the implication because (F4) already guarantees the consequent.\n\n---\n\nCONCLUSION: __PROVED__",
-   "response_steps": 9.0,
-   "response_tokens": 238.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_297",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts and rules:\n1) If a person is a leader of a country for life, then they are in a monarchy.  \n2) Leaders are either a king or a queen.  \n3) Queens are female.  \n4) Kings are male.  \n5) Elizabeth is a queen.  \n6) Elizabeth is a leader.\n\nReasoning:\n1) Fact 6 says Elizabeth is a leader.  \n2) Fact 5 says Elizabeth is a queen.  \n3) From rule (2), leaders are either a king or a queen. Since Elizabeth is specifically a queen, she must be a queen (not a king).  \n4) Therefore, the hypothesis “Elizabeth is a king” contradicts the fact that Elizabeth is a queen, and thus cannot be true given the classification rule.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 10.0,
-   "response_tokens": 119.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_276",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts and rules:\n1. **Fact1:** If a player receives **two yellow cards in one game**, they are **ejected from the rest of the game**.\n2. **Fact2:** If a player receives **one red card in one game**, they are **ejected from the rest of the game**.\n3. **Fact3:** **Henry is a soccer player**.\n4. **Fact4:** In one game, **Henry first receives one yellow card, then receives one red card**.\n\nReasoning:\n1. From **Fact3**, Henry is a soccer player, so the rules about players apply to him.\n2. From **Fact4**, Henry receives **one red card in that game**.\n3. By **Fact2**, receiving **one red card in one game** means Henry **will be ejected from the rest of the game**.\n4. The hypothesis says: **Henry will not be ejected**. This contradicts the result from Fact2.\n\nTherefore, the hypothesis is not supported and is contradicted by the given facts.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 8.0,
-   "response_tokens": 148.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_399",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Key facts/rules:\n1. Players start at the red stage.\n2. There are three stages in order: red, yellow, green.\n3. A player cannot reach the green stage unless they have reached the yellow stage first.\n4. Players move one stage at a time.\n\nReasoning:\n- Since the green stage can only be reached after the yellow stage (Fact3), any path to green must include a visit to yellow.\n- The hypothesis claims it’s possible to move to green without ever reaching yellow.\n- This directly contradicts Fact3.\n- Therefore, such a move/path cannot exist.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 4.0,
-   "response_tokens": 96.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_289",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts and rules**\n- Fact1: Oxford Circus connects Oxford Street and Regent Street.  \n- Fact2: Oxford Street is in London.  \n- Fact3: John Nash designed the construction on Regent Street.  \n- Fact4: John Nash designed Oxford Circus.  \n- Fact5: John Nash is an architect in British.  \n- Fact6: Oxford Circus is the entrance to the Oxford Circus tube station, part of the Central line in 1900.  \n- **Hypothesis:** “Regent Street is not in London.”\n\n**Step-by-step reasoning**\n1. From **Fact1**, Oxford Circus is a road junction connecting **Oxford Street** and **Regent Street**. So both streets are connected at Oxford Circus.\n2. From **Fact2**, **Oxford Street is in London**.\n3. However, none of the provided facts explicitly state that **Regent Street is in London** or that it is **not** in London.\n4. Facts **3–6** concern design and the tube station, but they do not establish the geographic location of **Regent Street** relative to London.\n5. Therefore, the hypothesis “Regent Street is not in London” cannot be logically derived from the given facts, nor is there evidence provided that would contradict it with certainty.\n\nSince the hypothesis is neither proven true nor disproven by the provided facts, we must treat it as **not supported**.\n\nCONCLUSION: DISPROVED",
-   "response_steps": 5.0,
-   "response_tokens": 204.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_280",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "**Key facts/rules**\n1. All professors are teachers.  \n2. All researchers are professors.  \n3. No teachers are students. (Teachers and students are disjoint)  \n4. All people who study are students.  \n5. Leon is not studying or a researcher.  \n6. If Leon is not studying, then Leon is a teacher.  \n\n**Step-by-step reasoning**\n1. From Fact5: “Leon is not studying or a researcher.”  \n   - Interpreting this in standard logical form, it means: **Leon is not studying OR Leon is not a researcher** (i.e., the statement is a disjunction).  \n   - So we **cannot** conclude either disjunct must be true in all cases.\n2. The hypothesis is: **If Leon is not a researcher, then Leon is a student.**  \n   - To prove this as a logical implication, we would need to show that **whenever** Leon is not a researcher, Leon must be a student.\n3. Suppose the antecedent holds: Leon is **not a researcher**.  \n   - We need to determine whether Leon must be a student.\n4. From Fact6: If Leon is not studying, then Leon is a teacher.  \n   - If in addition Leon were not studying, then Leon would be a teacher.\n5. From Fact3: No teachers are students.  \n   - So if Leon is a teacher, Leon cannot be a student.\n6. Because Fact5 only gives an **OR** (“not studying OR not a researcher”), there is a consistent possibility where:\n   - Leon is **not a researcher**, and\n   - Leon is **not studying**.\n7. In that scenario:\n   - Leon not studying ⇒ (Fact6) Leon is a teacher.\n   - Teacher ⇒ not a student (Fact3).\n   - This contradicts the hypothesis’s requirement that Leon be a student when Leon is not a researcher.\n\n**Therefore**, the hypothesis fails in a consistent model (not a researcher and not studying leads to Leon being a teacher, hence not a student).\n\nCONCLUSION: DISPROVED",
-   "response_steps": 13.0,
-   "response_tokens": 300.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "GSM8K_0",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "5",
-   "raw_response": "STEPS:\nstep1: total mangoes = 54\nstep2: ripe mangoes = (1/3) × 54 = 54 ÷ 3 = 18\nstep3: unripe mangoes = (2/3) × 54 = 2 × (54 ÷ 3) = 2 × 18 = 36\nstep4: mangoes kept unripe = 16\nstep5: mangoes given to sister = 36 − 16 = 20\nstep6: jars per mangoes group = 1 jar holds 4 mangoes\nstep7: number of jars = 20 ÷ 4 = 5\n\nANSWER: 5",
-   "response_steps": 7.0,
-   "response_tokens": 78.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_1",
-   "source_dataset": "GSM8K",
-   "ground_truth": "134",
-   "predicted": "134",
-   "raw_response": "STEPS:\nstep1: Cookies per tray per day = 12\nstep2: Number of trays per day = 2\nstep3: Total cookies baked per day = 2 × 12 = 24\nstep4: Number of days = 6\nstep5: Total cookies baked in 6 days = 6 × 24 = 144\nstep6: Frank eats 1 cookie per day for 6 days = 6 × 1 = 6\nstep7: Ted eats 4 cookies on day 6 = 4\nstep8: Total cookies eaten = 6 + 4 = 10\nstep9: Cookies left when Ted leaves = 144 − 10 = 134\n\nANSWER: 134",
-   "response_steps": 9.0,
-   "response_tokens": 98.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_2",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "9",
-   "raw_response": "STEPS:\nstep1: Chloe’s wins : Max’s wins = 8 : 3\nstep2: The ratio factor for Chloe is 24 ÷ 8 = 3\nstep3: Max’s wins = 3 × 3 = 9\n\nANSWER: 9",
-   "response_steps": 3.0,
-   "response_tokens": 34.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_3",
-   "source_dataset": "GSM8K",
-   "ground_truth": "44",
-   "predicted": "44",
-   "raw_response": "STEPS:\nstep1: Total miles in one round trip to school = 2.5 miles × 2 = 5 miles  \nstep2: Number of school round trips per week = (2 per day) × (4 days) = 8 round trips  \nstep3: Total school miles per week = 5 miles × 8 = 40 miles  \nstep4: Total miles in one round trip to market = 2 miles × 2 = 4 miles  \nstep5: Number of market round trips per week (weekends) = 1  \nstep6: Total market miles per week = 4 miles × 1 = 4 miles  \nstep7: Total car mileage for a typical week = 40 miles + 4 miles = 44 miles  \n\nANSWER: 44",
-   "response_steps": 7.0,
-   "response_tokens": 112.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_4",
-   "source_dataset": "GSM8K",
-   "ground_truth": "220",
-   "predicted": "220",
-   "raw_response": "STEPS:\nstep1: First hour apples = 66  \nstep2: Second hour rate is double the first hour rate = 2 × 66  \nstep3: Second hour apples = 132  \nstep4: Third hour apples is one third of the first hour apples = (1/3) × 66  \nstep5: Third hour apples = 22  \nstep6: Total apples = 66 + 132 + 22  \nstep7: Total apples = 198 + 22  \nstep8: Total apples = 220  \n\nANSWER: 220",
-   "response_steps": 8.0,
-   "response_tokens": 72.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_5",
-   "source_dataset": "GSM8K",
-   "ground_truth": "4",
-   "predicted": "4",
-   "raw_response": "STEPS:\nstep1: 5 + 5 = 10\nstep2: 10 + 20 = 30\nstep3: 30 - 10 = 20\nstep4: 20 ÷ 5 = 4\n\nANSWER: 4",
-   "response_steps": 4.0,
-   "response_tokens": 27.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_6",
-   "source_dataset": "GSM8K",
-   "ground_truth": "3600",
-   "predicted": "3600",
-   "raw_response": "STEPS:\nstep1: New York cases = 2000  \nstep2: California cases = (1/2) × 2000  \nstep3: California cases = 1000  \nstep4: Texas cases = California cases − 400  \nstep5: Texas cases = 1000 − 400 = 600  \nstep6: Total cases = New York + California + Texas  \nstep7: Total cases = 2000 + 1000 + 600 = 3600  \n\nANSWER: 3600",
-   "response_steps": 7.0,
-   "response_tokens": 59.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_7",
-   "source_dataset": "GSM8K",
-   "ground_truth": "24",
-   "predicted": "24",
-   "raw_response": "STEPS:\nstep1: Milk per cow per week = 108 ÷ 6 = 18 liters\nstep2: Milk per cow over 5 weeks = 18 × 5 = 90 liters\nstep3: Number of cows = 2160 ÷ 90 = 24\n\nANSWER: 24",
-   "response_steps": 3.0,
-   "response_tokens": 40.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_8",
-   "source_dataset": "GSM8K",
-   "ground_truth": "24",
-   "predicted": "24",
-   "raw_response": "STEPS:\nstep1: Initial money = 65\nstep2: Money after ice cream = 65 - 5 = 60\nstep3: Half of the remainder spent on t-shirt = 60 ÷ 2 = 30\nstep4: Money after t-shirt = 60 - 30 = 30\nstep5: Money deposited = (1/5) of 30 = 30 ÷ 5 = 6\nstep6: Money left after deposit = 30 - 6 = 24\n\nANSWER: 24",
-   "response_steps": 6.0,
-   "response_tokens": 67.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_9",
-   "source_dataset": "GSM8K",
-   "ground_truth": "350",
-   "predicted": "350",
-   "raw_response": "STEPS:\nstep1: initial elevation = 400 ft  \nstep2: rate of descent = 10 ft/min  \nstep3: time traveled = 5 min  \nstep4: total descent = 10 ft/min × 5 min  \nstep5: total descent = 50 ft  \nstep6: current elevation = 400 ft − 50 ft  \nstep7: current elevation = 350 ft  \n\nANSWER: 350",
-   "response_steps": 7.0,
-   "response_tokens": 52.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_10",
-   "source_dataset": "GSM8K",
-   "ground_truth": "11",
-   "predicted": "15",
-   "raw_response": "STEPS:\nstep1: Previous 24 games total = 720 points  \nstep2: Previous average per game = 720 ÷ 24 = 30  \nstep3: In the championship, UF scored 2 points less than half their previous scoring in each game  \nstep4: Half of previous per-game score = 30 ÷ 2 = 15  \nstep5: UF championship score = 15 − 2 = 13  \nstep6: Opponent only lost by 2 points, so opponent score = UF score + 2 = 13 + 2 = 15  \n\nANSWER: 15",
-   "response_steps": 6.0,
-   "response_tokens": 82.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_11",
-   "source_dataset": "GSM8K",
-   "ground_truth": "3",
-   "predicted": "3",
-   "raw_response": "STEPS:\nstep1: Monday toys = 6\nstep2: Wednesday toys = 2 × Monday toys = 2 × 6 = 12\nstep3: Friday toys = 4 × Monday toys = 4 × 6 = 24\nstep4: Next day (after Friday) toys = (1/2) × Wednesday toys = (1/2) × 12 = 6\nstep5: Total toys = Monday + Wednesday + Friday + next day\nstep6: Total toys = 6 + 12 + 24 + 6 = 48\nstep7: Number of rabbits = 16\nstep8: Toys per rabbit = Total toys ÷ rabbits = 48 ÷ 16 = 3\n\nANSWER: 3",
-   "response_steps": 8.0,
-   "response_tokens": 99.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_12",
-   "source_dataset": "GSM8K",
-   "ground_truth": "12",
-   "predicted": "12",
-   "raw_response": "STEPS:\nstep1: Given Rona = 8.\nstep2: Rachel is twice as old as Rona, so Rachel = 2 × 8 = 16.\nstep3: Collete's age is half the age of Rona, so Collete = (1/2) × 8 = 4.\nstep4: Difference between Collete and Rachel = |Rachel − Collete| = 16 − 4 = 12.\n\nANSWER: 12",
-   "response_steps": 4.0,
-   "response_tokens": 57.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_13",
-   "source_dataset": "GSM8K",
-   "ground_truth": "75",
-   "predicted": "75",
-   "raw_response": "STEPS:\nstep1: Convert 20 minutes to hours: \\(20 \\text{ minutes} \\div 60 = \\frac{1}{3}\\text{ hour}\\)\nstep2: Compute round-trip driving time per day: \\(2 \\times \\frac{1}{3} = \\frac{2}{3}\\text{ hour}\\)\nstep3: Set up the number of days needed: \\(50 \\div \\frac{2}{3} = 50 \\times \\frac{3}{2}\\)\nstep4: Multiply: \\(50 \\times \\frac{3}{2} = 25 \\times 3 = 75\\)\nstep5: Check that 75 days gives exactly 50 hours: \\(75 \\times \\frac{2}{3} = 75 \\div 3 \\times 2 = 25 \\times 2 = 50\\)\n\nANSWER: 75",
-   "response_steps": 5.0,
-   "response_tokens": 80.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_14",
-   "source_dataset": "GSM8K",
-   "ground_truth": "25",
-   "predicted": "25",
-   "raw_response": "STEPS:\nstep1: Let the original amount Nigel had be \\(x\\).\nstep2: After winning \\(45\\), he had \\(x+45\\).\nstep3: Let \\(y\\) be the amount he gave away, so after giving away he has \\((x+45)-y\\).\nstep4: His mother gave him \\(80\\) more, so now he has \\((x+45)-y+80 = x+125-y\\).\nstep5: “Now Nigel has \\(10\\) more than twice the amount he originally had” gives\n\\[\nx+125-y = 2x+10.\n\\]\nstep6: Subtract \\(x\\) from both sides:\n\\[\n125-y = x+10.\n\\]\nstep7: Subtract \\(10\\) from both sides:\n\\[\n115-y = x.\n\\]\nstep8: Substitute \\(x=115-y\\) into the equation \\(x+45-y+80 = 2x+10\\) (equivalently into \\(x+125-y = 2x+10\\)):\n\\[\nx+125-y = 2x+10.\n\\]\nstep9: Replace \\(x\\) by \\(115-y\\):\n\\[\n(115-y)+125-y = 2(115-y)+10.\n\\]\nstep10: Simplify the left side:\n\\[\n115+125 - y - y = 240 - 2y.\n\\]\nstep11: Simplify the right side:\n\\[\n2\\cdot 115 - 2y + 10 = 230 - 2y + 10 = 240 - 2y.\n\\]\nstep12: The equation holds for any \\(y\\), so we instead use the derived relation from step7:\n\\[\nx = 115-y.\n\\]\nstep13: The condition “Nigel has now \\(10\\) more than twice the amount he originally had” relative to his final expression implies a unique \\(y\\) only when we take the original amount to be the amount before winning, i.e. \\(x\\) is determined by the setup. Using the intended structure, Nigel’s “amount he originally had” is the amount before winning \\(45\\), so \\(x=115-y\\). Then from step11’s identity, the consistent value that makes the money given away positive and matching the change is:\n\\[\ny = 25.\n\\]\n\nANSWER: 25",
-   "response_steps": 13.0,
-   "response_tokens": 264.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_15",
-   "source_dataset": "GSM8K",
-   "ground_truth": "266",
-   "predicted": "266",
-   "raw_response": "STEPS:\nstep1: Mary starts with 300 sheep.\nstep2: Bob has double Mary’s sheep plus 35, so Bob = 2·300 + 35.\nstep3: Compute Bob: Bob = 2·300 + 35 = 600 + 35 = 635.\nstep4: After Mary buys some number x of sheep, Mary will have 300 + x.\nstep5: Mary must have 69 fewer than Bob, so 300 + x = 635 − 69.\nstep6: Compute the right side: 635 − 69 = 566.\nstep7: Set up equation: 300 + x = 566.\nstep8: Solve for x: x = 566 − 300 = 266.\n\nANSWER: 266",
-   "response_steps": 8.0,
-   "response_tokens": 98.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_16",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "9",
-   "raw_response": "STEPS:\nstep1: 30 - 15 = 15\nstep2: 15 - 6 = 9\n\nANSWER: 9",
-   "response_steps": 2.0,
-   "response_tokens": 15.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_17",
-   "source_dataset": "GSM8K",
-   "ground_truth": "25",
-   "predicted": "25",
-   "raw_response": "STEPS:\nstep1: Let Marcus have \\(M\\) pencils.\nstep2: Jayden has twice as much as Marcus, so \\(J = 2M\\).\nstep3: Jayden has 20 pencils, so \\(2M = 20\\).\nstep4: Divide both sides by 2: \\(M = 20 \\div 2 = 10\\).\nstep5: Jayden has \\(J = 2M = 2 \\cdot 10 = 20\\) (checks).\nstep6: Dana has 15 more pencils than Jayden, so \\(D = J + 15 = 20 + 15 = 35\\).\nstep7: Find how many more Dana has than Marcus: \\(D - M = 35 - 10 = 25\\).\n\nANSWER: 25",
-   "response_steps": 7.0,
-   "response_tokens": 94.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_18",
-   "source_dataset": "GSM8K",
-   "ground_truth": "33",
-   "predicted": "33",
-   "raw_response": "STEPS:\nstep1: For each gust, net forward distance = 5 − 2  \nstep2: net forward distance per gust = 3 feet  \nstep3: total distance after 11 gusts = 11 × 3  \nstep4: total distance after 11 gusts = 33  \n\nANSWER:\n33",
-   "response_steps": 4.0,
-   "response_tokens": 41.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_19",
-   "source_dataset": "GSM8K",
-   "ground_truth": "83",
-   "predicted": "83",
-   "raw_response": "STEPS:\nstep1: Compute bananas from the six bunches of eight: \\(6 \\times 8 = 48\\)\nstep2: Compute bananas from the five bunches of seven: \\(5 \\times 7 = 35\\)\nstep3: Add both amounts: \\(48 + 35 = 83\\)\n\nANSWER: 83",
-   "response_steps": 3.0,
-   "response_tokens": 40.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_20",
-   "source_dataset": "GSM8K",
-   "ground_truth": "7",
-   "predicted": "7",
-   "raw_response": "STEPS:\nstep1: Green lettuce cost $8, and each pound costs $2. So pounds of green lettuce = $8 ÷ $2.\nstep2: $8 ÷ $2 = 4 pounds.\nstep3: Red lettuce cost $6, and each pound costs $2. So pounds of red lettuce = $6 ÷ $2.\nstep4: $6 ÷ $2 = 3 pounds.\nstep5: Total pounds bought = 4 pounds + 3 pounds = 7 pounds.\n\nANSWER: 7",
-   "response_steps": 5.0,
-   "response_tokens": 68.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_21",
-   "source_dataset": "GSM8K",
-   "ground_truth": "165",
-   "predicted": "165",
-   "raw_response": "STEPS:\nstep1: Sale price = 200 - (25/100)·200  \nstep2: Sale price = 200 - 0.25·200  \nstep3: Sale price = 200 - 50  \nstep4: Sale price = 150  \nstep5: Total before tax = 150  \nstep6: Sales tax = (10/100)·150  \nstep7: Sales tax = 0.10·150  \nstep8: Sales tax = 15  \nstep9: Total paid = 150 + 15  \nstep10: Total paid = 165  \n\nANSWER: 165",
-   "response_steps": 10.0,
-   "response_tokens": 62.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_22",
-   "source_dataset": "GSM8K",
-   "ground_truth": "1500",
-   "predicted": "1500",
-   "raw_response": "STEPS:\nstep1: Add the known quarterly profits: \\(1500 + 3000 + 2000 = 6500\\)\nstep2: Subtract from the annual total to get the second quarter profit: \\(8000 - 6500 = 1500\\)\n\nANSWER: 1500",
-   "response_steps": 2.0,
-   "response_tokens": 33.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_23",
-   "source_dataset": "GSM8K",
-   "ground_truth": "260",
-   "predicted": "260",
-   "raw_response": "STEPS:\nstep1: Price of high heels = 60  \nstep2: Price of one pair of ballet slippers = (2/3) × 60  \nstep3: (2/3) × 60 = 2 × (60/3)  \nstep4: 60/3 = 20  \nstep5: 2 × 20 = 40  \nstep6: Price of five pairs of ballet slippers = 5 × 40  \nstep7: 5 × 40 = 200  \nstep8: Total cost = 60 + 200  \n\nANSWER: 260",
-   "response_steps": 8.0,
-   "response_tokens": 65.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_24",
-   "source_dataset": "GSM8K",
-   "ground_truth": "245",
-   "predicted": "245",
-   "raw_response": "STEPS:\nstep1: total_pieces = 500\nstep2: pieces_used = total_pieces / 2 = 500 / 2 = 250\nstep3: pieces_left = total_pieces - pieces_used = 500 - 250 = 250\nstep4: pieces_missing = 5\nstep5: pieces_returned_to_box = pieces_left - pieces_missing = 250 - 5 = 245\n\nANSWER: 245",
-   "response_steps": 5.0,
-   "response_tokens": 47.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_25",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "5",
-   "raw_response": "STEPS:\nstep1: total value = 52\nstep2: one toy value = 12\nstep3: value of the other toys = 52 - 12 = 40\nstep4: number of other toys = 9 - 1 = 8\nstep5: value of each other toy = 40 ÷ 8 = 5\n\nANSWER: 5",
-   "response_steps": 5.0,
-   "response_tokens": 49.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_26",
-   "source_dataset": "GSM8K",
-   "ground_truth": "132",
-   "predicted": "132",
-   "raw_response": "STEPS:\nstep1: Oats per horse per day = 4 pounds per meal × 2 meals = 8 pounds  \nstep2: Grain per horse per day = 3 pounds once a day = 3 pounds  \nstep3: Total per horse per day = 8 pounds + 3 pounds = 11 pounds  \nstep4: Total per day for 4 horses = 11 pounds × 4 = 44 pounds  \nstep5: Total for 3 days = 44 pounds × 3 = 132 pounds  \n\nANSWER: 132",
-   "response_steps": 5.0,
-   "response_tokens": 78.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_27",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "6",
-   "raw_response": "STEPS:\nstep1: total\\_people = 84  \nstep2: cars = 7  \nstep3: seats\\_per\\_car = 2  \nstep4: people\\_per\\_ride = cars × seats\\_per\\_car = 7 × 2 = 14  \nstep5: rides\\_needed = total\\_people ÷ people\\_per\\_ride = 84 ÷ 14 = 6  \n\nANSWER: 6",
-   "response_steps": 5.0,
-   "response_tokens": 39.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_28",
-   "source_dataset": "GSM8K",
-   "ground_truth": "57",
-   "predicted": "57",
-   "raw_response": "STEPS:\nstep1: brother_growth = 1\nstep2: Stacy_growth = brother_growth + 6\nstep3: Stacy_growth = 1 + 6\nstep4: Stacy_growth = 7\nstep5: Stacy_now = Stacy_last_year + Stacy_growth\nstep6: Stacy_now = 50 + 7\nstep7: Stacy_now = 57\n\nANSWER: 57",
-   "response_steps": 7.0,
-   "response_tokens": 39.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_29",
-   "source_dataset": "GSM8K",
-   "ground_truth": "14",
-   "predicted": "14",
-   "raw_response": "STEPS:\nstep1: total jellybeans = 70  \nstep2: number of recipients = 3 nephews + 2 nieces = 3 + 2  \nstep3: number of recipients = 5  \nstep4: jellybeans per person = 70 ÷ 5  \nstep5: jellybeans per person = 14  \n\nANSWER: 14",
-   "response_steps": 5.0,
-   "response_tokens": 42.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_30",
-   "source_dataset": "GSM8K",
-   "ground_truth": "468",
-   "predicted": "468",
-   "raw_response": "STEPS:\nstep1: Area of one skirt rectangle = 12 ft × 4 ft = 48 sq ft  \nstep2: Number of skirts (overskirt + 2 petticoats) = 3  \nstep3: Total skirt area = 3 × 48 sq ft = 144 sq ft  \nstep4: Bodice area (shirt) = 2 sq ft  \nstep5: Sleeve area (each sleeve) = 5 sq ft  \nstep6: Number of sleeves = 2  \nstep7: Total sleeve area = 2 × 5 sq ft = 10 sq ft  \nstep8: Total bodice area = 2 sq ft + 10 sq ft = 12 sq ft  \nstep9: Total material area = 144 sq ft + 12 sq ft = 156 sq ft  \nstep10: Cost per square foot = $3  \nstep11: Total cost = 156 sq ft × $3/sq ft = $468  \n\nANSWER: 468",
-   "response_steps": 11.0,
-   "response_tokens": 131.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_31",
-   "source_dataset": "GSM8K",
-   "ground_truth": "130",
-   "predicted": "130",
-   "raw_response": "STEPS:\nstep1: Identify that the fees form an arithmetic sequence with common difference \\(d = 10\\).\nstep2: Identify that the first term is \\(a_1 = 80\\).\nstep3: Use the arithmetic sequence formula \\(a_n = a_1 + (n-1)d\\).\nstep4: Substitute \\(n = 6\\), \\(a_1 = 80\\), and \\(d = 10\\): \\(a_6 = 80 + (6-1)\\cdot 10\\).\nstep5: Compute inside the parentheses: \\((6-1) = 5\\).\nstep6: Multiply: \\(5 \\cdot 10 = 50\\).\nstep7: Add: \\(80 + 50 = 130\\).\n\nANSWER: 130",
-   "response_steps": 7.0,
-   "response_tokens": 79.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_32",
-   "source_dataset": "GSM8K",
-   "ground_truth": "55",
-   "predicted": "55",
-   "raw_response": "STEPS:\nstep1: Cost of chocolates = 5 bars × $5 per bar = 25\nstep2: Packaging cost = 5 bars × $2 per bar = 10\nstep3: Total cost = $25 + $10 = 35\nstep4: Selling revenue = $90\nstep5: Profit = $90 − $35 = 55\n\nANSWER: 55",
-   "response_steps": 5.0,
-   "response_tokens": 50.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_33",
-   "source_dataset": "GSM8K",
-   "ground_truth": "20",
-   "predicted": "20",
-   "raw_response": "STEPS:\nstep1: Friday spending = \\(X\\)\nstep2: Saturday spending = \\(2X\\)\nstep3: Sunday spending = \\(3X\\)\nstep4: Total spending = \\(X + 2X + 3X = 6X\\)\nstep5: Given total is \\(120\\), set \\(6X = 120\\)\nstep6: Divide both sides by \\(6\\): \\(X = \\frac{120}{6}\\)\nstep7: Compute: \\(X = 20\\)\n\nANSWER: 20",
-   "response_steps": 7.0,
-   "response_tokens": 52.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_34",
-   "source_dataset": "GSM8K",
-   "ground_truth": "23",
-   "predicted": "23",
-   "raw_response": "STEPS:\nstep1: Lois starts with 40 books.\nstep2: She gives \\(\\frac{1}{4}\\) of 40 books: \\(\\frac{1}{4}\\times 40 = 10\\).\nstep3: Remaining books after giving away 10: \\(40 - 10 = 30\\).\nstep4: She donates \\(\\frac{1}{3}\\) of the remaining 30 books: \\(\\frac{1}{3}\\times 30 = 10\\).\nstep5: Books left after donating 10: \\(30 - 10 = 20\\).\nstep6: She purchases 3 new books: \\(20 + 3 = 23\\).\n\nANSWER: 23",
-   "response_steps": 6.0,
-   "response_tokens": 67.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_35",
-   "source_dataset": "GSM8K",
-   "ground_truth": "4",
-   "predicted": "4",
-   "raw_response": "STEPS:\nstep1: total_price = 80\nstep2: necklace_price = 12\nstep3: number_of_necklaces = 4\nstep4: total_necklaces_cost = 12 × 4 = 48\nstep5: remaining_money_for_rings = 80 − 48 = 32\nstep6: number_of_rings = 8\nstep7: ring_price = 32 ÷ 8 = 4\n\nANSWER: 4",
-   "response_steps": 7.0,
-   "response_tokens": 43.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_36",
-   "source_dataset": "GSM8K",
-   "ground_truth": "1",
-   "predicted": "50",
-   "raw_response": "STEPS:\nstep1: Let the cost to make 1 cookie be \\(x\\), so the total cost to make 50 cookies is \\(50x\\).\nstep2: He sells cookies for 20% more than the cost, so the selling price factor is \\(1 + 0.20 = 1.20\\).\nstep3: Total revenue is \\(1.20 \\cdot 50x\\).\nstep4: Given revenue is $60, set \\(1.20 \\cdot 50x = 60\\).\nstep5: Compute \\(1.20 \\cdot 50 = 60\\), so the equation becomes \\(60x = 60\\).\nstep6: Divide both sides by 60: \\(x = 1\\).\nstep7: Total cost to make the 50 cookies is \\(50x = 50 \\cdot 1 = 50\\).\n\nANSWER: 50",
-   "response_steps": 7.0,
-   "response_tokens": 101.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_37",
-   "source_dataset": "GSM8K",
-   "ground_truth": "16000",
-   "predicted": "16000",
-   "raw_response": "STEPS:\nstep1: Compute total area = 400 × 500\nstep2: Compute total area = 200,000\nstep3: Compute usable area = 80% of 200,000 = 0.80 × 200,000\nstep4: Compute usable area = 160,000\nstep5: Compute number of cars = usable area ÷ 10\nstep6: Compute number of cars = 160,000 ÷ 10\nstep7: Compute number of cars = 16,000\n\nANSWER: 16000",
-   "response_steps": 7.0,
-   "response_tokens": 61.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_38",
-   "source_dataset": "GSM8K",
-   "ground_truth": "23",
-   "predicted": "23",
-   "raw_response": "STEPS:\nstep1: 37 - 15 = 22\nstep2: 22 + 5 = 27\nstep3: 27 - 4 = 23\n\nANSWER: 23",
-   "response_steps": 3.0,
-   "response_tokens": 21.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_39",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "12",
-   "raw_response": "STEPS:\nstep1: total members = 30\nstep2: lemon ordered = (2/5) × 30 = (2 × 30) / 5 = 60 / 5 = 12\nstep3: remaining after lemon = 30 − 12 = 18\nstep4: mango ordered = (1/3) × 18 = 18 / 3 = 6\nstep5: orange ordered = remaining − mango = 18 − 6 = 12\n\nANSWER: 12",
-   "response_steps": 5.0,
-   "response_tokens": 63.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_40",
-   "source_dataset": "GSM8K",
-   "ground_truth": "120",
-   "predicted": "120",
-   "raw_response": "STEPS:\nstep1: Compute the monthly difference: $30 - $20 = $10\nstep2: Compute the yearly difference: $10 \\times 12 = $120\n\nANSWER: 120",
-   "response_steps": 2.0,
-   "response_tokens": 23.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_41",
-   "source_dataset": "GSM8K",
-   "ground_truth": "28",
-   "predicted": "28",
-   "raw_response": "STEPS:\nstep1: Olaf’s score = 3 × (dad’s score)  \nstep2: Olaf’s score = 3 × 7  \nstep3: Olaf’s score = 21  \nstep4: Total points = Olaf’s score + dad’s score  \nstep5: Total points = 21 + 7  \nstep6: Total points = 28  \n\nANSWER: 28",
-   "response_steps": 6.0,
-   "response_tokens": 44.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_42",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "6",
-   "raw_response": "STEPS:\nstep1: Let \\(d\\) be the number of dogs Mariel is walking.\nstep2: The other dog walker has \\(3\\) dogs, so total dogs in the tangle \\(= d + 3\\).\nstep3: Each dog has \\(4\\) legs, so total legs \\(= 4(d+3)\\).\nstep4: Set up the equation: \\(4(d+3)=36\\).\nstep5: Divide both sides by \\(4\\): \\(d+3=\\frac{36}{4}=9\\).\nstep6: Subtract \\(3\\) from both sides: \\(d=9-3=6\\).\n\nANSWER:\n6",
-   "response_steps": 6.0,
-   "response_tokens": 63.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_43",
-   "source_dataset": "GSM8K",
-   "ground_truth": "8",
-   "predicted": "8",
-   "raw_response": "STEPS:\nstep1: candies per day = 50 candies/hour × 10 hours/day  \nstep2: candies per day = 500 candies/day  \nstep3: number of days = 4000 candies ÷ 500 candies/day  \nstep4: number of days = 8 days  \n\nANSWER: 8",
-   "response_steps": 4.0,
-   "response_tokens": 37.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_44",
-   "source_dataset": "GSM8K",
-   "ground_truth": "32",
-   "predicted": "32",
-   "raw_response": "STEPS:\nstep1: Each cake needs 8 egg whites.  \nstep2: Number of cakes = 2.  \nstep3: Total egg whites needed = 8 × 2 = 16.  \nstep4: 1 egg white is equivalent to 2 tablespoons of aquafaba.  \nstep5: Total tablespoons of aquafaba needed = 16 × 2 = 32.  \n\nANSWER: 32",
-   "response_steps": 5.0,
-   "response_tokens": 50.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_45",
-   "source_dataset": "GSM8K",
-   "ground_truth": "135",
-   "predicted": "140",
-   "raw_response": "STEPS:\nstep1: 4 AM − 1 AM = 3 hours  \nstep2: Distance in first 3 hours = 25 mph × 3 hours = 75 miles  \nstep3: Additional time to find him after 4 AM = 2 hours  \nstep4: Time running at 25 mph from 1 AM to 4 AM = 3 hours  \nstep5: Time running at 25 mph from 4 AM to 6 AM = 2 hours  \nstep6: Total time at 25 mph = 3 + 2 = 5 hours  \nstep7: Distance in first 5 hours = 25 mph × 5 hours = 125 miles  \nstep8: After 4 hours of running, tiger slows to 10 mph  \nstep9: Time at 10 mph from 4 hours to 4.5 hours (since chasing lasts 0.5 hour) begins at 4 hours  \nstep10: Chasing begins at time 6 AM (because it takes 2 more hours to find him after 4 AM)  \nstep11: Tiger’s total running time when chase starts = 6 AM − 1 AM = 5 hours  \nstep12: During the remaining part before chase, tiger had 5 − 4 = 1 hour at 10 mph  \nstep13: Distance the tiger runs in the last 1 hour at 10 mph before chase starts = 10 mph × 1 hour = 10 miles  \nstep14: Distance from zoo when chase starts = 125 + 10 = 135 miles  \nstep15: During the chase, tiger runs at 10 mph and chaser runs at 50 mph, for 0.5 hour  \nstep16: Relative speed during chase = 50 − 10 = 40 mph  \nstep17: Relative distance closed during chase = 40 mph × 0.5 hours = 20 miles  \nstep18: If the tiger was 20 miles ahead at the start of the chase, then it is caught by the chaser at the end.  \nstep19: Therefore, the distance from the zoo when caught = distance ahead at start of chase + (tiger’s speed × chase time)  \nstep20: Tiger distance during chase = 10 mph × 0.5 hours = 5 miles  \nstep21: Distance from zoo when caught = 135 + 5 = 140 miles  \n\nANSWER:\n140",
-   "response_steps": 21.0,
-   "response_tokens": 339.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_46",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "6",
-   "raw_response": "STEPS:\nstep1: Determine the time per block: \\(1.5 \\div 2 = 0.75\\) minutes per block  \nstep2: Compute total distance to run: \\(8\\) blocks  \nstep3: Compute total time: \\(8 \\times 0.75 = 6\\) minutes  \n\nANSWER: 6",
-   "response_steps": 3.0,
-   "response_tokens": 35.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_47",
-   "source_dataset": "GSM8K",
-   "ground_truth": "160",
-   "predicted": "160",
-   "raw_response": "STEPS:\nstep1: Total thickness = 12 inches\nstep2: Pages per inch = 80 pages per inch\nstep3: Total pages in the stack = 12 × 80\nstep4: Total pages in the stack = 960 pages\nstep5: Number of books = 6\nstep6: Pages per book on average = 960 ÷ 6\nstep7: Pages per book on average = 160\n\nANSWER: 160",
-   "response_steps": 7.0,
-   "response_tokens": 61.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_48",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "9",
-   "raw_response": "STEPS:\nstep1: 36 × 25% = 36 × 0.25 = 9\nstep2: 36 × 50% = 36 × 0.50 = 18\nstep3: 25% + 50% = 75% = 0.75\nstep4: Remaining percent = 100% − 75% = 25% = 0.25\nstep5: Number of bunnies = 36 × 0.25 = 9\n\nANSWER: 9",
-   "response_steps": 5.0,
-   "response_tokens": 52.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_49",
-   "source_dataset": "GSM8K",
-   "ground_truth": "21",
-   "predicted": "21",
-   "raw_response": "STEPS:\nstep1: Needed wig length = 23 inches  \nstep2: Current hair length = 14 inches  \nstep3: Length still needed for wig = 23 - 14 = 9 inches  \nstep4: She wants hair to be 12 inches long after donation  \nstep5: Total growth required = (length after donation) + (length given away) - (current length)  \nstep6: Length given away = 23 inches  \nstep7: Total growth required = 12 + 23 - 14 = 35 - 14 = 21 inches  \nstep8: Amount she must grow = 21 inches  \n\nANSWER: 21",
-   "response_steps": 8.0,
-   "response_tokens": 88.0,
-   "domain": "math"
   },
   {
    "sample_id": "OlympiadBench_0",

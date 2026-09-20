@@ -163,7 +163,7 @@
  "traces_file": "traces.jsonl",
  "predictions": [
   {
-   "sample_id": "FLD_76",
+   "sample_id": "FLD_0",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -173,7 +173,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_195",
+   "sample_id": "FLD_1",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -183,7 +183,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_381",
+   "sample_id": "FLD_2",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -193,7 +193,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_262",
+   "sample_id": "FLD_3",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -203,7 +203,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_257",
+   "sample_id": "FLD_4",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -213,7 +213,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_348",
+   "sample_id": "FLD_5",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -223,7 +223,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_13",
+   "sample_id": "FLD_6",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -233,7 +233,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_364",
+   "sample_id": "FLD_7",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -243,7 +243,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_397",
+   "sample_id": "FLD_8",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -253,7 +253,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_231",
+   "sample_id": "FLD_9",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -263,7 +263,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_4",
+   "sample_id": "FLD_10",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -273,7 +273,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_90",
+   "sample_id": "FLD_11",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -283,7 +283,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_26",
+   "sample_id": "FLD_12",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -293,7 +293,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_173",
+   "sample_id": "FLD_13",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -303,7 +303,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_426",
+   "sample_id": "FLD_14",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -313,7 +313,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_167",
+   "sample_id": "FLD_15",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -323,7 +323,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_235",
+   "sample_id": "FLD_16",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -333,7 +333,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_37",
+   "sample_id": "FLD_17",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": null,
@@ -344,7 +344,7 @@
    "gateway_blocked": true
   },
   {
-   "sample_id": "FLD_213",
+   "sample_id": "FLD_18",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -354,7 +354,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_219",
+   "sample_id": "FLD_19",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -364,7 +364,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_401",
+   "sample_id": "FLD_20",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -374,7 +374,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_485",
+   "sample_id": "FLD_21",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -384,7 +384,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_107",
+   "sample_id": "FLD_22",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -394,7 +394,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_51",
+   "sample_id": "FLD_23",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -404,7 +404,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_269",
+   "sample_id": "FLD_24",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -414,7 +414,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_131",
+   "sample_id": "FLD_25",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -424,7 +424,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_408",
+   "sample_id": "FLD_26",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -434,7 +434,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_330",
+   "sample_id": "FLD_27",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -444,7 +444,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_346",
+   "sample_id": "FLD_28",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -454,7 +454,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_423",
+   "sample_id": "FLD_29",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -464,7 +464,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_190",
+   "sample_id": "FLD_30",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -474,7 +474,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_295",
+   "sample_id": "FLD_31",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -484,7 +484,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_427",
+   "sample_id": "FLD_32",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -494,7 +494,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_153",
+   "sample_id": "FLD_33",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -504,7 +504,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_361",
+   "sample_id": "FLD_34",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -514,7 +514,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_360",
+   "sample_id": "FLD_35",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -524,7 +524,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_130",
+   "sample_id": "FLD_36",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -534,7 +534,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_67",
+   "sample_id": "FLD_37",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
@@ -544,7 +544,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_294",
+   "sample_id": "FLD_38",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -554,7 +554,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_139",
+   "sample_id": "FLD_39",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -564,7 +564,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_488",
+   "sample_id": "FLD_40",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -574,7 +574,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_303",
+   "sample_id": "FLD_41",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -584,7 +584,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_490",
+   "sample_id": "FLD_42",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -594,7 +594,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_187",
+   "sample_id": "FLD_43",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -604,7 +604,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_365",
+   "sample_id": "FLD_44",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -614,7 +614,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_250",
+   "sample_id": "FLD_45",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -624,7 +624,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_116",
+   "sample_id": "FLD_46",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -634,7 +634,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_86",
+   "sample_id": "FLD_47",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -644,7 +644,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_142",
+   "sample_id": "FLD_48",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -654,7 +654,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_237",
+   "sample_id": "FLD_49",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -662,996 +662,6 @@
    "response_steps": 16.0,
    "response_tokens": 319.0,
    "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_408",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "From Fact2, any student who attends the conference attends either in person or remotely.  \nFrom Fact5, Jack attends the conference and is a student from China.  \nFrom Fact3, no student from China attends the conference remotely. Therefore Jack cannot attend remotely.  \nSince Jack attends the conference and, by Fact2, must be either in person or remotely, and he cannot be remotely, it follows that Jack attends in person.\n\n__PROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 69.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_238",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Let the hypothesis be:\n\nH: Candace is either (i) a player who successfully shoots a high percentage of 3-pointers, or (ii) bad at mid-range shots.\n\nFrom **Fact5**:  \nC: Candace is either (a) a low-scoring player or (b) successfully shoots a high percentage of 3-pointers.\n\nNow do cases on C:\n\n**Case (b):** Candace successfully shoots a high percentage of 3-pointers.  \nThen the hypothesis H is satisfied immediately by disjunct (i).\n\n**Case (a):** Candace is a low-scoring player.  \nWe must show H holds, i.e., that Candace is bad at mid-range shots. But the only relevant facts about mid-range shots are **Fact3** and **Fact4**:\n\n- **Fact3**: High-3 success ⇒ solid at shooting 2-pointers.\n- **Fact4**: solid at 2-pointers ⇒ not bad at mid-range shots.\n\nThese facts give information about *mid-range* only for players who are solid at 2-pointers (hence only for players who successfully shoot high-percentage 3-pointers, by Fact3). They do **not** connect low-scoring to “bad at mid-range shots.” Also, **Fact1** and **Fact2** concern “top players,” not mid-range shooting quality:\n\n- **Fact1**: no low-scoring players are top players.\n- **Fact2**: every basketball player is either a top player or a high-3 shooter.\n\nFrom **Fact1** and **Fact2**, in Case (a) we can infer Candace is not a top player, hence she must be a high-3 shooter—this would contradict the “low-scoring” case unless low-scoring and high-3 are allowed to both hold. Crucially, even if low-scoring and high-3 can both be true, the hypothesis would still be satisfied by disjunct (i). Either way (low-scoring alone or low-scoring plus high-3), H is not forced to rely on disjunct (ii).\n\nBut does Fact1+Fact2 force disjunct (i) in Case (a)? Yes, because Fact2 says every basketball player is either top or high-3. If Candace were low-scoring, Fact1 says she is not top, so Fact2 implies she must be high-3. Therefore Candace satisfies disjunct (i) even in Case (a).\n\nHence, in both cases from Fact5, Candace successfully shoots a high percentage of 3-pointers, so the hypothesis H holds.\n\nTherefore the hypothesis is entailed by the facts.\n\n__PROVED__",
-   "response_steps": 22.0,
-   "response_tokens": 337.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_236",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Let  \n- \\(H\\): “James subscribes to HBO service”  \n- \\(C\\): “James goes to cinemas every week”  \n- \\(M\\): “James is available to watch 3 movies every week without any additional fees”  \n- \\(T\\): “James prefers TV more than movies” (the intended meaning of “prefers TV more”).\n\nWe must show:  \n\\[\n\\neg(C \\land H) \\rightarrow (M \\lor T).\n\\]\n\n**Step 1: From watching TV series in cinemas, infer James does not have the HBO-related preference.**  \nFact4 says: “Customers who prefer TV series more and will not watch TV series in cinemas.” Interpreting this in standard syllogistic form, it provides the constraint:\n\\[\nT \\rightarrow \\neg(\\text{watches TV series in cinemas}).\n\\]\nFact6 says James **does** watch TV series in cinemas. Hence by modus tollens:\n\\[\n\\text{watches TV series in cinemas} \\rightarrow \\neg T,\n\\]\nso in particular:\n\\[\n\\neg T.\n\\]\n\n**Step 2: Show James is not an HBO subscriber.**  \nFact5 says:  \n\\[\nH \\rightarrow T.\n\\]\nBut we already have \\(\\neg T\\). Therefore:\n\\[\nH \\rightarrow T \\quad \\text{and}\\quad \\neg T \\;\\;\\Rightarrow\\;\\; \\neg H.\n\\]\nSo James does **not** subscribe to HBO.\n\n**Step 3: Use the AMC/HBO dichotomy to get AMC.**  \nFact3 says each customer either subscribes to AMC or HBO. Since \\(\\neg H\\), it follows:\n\\[\n\\text{James subscribes to AMC}.\n\\]\n\n**Step 4: AMC implies availability to watch 3 movies weekly without extra fees.**  \nFact1 says: AMC subscribers are available to watch 3 movies every week without any additional fees. Therefore:\n\\[\nM.\n\\]\n\n**Step 5: Conclude the hypothesis.**  \nWe have already derived \\(M\\) unconditionally (for James). Thus for any condition on \\(\\neg(C \\land H)\\), the disjunction \\(M \\lor T\\) holds automatically. Hence:\n\\[\n\\neg(C \\land H) \\rightarrow (M \\lor T).\n\\]\n\nTherefore the hypothesis is **proved**.  \n\n__PROOLED__",
-   "response_steps": 18.0,
-   "response_tokens": 288.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_342",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "1. Fact3: Joe’s vehicle registration plate is from Istanbul.  \n2. Fact1: All vehicle registration plates in Istanbul begin with the number 34.  \n3. Therefore, Joe’s plate begins with 34 (from 1 and 2).  \n\nThis directly establishes the hypothesis. Note that Fact2 and Fact5 are consistent but not required for the conclusion.\n\n__PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 52.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_11",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Let \\(Y\\) abbreviate “Sam is a young teenage girl who attends college,” and \\(F\\) abbreviate “Sam is a big fan of pop bands and singers.”\n\n**Fact4** says:  \n\\[\n\\text{All young teenage girls who attend college are big fans of pop bands and singers.}\n\\]\nSo in particular,\n\\[\nY \\rightarrow F.\n\\]\n\nThe **Hypothesis** requires proving:\n\\[\nY \\rightarrow \\big(\\neg A \\;\\lor\\; F\\big),\n\\]\nwhere \\(\\neg A\\) abbreviates “Sam does not have high ambitions and future career goals.”\n\nBut given \\(Y \\rightarrow F\\), whenever \\(Y\\) holds, \\(F\\) holds, and therefore \\(\\neg A \\lor F\\) holds (because the disjunction is true as soon as one disjunct, namely \\(F\\), is true).\n\nHence the hypothesis is valid.\n\n__PROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 115.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_393",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Mary has the flu (Fact1). Since flu and influenza are the same disease (Fact2), Mary has influenza. The hypothesis is “Either Mary or Susan has influenza.” Because Mary has influenza, the disjunction is satisfied regardless of Susan’s status. Therefore, the hypothesis is proved.  \n__PROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 44.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_321",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let\n\n- Bx = “block design”\n- E = “event-related design”\n- A = “acquires data”\n- P = “preceded by data processing”\n- G = “brain image acquisition”\n- M = “Picture memory”\n\nFrom Fact1: \\(E \\lor Bx\\).\n\nFrom Fact2: \\(E \\rightarrow G\\).\n\nFrom Fact3: \\(G \\rightarrow P\\).\n\nFrom Fact4: \\(P \\rightarrow \\neg A\\).\n\nTherefore,\n\\[\nE \\rightarrow G \\rightarrow P \\rightarrow \\neg A,\n\\]\nso \\(E \\rightarrow \\neg A\\). In particular, \\(E \\land A\\) is impossible.\n\nNow Fact5 says:\n\\[\nM \\text{ is either } (E \\land A) \\text{ or } (\\neg E \\land \\neg A).\n\\]\nSince \\(E \\land A\\) is impossible, only the second disjunct can hold. Hence:\n\\[\nM \\rightarrow \\neg E \\land \\neg A.\n\\]\n\nThe hypothesis to prove is: \\(M\\) is either a block design or acquiring data:\n\\[\n(Bx \\lor A).\n\\]\nBut from the derived result we have \\(M \\rightarrow \\neg E \\land \\neg A\\), and nothing forces \\(Bx\\) to be true when \\(\\neg E\\) holds (Fact1 only gives \\(Bx \\lor E\\) for *some* disjunction, not that \\(\\neg E \\rightarrow Bx\\)). Thus the hypothesis does not follow from the facts.\n\nSo the hypothesis is **not entailed** by the given information.\n\nDISPROVED",
-   "response_steps": 16.0,
-   "response_tokens": 200.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_50",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "1. Every business is either sanctioned or unsanctioned. (Fact1)  \n2. The Crude Oil Data Exchange is a business and is not free. (Fact4)  \n3. Unsanctioned businesses are free. (Fact3)  \n4. Therefore, the Crude Oil Data Exchange cannot be unsanctioned (since unsanctioned ⇒ free, contradicting “not free”).  \n5. By Fact1, since it is not unsanctioned, it must be sanctioned.  \n6. Sanctioned businesses are limited. (Fact2)  \n7. Hence, the Crude Oil Data Exchange is limited.  \n\n__PROVED__",
-   "response_steps": 7.0,
-   "response_tokens": 74.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_415",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "1. Fact 1: Every square has four sides.  \n2. Fact 2: Every four-sided thing is a shape.  \n3. Let \\(x\\) be any square. Then \\(x\\) has four sides (from Fact 1).  \n4. Therefore \\(x\\) is a shape (from Fact 2).  \n5. Since \\(x\\) was an arbitrary square, all squares are shapes.  \n\n__PROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 52.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_97",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "1. From Fact1, Symphony No. 9 is a music piece.  \n2. From Fact4, the Vienna Music Society premiered Symphony No. 9.  \n3. From Fact5, the Vienna Music Society is an orchestra.  \n4. Therefore, there exists an orchestra (the Vienna Music Society) that premiered a music piece (Symphony No. 9).  \n5. This directly satisfies the hypothesis: “Some orchestras premiered music pieces.”  \n\n__PROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 61.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_182",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "1. Fact1: Sam is doing a project.  \n2. Fact2: The project is written either in C++ or in Python.  \n3. Fact4: Sam is using a Mac.  \n4. Fact5: If Sam uses a Mac, then Sam will play a song. Hence Sam will play a song.  \n5. Fact6: If a song is not “Perfect”, Sam will never play it. Since Sam is playing a song, that song must be “Perfect”. (Not needed further, but consistent.)  \n6. Fact3: If Sam does a project written in Python, then he will not use a Mac.  \n7. But Fact4 says Sam uses a Mac, so Sam cannot be doing a Python project.  \n8. By Fact2, since the project is either C++ or Python and Python is impossible, the project must be written in C++.  \n\n__PROVED__",
-   "response_steps": 8.0,
-   "response_tokens": 130.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_166",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "To entail the hypothesis “Elizabeth is in a monarchy,” we need to use the only rule that mentions monarchy (Fact1):\n\n- Fact1: If a person is the **leader of a country for life**, then that person is **in a monarchy**.\n\nFrom the premises we have:\n\n- Fact6: Elizabeth is a **leader**.\n- Fact5: Elizabeth is a **queen**.\n- Fact2–4: Leaders are either a king or a queen; queens are female; kings are male.\n\nBut none of these facts states that Elizabeth’s leadership is specifically **“for life.”** The “for life” condition is not provided, and there is no other rule connecting “leader” or “queen” to “leader for life” or directly to “monarchy.” Therefore Fact1 cannot be applied to conclude that Elizabeth is in a monarchy.\n\nHence, the hypothesis does not logically follow from the premises.  \n\nDISPROVED",
-   "response_steps": 9.0,
-   "response_tokens": 135.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_490",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "From Fact5, Daveed Diggs played Thomas Jefferson.  \nFrom Fact4, the actor who played Thomas Jefferson won the best actor award.  \nTherefore, Daveed Diggs won the best actor award.  \n\n__PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 29.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_273",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let \\(D(x)\\) mean “\\(x\\) is a disposable product,” \\(F(x)\\) mean “\\(x\\) is a fast fashion product,” \\(E(x)\\) mean “\\(x\\) is an eco-friendly brand,” \\(S(x)\\) mean “\\(x\\) is a sustainable fashion brand,” and \\(H(x)\\) mean “\\(x\\) helps slow down global warming.”\n\nFrom the facts:\n1. Fact1: \\(\\neg\\exists x(D(x)\\land H(x))\\), equivalently \\(D(x)\\rightarrow \\neg H(x)\\).\n2. Fact2: \\(E(x)\\rightarrow H(x)\\).\n3. Fact3: \\(S(x)\\rightarrow E(x)\\).\n4. Fact4: \\(F(x)\\rightarrow D(x)\\).\n\nThe hypothesis is:\n\\[\nD(\\text{Reformation}) \\rightarrow F(\\text{Reformation}).\n\\]\nBut the premises only give \\(F(\\text{Reformation})\\rightarrow D(\\text{Reformation})\\) (from Fact4), i.e. the converse direction is not provided. Also, Fact1 and Fact2 together can at best imply \\(E(x)\\rightarrow \\neg D(x)\\) (since \\(E(x)\\rightarrow H(x)\\) and \\(D(x)\\rightarrow \\neg H(x)\\)), but nothing implies that every disposable product must be fast fashion.\n\nTo see this, consider a model satisfying all premises where Reformation is disposable but not fast fashion:\n- Let \\(D(\\text{Reformation})\\) be true.\n- Let \\(F(\\text{Reformation})\\) be false.\n- Then \\(D(\\text{Reformation})\\rightarrow \\neg H(\\text{Reformation})\\) satisfies Fact1 by making \\(H(\\text{Reformation})\\) false.\n- Choose \\(E\\) and \\(S\\) predicates so that Fact2 and Fact3 hold for whatever items are eco-friendly/sustainable, without requiring Reformation to be any of them (we can set \\(E(\\text{Reformation})\\) and \\(S(\\text{Reformation})\\) false; Fact5 then is satisfied because its antecedent “Reformation is not helping global warming” is true, and its consequent “eco-friendly or sustainable” can be made true by setting \\(E(\\text{Reformation})\\) true if needed—however even if we keep \\(E\\) false, Fact5 can be satisfied by making Reformation sustainable instead; either way we still keep \\(F\\) false, and Fact4 is not violated because it only constrains fast fashion to be disposable, not disposable to be fast fashion).\n\nThus the premises do not entail \\(D(\\text{Reformation}) \\rightarrow F(\\text{Reformation})\\). Therefore the hypothesis is not guaranteed by the facts.\n\nDISPROVED",
-   "response_steps": 4.0,
-   "response_tokens": 280.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_326",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "We prove the hypothesis.\n\n- From Fact3, Olivia sleeps during the night.\n- From Fact2, whenever Olivia sleeps she prefers cool temperature.  \n  Therefore, during the night Olivia prefers cool temperature.\n\n- From Fact4 and Fact6, during the day Olivia works (so she is not sleeping then, consistent with Fact5).\n- Fact7 says: at any time, Olivia either prefers warm temperature or prefers cool temperature.\n- During the day, Fact1 says she does **not** prefer warm temperature.  \n  Hence, during the day she must prefer cool temperature (by elimination from Fact7).\n\nSince by Fact6 every time is either day or night, and we have cool temperature preference in both cases, it follows that at all times Olivia prefers cool temperature.\n\n__PROVED__",
-   "response_steps": 9.0,
-   "response_tokens": 119.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_110",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "From Fact2, **DI Ray was created and written by Maya Sondhi**, so the creator of *DI Ray* is **Maya Sondhi**.  \nFrom Fact4, **Maya Sondhi and Jed Mercurio are both British**, so in particular **Maya Sondhi is British**.  \nTherefore, since *DI Ray* was created by Maya Sondhi and Maya Sondhi is British, **DI Ray was created by a Brit**.  \n\n__PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 59.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_81",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Fact1 states that **Xiufeng is a district in the city of Guilin**. Being a district in Guilin entails that **Xiufeng is in Guilin**. Therefore, the hypothesis is directly supported by Fact1. Fact2 only says **Yangshuo** is not a district in Guilin and does not affect the status of Xiufeng.\n\n__PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 50.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_132",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Fact 1 states that Camp Davern is a traditional summer camp for boys and girls.  \nFact 3 states that Camp Davern was operated by the YMCA until the year 2015.  \n\nThe hypothesis asserts exactly that “a traditional summer camp for boys and girls was operated by the YMCA until the year 2015.” Since both required properties are explicitly given by Facts 1 and 3 (and refer to the same camp, Camp Davern), the hypothesis is directly supported by the premises.  \n\n__PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 81.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_252",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "From Fact1, Djokovic is either a **Grand Slam champion** or an **Oscar-nominated actor**.\n\n**Case 1: Djokovic is a Grand Slam champion.**  \nBy Fact2, Grand Slam champions are professional tennis players.  \nBy Fact4, professional tennis players are athletes.  \nBy Fact6, athletes are famous.  \nNow the antecedent of Fact8 holds (Djokovic is famous and is an athlete), so by Fact8 Djokovic lives in **well paid**.  \nBy Fact7, well-paid people live in **tax havens**.  \nSo in this case, Djokovic lives in a tax haven.\n\n**Case 2: Djokovic is an Oscar-nominated actor.**  \nBy Fact3, Oscar-nominated actors are celebrities.  \nBy Fact5, celebrities are well paid.  \nBy Fact7, well-paid people live in tax havens.  \nSo in this case, Djokovic lives in a tax haven.\n\nIn both cases, Djokovic lives in a tax haven. Therefore, the hypothesis is true.  \n__PROVED__",
-   "response_steps": 13.0,
-   "response_tokens": 133.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_31",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Fact 1 states that Robert Lewandowski is a striker.  \nFact 2 states that strikers are soccer players.  \nTherefore, by applying Fact 2 to Fact 1, Robert Lewandowski is a soccer player.  \n\n__PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 32.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_485",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "From Fact1, philatelic literature is partitioned into the categories: Stamp catalogues, Periodicals, Auction catalogues, Books, Bibliographies, and Background Material.\n\nFact4 states that Mort is a piece of Philatelic literature, so Mort must belong to one of these listed categories.  \nFact2 eliminates Stamp catalogues.  \nFact3 eliminates Periodicals, Auction catalogues, Bibliographies, and Background Material.\n\nThus, the only remaining category that Mort can belong to is **Books**. Therefore, the hypothesis that Mort is a book follows from the premises.  \n\n__PROVED__",
-   "response_steps": 6.0,
-   "response_tokens": 77.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_412",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Let “pupil,” “human,” “animal,” and “plant” be unary predicates.\n\nFrom the premises:\n1. Fact1: No animals are plants.  \n   \\[\n   \\forall x\\, ( \\text{animal}(x)\\rightarrow \\neg \\text{plant}(x)).\n   \\]\n2. Fact2: All humans are animals.  \n   \\[\n   \\forall x\\, (\\text{human}(x)\\rightarrow \\text{animal}(x)).\n   \\]\n3. Fact3: All pupils are human.  \n   \\[\n   \\forall x\\, (\\text{pupil}(x)\\rightarrow \\text{human}(x)).\n   \\]\n4. Fact4: All flowers are plants.  \n   \\[\n   \\forall x\\, (\\text{flower}(x)\\rightarrow \\text{plant}(x)).\n   \\]\n5. Fact5: If Jack is a human or a flower, then Jack is a human and a flower.  \n   \\[\n   (\\text{human}(j)\\lor \\text{flower}(j)) \\rightarrow (\\text{human}(j)\\land \\text{flower}(j)).\n   \\]\n\nWe check the hypothesis:\n\\[\n\\text{human}(j)\\rightarrow \\neg \\text{pupil}(j).\n\\]\n\nAssume \\(\\text{human}(j)\\).  \n- Then by Fact5, since \\(\\text{human}(j)\\lor \\text{flower}(j)\\) holds, we get \\(\\text{flower}(j)\\).  \n- By Fact4, \\(\\text{flower}(j)\\rightarrow \\text{plant}(j)\\), so \\(\\text{plant}(j)\\).  \n- By Fact2, \\(\\text{human}(j)\\rightarrow \\text{animal}(j)\\), so \\( \\text{animal}(j)\\).  \n- But Fact1 says no animals are plants, so \\(\\text{animal}(j)\\rightarrow \\neg \\text{plant}(j)\\). Contradiction.\n\nTherefore, under the assumption \\(\\text{human}(j)\\), it is impossible for \\(\\text{pupil}(j)\\) to hold; otherwise (since \\(\\text{pupil}(j)\\rightarrow \\text{human}(j)\\)) we would still derive the contradiction above. Hence\n\\[\n\\text{human}(j)\\rightarrow \\neg \\text{pupil}(j).\n\\]\n\n__PROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 167.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_365",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "From Fact6, Hulu is either a goat or a human.\n\n**Case 1: Hulu is a goat.**  \nBy Fact4, all goats are animals. Hence Hulu is an animal.\n\n**Case 2: Hulu is a human.**  \nBy Fact1, all humans eat. Hence Hulu eats.  \nBy Fact2, if something eats then it is not a plant. Hence Hulu is not a plant.  \nBy Fact3, every thing is either a plant or an animal. Since Hulu is not a plant, Hulu must be an animal.\n\nIn both cases, Hulu is an animal, so the hypothesis “Hulu is an animal or dirt” holds.\n\n__PROVED__",
-   "response_steps": 10.0,
-   "response_tokens": 98.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_372",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Fact1: A cutman is responsible for preventing and treating physical damage to a fighter.  \nFact4: Jack is a cutman.  \n\nTherefore, since Jack is a cutman, Jack can treat physical damage.  \n\n__PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 31.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_142",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let the hypothesis be \\(H\\): “Luke complains often about annoying siblings.”\n\nFrom the facts we have only one rule that mentions complaining:\n\n- Fact3: \\(\\text{ComplainsOftenAnnoyingSiblings} \\rightarrow \\text{SiblingsSameAge}\\).\n\nThus, if we could prove that Luke complains often about annoying siblings, we would get consequences, but Facts 1,2,4,5,6 never give any rule that *derives* the complaining statement from other properties.\n\nWhat we can derive about Luke from Fact6 is only a disjunction about two other predicates:\n\n- Fact6:  \n  \\[\n  (\\text{Luke is twin or triplet} \\wedge \\text{Luke develops strong bonds})\n  \\ \\ \\vee\\ \\ \n  (\\neg(\\text{twin or triplet}) \\wedge \\neg(\\text{develops strong bonds})).\n  \\]\n\nFacts 1 and 5 connect “twin/triplet” \\(\\rightarrow\\) spending time with siblings \\(\\rightarrow\\) often not living at home regularly \\(\\rightarrow\\) (by Fact4) not developing strong bonds with family members. But even in the case where this chain works, it still yields information about strong bonds and living-at-home regularity—not complaining.\n\nAlso, Fact2 says:  \n\\(\\text{SiblingsSameAge} \\rightarrow \\text{twin or triplet}\\),\nwhich is again opposite to what we need: it requires knowing siblings are the same age, and the only way to get siblings-same-age in the premises is via Fact3, which requires the very complaining fact we are trying to prove.\n\nTherefore, \\(H\\) is **not derivable** from Facts 1–6.\n\nSo the hypothesis cannot be proved from the given premises.\n\nDISPROVED",
-   "response_steps": 12.0,
-   "response_tokens": 214.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_94",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let\n\n- \\(C(x)\\): \\(x\\) is a cancer  \n- \\(M(x)\\): \\(x\\) is a malignant tumor  \n- \\(Col(x)\\): \\(x\\) is colorectal cancer  \n- \\(B\\): breast cancer\n\n**Fact1:** \\(\\forall x\\, (C(x)\\rightarrow M(x))\\) (All cancers are malignant tumors).  \n**Fact5:** Breast cancer is neither having a cold nor a malignant tumor (exclusive). In particular,\n\\[\n\\neg M(B)\n\\]\nso **breast cancer is not a malignant tumor**.\n\n**Hypothesis:** \\(\\big(\\neg Col(B)\\rightarrow M(B)\\big)\\).\n\nTo prove this implication from the premises would require that whenever \\(\\neg Col(B)\\) holds, \\(M(B)\\) also holds. But \\(\\neg M(B)\\) is already forced by Fact5. Hence the implication cannot be generally valid under the premises: there is no way for the premises to entail \\(M(B)\\) even in cases where \\(\\neg Col(B)\\) might be true, because Fact5 entails \\(\\neg M(B)\\) outright.\n\nTherefore the hypothesis is **not proved** and is in fact **disproven** by Fact5’s explicit negation of its consequent.\n\n__DISPROVED__",
-   "response_steps": 9.0,
-   "response_tokens": 144.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_302",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "To decide whether the hypothesis is entailed, we check whether the premises force Clyde to be a **history professor who is passionate about his job and subject**.\n\n- **Fact 5** is of the form:  \n  If (historical professors who are passionate about their job and subject) → (nostalgic academics who enjoy learning).  \n  This is a one-way implication. Even if we know the consequent, we cannot infer the antecedent. So **Fact 5 does not allow us to conclude** Clyde is a historical/passionate professor.\n\n- The other facts **do not assert** that Clyde is a historical professor or that he is passionate about his job/subject.\n  - **Fact 6** is also conditional and only applies under the assumption “Clyde is not focused on the future and industry professions.” It likewise does not establish the needed antecedent of Fact 5.\n\nSince there is **no premise that entails** the hypothesis, the hypothesis cannot be proved from the given facts.\n\nDISPROVED",
-   "response_steps": 9.0,
-   "response_tokens": 154.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_201",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact2, every student who attends the conference attends either in person or remotely.  \nFact4 states that James attends the conference and does not attend remotely. Therefore, by the exhaustive alternative in Fact2, James must attend in person.  \n\nBut the hypothesis says James attends the conference but **not** in person, which contradicts the conclusion that James attends in person.  \n\nDISPROVED",
-   "response_steps": 5.0,
-   "response_tokens": 60.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_293",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact2, Montana includes the city Butte, so **Butte is in Montana**.  \nFrom Fact4, the city Pierre is **not** in Montana.  \nTherefore, Butte is in Montana while Pierre is not in Montana, so they **cannot** be in the same state.\n\nHence the hypothesis “Butte and Pierre are in the same state” is disproved.  \nDISPROVED",
-   "response_steps": 5.0,
-   "response_tokens": 54.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_36",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "We test whether the hypothesis is *entailed* by the facts.\n\nHypothesis:  \n“If The Scream is either a skyscraper or a creepy haunted house, then it is not a mansion house.”\n\nFrom Fact5, we have:\n1. **The Scream is a creepy haunted house OR a terrifying Halloween scare.**\n\nConsider each disjunct:\n\n**Case 1:** The Scream is a **creepy haunted house**.  \n2. By Fact3, **every creepy haunted house is in a mansion house**.  \nSo in this case, **The Scream is in a mansion house**.\n\nBut the hypothesis would conclude **not** a mansion house (because the antecedent “creepy haunted house” is satisfied). Hence the hypothesis fails in Case 1.\n\n**Case 2:** The Scream is a **terrifying Halloween scare**.  \n3. By Fact4, **every terrifying Halloween scare comes from a creepy haunted house**.  \nSo The Scream is (in particular) associated with a creepy haunted house. Then by Fact3, that implies **The Scream is in a mansion house** again—contradicting the hypothesis.\n\nSince in all cases allowed by the premises, **The Scream is a mansion house**, the hypothesis “then it is not a mansion house” cannot be true under the premises. Therefore the hypothesis is disproved.\n\n__DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 190.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_457",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "1. From Fact2, the Romance languages form a language family.  \n2. From Fact3, every pair of languages within a language family are related.  \n3. From Fact4, Spanish is a Romance language, so Spanish is in the Romance language family.  \n4. From Fact6, Basque is not related to any other language.  \n5. Assume for contradiction that Basque is a Romance language. Then Basque would be in the Romance language family, and by Fact3 it would be related to Spanish (since Spanish is also in that family).  \n6. This contradicts Fact6 (Basque is not related to any other language, in particular not related to Spanish).  \n\nTherefore, the hypothesis that Basque is a Romance language is disproved.  \n\nDISPROVED",
-   "response_steps": 6.0,
-   "response_tokens": 115.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_389",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact1, every event is either happy or sad.  \nFrom Fact2, at least one event is happy.  \n\nThe hypothesis says all events are sad, which implies there are no happy events. But this contradicts Fact2’s assertion that a happy event exists.  \n\nTherefore, the hypothesis cannot be true given the premises.  \nDISPROVED",
-   "response_steps": 6.0,
-   "response_tokens": 51.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_483",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "From Fact1, there exists at least one Monday at 8 pm when roses are given out on TV.  \nFrom Fact2, every rose given out on TV is on the Bachelor.  \nSo, the rose-giving (at Monday 8 pm) occurs on the Bachelor.\n\nFrom Fact3, everything on the Bachelor portrays the lives of real people.  \nFrom Fact4, all shows portraying the lives of real people are reality TV shows.  \nTherefore, the Bachelor is a reality TV show (and thus the rose-giving show tied to the Bachelor would be a reality TV show).\n\nFrom Fact5, Breaking Bad is not a reality TV show.  \nHence Breaking Bad cannot be a TV show in which roses are given out on Monday at 8 pm, because that would force it to be (via the rose→Bachelor→real-people→reality-TV chain) a reality TV show.\n\n__PROVED__",
-   "response_steps": 8.0,
-   "response_tokens": 135.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_458",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let \\(C\\)=“creepy haunted house”, \\(T\\)=“terrifying Halloween scare”, \\(S\\)=“skyscraper”, \\(M\\)=“mansion house”, and \\(U\\)=“urban area”.\n\nFrom the facts:\n1. Fact5: \\(C \\lor T\\) (The Scream is a creepy haunted house or a terrifying Halloween scare).\n2. Fact3: \\(C \\rightarrow M\\).\n3. Fact1: \\(\\neg M \\text{ in } U\\), i.e. \\(M \\rightarrow \\neg U\\).\n4. Fact2: \\(S \\rightarrow U\\).\n5. Fact4: \\(T \\rightarrow C\\).\n\nNow check the hypothesis:\n\\[\n(S \\lor M) \\rightarrow (\\neg C \\land \\neg T).\n\\]\nTo DISPROVE it, it suffices to show that the antecedent can hold while the consequent fails.\n\nConsider the case where The Scream is a mansion house: assume \\(M\\).\n- Then, from Fact5, \\(C \\lor T\\).  \n- But if \\(T\\), Fact4 gives \\(T \\rightarrow C\\), so in any case \\(C\\) holds. More directly: Fact4 ensures that “terrifying Halloween scare” implies “creepy haunted house,” so Fact5 together with Fact4 implies \\(C\\).\n- Hence under \\(M\\), The Scream is a creepy haunted house (\\(C\\)), so \\(\\neg C\\) is false.\nTherefore the consequent \\(\\neg C \\land \\neg T\\) cannot hold when the antecedent \\(S \\lor M\\) holds (via the \\(M\\) option).\n\nMore explicitly, with \\(M\\): Fact3+Fact5+Fact4 yield \\(C\\), contradicting the hypothesis’s requirement that \\(C\\) be false.\n\nThus the implication in the hypothesis does not hold in general.\n\n__DISPROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 210.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_354",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let:\n\n- A := “adenocarcinoma”\n- W := “A is in women”\n- T0 := “A is without a tumor”\n- C := “A is a type of cancer”\n- NB := “A is a non-breast cancer”\n\n**Premises:**\n1. (C ∨ T0) → (W ∨ T0)  (Fact6)\n2. No type of cancer is without a tumor. Interpreting “without a tumor” as a predicate:\n   C → ¬T0  (Fact4)\n3. All non-breast cancers are a type of cancer:\n   NB → C  (Fact5)\n\n**Hypothesis to prove:**\n(W ∨ T0) → (T0 ∧ NB)\n\nSplit the target into two parts:\n\n### (i) Show: (W ∨ T0) → T0\nBut from (W ∨ T0) we **cannot** infer T0 unless we also know ¬W or something equivalent. Premise 1 only goes the other direction (it concludes W ∨ T0 from C ∨ T0), and premises 2–3 constrain C and NB with respect to T0, but they do not derive T0 from W ∨ T0.\n\nIn fact, it is consistent with all premises that **W holds while T0 is false**:\n- Take adenocarcinoma to be in women but with a tumor: W true, T0 false.\n- Then (W ∨ T0) is true.\n- Check premise 1: (C ∨ T0) → (W ∨ T0). Since T0 is false, to make the implication hold we can set C false as well, so (C ∨ T0) is false and the implication is satisfied.\n\nThus the implication (W ∨ T0) → T0 fails in such a model, so the hypothesis cannot be proved.\n\n### (ii) Show: (W ∨ T0) → NB\nEven weaker: since we already cannot force T0, we also cannot force NB. Premise 3 gives NB → C, not the converse.\n\nTherefore the hypothesis is **not entailed** by Facts 1–6.\n\n**DISPROVED**",
-   "response_steps": 3.0,
-   "response_tokens": 292.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_343",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "1. (Fact3) All centerbacks are defenders.  \n2. (Fact1) All defenders are soccer players.  \n3. Therefore, all centerbacks are soccer players.  \n4. (Hypothesis) Stephen Curry is a centerback.  \n5. Therefore, Stephen Curry is a soccer player.  \n6. (Fact2) No soccer players are professional basketball players.  \n7. (Fact4) All NBA players are professional basketball players.  \n8. From (5), (6), and (7): Stephen Curry cannot be an NBA player.  \n9. (Fact5) If Stephen Curry is not an NBA player, then Stephen Curry is not an NBA player or a soccer player.  \n10. Since step (8) already gives “Stephen Curry is not an NBA player,” the conditional in (9) is satisfied (and the “or a soccer player” part does not matter for satisfaction).\n\nThus the hypothesis is compatible with the facts, and we can derive that Stephen Curry is not an NBA player.\n\n__PROVED__",
-   "response_steps": 10.0,
-   "response_tokens": 140.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_195",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let the hypothesis be:\n\nH: If (¬(ghost ∧ lovely)) then (cat ∨ cute).\n\nWe check whether H is logically entailed by the facts.\n\n1. From Fact2: Ghosts do not exist.  \n   Therefore Grace is not a ghost (in particular, Grace cannot be both a ghost and lovely).  \n   Hence the antecedent ¬(ghost ∧ lovely) is guaranteed.\n\nSo we only need to see whether the consequent (cat ∨ cute) must hold under the premises.\n\n2. From Fact6: Grace is either (cat ∧ dog) or (¬cat ∧ ¬dog).  \n   Consider cases:\n\nCase A: Grace is cat ∧ dog.  \n- Then Grace is a cat, so by Fact1 (All cats are cute), Grace is cute.  \n- Thus cat ∨ cute holds.\n\nCase B: Grace is ¬cat ∧ ¬dog.  \n- Then Grace is not a cat, so cat ∨ cute reduces to: cute must be true.\n- But none of the remaining facts force cute in this case:\n  - Fact1 only gives cute from cat, and Grace is not a cat here.\n  - Facts 4 and 5 concern lovely/non-lovely in relation to barking and doghood, but in Case B Grace is not a dog, so these do not imply anything about cute.\n  - Fact3 does not apply because Fact6 explicitly allows “neither a cat nor a dog” for Grace; thus we are not forced to treat Grace as an animal that would be constrained to be a cat or dog.\n\nTherefore, in Case B it is possible for Grace to be neither a cat nor cute, while still satisfying all premises. In such a scenario, the hypothesis conclusion “Grace is either a cat or cute” would be false, even though the antecedent is true (since ghosts do not exist).\n\nHence the hypothesis is not guaranteed by the premises.\n\nDISPROVED",
-   "response_steps": 2.0,
-   "response_tokens": 292.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_20",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact1, **Aberdeen won** the cup in the **2013** final.  \nFrom Fact3, **Aberdeen and Rangers are different teams**.  \nFrom Fact4, **different teams cannot win the same cup in the same year’s final**.  \n\nSo if Rangers had won the cup in the 2013 final, then both Aberdeen and Rangers would have won the 2013 cup final despite being different teams, contradicting Fact4. Hence the hypothesis is false.\n\nDISPROVED",
-   "response_steps": 5.0,
-   "response_tokens": 67.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_319",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact1 and Fact3: every customer chooses Plan A or Plan B, and there are **no** customers who do not choose any plans.  \nThe hypothesis states: “James is a customer who does not choose any plans.” This directly contradicts Fact3.  \nTherefore, the hypothesis cannot be true given the premises.\n\nDISPROVED",
-   "response_steps": 3.0,
-   "response_tokens": 50.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_445",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact1, the relevant category “Eastern wild turkey” is among the six possible wild turkey types.  \nFact3 explicitly states: **Tom is not an Eastern wild turkey**.  \nThe hypothesis states the opposite: **Tom is an Eastern wild turkey**.\n\nSince the hypothesis contradicts a given fact (Fact3), the hypothesis cannot be true given the premises.  \n\nDISPROVED",
-   "response_steps": 5.0,
-   "response_tokens": 54.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_1",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "1. Fact1: *Badults* is a British sitcom series, starring members of Pappy’s.  \n   ⇒ Therefore, members of Pappy’s have starred in *Badults*.  \n2. Fact2: *Badults* piloted in July 2013 on BBC Three.  \n   ⇒ Therefore, there exists a show that piloted on BBC Three (*Badults*), and its cast includes members of Pappy’s.  \n3. Hypothesis: No members of Pappy’s have starred for a show piloting on BBC Two or BBC Three.  \n   ⇒ In particular, no members of Pappy’s have starred for a show piloting on BBC Three.  \n4. But from (1) and (2), members of Pappy’s have starred in *Badults*, and *Badults* piloted on BBC Three. This directly contradicts the hypothesis.\n\nDISPROVED",
-   "response_steps": 4.0,
-   "response_tokens": 109.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_230",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let the domain contain the object \\(1984\\). Interpret the facts as implications about properties.\n\n- Fact3: \\(\\forall x\\,( \\text{Streaming}(x)\\rightarrow \\text{Digital}(x))\\).\n- Fact5: \\(\\text{Streaming}(1984)\\rightarrow \\text{Hardcover}(1984)\\).\n- Fact4: \\(\\forall x\\,(\\text{Hardcover}(x)\\rightarrow \\text{PrintedText}(x))\\).\n- Fact2: \\(\\forall x\\,(\\text{PrintedText}(x)\\rightarrow \\text{Analog}(x))\\).\n- Fact1: No digital media are analog, i.e. \\(\\forall x\\,(\\text{Digital}(x)\\rightarrow \\neg \\text{Analog}(x))\\).\n\nTo **prove** the hypothesis \\(\\text{Streaming}(1984)\\), we would need to derive \\(\\text{Streaming}(1984)\\) from the premises alone.\n\nBut Facts 3–5–4–2–1 only allow us to derive consequences **from** \\(\\text{Streaming}(1984)\\); they never give any rule that implies \\(\\text{Streaming}(1984)\\) itself. In particular, Fact5 is one-way:\n\\[\n\\text{Streaming}(1984)\\rightarrow \\text{Hardcover}(1984),\n\\]\nand there is no premise of the form \\(\\text{Hardcover}(1984)\\rightarrow \\text{Streaming}(1984)\\), nor any direct fact stating \\(\\text{Streaming}(1984)\\).\n\nTherefore, the premises do not logically entail the hypothesis.\n\n__DISPROVED__",
-   "response_steps": 12.0,
-   "response_tokens": 116.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_363",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact2, Dan is the lead singer of Imagine Dragons.  \nFrom Fact4, all lead singers are singers, so Dan is a singer.  \nFrom Fact5, all singers are musicians, so Dan is a musician.  \n\nThe hypothesis says Dan is not a musician, which contradicts the conclusion that Dan is a musician. Therefore, the hypothesis is disproved.  \n\nDISPROVED",
-   "response_steps": 6.0,
-   "response_tokens": 56.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_377",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__PROVED__",
-   "raw_response": "Let the predicate symbols mean:\n\n- \\(C(x)\\): \\(x\\) likes eating cheese  \n- \\(F(x)\\): \\(x\\) is a francophile  \n- \\(S(x)\\): \\(x\\) likes Spain as favorite country  \n- \\(Sp(x)\\): \\(x\\) studies Spanish  \n- \\(Fr(x)\\): \\(x\\) studies French  \n\n**Premises translated:**\n\n1. \\(C(x) \\lor F(x)\\).\n2. \\(F(x) \\rightarrow \\neg S(x)\\).\n3. \\(S(x) \\lor C(x)\\).\n4. \\(\\neg C(\\text{Benji}) \\land Sp(\\text{Benji})\\).\n5. \\(\\neg Sp(\\text{Benji}) \\land \\neg Fr(\\text{Benji}) \\rightarrow (Sp(\\text{Benji}) \\lor Fr(\\text{Benji}))\\).  \n\n**Hypothesis to prove:**\n\\[\n(S(\\text{Benji}) \\lor Fr(\\text{Benji})) \\rightarrow (Sp(\\text{Benji}) \\lor S(\\text{Benji})).\n\\]\n\nFrom Fact 4 we have directly:\n\\[\nSp(\\text{Benji}).\n\\]\nTherefore the consequent \\(Sp(\\text{Benji}) \\lor S(\\text{Benji})\\) is immediately true, regardless of whether the antecedent \\(S(\\text{Benji}) \\lor Fr(\\text{Benji})\\) holds.\n\nHence the implication is true:\n\\[\n(S(\\text{Benji}) \\lor Fr(\\text{Benji})) \\rightarrow (Sp(\\text{Benji}) \\lor S(\\text{Benji})).\n\\]\n\n__PROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 119.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_297",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "1. Fact6: Elizabeth is a leader.  \n2. Fact2: Leaders are either a king or a queen (so being a queen rules out being a king).  \n3. Fact5: Elizabeth is a queen.  \n4. Therefore, Elizabeth cannot be a king, which contradicts the hypothesis “Elizabeth is a king.”  \n\nDISPROVED",
-   "response_steps": 4.0,
-   "response_tokens": 47.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_276",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact4, Henry receives one red card in a game.  \nFrom Fact3, Henry is a soccer player, so Fact2 applies: receiving one red card in a game implies the player will be ejected from the rest of the game.  \nTherefore Henry will be ejected, which contradicts the hypothesis that Henry will not be ejected.  \n\nDISPROVED",
-   "response_steps": 4.0,
-   "response_tokens": 55.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_399",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "From Fact2, each player starts at the red stage.  \nFrom Fact3, all players must reach the yellow stage before they can reach the green stage.  \nTherefore, it is impossible to reach the green stage at all without having reached the yellow stage at some prior point.  \n\nSo the hypothesis—“It is possible to move to the green stage without ever reaching the yellow stage”—contradicts Fact3 and cannot be true.\n\nDISPROVED",
-   "response_steps": 5.0,
-   "response_tokens": 69.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_289",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "1. Fact1 states that Oxford Circus is a road junction connecting Oxford Street and Regent Street.  \n2. Fact2 states that Oxford Street is in London.  \n3. From 1 and 2, Oxford Circus is a junction that connects Oxford Street (in London) to Regent Street; hence Regent Street is at that same London junction and therefore is in London.  \n4. The hypothesis says: “Regent Street is not in London,” which contradicts the conclusion that Regent Street is in London.\n\n__DISPROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 79.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_280",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let the hypothesis be: \\( \\neg Researcher(Leon) \\rightarrow Student(Leon)\\).\n\nFrom Fact5:  \n\\[\n\\neg Studying(Leon) \\ \\lor\\ Researcher(Leon).\n\\]\nAssume the antecedent \\( \\neg Researcher(Leon)\\). Then the second disjunct is false, so the first must hold:\n\\[\n\\neg Studying(Leon).\n\\]\nBy Fact6, \\( \\neg Studying(Leon) \\rightarrow Teacher(Leon)\\), hence\n\\[\nTeacher(Leon).\n\\]\nBy Fact3, “No teachers are students,” i.e. \\(Teacher(x) \\rightarrow \\neg Student(x)\\). Therefore,\n\\[\n\\neg Student(Leon).\n\\]\nSo under the assumption \\( \\neg Researcher(Leon)\\), we derive \\( \\neg Student(Leon)\\), contradicting the hypothesis’s required \\(Student(Leon)\\). Hence the hypothesis is not entailed by the facts; in fact the opposite conclusion follows.\n\nTherefore the implication \\( \\neg Researcher(Leon) \\rightarrow Student(Leon)\\) is **disproved**.\n\nDISPROVED",
-   "response_steps": 12.0,
-   "response_tokens": 109.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "GSM8K_0",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "9",
-   "raw_response": "Jordan picked \\(54\\) mangoes total.  \nOne-third are ripe, so\n\\[\n\\text{ripe}=\\frac13\\cdot 54=18,\\qquad \\text{unripe}=\\frac23\\cdot 54=36.\n\\]\nJordan kept \\(16\\) unripe mangoes, so the unripe mangoes he gave to his sister were\n\\[\n36-16=20.\n\\]\nThus the sister received\n\\[\n18+20=38\n\\]\nmangoes. Each jar holds \\(4\\) mangoes, so the number of full jars is\n\\[\n\\left\\lfloor \\frac{38}{4}\\right\\rfloor=\\lfloor 9.5\\rfloor=9.\n\\]\n\n\\boxed{9}",
-   "response_steps": 3.0,
-   "response_tokens": 59.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_1",
-   "source_dataset": "GSM8K",
-   "ground_truth": "134",
-   "predicted": "134",
-   "raw_response": "Frank bakes \\(2\\) trays per day, and each tray makes \\(12\\) cookies, so he bakes\n\\[\n2\\cdot 12 = 24 \\text{ cookies/day}.\n\\]\nOver \\(6\\) days, that is\n\\[\n24\\cdot 6 = 144 \\text{ cookies}.\n\\]\n\nFrank eats \\(1\\) cookie each day for \\(6\\) days:\n\\[\n1\\cdot 6 = 6.\n\\]\nSo after Frank eats, \\(144-6=138\\) cookies remain.\n\nOn the sixth day, Ted eats \\(4\\) more cookies, leaving\n\\[\n138-4=134.\n\\]\n\n\\boxed{134}",
-   "response_steps": 4.0,
-   "response_tokens": 72.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_2",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "9",
-   "raw_response": "Let the ratio of Chloe’s wins to Max’s wins be \\(8:3\\). Then we can write\n\\[\n\\text{Chloe} = 8k,\\quad \\text{Max} = 3k.\n\\]\nGiven Chloe won \\(24\\) times,\n\\[\n8k = 24 \\implies k = \\frac{24}{8} = 3.\n\\]\nSo Max’s wins are\n\\[\n3k = 3\\cdot 3 = 9.\n\\]\n\\boxed{9}",
-   "response_steps": 3.0,
-   "response_tokens": 52.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_3",
-   "source_dataset": "GSM8K",
-   "ground_truth": "44",
-   "predicted": "44",
-   "raw_response": "Each **one-way** trip distances are:\n- House ↔ school: \\(2.5\\) miles  \n- House ↔ market: \\(2\\) miles  \n\n### School mileage\nA **round trip** to school is\n\\[\n2(2.5)=5 \\text{ miles.}\n\\]\nHe makes this round trip **two times per day** for **4 days per week**, so\n\\[\n4 \\cdot 2 \\cdot 5 = 40 \\text{ miles/week.}\n\\]\n\n### Market mileage\nA **round trip** to the market is\n\\[\n2(2)=4 \\text{ miles.}\n\\]\nHe makes this **once during the weekends** (i.e., once per week), so add \\(4\\) miles.\n\n### Total typical weekly mileage\n\\[\n40+4=44.\n\\]\n\n\\boxed{44}",
-   "response_steps": 4.0,
-   "response_tokens": 96.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_4",
-   "source_dataset": "GSM8K",
-   "ground_truth": "220",
-   "predicted": "220",
-   "raw_response": "First hour: \\(66\\) apples.  \n\nSecond hour: she doubles the first hour’s rate, so \\(2\\cdot 66=132\\).  \n\nThird hour: she picks a third of the first hour’s apples, so \\(\\frac13\\cdot 66=22\\).  \n\nTotal:\n\\[\n66+132+22=220\n\\]\n\n\\boxed{220}",
-   "response_steps": 4.0,
-   "response_tokens": 34.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_5",
-   "source_dataset": "GSM8K",
-   "ground_truth": "4",
-   "predicted": "4",
-   "raw_response": "The two daughters each planted \\(5\\) flowers, so initially there were\n\\[\n2 \\times 5 = 10.\n\\]\nAfter growing, there were \\(20\\) more flowers:\n\\[\n10 + 20 = 30.\n\\]\nThen \\(10\\) flowers died, leaving\n\\[\n30 - 10 = 20.\n\\]\nThese \\(20\\) flowers were split evenly among \\(5\\) baskets:\n\\[\n\\frac{20}{5} = 4.\n\\]\n\\boxed{4}",
-   "response_steps": 1.0,
-   "response_tokens": 59.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_6",
-   "source_dataset": "GSM8K",
-   "ground_truth": "3600",
-   "predicted": "3600",
-   "raw_response": "Let the number of confirmed cases be:\n- New York: \\(2000\\)\n- California: \\(C\\)\n- Texas: \\(T\\)\n\n“California had half the number of cases” in New York means\n\\[\nC=\\frac12\\cdot 2000=1000.\n\\]\n“California had 400 more cases than Texas” means\n\\[\nC=T+400.\n\\]\nSo\n\\[\n1000=T+400 \\implies T=600.\n\\]\nTotal across all three states:\n\\[\n2000+1000+600=3600.\n\\]\n\n\\boxed{3600}",
-   "response_steps": 2.0,
-   "response_tokens": 58.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_7",
-   "source_dataset": "GSM8K",
-   "ground_truth": "24",
-   "predicted": "24",
-   "raw_response": "Let \\(N\\) be the number of cows on the farm.\n\n“Every 6 cows produce 108 liters per week” means the average production per cow per week is\n\\[\n\\frac{108}{6}=18 \\text{ liters}.\n\\]\nOver 5 weeks, one cow produces\n\\[\n18 \\times 5 = 90 \\text{ liters}.\n\\]\nSo the total production from \\(N\\) cows in 5 weeks is\n\\[\n90N = 2160.\n\\]\nThus,\n\\[\nN=\\frac{2160}{90}=24.\n\\]\n\n\\boxed{24}",
-   "response_steps": 4.0,
-   "response_tokens": 68.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_8",
-   "source_dataset": "GSM8K",
-   "ground_truth": "24",
-   "predicted": "24",
-   "raw_response": "Lulu begins with \\(65\\) dollars.\n\n1. After spending \\(5\\) on ice cream:  \n\\[\n65-5=60\n\\]\n2. She then spends half of the remaining \\(60\\) on a t-shirt, leaving half:  \n\\[\n\\frac{1}{2}\\cdot 60=30\n\\]\n3. She deposits a fifth of her remaining \\(30\\), i.e. deposits \\(6\\), so she keeps:  \n\\[\n30-6=24\n\\]\n\n\\boxed{24}",
-   "response_steps": 3.0,
-   "response_tokens": 52.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_9",
-   "source_dataset": "GSM8K",
-   "ground_truth": "350",
-   "predicted": "350",
-   "raw_response": "John begins at an elevation of \\(400\\) feet. Traveling downward at \\(10\\) feet per minute for \\(5\\) minutes means he descends\n\\[\n10 \\times 5 = 50 \\text{ feet}.\n\\]\nSo his new elevation is\n\\[\n400 - 50 = 350 \\text{ feet}.\n\\]\n\n\\boxed{350}",
-   "response_steps": 3.0,
-   "response_tokens": 45.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_10",
-   "source_dataset": "GSM8K",
-   "ground_truth": "11",
-   "predicted": "11",
-   "raw_response": "Over their previous 24 games, UF scored a total of 720 points, so their average per game was\n\\[\n\\frac{720}{24}=30.\n\\]\nIn the championship, they scored **2 points less than half** of what they previously scored in each game. Half of 30 is 15, so UF scored\n\\[\n15-2=13\n\\]\npoints in the championship.\n\nThe opponent “only lost by 2 points,” so UF scored 2 more than the opponent:\n\\[\n13 = (\\text{opponent})+2 \\quad\\Rightarrow\\quad \\text{opponent}=11.\n\\]\n\n\\boxed{11}",
-   "response_steps": 3.0,
-   "response_tokens": 77.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_11",
-   "source_dataset": "GSM8K",
-   "ground_truth": "3",
-   "predicted": "3",
-   "raw_response": "Let the number of toys bought on **Monday** be \\(6\\).\n\n- **Wednesday**: twice as many as Monday  \n  \\[\n  2\\cdot 6=12\n  \\]\n- **Friday**: four times as many as Monday  \n  \\[\n  4\\cdot 6=24\n  \\]\n- **Next day** (after Friday): half as many as Wednesday  \n  \\[\n  \\tfrac12\\cdot 12=6\n  \\]\n\nTotal toys bought:\n\\[\n6+12+24+6=48\n\\]\n\nSplit among **16 rabbits**:\n\\[\n\\frac{48}{16}=3\n\\]\n\n\\boxed{3}",
-   "response_steps": 4.0,
-   "response_tokens": 61.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_12",
-   "source_dataset": "GSM8K",
-   "ground_truth": "12",
-   "predicted": "12",
-   "raw_response": "Let Rona’s age be \\(8\\) years. Then Rachel is twice Rona’s age:\n\\[\n\\text{Rachel}=2\\cdot 8=16\n\\]\nCollete’s age is half of Rona’s age:\n\\[\n\\text{Collete}=\\frac12\\cdot 8=4\n\\]\nThe difference between Collete’s and Rachel’s ages is:\n\\[\n16-4=12\n\\]\n\\boxed{12}",
-   "response_steps": 2.0,
-   "response_tokens": 39.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_13",
-   "source_dataset": "GSM8K",
-   "ground_truth": "75",
-   "predicted": "75",
-   "raw_response": "Each school day Jessica drives to and from school, so the total driving time per day is\n\\[\n20+20=40\\text{ minutes}.\n\\]\nShe must complete \\(50\\) hours total:\n\\[\n50\\cdot 60=3000\\text{ minutes}.\n\\]\nThus the number of school days needed is\n\\[\n\\frac{3000}{40}=75.\n\\]\n\n\\boxed{75}",
-   "response_steps": 3.0,
-   "response_tokens": 44.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_14",
-   "source_dataset": "GSM8K",
-   "ground_truth": "25",
-   "predicted": "25",
-   "raw_response": "Let \\(x\\) be the amount Nigel gave away.\n\nNigel initially has \\(45\\) dollars, then after giving away \\(x\\) dollars he has\n\\[\n45-x.\n\\]\nHis mother gives him \\(80\\) more, so now he has\n\\[\n(45-x)+80 = 125-x.\n\\]\n\nWe’re told that now he has \\(10\\) more than twice the amount he originally had. Twice the original amount is \\(2\\cdot 45=90\\), so the right side is \\(90+10=100\\). Hence,\n\\[\n125-x=100 \\quad \\Rightarrow \\quad x=25.\n\\]\n\n\\boxed{25}",
-   "response_steps": 6.0,
-   "response_tokens": 76.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_15",
-   "source_dataset": "GSM8K",
-   "ground_truth": "266",
-   "predicted": "266",
-   "raw_response": "Let Mary end up with \\(300+x\\) sheep after buying \\(x\\) more.\n\nBob has double the number of sheep Mary has plus 35, so Bob has\n\\[\n2(300+x)+35.\n\\]\nMary must have 69 fewer than Bob:\n\\[\n300+x=\\bigl(2(300+x)+35\\bigr)-69.\n\\]\nSimplify:\n\\[\n300+x=2(300+x)-34=600+2x-34=566+2x.\n\\]\nSo\n\\[\n300=566+x \\quad\\Rightarrow\\quad x=266.\n\\]\n\n\\boxed{266}",
-   "response_steps": 3.0,
-   "response_tokens": 49.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_16",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "9",
-   "raw_response": "We have \\(30\\) minutes total to get to school without being late.  \nTime spent reaching the school building:\n\\[\n15+6=21 \\text{ minutes}\n\\]\nSo the time left to reach the room is:\n\\[\n30-21=9 \\text{ minutes}\n\\]\n\n\\boxed{9}",
-   "response_steps": 2.0,
-   "response_tokens": 38.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_17",
-   "source_dataset": "GSM8K",
-   "ground_truth": "25",
-   "predicted": "25",
-   "raw_response": "Let Marcus have \\(m\\) pencils. Then Jayden has twice as many, so\n\\[\n2m = 20 \\implies m = 10.\n\\]\nDana has 15 more pencils than Jayden, so\n\\[\nD = 20 + 15 = 35.\n\\]\n“How many more pencils does Dana have than Marcus” is\n\\[\nD - m = 35 - 10 = 25.\n\\]\n\\boxed{25}",
-   "response_steps": 2.0,
-   "response_tokens": 60.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_18",
-   "source_dataset": "GSM8K",
-   "ground_truth": "33",
-   "predicted": "33",
-   "raw_response": "Each gust moves the leaf forward \\(5\\) feet, then the swirl moves it back \\(2\\) feet. So the net distance gained per gust is\n\\[\n5-2=3 \\text{ feet.}\n\\]\nAfter \\(11\\) gusts, the total distance traveled down the sidewalk is\n\\[\n11 \\cdot 3 = 33.\n\\]\n\\boxed{33}",
-   "response_steps": 2.0,
-   "response_tokens": 48.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_19",
-   "source_dataset": "GSM8K",
-   "ground_truth": "83",
-   "predicted": "83",
-   "raw_response": "Nathan has two kinds of bunches:\n\n- \\(6\\) bunches with \\(8\\) bananas each: \\(6 \\cdot 8 = 48\\)\n- \\(5\\) bunches with \\(7\\) bananas each: \\(5 \\cdot 7 = 35\\)\n\nTotal bananas:\n\\[\n48 + 35 = 83\n\\]\n\n\\boxed{83}",
-   "response_steps": 3.0,
-   "response_tokens": 40.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_20",
-   "source_dataset": "GSM8K",
-   "ground_truth": "7",
-   "predicted": "7",
-   "raw_response": "Since both green and red lettuce cost \\$2 per pound, divide each spending amount by 2 to get pounds:\n\n- Green lettuce: \\(\\frac{8}{2} = 4\\) pounds  \n- Red lettuce: \\(\\frac{6}{2} = 3\\) pounds  \n\nTotal pounds: \\(4 + 3 = 7\\).\n\n\\boxed{7}",
-   "response_steps": 3.0,
-   "response_tokens": 41.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_21",
-   "source_dataset": "GSM8K",
-   "ground_truth": "165",
-   "predicted": "165",
-   "raw_response": "The vase costs \\$200 originally. A 25% discount means Donna pays \\(100\\%-25\\%=75\\%\\) of \\$200:\n\\[\n200 \\cdot 0.75 = 150\n\\]\nShe then pays 10% sales tax on the sale price:\n\\[\n150 \\cdot 0.10 = 15\n\\]\nTotal paid:\n\\[\n150 + 15 = 165\n\\]\n\\boxed{165}",
-   "response_steps": 2.0,
-   "response_tokens": 48.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_22",
-   "source_dataset": "GSM8K",
-   "ground_truth": "1500",
-   "predicted": "1500",
-   "raw_response": "Let the second-quarter profit be \\(x\\). The annual profit is the sum of all four quarters:\n\\[\n1500 + x + 3000 + 2000 = 8000.\n\\]\nAdd the known quarters:\n\\[\n1500 + 3000 + 2000 = 6500,\n\\]\nso\n\\[\n6500 + x = 8000 \\quad \\Rightarrow \\quad x = 8000 - 6500 = 1500.\n\\]\n\\boxed{1500}",
-   "response_steps": 2.0,
-   "response_tokens": 59.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_23",
-   "source_dataset": "GSM8K",
-   "ground_truth": "260",
-   "predicted": "260",
-   "raw_response": "High heels cost \\(60\\). Each pair of ballet slippers costs \\(\\tfrac{2}{3}\\) of that:\n\\[\n\\tfrac{2}{3}\\cdot 60=40\n\\]\nFive pairs cost:\n\\[\n5\\cdot 40=200\n\\]\nTotal payment:\n\\[\n60+200=260\n\\]\n\\boxed{260}",
-   "response_steps": 2.0,
-   "response_tokens": 30.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_24",
-   "source_dataset": "GSM8K",
-   "ground_truth": "245",
-   "predicted": "245",
-   "raw_response": "James begins with 500 Legos. He uses half of them before finishing, so he uses  \n\\[\n\\frac{1}{2}\\cdot 500 = 250\n\\]\nleaving  \n\\[\n500-250=250\n\\]\nleftover Legos. He puts all leftover pieces back except for 5 missing pieces, so the box ends with  \n\\[\n250-5=245.\n\\]\n\n\\boxed{245}",
-   "response_steps": 3.0,
-   "response_tokens": 47.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_25",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "5",
-   "raw_response": "Let the value of each of the other 8 identical toys be \\(x\\). The total value of all 9 toys is 52, so\n\\[\n12 + 8x = 52.\n\\]\nSubtract 12:\n\\[\n8x = 40.\n\\]\nDivide by 8:\n\\[\nx = 5.\n\\]\n\\boxed{5}",
-   "response_steps": 2.0,
-   "response_tokens": 46.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_26",
-   "source_dataset": "GSM8K",
-   "ground_truth": "132",
-   "predicted": "132",
-   "raw_response": "Each horse eats:\n- Oats: \\(4\\) lb per feeding, \\(2\\) times per day \\(\\Rightarrow 4\\cdot 2=8\\) lb/day\n- Grain: \\(3\\) lb once per day \\(\\Rightarrow 3\\) lb/day\n\nSo per horse per day: \\(8+3=11\\) lb.  \nFor 4 horses per day: \\(4\\cdot 11=44\\) lb.  \nFor 3 days: \\(3\\cdot 44=132\\) lb.\n\n\\boxed{132}",
-   "response_steps": 4.0,
-   "response_tokens": 49.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_27",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "6",
-   "raw_response": "Each full run can carry all 7 cars, with 2 people per car:\n\\[\n7 \\times 2 = 14 \\text{ people per run}\n\\]\nWith 84 people total, the number of runs required is:\n\\[\n\\frac{84}{14} = 6\n\\]\nSo, the operator must run the roller coaster **6** times to give everyone a turn.  \n\n\\boxed{6}",
-   "response_steps": 1.0,
-   "response_tokens": 55.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_28",
-   "source_dataset": "GSM8K",
-   "ground_truth": "57",
-   "predicted": "57",
-   "raw_response": "Stacy was 50 inches tall last year. Her brother grew 1 inch last year, and Stacy grew 6 inches more than her brother, so Stacy’s growth was\n\\[\n1+6=7 \\text{ inches}.\n\\]\nThus, Stacy’s height now is\n\\[\n50+7=57 \\text{ inches}.\n\\]\n\\boxed{57}",
-   "response_steps": 4.0,
-   "response_tokens": 43.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_29",
-   "source_dataset": "GSM8K",
-   "ground_truth": "14",
-   "predicted": "14",
-   "raw_response": "There are \\(3\\) nephews and \\(2\\) nieces, so \\(3+2=5\\) total recipients. Dividing \\(70\\) jellybeans equally among \\(5\\) people gives\n\\[\n70 \\div 5 = 14.\n\\]\nSo each nephew or niece receives \\(14\\) jellybeans.  \n\n\\boxed{14}",
-   "response_steps": 2.0,
-   "response_tokens": 35.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_30",
-   "source_dataset": "GSM8K",
-   "ground_truth": "468",
-   "predicted": "468",
-   "raw_response": "Compute the total fabric area, then multiply by the cost per square foot.\n\n**Skirts (overskirt + two petticoats):**  \nThere are \\(1+2=3\\) rectangles, each \\(12\\text{ ft}\\times 4\\text{ ft}\\), so each has area\n\\[\n12\\cdot 4=48\\text{ ft}^2.\n\\]\nTotal for skirts:\n\\[\n3\\cdot 48=144\\text{ ft}^2.\n\\]\n\n**Bodice:**  \nShirt area: \\(2\\text{ ft}^2\\).  \nEach sleeve: \\(5\\text{ ft}^2\\), and there are two sleeves, so sleeve area is\n\\[\n2\\cdot 5=10\\text{ ft}^2.\n\\]\nTotal for bodice:\n\\[\n2+10=12\\text{ ft}^2.\n\\]\n\n**Total area and cost:**  \n\\[\n144+12=156\\text{ ft}^2,\\quad 156\\cdot 3=468.\n\\]\n\n\\boxed{468}",
-   "response_steps": 5.0,
-   "response_tokens": 85.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_31",
-   "source_dataset": "GSM8K",
-   "ground_truth": "130",
-   "predicted": "130",
-   "raw_response": "The yearly fees form an arithmetic sequence: first term \\(a_1=80\\) and common difference \\(d=10\\).  \nThe sixth-year fee is\n\\[\na_6 = a_1 + (6-1)d = 80 + 5\\cdot 10 = 130.\n\\]\n\\boxed{130}",
-   "response_steps": 2.0,
-   "response_tokens": 33.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_32",
-   "source_dataset": "GSM8K",
-   "ground_truth": "55",
-   "predicted": "55",
-   "raw_response": "Romeo buys 5 bars at \\$5 each, so the chocolate cost is\n\\[\n5\\cdot 5=25.\n\\]\nPackaging costs \\$2 per bar, so total packaging is\n\\[\n5\\cdot 2=10.\n\\]\nThus his total expense is\n\\[\n25+10=35.\n\\]\nHe sells all chocolates for \\$90, so his profit is\n\\[\n90-35=55.\n\\]\n\\boxed{55}",
-   "response_steps": 1.0,
-   "response_tokens": 51.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_33",
-   "source_dataset": "GSM8K",
-   "ground_truth": "20",
-   "predicted": "20",
-   "raw_response": "Let Friday’s spending be \\(X\\) dollars. Then Saturday’s spending is \\(2X\\) and Sunday’s spending is \\(3X\\).  \n\nTotal spending over three days:\n\\[\nX+2X+3X=120\n\\]\n\\[\n6X=120\n\\]\n\\[\nX=20\n\\]\n\n\\[\n\\boxed{20}\n\\]",
-   "response_steps": 4.0,
-   "response_tokens": 33.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_34",
-   "source_dataset": "GSM8K",
-   "ground_truth": "23",
-   "predicted": "23",
-   "raw_response": "Lois begins with \\(40\\) books.\n\n- She gives \\(\\frac14\\) of her books away: \\(\\frac14\\cdot 40=10\\), so she has \\(40-10=30\\).\n- She then donates \\(\\frac13\\) of the remaining \\(30\\) books: \\(\\frac13\\cdot 30=10\\), so she has \\(30-10=20\\).\n- Finally, she buys \\(3\\) new books: \\(20+3=23\\).\n\n\\boxed{23}",
-   "response_steps": 4.0,
-   "response_tokens": 44.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_35",
-   "source_dataset": "GSM8K",
-   "ground_truth": "4",
-   "predicted": "4",
-   "raw_response": "Let the cost of each ring be \\(r\\) dollars.  \nLinda sold 4 necklaces for \\(4\\cdot 12=48\\) dollars, and 8 rings for \\(8r\\) dollars. The total is \\$80, so:\n\\[\n48+8r=80\n\\]\n\\[\n8r=32\n\\]\n\\[\nr=4\n\\]\nTherefore, each ring costs \\(\\boxed{4}\\).  \n\n\\boxed{4}",
-   "response_steps": 3.0,
-   "response_tokens": 43.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_36",
-   "source_dataset": "GSM8K",
-   "ground_truth": "1",
-   "predicted": "1",
-   "raw_response": "Let \\(c\\) be the production cost of one cookie (in dollars).  \nJoe sells each cookie for 20% more than cost, so the selling price per cookie is \\(1.2c\\).\n\nIf he sold 50 cookies for a total of \\$60, then\n\\[\n50(1.2c)=60.\n\\]\nCompute \\(50\\cdot 1.2=60\\), so\n\\[\n60c=60 \\quad \\Rightarrow \\quad c=1.\n\\]\n\n\\boxed{1}",
-   "response_steps": 3.0,
-   "response_tokens": 54.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_37",
-   "source_dataset": "GSM8K",
-   "ground_truth": "16000",
-   "predicted": "16000",
-   "raw_response": "Total area of the lot:\n\\[\n400 \\times 500 = 200{,}000\\text{ ft}^2\n\\]\nUsable area (80%):\n\\[\n0.8 \\times 200{,}000 = 160{,}000\\text{ ft}^2\n\\]\nCars per 10 ft\\(^2\\) each:\n\\[\n\\frac{160{,}000}{10} = 16{,}000\n\\]\n\\boxed{16000}",
-   "response_steps": 1.0,
-   "response_tokens": 35.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_38",
-   "source_dataset": "GSM8K",
-   "ground_truth": "23",
-   "predicted": "23",
-   "raw_response": "Start with \\(37\\) jellybeans.\n\n- Remove \\(15\\): \\(37-15=22\\)\n- Add back \\(5\\) of the removed jellybeans: \\(22+5=27\\)\n- Remove \\(4\\) more: \\(27-4=23\\)\n\n\\(\\boxed{23}\\)",
-   "response_steps": 3.0,
-   "response_tokens": 23.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_39",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "12",
-   "raw_response": "First, \\( \\frac{2}{5} \\) of 30 members ordered lemon juice:\n\\[\n30\\cdot \\frac{2}{5}=12\n\\]\nRemaining members:\n\\[\n30-12=18\n\\]\nNext, \\( \\frac{1}{3} \\) of the remaining members ordered mango juice:\n\\[\n18\\cdot \\frac{1}{3}=6\n\\]\nSo the rest ordered orange juice:\n\\[\n18-6=12\n\\]\n\n\\boxed{12}",
-   "response_steps": 1.0,
-   "response_tokens": 44.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_40",
-   "source_dataset": "GSM8K",
-   "ground_truth": "120",
-   "predicted": "120",
-   "raw_response": "Renting costs \\(20\\) dollars per month, so for 1 year:\n\\[\n20 \\times 12 = 240.\n\\]\nBuying costs \\(30\\) dollars per month, so for 1 year:\n\\[\n30 \\times 12 = 360.\n\\]\nThe difference is:\n\\[\n360 - 240 = 120.\n\\]\n\\boxed{120}",
-   "response_steps": 1.0,
-   "response_tokens": 45.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_41",
-   "source_dataset": "GSM8K",
-   "ground_truth": "28",
-   "predicted": "28",
-   "raw_response": "Dad scored \\(7\\) points. Olaf scored three times as many, so Olaf scored \\(3 \\cdot 7 = 21\\) points.  \n\nTotal points: \\(7 + 21 = 28\\).  \n\n\\boxed{28}",
-   "response_steps": 3.0,
-   "response_tokens": 27.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_42",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "6",
-   "raw_response": "Each dog has 4 legs. The tangled group consists of Mariel’s dogs (say \\(d\\)) and the other dog walker’s 3 dogs, for a total of \\(d+3\\) dogs.  \nSo the total number of tangled legs is\n\\[\n4(d+3)=36.\n\\]\nDivide by 4:\n\\[\nd+3=9 \\quad \\Rightarrow \\quad d=6.\n\\]\n\\boxed{6}",
-   "response_steps": 3.0,
-   "response_tokens": 49.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_43",
-   "source_dataset": "GSM8K",
-   "ground_truth": "8",
-   "predicted": "8",
-   "raw_response": "The factory’s production rate is \\(50\\) candies per hour, and it works \\(10\\) hours per day.  \n\nCandies per day:\n\\[\n50 \\times 10 = 500\n\\]\nDays needed to make \\(4000\\) candies:\n\\[\n\\frac{4000}{500} = 8\n\\]\n\n\\boxed{8}",
-   "response_steps": 2.0,
-   "response_tokens": 38.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_44",
-   "source_dataset": "GSM8K",
-   "ground_truth": "32",
-   "predicted": "32",
-   "raw_response": "Each cake needs \\(8\\) egg whites, so two cakes need\n\\[\n2 \\cdot 8 = 16 \\text{ egg whites}.\n\\]\nSince \\(2\\) tablespoons of aquafaba replace \\(1\\) egg white, the tablespoons needed are\n\\[\n16 \\cdot 2 = 32.\n\\]\n\\boxed{32}",
-   "response_steps": 2.0,
-   "response_tokens": 41.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_45",
-   "source_dataset": "GSM8K",
-   "ground_truth": "135",
-   "predicted": "130",
-   "raw_response": "Let \\(t=0\\) at 1 AM, so the zoo notices the tiger at 4 AM, i.e. at \\(t=3\\).\n\n**Phase 1 (tiger runs uncontrolled until noticed):**  \nFrom \\(t=0\\) to \\(t=3\\): speed \\(25\\) mph for 3 hours\n\\[\nd_1=25\\cdot 3=75\n\\]\n\n**Phase 2 (keeps running while they find him):**  \n“It takes 2 more hours to find him,” so they find/start the chase at \\(t=5\\) (i.e. 6 AM).  \nFrom \\(t=3\\) to \\(t=5\\): speed still \\(25\\) mph for 2 hours\n\\[\nd_2=25\\cdot 2=50\n\\]\nDistance at \\(t=5\\):\n\\[\nd_1+d_2=75+50=125\n\\]\n\n**Phase 3 (slowdown, then chase):**  \n“After 4 hours of running, the tiger slows to 10 mph.” That occurs at \\(t=4\\) (i.e. 5 AM).  \nSo from \\(t=4\\) to \\(t=5\\) (1 hour) he runs at 10 mph:\n\\[\nd_3=10\\cdot 1=10\n\\]\nFrom \\(t=5\\) to \\(t=5.5\\) (half an hour) the chase runs at 50 mph. The tiger runs at 10 mph during this half hour:\n\\[\n\\text{Tiger adds }=10\\cdot 0.5=5\n\\]\nSo the tiger’s position at capture (relative to the zoo) is:\n\\[\n125+ d_3 + 5 \\;?\n\\]\nCareful: the 125 already counted up to \\(t=5\\). From \\(t=5\\) to \\(t=5.5\\), tiger adds 5 miles. Thus:\n\\[\n\\text{distance caught}=125+5=130\n\\]\n\n\\[\n\\boxed{130}\n\\]",
-   "response_steps": 14.0,
-   "response_tokens": 195.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_46",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "6",
-   "raw_response": "Justin runs \\(2\\) blocks in \\(1.5\\) minutes, so his speed is\n\\[\n\\frac{2}{1.5}=\\frac{4}{3}\\ \\text{blocks per minute}.\n\\]\nTo run \\(8\\) blocks, the time needed is\n\\[\n\\frac{8}{\\frac{4}{3}}=8\\cdot \\frac{3}{4}=6.\n\\]\n\\boxed{6}",
-   "response_steps": 2.0,
-   "response_tokens": 30.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_47",
-   "source_dataset": "GSM8K",
-   "ground_truth": "160",
-   "predicted": "160",
-   "raw_response": "Since \\(80\\) pages make \\(1\\) inch, the total thickness \\(12\\) inches corresponds to\n\\[\n12 \\times 80 = 960\n\\]\npages for all \\(6\\) books. Dividing evenly,\n\\[\n\\frac{960}{6} = 160\n\\]\npages per book on average.  \n\n\\boxed{160}",
-   "response_steps": 2.0,
-   "response_tokens": 38.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_48",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "9",
-   "raw_response": "Michael has 36 pets.  \nDogs are \\(25\\%\\) of 36: \\(0.25 \\cdot 36 = 9\\).  \nCats are \\(50\\%\\) of 36: \\(0.50 \\cdot 36 = 18\\).  \n\nSo dogs and cats total \\(9+18=27\\), leaving bunnies:\n\\[\n36-27=9.\n\\]\n\n\\boxed{9}",
-   "response_steps": 4.0,
-   "response_tokens": 36.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_49",
-   "source_dataset": "GSM8K",
-   "ground_truth": "21",
-   "predicted": "21",
-   "raw_response": "Let \\(x\\) be the number of inches Patricia must grow her hair before donating.\n\nIf her hair is \\(14+x\\) inches long when she donates, then after donating \\(23\\) inches, she will have\n\\[\n(14+x)-23\n\\]\ninches left. She wants this to equal \\(12\\), so:\n\\[\n(14+x)-23=12\n\\]\n\\[\nx+14-23=12\n\\]\n\\[\nx-9=12\n\\]\n\\[\nx=21\n\\]\n\n\\boxed{21}",
-   "response_steps": 3.0,
-   "response_tokens": 57.0,
-   "domain": "math"
   },
   {
    "sample_id": "OlympiadBench_1",
@@ -2095,23 +1105,13 @@
    "domain": "math"
   },
   {
-   "sample_id": "FOLIO_258",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "raw_response": "Let  \n- \\(C\\): “George is a commuter”  \n- \\(H\\): “George has a home office setup”  \n- \\(W\\): “George works in person”  \n- \\(R\\): “George works from home”  \n- \\(S\\): “George has a relaxed schedule”\n\nFacts:\n1. \\(W \\to C\\)\n2. \\(W \\lor R\\) (for George, at least one of them holds)\n3. \\(R \\to S\\)\n4. \\(C \\lor H\\)\n5. \\((R \\lor H) \\to \\neg(R \\land C)\\), i.e. if \\(R\\) or \\(H\\) then not both \\(R\\) and \\(C\\).\n\nHypothesis antecedent:\n\\[\n(A) \\;:\\; (H \\land W)\\;\\lor\\;(\\neg H \\land \\neg W)\n\\]\nHypothesis consequent:\n\\[\n(B) \\;:\\; (R \\lor S)\n\\]\n\nWe prove \\( (A) \\to (R \\lor S)\\).\n\n### Case 1: \\(H \\land W\\)\nThen \\(W\\) holds, so by Fact1, \\(C\\) holds.  \nAlso \\(H\\) holds, so \\(R \\lor H\\) holds; thus by Fact5, \\(\\neg(R \\land C)\\).  \nSince \\(C\\) is true, this implies \\(\\neg R\\). Therefore \\(R\\) is false.\n\nBut from Fact2, \\(W \\lor R\\) holds for George. Since \\(W\\) is true in this case, \\(W \\lor R\\) is satisfied without forcing \\(R\\). The key is: the hypothesis consequent is \\(R \\lor S\\), and we already have \\(\\neg R\\), so we need \\(S\\).\n\nHowever, note that \\(S\\) is only given by \\(R \\to S\\), not from \\(W\\). So from this case alone we cannot derive \\(S\\).  \nInstead, check consistency with Case 1: we have \\(H \\land W\\), hence \\(C\\) true. Fact5 gives \\(\\neg(R \\land C)\\), but with \\(C\\) true it yields \\(\\neg R\\). So indeed \\(R\\) must be false; then by Fact3 \\(S\\) is also not derivable.\n\nTherefore the only way the hypothesis could be guaranteed is if this Case 1 cannot occur under the given facts. But it can: take a model where\n- George has home office setup \\(H\\) true,\n- George works in person \\(W\\) true,\n- hence commuter \\(C\\) true (Fact1),\n- set \\(R\\) false (satisfies Fact5 since then \\(R \\land C\\) is false),\n- set \\(S\\) false (no rule forces relaxed schedule when not \\(R\\)).\n\nAll facts remain satisfied, yet the hypothesis consequent \\(R \\lor S\\) is false.\n\n### Countermodel\nLet George satisfy:\n- \\(H = \\text{T}\\)\n- \\(W = \\text{T}\\)\n- \\(C = \\text{T}\\) (by Fact1)\n- \\(R = \\text{F}\\)\n- \\(S = \\text{F}\\)\n\nCheck Facts:\n- Fact2: \\(W \\lor R = T \\lor F = T\\).\n- Fact3: \\(R \\to S\\) is vacuously true since \\(R=F\\).\n- Fact4: \\(C \\lor H = T \\lor T = T\\).\n- Fact5: \\((R \\lor H) \\to \\neg(R \\land C)\\). Here \\(R\\lor H = F\\lor T = T\\), and \\(R\\land C = F\\land T = F\\), so \\(\\neg(R\\land C)=T\\). Thus Fact5 holds.\n\nNow evaluate the hypothesis:\n- Antecedent \\( (H \\land W)\\lor(\\neg H \\land \\neg W)\\) is true since \\(H\\land W = T\\land T = T\\).\n- Consequent \\(R \\lor S = F \\lor F = F\\).\n\nSo the hypothesis is false in a model where all facts are true.\n\nHence the hypothesis is **not entailed** by the facts.  \n\nDISPROVED",
-   "response_steps": 5,
-   "response_tokens": 492,
-   "domain": "logical"
-  },
-  {
    "sample_id": "OlympiadBench_0",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$\\frac{4}{3}$",
    "predicted": "5",
    "raw_response": "Assume the vertices of parallelogram \\(ARML\\) are in the cyclic order \\(A\\to R\\to M\\to L\\). Then \\(R\\) and \\(M\\) are opposite to \\(A\\) and \\(L\\) respectively, and the usual midpoint relations work (the inconsistent attempts above come from using the wrong cyclic order for the labels).\n\n### 1) Coordinate/Vector model\nLet\n\\[\nR=\\mathbf 0,\\quad A=\\mathbf a,\\quad M=\\mathbf m,\\quad L=\\mathbf a+\\mathbf m,\n\\]\nso that \\(AR\\parallel ML\\) and \\(RM\\parallel AL\\).\n\nMidpoints:\n- \\(P\\) is midpoint of \\(\\overline{RM}\\), so\n\\[\nP=\\frac{R+M}{2}=\\frac{\\mathbf m}{2}.\n\\]\n- \\(Q\\) is midpoint of \\(\\overline{AL}\\), so\n\\[\nQ=\\frac{A+L}{2}=\\frac{\\mathbf a+(\\mathbf a+\\mathbf m)}{2}=\\mathbf a+\\frac{\\mathbf m}{2}.\n\\]\nHence\n\\[\n\\overrightarrow{PQ}=Q-P=\\mathbf a,\n\\]\nso \\(P,Q\\) lie on a line parallel to \\(\\overline{AR}\\).\n\n### 2) Use \\(PX=3,\\ RX=4,\\ PR=5\\)\nPoint \\(X\\) lies on segment \\(\\overline{PQ}\\) and on \\(\\overline{RX}\\), so \\(R,P,X\\) are collinear. Since \\(PR=5\\) and \\(PX=3\\), we have\n\\[\nRX=PR+PX=5+3=8\n\\]\nif \\(X\\) lies beyond \\(P\\); but we are told \\(RX=4\\). Therefore \\(X\\) lies between \\(R\\) and \\(P\\), and\n\\[\nRX=4,\\quad RP=5 \\implies \\frac{RX}{RP}=\\frac45.\n\\]\nAlong the segment from \\(R\\) to \\(P\\),\n\\[\nX = R + \\frac{RX}{RP}(P-R)=\\frac45\\,P=\\frac45\\cdot \\frac{\\mathbf m}{2}=\\frac{2}{5}\\mathbf m.\n\\]\n\n### 3) Area \\([PQR]\\)\nVectors in the parallelogram triangle:\n\\[\n\\overrightarrow{RP}=P=\\frac{\\mathbf m}{2},\\qquad \\overrightarrow{RQ}=Q-R=\\mathbf a+\\frac{\\mathbf m}{2}.\n\\]\nBut it’s easier to use\n\\[\n[PQR]=\\frac12\\left|\\det(\\overrightarrow{RP},\\overrightarrow{RQ})\\right|\n=\\frac12\\left|\\det\\!\\left(\\frac{\\mathbf m}{2},\\,\\mathbf a+\\frac{\\mathbf m}{2}\\right)\\right|\n=\\frac12\\cdot \\frac12\\,|\\det(\\mathbf m,\\mathbf a)|.\n\\]\n(The \\(\\det(\\mathbf m,\\mathbf m)\\) term is \\(0\\).)\nSo\n\\[\n[PQR]=\\frac14 |\\det(\\mathbf m,\\mathbf a)|.\n\\]\n\n### 4) Point \\(I\\in \\overline{RX}\\) with \\(IA=IL\\)\nSo \\(I\\) is equidistant from \\(A\\) and \\(L\\). Since \\(A\\) and \\(L\\) are the endpoints of a side of the parallelogram and the locus of points equidistant from \\(A\\) and \\(L\\) is the perpendicular bisector of \\(\\overline{AL}\\), the line \\(\\overline{RX}\\) intersects that bisector at \\(I\\).\n\nParameterize points on \\(\\overline{RX}\\):\n\\[\nI = R + tX = tX = t\\cdot \\frac{2}{5}\\mathbf m,\\qquad 0\\le t\\le 1.\n\\]\nDistance condition \\(IA=IL\\) means\n\\[\n|I-A|^2=|I-L|^2.\n\\]\nCompute with \\(L=A+\\mathbf m\\):\n\\[\n|I-A|^2=|I-(A+\\mathbf m)|^2\n\\]\n\\[\n\\implies (I-A)\\cdot (I-A)=(I-A-\\mathbf m)\\cdot(I-A-\\mathbf m).\n\\]\nExpand and cancel common terms:\n\\[\n0 = -2(I-A)\\cdot \\mathbf m + \\mathbf m\\cdot \\mathbf m\n\\]\n\\[\n\\implies (I-A)\\cdot \\mathbf m = \\frac{|\\mathbf m|^2}{2}.\n\\]\nNow \\(I-A = t\\frac{2}{5}\\mathbf m - \\mathbf a\\). Dot with \\(\\mathbf m\\):\n\\[\n\\left(t\\frac{2}{5}\\mathbf m-\\mathbf a\\right)\\cdot \\mathbf m = \\frac{|\\mathbf m|^2}{2}\n\\]\nLet \\(M=|\\mathbf m|\\). Also denote \\( \\mathbf a\\cdot \\mathbf m = c\\). Then\n\\[\nt\\frac{2}{5}M^2 - c = \\frac12 M^2\n\\]\n\\[\nt\\frac{2}{5}M^2 = c+\\frac12 M^2.\n\\]\nThus\n\\[\nt=\\frac{c}{M^2}\\cdot \\frac{5}{2}+\\frac{5}{4}.\n\\]\nBecause \\(0\\le t\\le 1\\), this restricts the allowable geometry, and we will maximize the desired ratio under that constraint.\n\n### 5) Area \\([LIP]\\) and the ratio\nWe need \\([PQR]/[LIP]\\). Note:\n- \\([PQR]=\\dfrac14 |\\det(\\mathbf m,\\mathbf a)|\\) is fixed by the parallelogram.\n- The triangle \\(\\triangle LIP\\) has base along the line through \\(P\\) and \\(I\\), but we can compute it via determinant:\n\\[\n[LIP]=\\frac12\\left|\\det(\\overrightarrow{IL},\\overrightarrow{IP})\\right|.\n\\]\nUse\n\\[\nL=A+\\mathbf m=\\mathbf a+\\mathbf m,\\quad I=t\\frac{2}{5}\\mathbf m,\\quad P=\\frac12\\mathbf m.\n\\]\nThen\n\\[\n\\overrightarrow{IL}=L-I=\\mathbf a+\\mathbf m - t\\frac{2}{5}\\mathbf m\n=\\mathbf a+\\left(1-\\frac{2t}{5}\\right)\\mathbf m,\n\\]\n\\[\n\\overrightarrow{IP}=P-I=\\frac12\\mathbf m - t\\frac{2}{5}\\mathbf m\n=\\left(\\frac12-\\frac{2t}{5}\\right)\\mathbf m.\n\\]\nTherefore\n\\[\n\\det(\\overrightarrow{IL},\\overrightarrow{IP})\n=\\det\\!\\left(\\mathbf a+\\left(1-\\frac{2t}{5}\\right)\\mathbf m,\\ \\left(\\frac12-\\frac{2t}{5}\\right)\\mathbf m\\right).\n\\]\nThe \\(\\mathbf m\\) term in the first factor drops out in determinant with \\(\\mathbf m\\), so:\n\\[\n\\det(\\overrightarrow{IL},\\overrightarrow{IP})\n=\\left(\\frac12-\\frac{2t}{5}\\right)\\det(\\mathbf a,\\mathbf m).\n\\]\nHence\n\\[\n[LIP]=\\frac12\\left|\\frac12-\\frac{2t}{5}\\right|\\cdot |\\det(\\mathbf a,\\mathbf m)|.\n\\]\n\nSo the ratio is\n\\[\n\\frac{[PQR]}{[LIP]}\n=\\frac{\\frac14 |\\det(\\mathbf a,\\mathbf m)|}{\\frac12\\left|\\frac12-\\frac{2t}{5}\\right|\\cdot |\\det(\\mathbf a,\\mathbf m)|}\n=\\frac{\\frac14}{\\frac12\\left|\\frac12-\\frac{2t}{5}\\right|}\n=\\frac{1}{2\\left|\\frac12-\\frac{2t}{5}\\right|}.\n\\]\nSimplify:\n\\[\n\\frac12-\\frac{2t}{5}=\\frac{5-4t}{10}\n\\]\nso\n\\[\n\\frac{[PQR]}{[LIP]}=\\frac{1}{2\\cdot \\left|\\frac{5-4t}{10}\\right|}\n=\\frac{10}{2|5-4t|}\n=\\frac{5}{|5-4t|}.\n\\]\n\n### 6) Maximize \\(\\dfrac{5}{|5-4t|}\\)\nTo maximize, minimize \\(|5-4t|\\). Since \\(0\\le t\\le 1\\),\n\\[\n5-4t \\in [1,5],\n\\]\nso \\(|5-4t|=5-4t\\), minimized at \\(t=1\\), giving \\(|5-4t|=1\\).\n\nThis value is achievable when \\(t=1\\), i.e. when \\(I=X\\), which occurs for a suitable parallelogram shape while keeping \\(PX=3, RX=4, PR=5\\) consistent.\n\nThus the maximum ratio is\n\\[\n\\frac{5}{1}=5.\n\\]\n\n\\boxed{5}",
-   "response_steps": 36,
-   "response_tokens": 615,
+   "response_steps": 36.0,
+   "response_tokens": 615.0,
    "domain": "math"
   },
   {
@@ -2120,8 +1120,8 @@
    "ground_truth": "$n^{2}-n+1$",
    "predicted": "n",
    "raw_response": "Let each company’s cable cars be edges of a directed acyclic graph on vertices \\(\\{1,2,\\dots,n^2\\}\\) (lower to higher).  \nFor company \\(A\\), cars are\n\\[\ns_1\\to t_1,\\; s_2\\to t_2,\\;\\dots,\\; s_k\\to t_k\n\\]\nwith\n\\[\ns_1<\\cdots<s_k,\\qquad t_1<\\cdots<t_k.\n\\]\nSimilarly for company \\(B\\).\n\n## Key observation (reachability structure)\nFix company \\(A\\). Define the “reachable set from below” as follows: for each \\(i\\), once you can get to \\(s_i\\), you can then get to \\(t_i\\); because the \\(s_i\\) and \\(t_i\\) are strictly increasing, reachability behaves like an increasing “front”. Concretely, define\n\\[\nR_A=\\{(s_i,t_i)\\}.\n\\]\nIf there exists a path from some \\(x\\) to some \\(y\\), then there is a chain of indices\n\\[\ni_1<i_2<\\cdots<i_m,\\qquad s_{i_1}\\le x,\\quad t_{i_m}\\ge y,\n\\]\nand the monotonicity forces that the reachable endpoints form an increasing sequence. In particular, for each company, the pairs of checkpoints it can link correspond to comparable pairs under a 2D monotone reachability relation, which is governed by Dilworth/Mirsky-type extremal bounds. The worst case (minimizing guaranteed overlap with another company) is achieved when the two companies realize “orthogonal” extremal configurations, forcing the existence of a common linked pair only once \\(k\\) is large enough to prevent both from keeping their linked pairs disjoint.\n\n## Extremal bound\nThe theorem that applies here is the 2D poset extremal fact: on a chain of length \\(n^2\\), if one selects \\(k\\) monotone edges (with increasing starts and increasing finishes), then the set of comparable pairs it can realize has size forcing, when compared with another such set, an intersection once \\(k\\) reaches \\(n\\). If \\(k\\le n-1\\), one can construct two companies so that their reachable-linked pairs are confined to two “staircase” regions that do not intersect in any pair \\((x,y)\\) with \\(x<y\\).\n\n- **Construction for \\(k=n-1\\) (showing insufficiency):** partition checkpoints into \\(n\\) blocks of size \\(n\\) except one missing row/column effect; arrange company \\(A\\) so its edges only connect within a corresponding staircase using starts/finishes taken from the first \\(n-1\\) blocks, and company \\(B\\) shifted by one block. Then no single increasing pair of checkpoints is reachable by both companies.\n\n- **Therefore \\(k\\ge n\\).**\n- **For \\(k=n\\) (showing sufficiency):** any monotone edge set with \\(n\\) edges forces at least one linked pair in each of the \\(n\\times n\\) grid cells determined by the starts and finishes; with two companies, by pigeonhole/comparability intersection (equivalently, by the fact that two width-\\((n-1)\\) avoidant configurations cannot both exist), there must be a common linked pair. Hence the guarantee holds for \\(k=n\\).\n\nSo the smallest such \\(k\\) is \\(n\\).\n\n\\boxed{n}",
-   "response_steps": 16,
-   "response_tokens": 416,
+   "response_steps": 16.0,
+   "response_tokens": 416.0,
    "domain": "math"
   },
   {
@@ -2130,8 +1130,8 @@
    "ground_truth": "$\\frac{4 \\cdot 999^{4}}{27}$",
    "predicted": "147556443852",
    "raw_response": "Let the grid be indexed by rows \\(1,\\dots,n\\) and columns \\(1,\\dots,n\\) with \\(n=999\\).\nA valid triple has the form\n\\[\nC_1=(i,a)\\ (\\text{white}),\\quad C_2=(i,b)\\ (\\text{red}),\\quad C_3=(k,b)\\ (\\text{white}),\n\\]\nwhere \\(i\\neq k\\) and \\(a\\neq b\\). (This matches: first two in the same row, last two in the same column, with \\(C_1,C_3\\) white and \\(C_2\\) red.)\n\nFix a red cell \\(C_2=(i,b)\\).  \nThen the number of choices is:\n- \\(C_1\\) can be any white cell in row \\(i\\) with column \\(\\neq b\\): if row \\(i\\) has \\(w_i\\) white cells total, then \\(C_1\\) has \\(w_i\\) choices (since \\(b\\) is red, it is not among the white cells).\n- \\(C_3\\) can be any white cell in column \\(b\\) with row \\(\\neq i\\): if column \\(b\\) has \\(W_b\\) white cells total, then \\(C_3\\) has \\(W_b\\) choices (since \\(i\\) is red, again it is not among the whites).\n\nSo each red cell \\((i,b)\\) contributes exactly \\(w_i\\,W_b\\), hence\n\\[\nT=\\sum_{\\substack{(i,b)\\text{ red}}} w_i\\,W_b.\n\\]\n\nNow define \\(w_i=\\#\\{\\text{white in row }i\\}\\) and \\(W_b=\\#\\{\\text{white in col }b\\}\\). Let\n\\[\nX=\\sum_{i=1}^n w_i \\quad\\text{and}\\quad Y=\\sum_{b=1}^n W_b,\n\\]\nbut \\(X=Y\\) equals the total number of white cells; call it \\(W\\) (to avoid confusion with column totals).\n\nThen\n\\[\n\\sum_{\\substack{(i,b)\\text{ red}}} w_i\\,W_b\n=\\sum_{i=1}^n\\sum_{b=1}^n w_iW_b\\cdot \\mathbf 1_{\\text{red at }(i,b)}\n=\\sum_{i,b} w_iW_b - \\sum_{i,b} w_iW_b\\cdot \\mathbf 1_{\\text{white at }(i,b)}.\n\\]\nThe first sum is\n\\[\n\\sum_{i,b} w_iW_b = \\left(\\sum_i w_i\\right)\\left(\\sum_b W_b\\right)=W^2.\n\\]\nFor the second sum, note it is at least \\(0\\), so\n\\[\nT \\le W^2.\n\\]\nWe can achieve equality by making every cell white-or red pattern such that the subtraction term is \\(0\\), i.e. there are no white cells at all. But that is impossible because then \\(T=0\\). So we must incorporate the correct dependence: the derived bound \\(T\\le W^2\\) is too weak.\n\nInstead, use the identity directly in the “combinatorial optimization” way:\nFor fixed \\(w_i\\) and \\(W_b\\),\n\\[\nT=\\sum_{\\substack{(i,b)\\text{ red}}} w_iW_b\n\\]\nis maximized by placing red cells where \\(w_iW_b\\) is largest, i.e. taking all cells in a rank-one “cut” pattern. By symmetry and standard rearrangement/convexity (equivalently, extreme points of the corresponding bilinear assignment), the maximum occurs when all white cells form a complete \\(a\\times b\\) subrectangle and all other cells are red:\n- choose \\(a\\) rows with all their white cells in the same \\(b\\) columns,\n- with \\(ab=W\\) whites,\n- so every red cell lies in rows where \\(w_i=b\\) or columns where \\(W_b=a\\), making the product \\(w_iW_b\\) uniform on red regions.\n\nLet the whites occupy an \\(a\\times b\\) block (with \\(1\\le a,b\\le n\\)). Then:\n- For each of the \\(a\\) white-rows, \\(w_i=b\\).\n- For each of the \\(n-a\\) red-rows, \\(w_i=0\\).\nSimilarly, in the \\(b\\) white-columns, \\(W_b=a\\), and in the \\(n-b\\) other columns, \\(W_b=0\\).\nRed cells are exactly those not in the \\(a\\times b\\) block, i.e.:\n- \\(a\\times (n-b)\\) cells: these lie in white-rows, so contribute \\(w_i=b\\), and in non-white columns so \\(W_b=0\\), hence contribute \\(0\\).\n- \\((n-a)\\times b\\) cells: these lie in non-white rows so \\(w_i=0\\), contribute \\(0\\).\n- \\((n-a)\\times (n-b)\\) cells: here \\(w_i=0\\) and \\(W_b=0\\), still contribute \\(0\\).\nThis shows the naive block placement gives \\(T=0\\), so the structure must be “white rows/columns interlaced” so that red cells occur at intersections of nonzero \\(w_i\\) and nonzero \\(W_b\\). Therefore, we should instead make *every* row and *every* column contain both colors, and put reds exactly at intersections of “white counts” and “column white counts”.\n\nThe optimal construction is: take a diagonal band where exactly one color is arranged so that for each row \\(i\\), the set of white columns has size \\(x\\) and for each column \\(j\\), the set of white rows has size \\(x\\), achieved by a permutation matrix-type design (possible for odd \\(n\\)) so that every row/column has exactly \\(x\\) whites and reds count \\(n-x\\). Then for a red cell, \\(w_i=x\\) and \\(W_b=x\\), so each red cell contributes \\(x^2\\). There are exactly \\(n(n-x)\\) red cells, so\n\\[\nT = n(n-x)\\,x^2.\n\\]\nThis is maximized over integer \\(x\\in[0,n]\\). Let \\(f(x) = n(n-x)x^2 = n(x^2n - x^3)\\).\nMaximize \\(g(x)=(n-x)x^2\\) on real \\(x\\):\n\\[\ng'(x)=2x(n-x) - x^2 = 2nx-2x^2-x^2 = 2nx-3x^2 = x(2n-3x).\n\\]\nSo \\(x=\\frac{2n}{3}\\). With \\(n=999\\), this gives \\(x=666\\). (Indeed \\(999\\cdot \\frac{2}{3}=666\\) is integer.)\n\nThus\n\\[\nT_{\\max}= n(n-x)x^2 = 999(999-666)\\cdot 666^2 = 999\\cdot 333\\cdot 666^2.\n\\]\nCompute:\n\\[\n666^2=443{,}556,\\qquad 999\\cdot 333=332{,}667.\n\\]\nTherefore\n\\[\nT_{\\max}=332{,}667\\cdot 443{,}556=147{,}554{,}259{,}? \n\\]\nNow multiply precisely:\n\\[\n443{,}556\\cdot 332{,}667\n=443{,}556(332{,}000+667)\n\\]\n\\[\n=443{,}556\\cdot 332{,}000 + 443{,}556\\cdot 667\n\\]\n\\[\n=443{,}556\\cdot 332\\cdot 1000 + 443{,}556(600+60+7)\n\\]\n\\[\n443{,}556\\cdot 332 =443{,}556\\cdot(300+30+2)=133{,}066{,}800+13{,}306{,}680+887{,}112=147{,}260{,}592.\n\\]\nSo first part \\(=147{,}260{,}592{,}000\\).\nSecond part:\n\\[\n443{,}556\\cdot 600=266{,}133{,}600,\\quad\n443{,}556\\cdot 60=26{,}613{,}360,\\quad\n443{,}556\\cdot 7=3{,}104{,}892\n\\]\nSum \\(=266{,}133{,}600+26{,}613{,}360+3{,}104{,}892=295{,}851{,}852\\).\nTotal:\n\\[\n147{,}260{,}592{,}000+295{,}851{,}852=147{,}556{,}443{,}852.\n\\]\n\n\\[\n\\boxed{147556443852}\n\\]",
-   "response_steps": 39,
-   "response_tokens": 756,
+   "response_steps": 39.0,
+   "response_tokens": 756.0,
    "domain": "math"
   },
   {
@@ -2140,8 +1140,8 @@
    "ground_truth": "960",
    "predicted": "31",
    "raw_response": "Let the numbers of pebbles in the boxes after some round be \\(x_1,\\dots,x_{60}\\) (nonnegative integers).  \nBob chooses \\(k\\in\\{1,\\dots,59\\}\\) and the split\n\\[\nL=\\{1,\\dots,k\\},\\qquad R=\\{k+1,\\dots,60\\}.\n\\]\nAlice then chooses one side to add \\(1\\) to each of its boxes and the other side to subtract \\(1\\) from each of its boxes.\n\nConsider the linear functional\n\\[\nF(x_1,\\dots,x_{60})=\\sum_{i=1}^{60} c_i x_i\n\\]\nwith coefficients\n\\[\nc_i=(-1)^i\\in\\{+1,-1\\}.\n\\]\nWe claim that in every move (after Bob picks \\(k\\), regardless of which side Alice chooses), the value of \\(F\\) changes by a fixed amount depending only on \\(k\\).\n\nIndeed, if Alice chooses \\(L\\) (so \\(+1\\) on \\(L\\), \\(-1\\) on \\(R\\)), then\n\\[\n\\Delta F=\\sum_{i\\in L} c_i-\\sum_{i\\in R} c_i.\n\\]\nIf Alice chooses \\(R\\), the roles swap and \\(\\Delta F\\) becomes\n\\[\n\\Delta F=-\\Big(\\sum_{i\\in L} c_i-\\sum_{i\\in R} c_i\\Big),\n\\]\nso in either case \\(|\\Delta F|=\\left|\\sum_{i\\in L} c_i-\\sum_{i\\in R} c_i\\right|\\).\n\nNow compute \\(\\sum_{i\\in L} c_i-\\sum_{i\\in R} c_i\\). Since \\(60\\) is even and the signs alternate, we have\n\\[\n\\sum_{i=1}^{60} c_i =0.\n\\]\nThus\n\\[\n\\sum_{i\\in L} c_i-\\sum_{i\\in R} c_i\n=\\sum_{i\\in L} c_i-\\Big(-\\sum_{i\\in L} c_i\\Big)=2\\sum_{i=1}^k (-1)^i.\n\\]\nBut \\(\\sum_{i=1}^k (-1)^i\\) equals \\(-1\\) if \\(k\\) is odd and \\(0\\) if \\(k\\) is even, because \\( (-1)^1=-1\\) and pairs cancel. Hence:\n- if \\(k\\) is even, \\(\\sum_{i=1}^k c_i=0\\), so \\(\\Delta F=0\\) no matter what Alice does;\n- if \\(k\\) is odd, \\(\\sum_{i=1}^k c_i=-1\\), so \\(|\\Delta F|=2\\).\n\nTherefore Bob can choose any odd \\(k\\) and force \\(F\\) to change by \\(\\pm 2\\) each round; in contrast, if Bob chooses even \\(k\\), \\(F\\) is unchanged.\n\nNow we use the winning condition. If at the end of a round some box has become empty, say \\(x_j=0\\), then consider \\(F\\) modulo \\(2\\). Since all \\(x_i\\) are integers and \\(c_i=\\pm 1\\), changing one box by \\(\\pm 1\\) changes \\(F\\) by an odd number, but here we need a sharper bound:\n\nObserve that if all boxes stay positive forever, then throughout the game \\(x_i\\ge 1\\). In that case,\n\\[\nF=\\sum_{i=1}^{60} c_i x_i\n=\\sum_{i=1}^{60} c_i(1+(x_i-1))\n=\\sum_{i=1}^{60} c_i+\\sum_{i=1}^{60} c_i(x_i-1)\n=\\sum_{i=1}^{60} c_i(x_i-1),\n\\]\nbecause \\(\\sum_{i=1}^{60} c_i=0\\). Hence \\(F\\) is a sum of even/odd contributions determined by the parities of \\((x_i-1)\\), but crucially, if all \\(x_i\\ge 1\\), then the maximum possible absolute value of \\(F\\) given \\(\\sum x_i=n\\) is attained by pushing all extra pebbles to indices where \\(c_i\\) has the same sign.\n\nThere are \\(30\\) indices with \\(c_i=+1\\) and \\(30\\) with \\(c_i=-1\\). Under the constraint \\(x_i\\ge 1\\),\n\\[\n\\sum_{i:c_i=+1} x_i \\le n,\\qquad \\sum_{i:c_i=-1} x_i \\ge 0,\n\\]\nand the extremal imbalance gives\n\\[\n|F|\\le n-30.\n\\]\n(After giving each box \\(1\\) pebble, only \\(n-60\\) pebbles are “extra”; they can at most increase \\(F\\) by \\(n-30\\) in absolute value with the alternating signs—this standard bound for a signed sum with \\(30\\) plus and \\(30\\) minus terms.)\n\nBut if Bob chooses always an odd cut, then each round forces \\(|\\Delta F|=2\\), so after \\(t\\) rounds, \\(|F|\\) changes by a multiple of \\(2\\). Since \\(F\\) is bounded by \\(\\le n-30\\), Bob can keep pushing until \\(|F|\\) exceeds this bound unless Alice is forced to allow some \\(x_i=0\\). The threshold occurs when the bound is too small to accommodate the necessary step changes.\n\nThe smallest \\(n\\) for which Alice *can* keep \\(x_i>0\\) indefinitely is exactly when the maximal bound \\(n-30\\) is at least \\(2\\) (so that Bob cannot force a contradiction in the first forced-odd moves). One checks:\n- If \\(n=30\\), then \\(n-30=0\\), so \\(F=0\\) always would be required while odd cuts force \\(|\\Delta F|=2\\), impossible; thus Bob wins.\n- If \\(n=31\\), then \\(n-30=1\\), and Bob’s forced \\(\\pm2\\) changes cannot be absorbed without eventually forcing a box to hit \\(0\\); thus Alice can prevent Bob’s immediate contradiction and can maintain positivity (there is a constructive strategy: keep the “plus-signed” boxes and “minus-signed” boxes balanced so Bob’s odd cut alternations only redistribute within the available slack of \\(1\\)).\n\nHence the minimal \\(n\\) is \\(31\\).\n\n\\boxed{31}",
-   "response_steps": 27,
-   "response_tokens": 641,
+   "response_steps": 27.0,
+   "response_tokens": 641.0,
    "domain": "math"
   },
   {
@@ -2150,8 +1150,8 @@
    "ground_truth": "2,4,3",
    "predicted": "243",
    "raw_response": "We count unordered integer triples \\((a,b,c)\\) with \\(a\\le b\\le c\\), \\(a,b,c\\in\\mathbb Z_{>0}\\), perimeter \\(a+b+c=n\\), and positive area.  \nFor \\(a\\le b\\le c\\), positive area is equivalent to the strict triangle inequality \\(a+b>c\\).\n\nWith \\(c=n-a-b\\), the condition \\(a+b>c\\) becomes\n\\[\na+b>n-a-b \\iff 2(a+b)>n \\iff a+b>\\frac n2.\n\\]\nThe ordering condition \\(b\\le c\\) becomes\n\\[\nb\\le n-a-b \\iff a+2b\\le n.\n\\]\n\nSo we count integer pairs \\(1\\le a\\le b\\) such that\n\\[\na+b>\\frac n2,\\qquad a+2b\\le n,\n\\]\nand each such \\((a,b)\\) gives exactly one triangle \\((a,b,n-a-b)\\).\n\n---\n\n### \\(T(10)\\)\nNeed \\(a+b>5\\) and \\(a+2b\\le 10\\), with \\(1\\le a\\le b\\).\n\nTry \\(b=3\\): then \\(a\\le 3\\) and \\(a+2b=a+6\\le 10\\Rightarrow a\\le 4\\) (auto).  \nBut \\(a+b=a+3>5\\Rightarrow a>2\\), so \\(a=3\\) works: \\((3,3,4)\\).\n\nTry \\(b=4\\): then \\(a\\le 4\\) and \\(a+8\\le 10\\Rightarrow a\\le 2\\).  \nAlso \\(a+4>5\\Rightarrow a>1\\), so \\(a=2\\) works: \\((2,4,4)\\).\n\nTry \\(b\\ge 5\\): then \\(a+2b\\le 10\\) forces \\(a\\le 0\\), impossible.\n\nHence \\(T(10)=2\\).\n\n---\n\n### \\(T(11)\\)\nNeed \\(a+b>\\frac{11}{2}\\Rightarrow a+b\\ge 6\\), and \\(a+2b\\le 11\\).\n\n\\(b=3\\): \\(a\\le 3\\) and \\(a+6\\le 11\\Rightarrow a\\le 5\\) (auto).  \nNeed \\(a+3\\ge 6\\Rightarrow a\\ge 3\\). So \\(a=3\\) works: \\((3,3,5)\\).\n\n\\(b=4\\): \\(a\\le 4\\) and \\(a+8\\le 11\\Rightarrow a\\le 3\\).  \nNeed \\(a+4\\ge 6\\Rightarrow a\\ge 2\\). So \\(a=2,3\\) work:\n\\((2,4,5)\\), \\((3,4,4)\\).\n\n\\(b\\ge 5\\): \\(a+2b\\le 11\\) forces \\(a\\le 1\\), but then \\(a+b\\ge 6\\) fails for \\(a=1,b=5\\) gives \\(a+b=6\\) actually works? check: \\(a=1,b=5\\Rightarrow c=5\\) but ordering \\(b\\le c\\) gives \\(5\\le 5\\) OK; and triangle inequality \\(1+5>5\\) true. However our enumeration requires \\(a\\le b\\) yes. Also constraint \\(a+2b=1+10=11\\) OK. So \\((1,5,5)\\) is valid.\n\nNo larger \\(b\\) works since \\(a\\ge 1\\) would make \\(a+2b\\ge 1+12>11\\).\n\nTotal: \\((1,5,5),(2,4,5),(3,4,4),(3,3,5)\\), so \\(T(11)=4\\).\n\n---\n\n### \\(T(12)\\)\nNeed \\(a+b>\\frac{12}{2}=6\\Rightarrow a+b\\ge 7\\), and \\(a+2b\\le 12\\).\n\n\\(b=3\\): then \\(a+6\\le 12\\Rightarrow a\\le 6\\) (auto with \\(a\\le 3\\)).  \nNeed \\(a+3\\ge 7\\Rightarrow a\\ge 4\\), impossible.\n\n\\(b=4\\): \\(a+8\\le 12\\Rightarrow a\\le 4\\).  \nNeed \\(a+4\\ge 7\\Rightarrow a\\ge 3\\). So \\(a=3,4\\):\n\\((3,4,5)\\), \\((4,4,4)\\).\n\n\\(b=5\\): \\(a+10\\le 12\\Rightarrow a\\le 2\\), but \\(a\\le b\\) and need \\(a+5\\ge 7\\Rightarrow a\\ge 2\\).  \nSo \\(a=2\\): \\((2,5,5)\\).\n\n\\(b\\ge 6\\): \\(a+2b\\le 12\\) with \\(a\\ge 1\\) gives \\(2b\\le 11\\Rightarrow b\\le 5\\), so stop.\n\nHence \\(T(12)=3\\).\n\n---\n\n\\[\nT(10)=2,\\quad T(11)=4,\\quad T(12)=3.\n\\]\n\n\\boxed{243}",
-   "response_steps": 36,
-   "response_tokens": 332,
+   "response_steps": 36.0,
+   "response_tokens": 332.0,
    "domain": "math"
   },
   {
@@ -2160,8 +1160,8 @@
    "ground_truth": "$n(n-1)$",
    "predicted": "n(n-1)(2n-1)3",
    "raw_response": "Let\n\\[\nS(x_1,\\dots,x_{2n})=\\sum_{1\\le r<s\\le 2n}(s-r-n)x_rx_s,\\qquad -1\\le x_i\\le 1.\n\\]\nFor fixed \\(x_j\\) with \\(j\\neq k\\), the expression is linear in \\(x_k\\), hence its maximum over \\([-1,1]\\) occurs at \\(x_k=\\pm1\\). Therefore the global maximum is attained for some choice\n\\[\nx_i\\in\\{-1,1\\}\\quad (1\\le i\\le 2n).\n\\]\n\nNow take the specific choice\n\\[\nx_i=\\begin{cases}\n-1,&1\\le i\\le n,\\\\\n\\phantom{-}1,&n+1\\le i\\le 2n.\n\\end{cases}\n\\]\nSplit the sum into three types of pairs:\n\n### 1) Pairs within the left half\nIf \\(1\\le r<s\\le n\\), then \\(x_rx_s=1\\) and the coefficient \\(s-r-n<0\\). The contribution is\n\\[\nS_{LL}=\\sum_{1\\le r<s\\le n}(s-r-n).\n\\]\n\n### 2) Pairs within the right half\nIf \\(n+1\\le r<s\\le 2n\\), then \\(x_rx_s=1\\) and again \\(s-r-n<0\\). Writing \\(r=n+a,\\ s=n+b\\) with \\(1\\le a<b\\le n\\), the coefficient is \\((b-a)-n\\), so\n\\[\nS_{RR}=\\sum_{1\\le a<b\\le n}\\bigl((b-a)-n\\bigr)=\\sum_{1\\le r<s\\le n}(s-r-n)=S_{LL}.\n\\]\n\n### 3) Cross pairs\nIf \\(1\\le r\\le n< s\\le 2n\\), then \\(x_rx_s=-1\\) and the coefficient \\(s-r-n=(s-n)-(r)\\).\nThus the contribution is\n\\[\nS_{LR}=-\\sum_{r=1}^{n}\\sum_{s=n+1}^{2n}(s-r-n).\n\\]\nLet \\(s=n+t\\) with \\(1\\le t\\le n\\). Then \\(s-r-n=t-r\\), so\n\\[\nS_{LR}=-\\sum_{r=1}^{n}\\sum_{t=1}^{n}(t-r)\n=-\\left(\\sum_{r=1}^n\\sum_{t=1}^n t-\\sum_{r=1}^n\\sum_{t=1}^n r\\right)=0.\n\\]\n\nHence\n\\[\nS=S_{LL}+S_{RR}=2S_{LL}.\n\\]\nCompute \\(S_{LL}\\):\n\\[\nS_{LL}=\\sum_{1\\le r<s\\le n}(s-r-n)\n=\\sum_{1\\le r<s\\le n}(s-r)-n\\cdot \\binom{n}{2}.\n\\]\nNow\n\\[\n\\sum_{1\\le r<s\\le n}(s-r)=\\sum_{d=1}^{n-1} d(n-d)\n=n\\sum_{d=1}^{n-1} d-\\sum_{d=1}^{n-1} d^2\n=n\\cdot\\frac{(n-1)n}{2}-\\frac{(n-1)n(2n-1)}{6}\n=\\frac{n(n-1)(n+1)}{6}.\n\\]\nTherefore\n\\[\nS_{LL}=\\frac{n(n-1)(n+1)}{6}-n\\cdot\\frac{n(n-1)}{2}\n=\\frac{n(n-1)}{6}\\bigl((n+1)-3n\\bigr)\n=\\frac{n(n-1)}{6}(1-2n)\n=-\\frac{n(n-1)(2n-1)}{6}.\n\\]\nSo\n\\[\nS=2S_{LL}=-\\frac{n(n-1)(2n-1)}{3}.\n\\]\n\nThis value is negative; flipping all signs \\(x_i\\mapsto -x_i\\) does not change \\(S\\) (it’s bilinear), so to get the maximum we instead take the opposite pattern\n\\[\nx_i=\\begin{cases}\n\\phantom{-}1,&1\\le i\\le n,\\\\\n-1,&n+1\\le i\\le 2n,\n\\end{cases}\n\\]\nwhich multiplies cross terms by \\(-1\\) and yields the positive value\n\\[\n\\boxed{\\frac{n(n-1)(2n-1)}{3}}.\n\\]\n\nFinally, since the maximum occurs at extreme points and we have exhibited a sign pattern achieving this value, this is the maximum.\n\n\\boxed{\\frac{n(n-1)(2n-1)}{3}}",
-   "response_steps": 20,
-   "response_tokens": 276,
+   "response_steps": 20.0,
+   "response_tokens": 276.0,
    "domain": "math"
   }
  ]

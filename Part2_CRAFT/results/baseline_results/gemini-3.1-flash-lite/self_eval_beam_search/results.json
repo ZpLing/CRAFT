@@ -163,7 +163,7 @@
  "traces_file": "traces.jsonl",
  "predictions": [
   {
-   "sample_id": "FLD_76",
+   "sample_id": "FLD_0",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -174,7 +174,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_195",
+   "sample_id": "FLD_1",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -185,7 +185,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_381",
+   "sample_id": "FLD_2",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -196,7 +196,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_262",
+   "sample_id": "FLD_3",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -207,7 +207,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_257",
+   "sample_id": "FLD_4",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -218,7 +218,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_348",
+   "sample_id": "FLD_5",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -229,7 +229,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_13",
+   "sample_id": "FLD_6",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -240,7 +240,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_364",
+   "sample_id": "FLD_7",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -251,7 +251,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_397",
+   "sample_id": "FLD_8",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -262,7 +262,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_231",
+   "sample_id": "FLD_9",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -273,7 +273,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_4",
+   "sample_id": "FLD_10",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -284,7 +284,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_90",
+   "sample_id": "FLD_11",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -295,7 +295,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_26",
+   "sample_id": "FLD_12",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -306,7 +306,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_173",
+   "sample_id": "FLD_13",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -317,7 +317,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_426",
+   "sample_id": "FLD_14",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -328,7 +328,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_167",
+   "sample_id": "FLD_15",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -339,7 +339,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_235",
+   "sample_id": "FLD_16",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -350,7 +350,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_37",
+   "sample_id": "FLD_17",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": null,
@@ -362,7 +362,7 @@
    "gateway_blocked": true
   },
   {
-   "sample_id": "FLD_213",
+   "sample_id": "FLD_18",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -373,7 +373,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_219",
+   "sample_id": "FLD_19",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -384,7 +384,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_401",
+   "sample_id": "FLD_20",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
@@ -395,7 +395,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_485",
+   "sample_id": "FLD_21",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -406,7 +406,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_107",
+   "sample_id": "FLD_22",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -417,7 +417,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_51",
+   "sample_id": "FLD_23",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -428,7 +428,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_269",
+   "sample_id": "FLD_24",
    "source_dataset": "FLD",
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
@@ -439,7 +439,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_131",
+   "sample_id": "FLD_25",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -450,7 +450,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_408",
+   "sample_id": "FLD_26",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
@@ -461,7 +461,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_330",
+   "sample_id": "FLD_27",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -472,7 +472,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_346",
+   "sample_id": "FLD_28",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -483,7 +483,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_423",
+   "sample_id": "FLD_29",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
@@ -494,7 +494,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_190",
+   "sample_id": "FLD_30",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -505,7 +505,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_295",
+   "sample_id": "FLD_31",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -516,7 +516,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_427",
+   "sample_id": "FLD_32",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -527,7 +527,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_153",
+   "sample_id": "FLD_33",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -538,7 +538,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_361",
+   "sample_id": "FLD_34",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -549,7 +549,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_360",
+   "sample_id": "FLD_35",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -560,7 +560,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_130",
+   "sample_id": "FLD_36",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
@@ -571,7 +571,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_67",
+   "sample_id": "FLD_37",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -582,7 +582,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_294",
+   "sample_id": "FLD_38",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -593,7 +593,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_139",
+   "sample_id": "FLD_39",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -604,7 +604,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_488",
+   "sample_id": "FLD_40",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -615,7 +615,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_303",
+   "sample_id": "FLD_41",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -626,7 +626,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_490",
+   "sample_id": "FLD_42",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
@@ -637,7 +637,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_187",
+   "sample_id": "FLD_43",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -648,7 +648,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_365",
+   "sample_id": "FLD_44",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -659,7 +659,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_250",
+   "sample_id": "FLD_45",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -670,7 +670,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_116",
+   "sample_id": "FLD_46",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -681,7 +681,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_86",
+   "sample_id": "FLD_47",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
@@ -692,7 +692,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_142",
+   "sample_id": "FLD_48",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -703,7 +703,7 @@
    "domain": "logical"
   },
   {
-   "sample_id": "FLD_237",
+   "sample_id": "FLD_49",
    "source_dataset": "FLD",
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
@@ -712,1106 +712,6 @@
    "response_steps": 1.0,
    "response_tokens": 61.0,
    "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_408",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact 2 and Fact 4, since James attends the conference and does not attend remotely, it must be true that James attends the conference in person.",
-   "response_steps": 1.0,
-   "response_tokens": 27.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_238",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.94,
-   "raw_response": "From Fact 1 and Fact 2, it follows that every low-scoring player must successfully shoot a high percentage of 3-pointers, because if they were not a top player (which they are not, by Fact 1), they must fall into the other category provided by Fact 2.\nFrom Fact 3 and Fact 4, it follows that all players who successfully shoot a high percentage of 3-pointers cannot be bad at mid-range shots, because they are solid at shooting 2-pointers, which precludes them from being bad at mid-range shots.\nSince Fact 5 states that Candace is either a low-scoring player or successfully shoots a high percentage of 3-pointers, and we established that low-scoring players must successfully shoot a high percentage of 3-pointers, it follows that Candace must successfully shoot a high percentage of 3-pointers. __PROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 133.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_236",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.892,
-   "raw_response": "From Fact 3, since every customer subscribes to either AMC or HBO, and Fact 5 states that all HBO subscribers prefer TV series to movies, if James does not subscribe to HBO, he must subscribe to AMC, which according to Fact 1 makes him available to watch 3 movies every week without additional fees.\nIf James subscribes to HBO, then according to Fact 5 he prefers TV series to movies, and since Fact 4 states that those who prefer TV series will not watch TV series in cinemas, this contradicts Fact 6, which states that James watches TV series in cinemas, implying that James cannot be an HBO subscriber. __PROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 110.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_342",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact1 and Fact3, since all Istanbul plates begin with 34 and Joe's plate is from Istanbul, it follows that Joe's license plate begins with 34. __PROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 27.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_11",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact4, if Sam is a young teenage girl who attends college, then Sam is a big fan of pop bands and singers; consequently, the disjunction \"Sam does not have high ambitions and future career goals OR Sam is a big fan of pop bands and singers\" is true for Sam because the second part of the disjunction is satisfied, making the entire statement true. __PROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 66.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_393",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact1 and Fact2, it follows that Mary has influenza.\nSince Mary has influenza, the statement \"Either Mary or Susan has influenza\" is true regardless of Susan's health status. __PROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 30.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_321",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact2, Fact3, and Fact4, it follows that if something is an event-related design, it is brain image acquisition, which is preceded by data processing, and therefore cannot acquire data (by Fact4).\nSince an event-related design cannot acquire data, Fact5 implies that for picture memory, the condition \"event-related design and acquiring data\" is false, meaning picture memory is neither an event-related design nor acquiring data.",
-   "response_steps": 2.0,
-   "response_tokens": 65.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_50",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Since the Crude Oil Data Exchange is not free, according to Fact 3 and the law of the excluded middle implied by Fact 1, it must be sanctioned.\nSince all sanctioned businesses are limited according to Fact 2, it follows that the Crude Oil Data Exchange is limited.__PROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 48.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_415",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact1, we know that any square necessarily possesses four sides.\nFrom Fact2, we know that any object possessing four sides is categorized as a shape.\nBy combining these two facts through the transitive property, it follows that since all squares have four sides and all four-sided things are shapes, all squares must be shapes. __PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 56.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_97",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Fact4 states that the Vienna Music Society premiered Symphony No. 9, and Fact5 states that the Vienna Music Society is an orchestra.\nSince the Vienna Music Society is an orchestra and it premiered Symphony No. 9, which is a music piece, it follows that at least one orchestra has premiered a music piece. __PROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 54.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_182",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact4 (Sam is using a Mac) and Fact5 (If Sam uses a Mac, he will play a song), it follows that Sam is playing a song.\nFrom Fact3 (If Sam does a project written in Python, he will not use a Mac) and Fact4 (Sam is using a Mac), by contraposition, it follows that the project Sam is doing is not written in Python.\nFrom Fact2 (A project is written either in C++ or in Python) and the conclusion that the project is not written in Python, it follows that the project Sam is doing is written in C++.__PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 100.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_258",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.8188,
-   "raw_response": "From Fact2, the set of all people is partitioned into those who work in person and those who work from home, and from Fact1, those who work in person are commuters.\nFrom Fact3, any person who works from home necessarily has a relaxed schedule, meaning the set of people who work from home is a subset of the set of people with a relaxed schedule.\nFrom Fact4, George is either a commuter or has a home office setup, and since Fact1 and Fact2 imply that all commuters are people who work in person, George must be either a person who works in person or a person who has a home office setup.\nFrom Fact5, if George is a person who works from home or has a home office setup, he cannot be both a person who works from home and a commuter, which, given that commuters are those who work in person (Fact1) and work-from-home people are not those who work in person (Fact2), is consistent with the definition of the groups.\nThe hypothesis states that if George is (a home office setup owner AND works in person) OR (neither a home office setup owner nor works in person), then George must be (a person who works from home OR has a relaxed schedule).\nIf George is a person who works in person, he is a commuter (Fact 1), and if he is not a person who works in person, he must be a person who works from home (Fact 2), which implies he has a relaxed schedule (Fact 3). __PROVED__",
-   "response_steps": 6.0,
-   "response_tokens": 261.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_166",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.808,
-   "raw_response": "From Fact5 and Fact2, since Elizabeth is a queen, she is a leader.\nFrom Fact5, Elizabeth is a queen, and since all queens are leaders according to the implication of Fact2, this confirms her status as a leader, but the hypothesis requires determining if she is a leader \"for life\" to satisfy the condition in Fact1.\nThe provided facts do not contain information establishing whether Elizabeth is a leader \"for life,\" therefore the condition in Fact1 cannot be satisfied to conclude she is in a monarchy. __DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 87.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_490",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Fact 4 states that the actor playing Thomas Jefferson won the best actor award, and Fact 5 states that Daveed Diggs played Thomas Jefferson, therefore Daveed Diggs won the best actor award. __PROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 33.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_273",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.328,
-   "raw_response": "From Fact 1 and Fact 2, it follows that no disposable products are eco-friendly brands, and since all sustainable fashion brands are eco-friendly (Fact 3), no sustainable fashion brands are disposable products.\nFrom Fact 4, if Reformation produces fast fashion products, it must produce disposable products, but the provided facts do not establish the converse (that all disposable products are fast fashion products), nor do they provide sufficient information to determine the nature of Reformation's products based on the hypothetical condition. __DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 82.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_326",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact 1 and Fact 7, since Olivia does not prefer warm temperature during the day, she must prefer cool temperature during the day.\nFrom Fact 2 and Fact 3, since Olivia sleeps during the night and prefers cool temperature when she sleeps, she prefers cool temperature during the night.\nSince Olivia prefers cool temperature during the day and she also prefers cool temperature during the night, she prefers cool temperature at all times, which confirms the hypothesis. __PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 79.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_110",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Fact2 states that DI Ray was created by Maya Sondhi, and Fact4 states that Maya Sondhi is British.\nSince Maya Sondhi is British and she created DI Ray, it follows that DI Ray was created by a Brit.__PROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 38.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_81",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Fact1 explicitly states that Xiufeng is a district in the city of Guilin.\nTherefore, it follows directly from Fact1 that Xiufeng is in Guilin, making the hypothesis true __PROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 29.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_132",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Fact 1 states that Camp Davern is a traditional summer camp for boys and girls, and Fact 3 states that Camp Davern was operated by the YMCA until the year 2015.\nBy combining Fact 1 and Fact 3, it follows that the specific traditional summer camp for boys and girls known as Camp Davern was operated by the YMCA until the year 2015, which directly supports the hypothesis. __PROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 69.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_252",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.9376,
-   "raw_response": "From Fact1, Djokovic is either a Grand Slam champion or an Oscar-nominated actor.\nIf Djokovic is a Grand Slam champion, then by Fact2 and Fact4, he is a professional tennis player and an athlete; if he is an Oscar-nominated actor, then by Fact3 and Fact5, he is a celebrity and well paid.\nIf Djokovic is a Grand Slam champion, then by Fact6, since he is an athlete, he is famous, which satisfies the condition in Fact8 to conclude he is well paid; if he is an Oscar-nominated actor, he is already established as well paid by Fact5.\nSince in either case (Djokovic being a Grand Slam champion or an Oscar-nominated actor) Djokovic is well paid, it follows from Fact7 that he lives in a tax haven. __PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 127.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_31",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact1 and Fact2, it follows by modus ponens that Robert Lewandowski is a soccer player. __PROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 17.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_485",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Since Philatelic literature consists exclusively of the six categories listed in Fact1, and Fact2 and Fact3 eliminate all categories except for \"Books\", Mort must be a book. __PROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 28.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_412",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.784,
-   "raw_response": "From Fact2 and Fact3, it follows that all pupils are animals.\nFrom Fact1 and Fact4, it follows that no flowers are animals.\nFrom Fact5, if Jack is a human, the condition \"Jack is a human or a flower\" is satisfied, which implies that Jack must be both a human and a flower.\nSince Jack must be both a human and a flower, and all humans are animals (Fact2), Jack must be an animal, while all flowers are plants (Fact4) and no animals are plants (Fact1), creating a contradiction that proves the premise \"Jack is a human\" is impossible in this system, therefore the conditional statement \"If Jack is a human, then Jack is not a pupil\" is vacuously true. __PROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 120.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_365",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.9904,
-   "raw_response": "From Fact4, since all goats are animals, and Fact6 states Hulu is a goat or a human, we must consider both cases: if Hulu is a goat, Hulu is an animal, which satisfies the hypothesis.\nIf Hulu is a human, then by Fact1, Hulu eats, and by Fact2, Hulu is not a plant, which, given Fact3, implies Hulu must be an animal.\nSince Hulu is an animal in both the case of being a goat and the case of being a human, Hulu is an animal, which satisfies the disjunction \"Hulu is an animal or dirt\" __PROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 97.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_372",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__PROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Based on Fact1, a cutman is responsible for preventing and treating physical damage to a fighter, and since Fact4 states that Jack is a cutman, it follows that Jack is responsible for treating physical damage. __PROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 36.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_142",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.6832,
-   "raw_response": "From Fact6, if Luke is a twin or triplet, then by Fact1, he spends a lot of time hanging out with and playing with his siblings.\nFrom Fact5, since Luke spends a lot of time hanging out with and playing with his siblings, he often did not live at home regularly.\nFrom Fact4, since Luke often did not live at home regularly, he does not develop strong bonds with his family members.\nSince Luke is a twin or triplet and does not develop strong bonds with his family members, this contradicts the first part of Fact6, implying he must be neither a twin nor a triplet and does not develop strong bonds with his family members. __DISPROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 117.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_94",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact 1 and Fact 3, it follows that all colorectal cancer is a malignant tumor.\nFact 5 explicitly states that breast cancer is not a malignant tumor.\nSince Fact 5 explicitly states that breast cancer is not a malignant tumor, the hypothesis \"If breast cancer is not colorectal cancer, then breast cancer is a malignant tumor\" is false because the antecedent (\"breast cancer is not colorectal cancer\") is true, but the consequent (\"breast cancer is a malignant tumor\") is false. __DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 82.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_302",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.916,
-   "raw_response": "From Fact6, if Clyde is not focused on the future and industry professions, he cannot enjoy dressing up in old-fashioned and historical period clothing, which by contrapositive of Fact1 implies he does not attend Renaissance fairs regularly.\nFrom the contrapositive of Fact2, if Clyde does not attend Renaissance fairs regularly, then he is not fascinated by the history of the Renaissance and other past eras.\nFrom Fact3, since Clyde is not fascinated by the history of the Renaissance and other past eras, it must be true that he is not a nostalgic academic who enjoys learning.",
-   "response_steps": 3.0,
-   "response_tokens": 96.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_201",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact2 and Fact4, since James attends the conference and does not attend remotely, it follows that James must attend the conference in person.\nComparing the conclusion that James attends the conference in person with the hypothesis that James does not attend in person, the hypothesis contradicts the established fact. __DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 51.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_293",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact2, Butte is in Montana; from Fact4, Pierre is not in Montana; therefore, Butte and Pierre are in different states. __DISPROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 22.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_36",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.916,
-   "raw_response": "From Fact 1 and Fact 2, it follows that no skyscraper can be a mansion house.\nFrom Fact 3, it follows that any creepy haunted house is necessarily a mansion house.\nFrom the hypothesis, if The Scream is a skyscraper, then by the first reasoning step it is not a mansion house, and if The Scream is a creepy haunted house, it contradicts Fact 3 unless it is a mansion house, meaning the condition \"it is not a mansion house\" cannot be satisfied if The Scream is a creepy haunted house. __DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 92.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_457",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.9904,
-   "raw_response": "From Fact1 and Fact4, it follows that French and Spanish are Indo-European languages, and since all Indo-European languages belong to the same language family, they are related to each other.\nAccording to Fact6, Basque is not related to any other language, whereas Fact3 and the established relationship between Romance languages imply that all Romance languages are related to each other.\nIf Basque were a Romance language, it would have to be related to other Romance languages according to Fact3, which directly contradicts Fact6. __DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 84.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_389",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Fact 2 states there is at least one happy event, which directly contradicts the hypothesis that all events are sad.\nSince the hypothesis claims all events are sad, it denies the existence of any happy events, which is explicitly refuted by Fact 2, therefore the hypothesis is __DISPROVED__.",
-   "response_steps": 2.0,
-   "response_tokens": 48.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_483",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact 1 and Fact 2, it follows that on some Mondays at 8 pm, the Bachelor features the giving out of roses.\nFrom Fact 3 and Fact 4, it follows that everything on the Bachelor is a reality TV show.\nFrom Fact 5 and the deduction that everything on the Bachelor is a reality TV show, it follows that Breaking Bad is not on the Bachelor.\nSince Breaking Bad is not on the Bachelor, and roses given out on TV are exclusively on the Bachelor (Fact 2), it follows that Breaking Bad cannot be a show in which roses are given out on Monday at 8 pm. __DISPROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 109.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_458",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.9081,
-   "raw_response": "From Fact 1 and Fact 2, it follows that no mansion house is a skyscraper, and no skyscraper is a mansion house.\nFrom Fact 3, it follows that if something is a creepy haunted house, it must be a mansion house, which implies that no creepy haunted house can be a skyscraper (since no skyscraper is a mansion house).\nFrom Fact 4, if something is a terrifying Halloween scare, it must come from a creepy haunted house, which in turn must be a mansion house, implying that no terrifying Halloween scare can be a skyscraper.\nSince no creepy haunted house and no terrifying Halloween scare can be a skyscraper, if The Scream is a skyscraper, it cannot be a creepy haunted house or a terrifying Halloween scare.\nIf The Scream is a mansion house, then according to Fact 3, it is either a creepy haunted house or it is not; however, if it is a creepy haunted house, it contradicts the hypothesis's condition that it is \"neither a creepy haunted house nor a terrifying Halloween scare,\" and if it is not a creepy haunted house, it could still be a terrifying Halloween scare (which must come from a creepy haunted house), so the hypothesis that a mansion house cannot be a creepy haunted house or a terrifying Halloween scare is false because a mansion house is the required location for both. __DISPROVED__",
-   "response_steps": 5.0,
-   "response_tokens": 232.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_354",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.976,
-   "raw_response": "From Fact 2 and Fact 3, it follows that if a person has breast cancer, they must be a woman.\nFrom Fact 4 and Fact 5, it follows that all non-breast cancers must contain a tumor.\nFrom Fact 6, if adenocarcinoma is a type of cancer, it must have a tumor, and since it is a type of cancer, it is either breast cancer or non-breast cancer, but the hypothesis cannot be definitively proven as Fact 6 does not establish that adenocarcinoma is a non-breast cancer, nor does it provide sufficient conditions to force the consequent of the hypothesis. __DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 100.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_343",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.784,
-   "raw_response": "From Fact1 and Fact3, by transitive property, all centerbacks are soccer players.\nFrom Fact2 and the deduction that all centerbacks are soccer players, it follows that no centerbacks are professional basketball players.\nFrom Fact4, it follows that no centerbacks are NBA players, but this does not establish whether Stephen Curry is or is not a centerback. __DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 57.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_195",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.94,
-   "raw_response": "From Fact 3, an animal is either a cat or a dog, so the statement \"Grace is either a cat and a dog, or neither a cat nor a dog\" (Fact 6) implies that Grace must be neither a cat nor a dog, because being both a cat and a dog contradicts the biological classification implied by the disjunction.__PROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 59.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_20",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "According to Fact1, Aberdeen won the cup in the 2013 final, which implies that only Aberdeen won the cup in that year.\nSince Fact1 establishes that Aberdeen won the cup in 2013, and Fact4 dictates that only one team can win the cup in a given year, it is impossible for Rangers to have won the cup in 2013. __DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 60.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_319",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.976,
-   "raw_response": "From Fact 1 and Fact 3, it follows that every customer must choose either Plan A or Plan B.\nFrom Fact 6 and Fact 5, since James is not currently studying at school, he must be older than 80.\nFrom Fact 4, since James is older than 80, he cannot be a customer who is rewarded with a $30 gift card, which implies by Fact 2 that James did not choose Plan B.\nSince James must choose either Plan A or Plan B according to Fact 1 and Fact 3, and he did not choose Plan B, he must have chosen Plan A, which contradicts the hypothesis that he does not choose any plans. __DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 115.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_445",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Fact 3, Fact 4, and Fact 5 explicitly state that Tom is not an Eastern, Osceola, Gould’s, Merriam’s, or Rio Grande wild turkey.\nSince Fact 6 confirms Tom is a wild turkey and the list of all six types consists of Eastern, Osceola, Gould’s, Merriam’s, Rio Grande, and Ocellated wild turkeys, Tom must be an Ocellated wild turkey, which contradicts the hypothesis that Tom is an Eastern wild turkey.__DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 69.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_1",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.76,
-   "raw_response": "Fact1 states that Badults is a British Sitcom series starring members of Pappy's, and Fact2 states that Badults piloted on BBC Three.\nSince members of Pappy's starred in Badults, which piloted on BBC Three, the existence of this show directly contradicts the hypothesis that no members of Pappy's have starred in a show piloting on BBC Three. __DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 58.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_230",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact1 (No digital media are analog) and Fact2 (Every printed text is analog), it follows by contraposition that no printed text is digital media.\nFrom Fact4 (If an object is a hardcover book then it is printed text) and the derived conclusion that no printed text is digital media, it follows that no hardcover book is digital media.\nFrom Fact5 (If 1984 is a streaming service, then 1984 is a hardcover book) and Fact3 (All streaming services are digital), if 1984 were a streaming service, it would be digital, but being a hardcover book would make it non-digital, creating a contradiction, which implies 1984 cannot be a streaming service. __DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 111.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_363",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.904,
-   "raw_response": "According to Fact2, Dan is the lead singer of Imagine Dragons, and according to Fact4, all lead singers are singers, which implies Dan is a singer.\nAccording to Fact5, all singers are musicians, and since it has been established that Dan is a singer, it follows that Dan is a musician.\nSince the hypothesis states that Dan is not a musician, which contradicts the established conclusion that Dan is a musician, the hypothesis is false. __DISPROVED__",
-   "response_steps": 3.0,
-   "response_tokens": 76.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_377",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__PROVED__",
-   "beam_score": 0.4749,
-   "raw_response": "From Fact1 and Fact3, since a person must either like cheese or be a francophile, and a person must either like Spain or like cheese, we can infer that if someone is not a francophile, they must like cheese, and if they do not like cheese, they must be a francophile and like Spain.\nFrom Fact1, if Benji does not like eating cheese, then Benji must be a francophile, which by Fact2 implies Benji cannot be a person who likes Spain as their favorite country.\nFrom Fact4, since the statement \"Benji is not (a person who likes eating cheese AND a person who studies Spanish)\" is given, and assuming Benji does not like eating cheese, then Benji must be a francophile (by Fact1), which implies Benji does not like Spain as their favorite country (by Fact2).\nFrom the hypothesis, we must evaluate the implication \"If Benji is a person who likes Spain as their favorite country OR studies French, then Benji is a person who studies Spanish OR a person who likes Spain as their favorite country\"; if Benji likes Spain, the conclusion \"studies Spanish OR likes Spain\" is trivially true, and if Benji does not like Spain but studies French, we must determine if Benji studies Spanish or likes Spain to satisfy the hypothesis. __PROVED__",
-   "response_steps": 4.0,
-   "response_tokens": 216.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_297",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "From Fact5, Elizabeth is a queen, and from Fact3, a queen is female, therefore Elizabeth is female.\nFrom Fact4, a king must be male, and since Elizabeth is female, she cannot be a king. __DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 35.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_276",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "According to Fact 2, receiving one red card in one game results in the player being ejected from the rest of the game.\nSince Fact 4 states that Henry received one red card in the game, it follows from Fact 2 that Henry will be ejected from the rest of the game. __DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 53.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_399",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "According to Fact3, reaching the yellow stage is a necessary condition for reaching the green stage, meaning no player can reach the green stage without first having reached the yellow stage.\nSince the hypothesis states that it is possible to reach the green stage without reaching the yellow stage, but Fact3 explicitly requires the yellow stage as a prerequisite for the green stage, the hypothesis contradicts the established facts. __DISPROVED__",
-   "response_steps": 2.0,
-   "response_tokens": 70.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_289",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 1.0,
-   "raw_response": "Fact1 states that Oxford Circus is a junction connecting Oxford Street and Regent Street, and Fact2 states that Oxford Street is in London; since Oxford Street and Regent Street meet at a single junction (Oxford Circus), they are located in the same geographic area, implying Regent Street is also in London. __DISPROVED__",
-   "response_steps": 1.0,
-   "response_tokens": 52.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "FOLIO_280",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": "__DISPROVED__",
-   "beam_score": 0.9194,
-   "raw_response": "From Fact1 and Fact2, it follows by transitivity that all researchers are teachers.\nFrom Fact3 and the fact that all researchers are teachers, it follows that no researchers are students.\nFrom Fact5 and the premise that Leon is not a researcher, it follows that Leon is not studying.\nFrom the derived fact that Leon is not studying and Fact6, it follows that Leon is a teacher.\nFrom the fact that Leon is a teacher and Fact3, which states that no teachers are students, it follows that Leon is not a student.\nSince the hypothesis \"If Leon is not a researcher, then Leon is a student\" requires Leon to be a student under the condition that he is not a researcher, but we have established that if Leon is not a researcher, he is not a student, the hypothesis is false. __DISPROVED__",
-   "response_steps": 6.0,
-   "response_tokens": 141.0,
-   "domain": "logical"
-  },
-  {
-   "sample_id": "GSM8K_0",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "5",
-   "beam_score": 1.0,
-   "raw_response": "The number of unripe mangoes is $\\frac{2}{3} \\times 54 = 36$.\nThe number of unripe mangoes given to the sister is $36 - 16 = 20$.\nThe number of jars of pickled mangoes the sister can make is $20 \\div 4 = \\boxed{5}$.",
-   "response_steps": 3.0,
-   "response_tokens": 43.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_1",
-   "source_dataset": "GSM8K",
-   "ground_truth": "134",
-   "predicted": "134",
-   "beam_score": 0.9904,
-   "raw_response": "Total cookies baked = 2 trays/day * 6 days * 12 cookies/tray = 144 cookies.\nTotal cookies eaten = 6 cookies (1 per day for 6 days) + 4 cookies (eaten by Ted) = 10 cookies.\nCookies left = 144 - 10 = \\boxed{134}",
-   "response_steps": 3.0,
-   "response_tokens": 44.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_2",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "8x = 72",
-   "beam_score": 1.0,
-   "raw_response": "Since the ratio of Chloe’s wins to Max’s wins is 8:3, we can set up the proportion $\\frac{8}{3} = \\frac{24}{x}$, where $x$ is the number of Max's wins.\nTo solve for $x$, multiply both sides of the equation by $3x$ or cross-multiply to get $8x = 24 \\times 3$.\n$8x = 72$",
-   "response_steps": 3.0,
-   "response_tokens": 52.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_3",
-   "source_dataset": "GSM8K",
-   "ground_truth": "44",
-   "predicted": "44",
-   "beam_score": 0.9946,
-   "raw_response": "The total distance for one round trip to school is 2.5 miles × 2 = 5 miles.\nThe total distance for all school trips in a week is 5 miles × 2 trips/day × 4 days/week = 40 miles.\nThe total distance for one round trip to the market is 2 miles × 2 = 4 miles.\nThe total distance for the market trip in a week is 4 miles × 1 trip/week = 4 miles.\nThe total mileage for a typical week is 40 miles + 4 miles = \\boxed{44}",
-   "response_steps": 5.0,
-   "response_tokens": 91.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_4",
-   "source_dataset": "GSM8K",
-   "ground_truth": "220",
-   "predicted": "220",
-   "beam_score": 1.0,
-   "raw_response": "The number of apples picked in the second hour is 66 * 2 = 132.\nThe number of apples picked in the third hour is 66 / 3 = 22.\nThe total number of apples picked is 66 + 132 + 22 = \\boxed{220}",
-   "response_steps": 1.0,
-   "response_tokens": 44.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_5",
-   "source_dataset": "GSM8K",
-   "ground_truth": "4",
-   "predicted": "4",
-   "beam_score": 1.0,
-   "raw_response": "The total number of flowers initially planted by the two daughters is 2 * 5 = 10.\nAfter the flowers grew into 20 more, the total number of flowers became 10 + 20 = 30.\nAfter 10 of them died, the total number of flowers became 30 - 10 = 20.\nThe number of flowers in each basket is 20 / 5 = \\boxed{4}",
-   "response_steps": 1.0,
-   "response_tokens": 64.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_6",
-   "source_dataset": "GSM8K",
-   "ground_truth": "3600",
-   "predicted": "3600",
-   "beam_score": 1.0,
-   "raw_response": "The number of cases in California is 2000 / 2 = 1000.\nThe number of cases in Texas is 1000 - 400 = 600.\nThe total number of cases is 2000 + 1000 + 600 = \\boxed{3600}",
-   "response_steps": 1.0,
-   "response_tokens": 37.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_7",
-   "source_dataset": "GSM8K",
-   "ground_truth": "24",
-   "predicted": "24",
-   "beam_score": 1.0,
-   "raw_response": "The number of liters produced per cow per week is 108 / 6 = 18 liters.\nThe total number of liters produced per week is 2160 / 5 = 432 liters.\nThe number of cows on the farm is 432 / 18 = \\boxed{24}",
-   "response_steps": 3.0,
-   "response_tokens": 44.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_8",
-   "source_dataset": "GSM8K",
-   "ground_truth": "24",
-   "predicted": "24",
-   "beam_score": 1.0,
-   "raw_response": "After spending $5 on ice cream, Lulu had $65 - $5 = $60 remaining.\nAfter spending half of the $60 on a t-shirt, Lulu had $60 - ($60 / 2) = $30 remaining.\nAfter depositing a fifth of the $30 remaining, Lulu deposited $30 / 5 = $6, leaving her with $30 - $6 = \\boxed{24}",
-   "response_steps": 3.0,
-   "response_tokens": 56.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_9",
-   "source_dataset": "GSM8K",
-   "ground_truth": "350",
-   "predicted": "350",
-   "beam_score": 1.0,
-   "raw_response": "John's total change in elevation is 10 feet/minute * 5 minutes = 50 feet downward.\nJohn's current elevation is 400 feet - 50 feet = \\boxed{350}",
-   "response_steps": 2.0,
-   "response_tokens": 26.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_10",
-   "source_dataset": "GSM8K",
-   "ground_truth": "11",
-   "predicted": "15",
-   "beam_score": 0.9904,
-   "raw_response": "The average number of points UF scored in each of the 24 games is 720 / 24 = 30.\nIn the championship game, UF scored 2 points less than half of their average, which is (30 / 2) - 2 = 13 points.\nSince UF scored 13 points and their opponent lost by 2 points, the opponent scored 13 + 2 = 15 points.\n\n\\boxed{15}",
-   "response_steps": 2.0,
-   "response_tokens": 65.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_11",
-   "source_dataset": "GSM8K",
-   "ground_truth": "3",
-   "predicted": "3",
-   "beam_score": 1.0,
-   "raw_response": "Monday: 6 toys; Wednesday: 6 * 2 = 12 toys; Friday: 6 * 4 = 24 toys; Saturday: 12 / 2 = 6 toys.\nTotal toys = 6 + 12 + 24 + 6 = 48 toys.\nEach rabbit gets 48 / 16 = \\boxed{3}",
-   "response_steps": 3.0,
-   "response_tokens": 45.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_12",
-   "source_dataset": "GSM8K",
-   "ground_truth": "12",
-   "predicted": "12",
-   "beam_score": 1.0,
-   "raw_response": "Since Rona is 8 years old, Rachel's age is 2 * 8 = 16 years old, and Collete's age is 8 / 2 = 4 years old.\nThe difference between Rachel's age and Collete's age is 16 - 4 = \\boxed{12}",
-   "response_steps": 2.0,
-   "response_tokens": 41.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_13",
-   "source_dataset": "GSM8K",
-   "ground_truth": "75",
-   "predicted": "75",
-   "beam_score": 1.0,
-   "raw_response": "Each day, Jessica drives to and from school, which is 20 minutes + 20 minutes = 40 minutes per day.\nTo convert the 50-hour requirement into minutes, multiply 50 hours by 60 minutes per hour, which equals 3,000 minutes.\nTo find the number of school days, divide the total required minutes (3,000) by the minutes driven per day (40), which equals 75.\n\n\\boxed{75}",
-   "response_steps": 3.0,
-   "response_tokens": 63.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_14",
-   "source_dataset": "GSM8K",
-   "ground_truth": "25",
-   "predicted": "125 - x = 100",
-   "beam_score": 1.0,
-   "raw_response": "Let $x$ be the amount of money Nigel gave away, so the amount he had after giving some away is $45 - x$.\nAfter his mother gave him $80, the amount he has is $(45 - x) + 80 = 125 - x$.\nThe equation representing Nigel's current total is $125 - x = 2(45) + 10$.\n125 - x = 100",
-   "response_steps": 4.0,
-   "response_tokens": 62.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_15",
-   "source_dataset": "GSM8K",
-   "ground_truth": "266",
-   "predicted": "300 + x = 566",
-   "beam_score": 1.0,
-   "raw_response": "Bob has $2 \\times 300 + 35 = 635$ sheep.\nLet $x$ be the number of sheep Mary must buy, so she will have $300 + x$ sheep, and we set up the equation $300 + x = 635 - 69$.\n300 + x = 566",
-   "response_steps": 3.0,
-   "response_tokens": 46.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_16",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "9",
-   "beam_score": 1.0,
-   "raw_response": "Total travel time = 15 minutes + 6 minutes = 21 minutes.\nRemaining time = 30 minutes - 21 minutes = \\boxed{9}",
-   "response_steps": 2.0,
-   "response_tokens": 22.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_17",
-   "source_dataset": "GSM8K",
-   "ground_truth": "25",
-   "predicted": "25",
-   "beam_score": 1.0,
-   "raw_response": "Since Jayden has 20 pencils and Marcus has half as many as Jayden, Marcus has 20 / 2 = 10 pencils.\nSince Dana has 15 more pencils than Jayden, Dana has 20 + 15 = 35 pencils.\nDana has 35 - 10 = 25 more pencils than Marcus, so the answer is \\boxed{25}.",
-   "response_steps": 3.0,
-   "response_tokens": 53.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_18",
-   "source_dataset": "GSM8K",
-   "ground_truth": "33",
-   "predicted": "33",
-   "beam_score": 0.208,
-   "raw_response": "Each gust results in a net displacement of $5 - 2 = 3$ feet.\nSince the leaf is blown forward 5 feet and then back 2 feet during each gust, after 11 gusts, the total net displacement is $11 \\times 3 = 33$ feet.\n\n\\boxed{33}",
-   "response_steps": 2.0,
-   "response_tokens": 45.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_19",
-   "source_dataset": "GSM8K",
-   "ground_truth": "83",
-   "predicted": "83",
-   "beam_score": 1.0,
-   "raw_response": "Calculate the total number of bananas in the six bunches of eight by multiplying 6 by 8, which equals 48.\nCalculate the total number of bananas in the five bunches of seven by multiplying 5 by 7, which equals 35.\nAdd the two totals together by calculating 48 + 35, which equals 83.\n\n\\boxed{83}",
-   "response_steps": 1.0,
-   "response_tokens": 54.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_20",
-   "source_dataset": "GSM8K",
-   "ground_truth": "7",
-   "predicted": "7",
-   "beam_score": 1.0,
-   "raw_response": "The total cost of the lettuce is $8 + $6 = $14.\nSince the cost is $2 per pound, the total weight is $14 / $2 = 7 pounds.\n\n\\boxed{7}",
-   "response_steps": 1.0,
-   "response_tokens": 30.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_21",
-   "source_dataset": "GSM8K",
-   "ground_truth": "165",
-   "predicted": "165",
-   "beam_score": 1.0,
-   "raw_response": "The sale price of the vase is $200 \\times (1 - 0.25) = 200 \\times 0.75 = 150$.\nThe total amount Donna paid including 10% sales tax is $150 \\times (1 + 0.10) = 150 \\times 1.1 = \\boxed{165}$.",
-   "response_steps": 2.0,
-   "response_tokens": 39.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_22",
-   "source_dataset": "GSM8K",
-   "ground_truth": "1500",
-   "predicted": "1500",
-   "beam_score": 1.0,
-   "raw_response": "To find the profit in the second quarter, subtract the sum of the profits from the other three quarters ($1,500 + $3,000 + $2,000) from the total annual profit of $8,000.\n$8,000 - ($1,500 + $3,000 + $2,000) = 8,000 - 6,500 = \\boxed{1,500}$",
-   "response_steps": 1.0,
-   "response_tokens": 44.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_23",
-   "source_dataset": "GSM8K",
-   "ground_truth": "260",
-   "predicted": "260",
-   "beam_score": 1.0,
-   "raw_response": "Price of one pair of ballet slippers = (2/3) * $60 = $40.\nTotal cost of five pairs of ballet slippers = 5 * $40 = $200.\nTotal cost = $60 + $200 = \\boxed{$260}",
-   "response_steps": 1.0,
-   "response_tokens": 35.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_24",
-   "source_dataset": "GSM8K",
-   "ground_truth": "245",
-   "predicted": "245",
-   "beam_score": 1.0,
-   "raw_response": "He uses half of the 500 Legos, so he uses $500 \\div 2 = 250$ pieces.\nThe number of leftover pieces is $500 - 250 = 250$.\nHe puts all but 5 of the 250 leftover pieces back in the box, so there are $250 - 5 = \\boxed{245}$ pieces in the box.",
-   "response_steps": 3.0,
-   "response_tokens": 53.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_25",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "5",
-   "beam_score": 1.0,
-   "raw_response": "The total value of the remaining 8 toys is $52 - 12 = 40$.\nThe cost of each of the 8 remaining toys is $40 / 8 = 5$.\n\n\\boxed{5}",
-   "response_steps": 2.0,
-   "response_tokens": 30.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_26",
-   "source_dataset": "GSM8K",
-   "ground_truth": "132",
-   "predicted": "132",
-   "beam_score": 1.0,
-   "raw_response": "Each horse eats (4 pounds × 2) + (3 pounds × 1) = 11 pounds of food per day.\nSince there are four horses, they consume 11 pounds × 4 = 44 pounds of food per day.\nFor 3 days, the total amount of food needed is 44 pounds × 3 = \\boxed{132}",
-   "response_steps": 3.0,
-   "response_tokens": 53.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_27",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "6",
-   "beam_score": 1.0,
-   "raw_response": "Each run of the roller coaster accommodates 7 cars × 2 people per car = 14 people.\nTo find the number of runs needed, divide the total number of people by the number of people per run: 84 people ÷ 14 people per run = 6 runs.\n\n\\boxed{6}",
-   "response_steps": 2.0,
-   "response_tokens": 48.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_28",
-   "source_dataset": "GSM8K",
-   "ground_truth": "57",
-   "predicted": "57",
-   "beam_score": 1.0,
-   "raw_response": "Stacy's brother grew 1 inch, so Stacy grew 1 + 6 = 7 inches.\nStacy's current height is 50 + 7 = \\boxed{57}",
-   "response_steps": 2.0,
-   "response_tokens": 23.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_29",
-   "source_dataset": "GSM8K",
-   "ground_truth": "14",
-   "predicted": "14",
-   "beam_score": 1.0,
-   "raw_response": "The total number of children is 3 nephews + 2 nieces = 5 children.\nTo find the number of jellybeans each child receives, divide the total number of jellybeans (70) by the total number of children (5): 70 / 5 = 14.\n\n\\boxed{14}",
-   "response_steps": 2.0,
-   "response_tokens": 43.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_30",
-   "source_dataset": "GSM8K",
-   "ground_truth": "468",
-   "predicted": "468",
-   "beam_score": 1.0,
-   "raw_response": "The total area for the three skirts is 3 rectangles × (12 feet × 4 feet) = 3 × 48 square feet = 144 square feet.\nThe total area for the bodice is 2 square feet for the shirt + (2 sleeves × 5 square feet per sleeve) = 2 + 10 = 12 square feet.\nThe total area of material needed is 144 square feet + 12 square feet = 156 square feet.\nThe total cost of the material is 156 square feet × $3 per square foot = $468.\n\n\\boxed{468}",
-   "response_steps": 4.0,
-   "response_tokens": 92.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_31",
-   "source_dataset": "GSM8K",
-   "ground_truth": "130",
-   "predicted": "130",
-   "beam_score": 1.0,
-   "raw_response": "The membership fee follows an arithmetic sequence where the first term $a_1 = 80$ and the common difference $d = 10$, so the fee in the sixth year is given by $a_6 = a_1 + (6 - 1)d = 80 + 5(10) = 80 + 50 = \\boxed{130}$",
-   "response_steps": 1.0,
-   "response_tokens": 48.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_32",
-   "source_dataset": "GSM8K",
-   "ground_truth": "55",
-   "predicted": "55",
-   "beam_score": 1.0,
-   "raw_response": "The total cost of the chocolate bars is 5 bars × $5/bar = $25.\nThe total cost of the packaging material is 5 bars × $2/bar = $10.\nThe total cost incurred is $25 + $10 = $35.\nThe profit is the total revenue minus the total cost, which is $90 - $35 = \\boxed{55}",
-   "response_steps": 1.0,
-   "response_tokens": 55.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_33",
-   "source_dataset": "GSM8K",
-   "ground_truth": "20",
-   "predicted": "x + 2x + 3x = 120",
-   "beam_score": 1.0,
-   "raw_response": "X + 2X + 3X = 120",
-   "response_steps": 1.0,
-   "response_tokens": 7.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_34",
-   "source_dataset": "GSM8K",
-   "ground_truth": "23",
-   "predicted": "23",
-   "beam_score": 1.0,
-   "raw_response": "Lois gives away a fourth of her 40 books, which is $40 \\times \\frac{1}{4} = 10$ books, leaving her with $40 - 10 = 30$ books.\nLois donates a third of her remaining 30 books to the library, which is $30 \\times \\frac{1}{3} = 10$ books, leaving her with $30 - 10 = 20$ books.\nLois purchases 3 new books, so she now has $20 + 3 = 23$ books. \\boxed{23}",
-   "response_steps": 3.0,
-   "response_tokens": 71.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_35",
-   "source_dataset": "GSM8K",
-   "ground_truth": "4",
-   "predicted": "4",
-   "beam_score": 1.0,
-   "raw_response": "The total cost of the 4 necklaces is 4 * $12 = $48.\nThe total cost of the 8 rings is $80 - $48 = $32.\nThe cost of each ring is $32 / 8 = \\boxed{4}$.",
-   "response_steps": 1.0,
-   "response_tokens": 37.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_36",
-   "source_dataset": "GSM8K",
-   "ground_truth": "1",
-   "predicted": "60c = 60",
-   "beam_score": 1.0,
-   "raw_response": "Let $c$ be the cost to make one cookie, so the selling price of one cookie is $1.20c$.\nThe total revenue from selling 50 cookies is $50 \\times 1.20c = 60c$, which equals $60.\n$60c = 60$",
-   "response_steps": 2.0,
-   "response_tokens": 37.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_37",
-   "source_dataset": "GSM8K",
-   "ground_truth": "16000",
-   "predicted": "16000",
-   "beam_score": 1.0,
-   "raw_response": "Total area = 400 feet * 500 feet = 200,000 square feet.\nUseable area = 200,000 square feet * 0.80 = 160,000 square feet.\nNumber of cars = 160,000 square feet / 10 square feet per car = 16,000 cars.\n\n\\boxed{16,000}",
-   "response_steps": 3.0,
-   "response_tokens": 41.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_38",
-   "source_dataset": "GSM8K",
-   "ground_truth": "23",
-   "predicted": "23",
-   "beam_score": 1.0,
-   "raw_response": "37 - 15 + 5 - 4 = \\boxed{23}",
-   "response_steps": 1.0,
-   "response_tokens": 9.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_39",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "12",
-   "beam_score": 1.0,
-   "raw_response": "The number of members who ordered lemon juice is $\\frac{2}{5} \\times 30 = 12$.\nThe number of remaining members is $30 - 12 = 18$.\nThe number of members who ordered mango juice is $\\frac{1}{3} \\times 18 = 6$.\nThe number of members who ordered orange juice is $18 - 6 = \\boxed{12}$.",
-   "response_steps": 4.0,
-   "response_tokens": 53.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_40",
-   "source_dataset": "GSM8K",
-   "ground_truth": "120",
-   "predicted": "120",
-   "beam_score": 1.0,
-   "raw_response": "The annual cost of renting the car is $20 \\times 12 = 240$ dollars, and the annual cost of the new car is $30 \\times 12 = 360$ dollars, so the difference is $360 - 240 = \\boxed{120}$",
-   "response_steps": 1.0,
-   "response_tokens": 38.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_41",
-   "source_dataset": "GSM8K",
-   "ground_truth": "28",
-   "predicted": "28",
-   "beam_score": 1.0,
-   "raw_response": "Olaf's score is 3 * 7 = 21 points.\nTotal points scored = 21 + 7 = \\boxed{28}",
-   "response_steps": 2.0,
-   "response_tokens": 18.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_42",
-   "source_dataset": "GSM8K",
-   "ground_truth": "5",
-   "predicted": "4(",
-   "beam_score": 1.0,
-   "raw_response": "Let $M$ be the number of dogs Mariel is walking, and let $H_M$ and $H_O$ be the number of humans (Mariel and the other walker, so 2 humans), then the total number of legs is $4(M + 3) + 2(2) = 36$.\n4(M + 3) + 4 = 36",
-   "response_steps": 2.0,
-   "response_tokens": 49.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_43",
-   "source_dataset": "GSM8K",
-   "ground_truth": "8",
-   "predicted": "8",
-   "beam_score": 1.0,
-   "raw_response": "The factory produces 50 candies/hour * 10 hours/day = 500 candies per day.\nThe number of days required is 4000 candies / 500 candies per day = 8 days.\n\n\\boxed{8}",
-   "response_steps": 2.0,
-   "response_tokens": 30.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_44",
-   "source_dataset": "GSM8K",
-   "ground_truth": "32",
-   "predicted": "32",
-   "beam_score": 1.0,
-   "raw_response": "Total number of egg whites needed = 2 cakes * 8 egg whites per cake = 16 egg whites.\nTotal tablespoons of aquafaba = 16 egg whites * 2 tablespoons per egg white = 32 tablespoons.\n\n\\boxed{32}",
-   "response_steps": 2.0,
-   "response_tokens": 37.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_45",
-   "source_dataset": "GSM8K",
-   "ground_truth": "135",
-   "predicted": "145",
-   "beam_score": 0.9587,
-   "raw_response": "The tiger runs at 25 mph for 4 hours, covering a distance of $25 \\times 4 = 100$ miles.\nAfter 4 hours, the tiger has been running for a total of 6 hours since his escape (4 hours at 25 mph plus 2 additional hours before the chase), meaning he ran at 10 mph for the 2 hours between the discovery and the start of the chase, covering a distance of $10 \\times 2 = 20$ miles.\nThe tiger then runs for half an hour at 50 mph, covering a distance of $50 \\times 0.5 = 25$ miles.\nTotal distance = 100 + 20 + 25 = \\boxed{145}",
-   "response_steps": 4.0,
-   "response_tokens": 108.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_46",
-   "source_dataset": "GSM8K",
-   "ground_truth": "6",
-   "predicted": "6",
-   "beam_score": 1.0,
-   "raw_response": "Justin's speed is 2 blocks / 1.5 minutes = 1.333... blocks per minute, so to run 8 blocks, the time taken is 8 / (2 / 1.5) = 8 * 1.5 / 2.\n\n\\boxed{6}",
-   "response_steps": 2.0,
-   "response_tokens": 34.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_47",
-   "source_dataset": "GSM8K",
-   "ground_truth": "160",
-   "predicted": "160",
-   "beam_score": 0.976,
-   "raw_response": "Total number of pages = 12 inches * 80 pages/inch = 960 pages.\nAverage pages per book = 960 pages / 6 books = 160 pages. \\boxed{160}",
-   "response_steps": 2.0,
-   "response_tokens": 27.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_48",
-   "source_dataset": "GSM8K",
-   "ground_truth": "9",
-   "predicted": "9",
-   "beam_score": 1.0,
-   "raw_response": "The percentage of bunnies is 100% - 25% - 50% = 25%.\nThe number of bunnies is 25% of 36, which is 0.25 × 36 = \\boxed{9}",
-   "response_steps": 2.0,
-   "response_tokens": 27.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "GSM8K_49",
-   "source_dataset": "GSM8K",
-   "ground_truth": "21",
-   "predicted": "21",
-   "beam_score": 1.0,
-   "raw_response": "To have 12 inches of hair remaining after donating 23 inches, Patricia needs her hair to reach a total length of 12 + 23 = 35 inches.\nSince her hair is currently 14 inches long and needs to reach 35 inches, she needs to grow it for 35 - 14 = \\boxed{21} inches.",
-   "response_steps": 2.0,
-   "response_tokens": 53.0,
-   "domain": "math"
   },
   {
    "sample_id": "OlympiadBench_0",
