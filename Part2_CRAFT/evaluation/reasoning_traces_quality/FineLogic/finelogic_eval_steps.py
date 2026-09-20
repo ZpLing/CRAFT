@@ -146,7 +146,12 @@ async def ask_bool(session, msgs):
         except Exception as exc:
             print(f"[info] {model} failed ({exc}). trying next model…")
             continue
-    return False
+    # No judge answered. Returning False here recorded a gateway failure as
+    # "this step is invalid", which is indistinguishable from a real judgement
+    # and can only push the reported rates down. The caller drops the step
+    # instead, the way it already drops a bare marker, and the summary counts
+    # how many were dropped that way.
+    return None
 
 
 ############################################
@@ -321,6 +326,8 @@ async def eval_step_nl(session, step, ref, later_steps, all_steps, facts_text, d
         f"[Step's own cited premises]\n{cited_text}\n\n"
         + wording["valid_question"].format(n=n) + " Answer true or false only."}]
     valid = await ask_bool(session, v_prompt)
+    if valid is None:
+        return {"step": n, "skip": True, "judge_failed": True}
 
     # Necessary: last step always necessary; else check if my step id is referenced later
     necessary = step["is_final"] or is_necessary_nl(step, later_steps)
@@ -332,6 +339,8 @@ async def eval_step_nl(session, step, ref, later_steps, all_steps, facts_text, d
             f"[Cited premises, if any]\n{cited_text}\n\n"
             + wording["atomic_question"] + " Answer true or false only."}]
         atomic = await ask_bool(session, a_prompt)
+        if atomic is None:
+            return {"step": n, "skip": True, "judge_failed": True}
 
     return {
         "step": step["n"],
@@ -393,10 +402,12 @@ def aggregate(sample_results):
     bucket = defaultdict(lambda: Counter(valid=0.0, necessary=0.0, atomic=0.0, samples=0))
     tot_true = Counter(valid=0, necessary=0, atomic=0, total=0)
     sample_perfect = Counter(all_valid=0, all_necessary=0, all_atomic=0, all_three=0, total_samples=0)
+    n_judge_failed = 0
 
     for samp in sample_results:
         if samp is None or samp.get("error"):
             continue
+        n_judge_failed += sum(1 for st in samp.get("steps", []) if st.get("judge_failed"))
         non_skip = [st for st in samp["steps"] if not st.get("skip")]
         if not non_skip:
             continue
@@ -452,6 +463,9 @@ def aggregate(sample_results):
         "all_atomic":    {"count": sample_perfect["all_atomic"],    "ratio": round(sample_perfect["all_atomic"]    / ts, 3)},
         "all_three":     {"count": sample_perfect["all_three"],     "ratio": round(sample_perfect["all_three"]     / ts, 3)},
     }
+    # Steps no judge would answer for. They are out of every rate above, so a
+    # run where this is not near zero is reporting on less than it scored.
+    result["judge_failed_steps"] = n_judge_failed
     return result
 
 

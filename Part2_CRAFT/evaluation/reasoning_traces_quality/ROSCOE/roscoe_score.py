@@ -180,6 +180,11 @@ def run_roscoe_evaluation(
             self.chain = self._parse(line, chain_type)
 
         def _parse(self, chain: str, chain_type: str) -> list:
+            # Upstream's own splitting, kept as upstream wrote it: a ROSCOE
+            # number is only comparable with a published ROSCOE number if the
+            # chain was stepped the same way. The exporter still records the
+            # generator's own boundaries in `steps`, which is what the
+            # step-count columns elsewhere report.
             if chain_type == "gsm8k_ref":
                 return chain.split("IGNORE THIS. Ground truth here for reference. ")[1].split("\n")
             elif chain_type == "gsm8k_hypo":
