@@ -261,6 +261,32 @@ def print_metrics(m: Dict, label: str = "", indent: str = "") -> None:
                 print(row)
 
 
+def print_per_dataset(per_ds: Dict[str, Dict], indent: str = "") -> None:
+    """One line per dataset, each reporting the metric that dataset has.
+
+    A logical dataset carries a two-class label, so what it has to report is
+    macro-F1 over PROVED and DISPROVED; a maths dataset has no classes to
+    average over, so accuracy is the whole of it and an F1 there would just be
+    accuracy under another name. Both report steps, since that is the column
+    they are compared on and it is the one place the cost of a method shows.
+
+    Printing the full metrics block per dataset buried this: four blocks of
+    ten lines, with the number that matters in a different row each time.
+    """
+    order = ["FLD", "ProofWriter", "OmniMATH", "OlympiadBench"]
+    names = [d for d in order if d in per_ds] + [d for d in sorted(per_ds) if d not in order]
+    if not names:
+        return
+    print(f"{indent}  {'dataset':<16}{'metric':>12}{'steps':>9}{'n':>7}")
+    for ds in names:
+        m = per_ds[ds]
+        if m.get("domain") == "math" or m.get("macro_f1") is None:
+            cell = f"acc {m['accuracy']:.3f}"
+        else:
+            cell = f"F1  {m['macro_f1']:.3f}"
+        print(f"{indent}  {ds:<16}{cell:>12}{m['avg_steps']:>9.1f}{m['n_total']:>7}")
+
+
 def _infer_dataset(sample_id: str) -> str:
     if "FLD" in sample_id or "Dataset1" in sample_id or "dataset1" in sample_id:
         return "FLD"
@@ -501,8 +527,7 @@ Examples:
         overall, per_ds = evaluate_single(args.input, args.source, args.n_per_class, args.seed)
         print_metrics(overall, label=args.input.name)
         if args.per_dataset:
-            for ds, dm in sorted(per_ds.items()):
-                print_metrics(dm, label=ds, indent="  ")
+            print_per_dataset(per_ds, indent="  ")
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             with open(args.output, "w", encoding="utf-8") as f:
@@ -1457,8 +1482,7 @@ async def run(args: argparse.Namespace) -> None:
             per_ds  = compute_per_dataset(preds)
 
             print_metrics(overall, label=f"Setting {key}: {name}")
-            for ds, dm in sorted(per_ds.items()):
-                print_metrics(dm, label=ds, indent="  ")
+            print_per_dataset(per_ds, indent="  ")
 
             all_results.append((name, overall))
             full_output[key] = {
