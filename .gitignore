@@ -73,8 +73,8 @@ Thumbs.db
 /baselines/
 
 # ── Filtering statistics — a local check, not part of the pipeline ───
-Part2_CRAFT/evaluation/filtering_stats/
-Part2_CRAFT/results/CRAFT_results/filtering_stats/
+Part2_CRAFT/evaluation/other_evaluation/filtering_stats/
+Part2_CRAFT/results/CRAFT_results/other_results/filtering_stats/
 
 # ── Dropped baselines and pre-swap backups — kept locally, never pushed ──
 Part2_CRAFT/results/baseline_results/_archive/
