@@ -226,39 +226,27 @@ def compute_per_dataset(samples: List[Dict]) -> Dict[str, Dict]:
 
 
 def print_metrics(m: Dict, label: str = "", indent: str = "") -> None:
-    BINARY_LABELS = ["__PROVED__", "__DISPROVED__"]
-    short  = {"__PROVED__": "PROVED", "__DISPROVED__": "DISPR"}
-    domain = m.get("domain", "logical")
+    """The one summary line for a run, and the datasets it is made of.
+
+    This used to print ten lines — tokens, mean trace accuracy, per-class F1,
+    a confusion matrix — and then repeat all ten for each of the four
+    datasets, forty lines in which the three numbers that get compared were
+    never adjacent. What a run is compared on is accuracy, macro-F1 where
+    there are classes to average, and steps. Those are what it prints.
+    """
     if label:
-        print(f"\n{indent}{'─'*66}")
+        print(f"\n{indent}{'─'*62}")
         print(f"{indent}  {label}")
-        print(f"{indent}{'─'*66}")
-    print(f"{indent}  Accuracy         : {m['accuracy']:.4f}  ({m['n_correct']}/{m['n_total']})")
-    if domain == "math":
-        print(f"{indent}  Metric           : exact-match on numeric answer")
-    else:
-        if m.get("macro_f1") is None:
-            print(f"{indent}  Macro-F1         : logical datasets only")
-        else:
-            print(f"{indent}  Macro-F1         : {m['macro_f1']:.4f}")
-    print(f"{indent}  Avg steps/trace  : {m['avg_steps']:.2f} ± {m['std_steps']:.2f}")
-    print(f"{indent}  Avg tokens/trace : {m['avg_tokens']:.1f} ± {m['std_tokens']:.1f}")
-    if m.get("std_trace_acc", 0) > 0:
-        print(f"{indent}  Mean trace acc   : {m['mean_trace_acc']:.4f} ± {m['std_trace_acc']:.4f}")
-    print(f"{indent}  No-pred rate     : {m['no_pred_rate']:.4f}  ({m['n_no_pred']} samples)")
-    if domain == "logical" and m.get("per_class_f1"):
-        f1_str = "  ".join(f"{short[c]}={m['per_class_f1'].get(c, 0):.3f}" for c in BINARY_LABELS)
-        print(f"{indent}  Per-class F1     : {f1_str}")
-        if m.get("confusion_matrix"):
-            print(f"\n{indent}  Confusion matrix (rows=GT, cols=Pred):")
-            hdr_label = "GT/Pred"
-            hdr = f"{indent}  {hdr_label:<10}" + "".join(f"{short[l]:>8}" for l in BINARY_LABELS) + f"{'none':>7}"
-            print(hdr)
-            cm = m["confusion_matrix"]
-            for gt in BINARY_LABELS:
-                row = f"{indent}  {short[gt]:<10}" + "".join(f"{cm.get(gt,{}).get(p,0):>8}" for p in BINARY_LABELS)
-                row += f"{cm.get(gt,{}).get('none',0):>7}"
-                print(row)
+        print(f"{indent}{'─'*62}")
+    f1 = m.get("macro_f1")
+    f1_cell = f"{f1:.3f}" if f1 is not None else "—"
+    print(f"{indent}  overall        acc {m['accuracy']:.3f}   macro-F1 {f1_cell:>5}   "
+          f"steps {m['avg_steps']:.1f}   n {m['n_total']}"
+          + (f"   no-pred {m['n_no_pred']}" if m.get("n_no_pred") else "")
+          + (f"   blocked {m['n_blocked']}" if m.get("n_blocked") else ""))
+    if m.get("per_dataset"):
+        print()
+        print_per_dataset(m["per_dataset"], indent=indent)
 
 
 def print_per_dataset(per_ds: Dict[str, Dict], indent: str = "") -> None:
@@ -526,9 +514,11 @@ Examples:
     if args.input:
         print(f"\nEvaluating: {args.input}  [source={args.source}]")
         overall, per_ds = evaluate_single(args.input, args.source, args.n_per_class, args.seed)
-        print_metrics(overall, label=args.input.name)
         if args.per_dataset:
-            print_per_dataset(per_ds, indent="  ")
+            overall["per_dataset"] = per_ds
+        print_metrics(overall, label=args.input.name)
+
+
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             with open(args.output, "w", encoding="utf-8") as f:
@@ -1483,7 +1473,7 @@ async def run(args: argparse.Namespace) -> None:
             per_ds  = compute_per_dataset(preds)
 
             print_metrics(overall, label=f"Setting {key}: {name}")
-            print_per_dataset(per_ds, indent="  ")
+
 
             all_results.append((name, overall))
             full_output[key] = {
