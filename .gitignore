@@ -52,8 +52,9 @@ Thumbs.db
 /Reasoning_CoT_EMNLP*.zip
 /paper/
 
-# ── Baselines — kept locally, never pushed ───────────────────────────
-/baselines/
+# ── Baselines — the code is tracked; its runs are not ────────────────
+/baselines/results/
+/baselines/__pycache__/
 
 # ── Filtering statistics — a local check, not part of the pipeline ───
 Part2_CRAFT/evaluation/filtering_stats/
