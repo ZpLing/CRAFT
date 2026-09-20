@@ -2,60 +2,60 @@
  "setting": "DICE (decompose<=4)",
  "setting_key": "dice",
  "overall": {
-  "accuracy": 0.8182,
+  "accuracy": 0.596,
   "macro_f1": null,
-  "avg_steps": 5.21,
-  "std_steps": 4.67,
-  "avg_tokens": 191.0,
-  "std_tokens": 77.4,
+  "avg_steps": 6.48,
+  "std_steps": 5.67,
+  "avg_tokens": 237.6,
+  "std_tokens": 72.2,
   "n_total": 198,
-  "n_correct": 162,
-  "n_no_pred": 1,
-  "no_pred_rate": 0.0051,
+  "n_correct": 118,
+  "n_no_pred": 6,
+  "no_pred_rate": 0.0303,
   "n_blocked": 2,
   "by_domain": {
    "logical": {
-    "accuracy": 0.8889,
-    "macro_f1": 0.8889,
-    "avg_steps": 4.4,
-    "std_steps": 1.55,
-    "avg_tokens": 196.2,
-    "std_tokens": 60.2,
+    "accuracy": 0.697,
+    "macro_f1": 0.7211,
+    "avg_steps": 5.21,
+    "std_steps": 2.42,
+    "avg_tokens": 226.5,
+    "std_tokens": 60.9,
     "n_total": 99,
-    "n_correct": 88,
-    "n_no_pred": 0,
-    "no_pred_rate": 0.0,
+    "n_correct": 69,
+    "n_no_pred": 4,
+    "no_pred_rate": 0.0404,
     "n_blocked": 1,
     "per_class_f1": {
-     "__PROVED__": 0.8889,
-     "__DISPROVED__": 0.8889
+     "__PROVED__": 0.6829,
+     "__DISPROVED__": 0.7593
     },
     "confusion_matrix": {
      "__PROVED__": {
-      "__PROVED__": 44,
-      "__DISPROVED__": 5,
-      "none": 0
+      "__PROVED__": 28,
+      "__DISPROVED__": 18,
+      "none": 3
      },
      "__DISPROVED__": {
-      "__PROVED__": 6,
-      "__DISPROVED__": 44,
-      "none": 0
+      "__PROVED__": 8,
+      "__DISPROVED__": 41,
+      "none": 1
      }
     },
     "domain": "logical"
    },
    "math": {
-    "accuracy": 0.7475,
+    "accuracy": 0.4949,
     "macro_f1": null,
-    "precision_answered": 0.7551,
-    "avg_steps": 6.12,
-    "std_steps": 6.29,
-    "avg_tokens": 189.7,
-    "std_tokens": 87.8,
+    "precision_answered": 0.5052,
+    "avg_steps": 7.88,
+    "std_steps": 7.4,
+    "avg_tokens": 253.5,
+    "std_tokens": 72.9,
     "n_total": 99,
-    "n_correct": 74,
-    "n_no_pred": 1,
-    "no_pred_rate": 0.0101,
+    "n_correct": 49,
+    "n_no_pred": 2,
+    "no_pred_rate": 0.0202,
     "n_blocked": 1,
     "domain": "math"
    }
@@ -92,51 +92,6 @@
     },
     "domain": "logical"
    },
-   "FOLIO": {
-    "accuracy": 0.94,
-    "macro_f1": 0.94,
-    "avg_steps": 4.3,
-    "std_steps": 1.3,
-    "avg_tokens": 181.0,
-    "std_tokens": 62.2,
-    "n_total": 50,
-    "n_correct": 47,
-    "n_no_pred": 0,
-    "no_pred_rate": 0.0,
-    "n_blocked": 0,
-    "per_class_f1": {
-     "__PROVED__": 0.9388,
-     "__DISPROVED__": 0.9412
-    },
-    "confusion_matrix": {
-     "__PROVED__": {
-      "__PROVED__": 23,
-      "__DISPROVED__": 2,
-      "none": 0
-     },
-     "__DISPROVED__": {
-      "__PROVED__": 1,
-      "__DISPROVED__": 24,
-      "none": 0
-     }
-    },
-    "domain": "logical"
-   },
-   "GSM8K": {
-    "accuracy": 0.94,
-    "macro_f1": null,
-    "precision_answered": 0.94,
-    "avg_steps": 3.26,
-    "std_steps": 0.87,
-    "avg_tokens": 121.1,
-    "std_tokens": 29.0,
-    "n_total": 50,
-    "n_correct": 47,
-    "n_no_pred": 0,
-    "no_pred_rate": 0.0,
-    "n_blocked": 0,
-    "domain": "math"
-   },
    "OlympiadBench": {
     "accuracy": 0.551,
     "macro_f1": null,
@@ -150,6 +105,51 @@
     "n_no_pred": 1,
     "no_pred_rate": 0.0204,
     "n_blocked": 1,
+    "domain": "math"
+   },
+   "ProofWriter": {
+    "accuracy": 0.56,
+    "macro_f1": 0.5687,
+    "avg_steps": 5.9,
+    "std_steps": 2.75,
+    "avg_tokens": 241.0,
+    "std_tokens": 63.8,
+    "n_total": 50,
+    "n_correct": 28,
+    "n_no_pred": 4,
+    "no_pred_rate": 0.08,
+    "n_blocked": 0,
+    "per_class_f1": {
+     "__PROVED__": 0.4375,
+     "__DISPROVED__": 0.7
+    },
+    "confusion_matrix": {
+     "__PROVED__": {
+      "__PROVED__": 7,
+      "__DISPROVED__": 15,
+      "none": 3
+     },
+     "__DISPROVED__": {
+      "__PROVED__": 3,
+      "__DISPROVED__": 21,
+      "none": 1
+     }
+    },
+    "domain": "logical"
+   },
+   "OmniMATH": {
+    "accuracy": 0.44,
+    "macro_f1": null,
+    "precision_answered": 0.449,
+    "avg_steps": 6.74,
+    "std_steps": 6.69,
+    "avg_tokens": 247.4,
+    "std_tokens": 74.4,
+    "n_total": 50,
+    "n_correct": 22,
+    "n_no_pred": 1,
+    "no_pred_rate": 0.02,
+    "n_blocked": 0,
     "domain": "math"
    }
   }
@@ -1161,6 +1161,1006 @@
    "predicted": "0.11111111",
    "response_steps": 3.0,
    "response_tokens": 257.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_1",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 234.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_2",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": null,
+   "response_steps": 3.0,
+   "response_tokens": 188.0,
+   "domain": "logical",
+   "n_subs": 3
+  },
+  {
+   "sample_id": "ProofWriter_3",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 227.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_7",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 237.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_8",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 277.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_11",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 232.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_12",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 188.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_13",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 359.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_14",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 171.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_15",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 224.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_16",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 323.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_18",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 314.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_21",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 230.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_22",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 194.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_25",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 208.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_27",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 225.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_29",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 237.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_30",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": null,
+   "response_steps": 4.0,
+   "response_tokens": 48.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_31",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 301.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_32",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 258.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_34",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": null,
+   "response_steps": 15.0,
+   "response_tokens": 202.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_35",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 307.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_36",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 190.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_37",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 245.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_41",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 170.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_0",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 309.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_4",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 310.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_5",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 263.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_6",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 309.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_9",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 340.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_10",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 264.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_17",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 253.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_19",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 147.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_20",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 308.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_23",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 159.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_24",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 2.0,
+   "response_tokens": 254.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_26",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 179.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_28",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 195.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_33",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 283.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_38",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 216.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_39",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 220.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_40",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 241.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_42",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 255.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_43",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": null,
+   "response_steps": 3.0,
+   "response_tokens": 61.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_46",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 248.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_48",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 371.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_49",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 274.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_51",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 277.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_53",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 259.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "ProofWriter_54",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 264.0,
+   "domain": "logical",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_0",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "6",
+   "predicted": "6",
+   "response_steps": 4.0,
+   "response_tokens": 295.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_1",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "26",
+   "predicted": "26",
+   "response_steps": 3.0,
+   "response_tokens": 125.0,
+   "domain": "math",
+   "n_subs": 3
+  },
+  {
+   "sample_id": "OmniMATH_2",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "60",
+   "predicted": "11",
+   "response_steps": 2.0,
+   "response_tokens": 307.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_3",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "(-1, -5)",
+   "predicted": "-5,-1",
+   "response_steps": 4.0,
+   "response_tokens": 263.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_4",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "f(n) = n",
+   "predicted": "f(n)=n",
+   "response_steps": 4.0,
+   "response_tokens": 281.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_5",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{21}{2}",
+   "predicted": "6",
+   "response_steps": 3.0,
+   "response_tokens": 196.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_6",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "7",
+   "predicted": "7",
+   "response_steps": 3.0,
+   "response_tokens": 271.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_7",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{19}{35}",
+   "predicted": "0.02857143",
+   "response_steps": 4.0,
+   "response_tokens": 345.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_8",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{11}{6}",
+   "predicted": "0.83333333",
+   "response_steps": 3.0,
+   "response_tokens": 205.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_9",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "25",
+   "predicted": "26h = 745 - 22",
+   "response_steps": 3.0,
+   "response_tokens": 178.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_10",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "f(x) = 0",
+   "predicted": "f(x)=0",
+   "response_steps": 3.0,
+   "response_tokens": 322.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_11",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "2",
+   "predicted": "2",
+   "response_steps": 3.0,
+   "response_tokens": 268.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_12",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "30",
+   "predicted": "28",
+   "response_steps": 14.0,
+   "response_tokens": 317.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_13",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "c < \\sqrt{2}",
+   "predicted": "2",
+   "response_steps": 4.0,
+   "response_tokens": 306.0,
+   "domain": "math",
+   "n_subs": 1
+  },
+  {
+   "sample_id": "OmniMATH_14",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{3}{200}",
+   "predicted": "0.015",
+   "response_steps": 4.0,
+   "response_tokens": 315.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_15",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\[\n(a, b, c, d) = (1989, 1989, 1990, 2 \\cdot 1989)\n\\]",
+   "predicted": "a=1989,b=1989,c=1990,d=3978",
+   "response_steps": 2.0,
+   "response_tokens": 227.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_16",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "40^{\\circ}",
+   "predicted": "30",
+   "response_steps": 3.0,
+   "response_tokens": 223.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_17",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "249750",
+   "predicted": "249750",
+   "response_steps": 5.0,
+   "response_tokens": 185.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_18",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "0",
+   "predicted": "0",
+   "response_steps": 3.0,
+   "response_tokens": 209.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_19",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "(2n-1)!!",
+   "predicted": "n!",
+   "response_steps": 13.0,
+   "response_tokens": 209.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_20",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "190/21",
+   "predicted": "9.04761905",
+   "response_steps": 4.0,
+   "response_tokens": 192.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_21",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "k+1",
+   "predicted": "1",
+   "response_steps": 4.0,
+   "response_tokens": 292.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_22",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\left\\lfloor \\frac{2n}{3} \\right\\rfloor + 1",
+   "predicted": "2n+23",
+   "response_steps": 2.0,
+   "response_tokens": 335.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_23",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{3}{4}",
+   "predicted": "x  0,x < 1",
+   "response_steps": 4.0,
+   "response_tokens": 258.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_24",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "60",
+   "predicted": "60",
+   "response_steps": 19.0,
+   "response_tokens": 325.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_25",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{2^{1009}}{2^{1009}+1009}",
+   "predicted": "2^10092^1009 + 1009",
+   "response_steps": 3.0,
+   "response_tokens": 279.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_26",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "2005^{1002} / 2004!",
+   "predicted": "2005^10022004!",
+   "response_steps": 11.0,
+   "response_tokens": 177.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_27",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{4850}{3}",
+   "predicted": "808.333",
+   "response_steps": 6.0,
+   "response_tokens": 345.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_28",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{L_n}",
+   "predicted": "n!",
+   "response_steps": 19.0,
+   "response_tokens": 271.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_29",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "236",
+   "predicted": "236",
+   "response_steps": 7.0,
+   "response_tokens": 169.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_30",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "24, 28, 32",
+   "predicted": "16,20,24",
+   "response_steps": 21.0,
+   "response_tokens": 409.0,
+   "domain": "math",
+   "n_subs": 3
+  },
+  {
+   "sample_id": "OmniMATH_31",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "46",
+   "predicted": "46",
+   "response_steps": 3.0,
+   "response_tokens": 77.0,
+   "domain": "math",
+   "n_subs": 3
+  },
+  {
+   "sample_id": "OmniMATH_32",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "561",
+   "predicted": "600",
+   "response_steps": 4.0,
+   "response_tokens": 316.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_33",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "5",
+   "predicted": "5",
+   "response_steps": 3.0,
+   "response_tokens": 189.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_34",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{3}",
+   "predicted": "0.33333333",
+   "response_steps": 4.0,
+   "response_tokens": 214.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_35",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{197}{1820}",
+   "predicted": "0.10824176",
+   "response_steps": 4.0,
+   "response_tokens": 247.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_36",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "2^{1006} \\sqrt{2^{2010}+2}-2^{2011}",
+   "predicted": "-2^2011 - 2^4022 + 2^2013",
+   "response_steps": 13.0,
+   "response_tokens": 235.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_37",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "5",
+   "predicted": null,
+   "response_steps": 11.0,
+   "response_tokens": 187.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_38",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\left(\\frac{a}{1-a}\\right)^{2}",
+   "predicted": "a^2(a-1)^2",
+   "response_steps": 5.0,
+   "response_tokens": 216.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_39",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "57",
+   "predicted": "57",
+   "response_steps": 2.0,
+   "response_tokens": 140.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_40",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "280",
+   "predicted": "*",
+   "response_steps": 3.0,
+   "response_tokens": 224.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_41",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "165",
+   "predicted": "165",
+   "response_steps": 4.0,
+   "response_tokens": 131.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_42",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{2}(7-3 \\sqrt{5})",
+   "predicted": "7-352",
+   "response_steps": 4.0,
+   "response_tokens": 253.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_43",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "rac{1}{2}",
+   "predicted": "0.5",
+   "response_steps": 5.0,
+   "response_tokens": 116.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_44",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "2",
+   "predicted": "3",
+   "response_steps": 4.0,
+   "response_tokens": 339.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_45",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{99}",
+   "predicted": "-0.01",
+   "response_steps": 39.0,
+   "response_tokens": 448.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_46",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "95",
+   "predicted": "95",
+   "response_steps": 14.0,
+   "response_tokens": 296.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_47",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "773",
+   "predicted": "773",
+   "response_steps": 4.0,
+   "response_tokens": 217.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_48",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{2}",
+   "predicted": "0.5",
+   "response_steps": 9.0,
+   "response_tokens": 235.0,
+   "domain": "math",
+   "n_subs": 4
+  },
+  {
+   "sample_id": "OmniMATH_49",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "43",
+   "predicted": "43",
+   "response_steps": 15.0,
+   "response_tokens": 192.0,
    "domain": "math",
    "n_subs": 4
   }

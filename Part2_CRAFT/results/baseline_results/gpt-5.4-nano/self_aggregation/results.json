@@ -2,60 +2,60 @@
  "setting": "Self-Aggregation (K=10)",
  "setting_key": "self_aggregation",
  "overall": {
-  "accuracy": 0.7374,
+  "accuracy": 0.6061,
   "macro_f1": null,
-  "avg_steps": 7.37,
-  "std_steps": 6.3,
-  "avg_tokens": 129.9,
-  "std_tokens": 115.1,
+  "avg_steps": 10.12,
+  "std_steps": 7.4,
+  "avg_tokens": 191.5,
+  "std_tokens": 128.4,
   "n_total": 198,
-  "n_correct": 146,
-  "n_no_pred": 1,
-  "no_pred_rate": 0.0051,
+  "n_correct": 120,
+  "n_no_pred": 2,
+  "no_pred_rate": 0.0101,
   "n_blocked": 2,
   "by_domain": {
    "logical": {
-    "accuracy": 0.8485,
-    "macro_f1": 0.8475,
-    "avg_steps": 7.43,
-    "std_steps": 4.34,
-    "avg_tokens": 137.3,
-    "std_tokens": 85.0,
+    "accuracy": 0.8586,
+    "macro_f1": 0.8561,
+    "avg_steps": 8.24,
+    "std_steps": 5.09,
+    "avg_tokens": 189.8,
+    "std_tokens": 93.0,
     "n_total": 99,
-    "n_correct": 84,
+    "n_correct": 85,
     "n_no_pred": 0,
     "no_pred_rate": 0.0,
     "n_blocked": 1,
     "per_class_f1": {
-     "__PROVED__": 0.8352,
-     "__DISPROVED__": 0.8598
+     "__PROVED__": 0.8372,
+     "__DISPROVED__": 0.875
     },
     "confusion_matrix": {
      "__PROVED__": {
-      "__PROVED__": 38,
-      "__DISPROVED__": 11,
+      "__PROVED__": 36,
+      "__DISPROVED__": 13,
       "none": 0
      },
      "__DISPROVED__": {
-      "__PROVED__": 4,
-      "__DISPROVED__": 46,
+      "__PROVED__": 1,
+      "__DISPROVED__": 49,
       "none": 0
      }
     },
     "domain": "logical"
    },
    "math": {
-    "accuracy": 0.6263,
+    "accuracy": 0.3535,
     "macro_f1": null,
-    "precision_answered": 0.6327,
-    "avg_steps": 7.44,
-    "std_steps": 7.77,
-    "avg_tokens": 125.2,
-    "std_tokens": 138.3,
+    "precision_answered": 0.3608,
+    "avg_steps": 12.21,
+    "std_steps": 8.64,
+    "avg_tokens": 197.0,
+    "std_tokens": 154.5,
     "n_total": 99,
-    "n_correct": 62,
-    "n_no_pred": 1,
-    "no_pred_rate": 0.0101,
+    "n_correct": 35,
+    "n_no_pred": 2,
+    "no_pred_rate": 0.0202,
     "n_blocked": 1,
     "domain": "math"
    }
@@ -92,51 +92,6 @@
     },
     "domain": "logical"
    },
-   "FOLIO": {
-    "accuracy": 0.86,
-    "macro_f1": 0.8599,
-    "avg_steps": 6.58,
-    "std_steps": 4.15,
-    "avg_tokens": 123.7,
-    "std_tokens": 93.1,
-    "n_total": 50,
-    "n_correct": 43,
-    "n_no_pred": 0,
-    "no_pred_rate": 0.0,
-    "n_blocked": 0,
-    "per_class_f1": {
-     "__PROVED__": 0.8571,
-     "__DISPROVED__": 0.8627
-    },
-    "confusion_matrix": {
-     "__PROVED__": {
-      "__PROVED__": 21,
-      "__DISPROVED__": 4,
-      "none": 0
-     },
-     "__DISPROVED__": {
-      "__PROVED__": 3,
-      "__DISPROVED__": 22,
-      "none": 0
-     }
-    },
-    "domain": "logical"
-   },
-   "GSM8K": {
-    "accuracy": 0.92,
-    "macro_f1": null,
-    "precision_answered": 0.92,
-    "avg_steps": 2.98,
-    "std_steps": 1.91,
-    "avg_tokens": 51.6,
-    "std_tokens": 25.2,
-    "n_total": 50,
-    "n_correct": 46,
-    "n_no_pred": 0,
-    "no_pred_rate": 0.0,
-    "n_blocked": 0,
-    "domain": "math"
-   },
    "OlympiadBench": {
     "accuracy": 0.3265,
     "macro_f1": null,
@@ -150,6 +105,51 @@
     "n_no_pred": 1,
     "no_pred_rate": 0.0204,
     "n_blocked": 1,
+    "domain": "math"
+   },
+   "ProofWriter": {
+    "accuracy": 0.88,
+    "macro_f1": 0.8782,
+    "avg_steps": 8.18,
+    "std_steps": 5.72,
+    "avg_tokens": 227.7,
+    "std_tokens": 94.7,
+    "n_total": 50,
+    "n_correct": 44,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
+    "n_blocked": 0,
+    "per_class_f1": {
+     "__PROVED__": 0.8636,
+     "__DISPROVED__": 0.8929
+    },
+    "confusion_matrix": {
+     "__PROVED__": {
+      "__PROVED__": 19,
+      "__DISPROVED__": 6,
+      "none": 0
+     },
+     "__DISPROVED__": {
+      "__PROVED__": 0,
+      "__DISPROVED__": 25,
+      "none": 0
+     }
+    },
+    "domain": "logical"
+   },
+   "OmniMATH": {
+    "accuracy": 0.38,
+    "macro_f1": null,
+    "precision_answered": 0.3878,
+    "avg_steps": 12.42,
+    "std_steps": 8.5,
+    "avg_tokens": 193.7,
+    "std_tokens": 144.8,
+    "n_total": 50,
+    "n_correct": 19,
+    "n_no_pred": 1,
+    "no_pred_rate": 0.02,
+    "n_blocked": 0,
     "domain": "math"
    }
   }
@@ -1162,6 +1162,1006 @@
    "raw_response": "Let\n\\[\nS(x_1,\\dots,x_{2n})=\\sum_{1\\le r<s\\le 2n}(s-r-n)x_rx_s,\\qquad -1\\le x_i\\le 1.\n\\]\nFor fixed \\(x_j\\) with \\(j\\neq k\\), the expression is linear in \\(x_k\\), hence its maximum over \\([-1,1]\\) occurs at \\(x_k=\\pm1\\). Therefore the global maximum is attained for some choice\n\\[\nx_i\\in\\{-1,1\\}\\quad (1\\le i\\le 2n).\n\\]\n\nNow take the specific choice\n\\[\nx_i=\\begin{cases}\n-1,&1\\le i\\le n,\\\\\n\\phantom{-}1,&n+1\\le i\\le 2n.\n\\end{cases}\n\\]\nSplit the sum into three types of pairs:\n\n### 1) Pairs within the left half\nIf \\(1\\le r<s\\le n\\), then \\(x_rx_s=1\\) and the coefficient \\(s-r-n<0\\). The contribution is\n\\[\nS_{LL}=\\sum_{1\\le r<s\\le n}(s-r-n).\n\\]\n\n### 2) Pairs within the right half\nIf \\(n+1\\le r<s\\le 2n\\), then \\(x_rx_s=1\\) and again \\(s-r-n<0\\). Writing \\(r=n+a,\\ s=n+b\\) with \\(1\\le a<b\\le n\\), the coefficient is \\((b-a)-n\\), so\n\\[\nS_{RR}=\\sum_{1\\le a<b\\le n}\\bigl((b-a)-n\\bigr)=\\sum_{1\\le r<s\\le n}(s-r-n)=S_{LL}.\n\\]\n\n### 3) Cross pairs\nIf \\(1\\le r\\le n< s\\le 2n\\), then \\(x_rx_s=-1\\) and the coefficient \\(s-r-n=(s-n)-(r)\\).\nThus the contribution is\n\\[\nS_{LR}=-\\sum_{r=1}^{n}\\sum_{s=n+1}^{2n}(s-r-n).\n\\]\nLet \\(s=n+t\\) with \\(1\\le t\\le n\\). Then \\(s-r-n=t-r\\), so\n\\[\nS_{LR}=-\\sum_{r=1}^{n}\\sum_{t=1}^{n}(t-r)\n=-\\left(\\sum_{r=1}^n\\sum_{t=1}^n t-\\sum_{r=1}^n\\sum_{t=1}^n r\\right)=0.\n\\]\n\nHence\n\\[\nS=S_{LL}+S_{RR}=2S_{LL}.\n\\]\nCompute \\(S_{LL}\\):\n\\[\nS_{LL}=\\sum_{1\\le r<s\\le n}(s-r-n)\n=\\sum_{1\\le r<s\\le n}(s-r)-n\\cdot \\binom{n}{2}.\n\\]\nNow\n\\[\n\\sum_{1\\le r<s\\le n}(s-r)=\\sum_{d=1}^{n-1} d(n-d)\n=n\\sum_{d=1}^{n-1} d-\\sum_{d=1}^{n-1} d^2\n=n\\cdot\\frac{(n-1)n}{2}-\\frac{(n-1)n(2n-1)}{6}\n=\\frac{n(n-1)(n+1)}{6}.\n\\]\nTherefore\n\\[\nS_{LL}=\\frac{n(n-1)(n+1)}{6}-n\\cdot\\frac{n(n-1)}{2}\n=\\frac{n(n-1)}{6}\\bigl((n+1)-3n\\bigr)\n=\\frac{n(n-1)}{6}(1-2n)\n=-\\frac{n(n-1)(2n-1)}{6}.\n\\]\nSo\n\\[\nS=2S_{LL}=-\\frac{n(n-1)(2n-1)}{3}.\n\\]\n\nThis value is negative; flipping all signs \\(x_i\\mapsto -x_i\\) does not change \\(S\\) (it’s bilinear), so to get the maximum we instead take the opposite pattern\n\\[\nx_i=\\begin{cases}\n\\phantom{-}1,&1\\le i\\le n,\\\\\n-1,&n+1\\le i\\le 2n,\n\\end{cases}\n\\]\nwhich multiplies cross terms by \\(-1\\) and yields the positive value\n\\[\n\\boxed{\\frac{n(n-1)(2n-1)}{3}}.\n\\]\n\nFinally, since the maximum occurs at extreme points and we have exhibited a sign pattern achieving this value, this is the maximum.\n\n\\boxed{\\frac{n(n-1)(2n-1)}{3}}",
    "response_steps": 20.0,
    "response_tokens": 276.0,
+   "domain": "math"
+  },
+  {
+   "sample_id": "ProofWriter_1",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "1. Fact7: The bald eagle needs the squirrel.  \n2. Fact14: If something needs the squirrel then the squirrel chases the cat.  \n   From (1) and Fact14, the squirrel chases the cat.  \n3. Fact21: If something chases the cat then it is cold.  \n   From (2) and Fact21, the squirrel is cold.  \n4. Fact15: If something chases the bear then it is round.  \n   Fact10: The cat chases the bear, so the cat is round.  \n   (But we need the squirrel to be round; we can still get squirrel roundness by using Fact15 with an entity that chases the bear. We have none explicitly for the squirrel, so instead we use Fact13.)  \n5. Fact3: The bald eagle eats the squirrel.  \n6. Fact9: The bear eats the bald eagle.  \n7. Fact6: The bald eagle does not need the cat.  \n8. Fact8: The bear does not chase the cat.  \n9. Fact13: If something eats the bear and the bear needs the cat then the cat is round.  \n   This does not yield that the squirrel is round, so cannot directly establish Fact20’s antecedent for the squirrel.  \n\nAt this point, we have derived the squirrel is cold, but we cannot derive that the squirrel is round, which is required by Fact20. Since Fact20 is:\n10. Fact20: If the squirrel is round and the squirrel is cold then the squirrel does not need the bear.  \n\nWe cannot satisfy Fact20’s “squirrel is round” condition from the given facts/rules, and there is no other rule to infer “squirrel round” from “squirrel cold” or similar. Therefore the conclusion is not derivable.\n\n__DISPROVED__",
+   "response_steps": 10,
+   "response_tokens": 259,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_2",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "To prove (or disprove) the conclusion **“The bear eats the bear”**, we check which rules can generate an “eats” statement about the **bear**.\n\n**Given rules relevant to eating:**\n- **(18)** If something is kind then it eats the bear.  \n  \\(\\text{kind}(x) \\rightarrow \\text{eats}(x,\\text{bear})\\)\n- **(22)** If something sees the cow then it is kind.  \n  \\(\\text{sees}(x,\\text{cow}) \\rightarrow \\text{kind}(x)\\)\n- **(17)** If something eats the bear then the bear sees the cow.  \n  \\(\\text{eats}(x,\\text{bear}) \\rightarrow \\text{sees}(\\text{bear},\\text{cow})\\)\n\nAlso:\n- **(23)** If something eats the squirrel then it eats the cat (does not mention bears).\n\n**We need** \\(\\text{eats}(\\text{bear},\\text{bear})\\).  \nBy rule (18), this would follow if we can show:\n- \\(\\text{kind}(\\text{bear})\\)\n\nAnd by rule (22), it suffices to show:\n- \\(\\text{sees}(\\text{bear},\\text{cow})\\)\n\nNow check what gives **bear sees cow**:\n- Rule (17) gives **bear sees cow** if **some entity** eats the bear.\n- Do we have any fact that someone eats the bear?  \n  The premises list eating facts:\n  - cat eats squirrel (Fact7)\n  - squirrel eats cat (Fact13)\n  - squirrel eats cow (Fact14)\n\nUsing (23):\n- From cat eats squirrel → cat eats cat.\n- Still no one eats the bear.\n\nUsing (18), we can infer someone eats the bear only if that someone is kind.\nWe can infer kind from seeing cow (22). We have:\n- squirrel sees cow (Fact16) ⇒ squirrel is kind (by 22)\n- squirrel kind ⇒ squirrel eats bear (by 18)\n\nSo we get:\n- squirrel eats bear\n- then by (17): bear sees cow\n\nFinally:\n- bear sees cow ⇒ bear is kind (by 22)\n- bear kind ⇒ bear eats bear (by 18)\n\nTherefore the conclusion is entailed.\n\n__PROVED__",
+   "response_steps": 20,
+   "response_tokens": 268,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_3",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "We work in standard forward-chaining/logic-of-rules style: rules are universally quantified conditionals, and to derive a conclusion like “cow visits cat” we must satisfy the antecedent(s) of some rule(s).\n\n- Fact17 is the only rule whose consequent is exactly **“the cow visits the cat”**:\n  - **Fact17:** If someone visits the cow **and** the cow likes the squirrel, then the cow visits the cat.\n\nSo, to prove the conclusion, we would need:\n1) **There exists some “someone”** such that **someone visits the cow**, and  \n2) **the cow likes the squirrel**.\n\nNow check what we can derive about (2):\n- Fact15: If someone is big, then they like the squirrel.\n- But we do not have **the cow is big** as a given fact.\n- The only rule that yields “the cow is big” is:\n  - **Fact18:** If someone visits the cow, then the cow is big.\n- Hence, (2) also depends on (1): we can only make the cow big (and thus like the squirrel via Fact15) if we already have someone visiting the cow.\n\nCrucially, **none of the given facts state that anyone visits the cow**, and no rule allows us to infer “someone visits the cow” from the existing visit facts (the only visit facts are about visits to the cat and to the rabbit: Facts 8–10).\n\nAlthough Fact12 implies:\n- If someone likes the squirrel, then the squirrel visits the cow,\nand we can indeed infer the **cat likes the squirrel** from Fact1 + Fact15, giving **squirrel visits the cow** (Fact12),\nthis still does **not** help, because Fact17 requires **some someone visits the cow**—and in that sense “the squirrel visits the cow” *does* provide that existential condition.\nHowever, we must still verify the other condition: **the cow likes the squirrel**.\n- From **squirrel visits the cow**, Fact18 yields **the cow is big**.\n- From **cow is big**, Fact15 yields **the cow likes the squirrel**.\n- Therefore Fact17 applies (with “someone = the squirrel”) and gives **the cow visits the cat**.\n\nThus the conclusion is derivable.\n\n__PROVED__",
+   "response_steps": 2,
+   "response_tokens": 337,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_7",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "1. Fact8: the lion visits the bear.  \n2. Fact16: if something visits the bear then it is not nice.  \n   From (1) and (2), the lion is not nice.  \n3. Fact9: the lion visits the cat.  \n4. Fact19: if something visits the cat and it is not nice then it is young.  \n   From (3) and (2), the lion is young.  \n5. Fact10: the lion visits the mouse.  \n6. Fact18: if something is young and it visits the mouse then it likes the cat.  \n   From (4) and (5), the lion likes the cat.  \n7. Fact17: if something likes the cat then it needs the bear.  \n   From (6), the lion needs the bear.  \n8. Fact20: if something needs the bear then it needs the mouse.  \n   From (7), the lion needs the mouse.  \n\n__PROVED__",
+   "response_steps": 8,
+   "response_tokens": 130,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_8",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "Let the domain contain the named individuals. We want to decide whether the premises entail:\n\n**Goal:** tiger eats bear.\n\nKey rules:\n\n- **Fact15:** If *something* eats the tiger and it is round, then the tiger eats the bear.\n  \\[\n  (\\exists x)[(x \\text{ eats } \\text{tiger}) \\land (x \\text{ round})] \\Rightarrow (\\text{tiger eats bear})\n  \\]\n- **Fact18:** If something eats the rabbit then it eats the tiger.\n  \\[\n  x \\text{ eats rabbit} \\Rightarrow x \\text{ eats tiger}\n  \\]\n- **Fact19:** If something is round and it does not need the bald eagle then it eats the rabbit.\n  \\[\n  (x \\text{ round}) \\land (x \\neg \\text{ need bald eagle}) \\Rightarrow x \\text{ eats rabbit}\n  \\]\n- **Fact16:** If something needs the tiger then it is red.\n- **Fact17:** If something eats the bald eagle then it is red.\n- **Fact21:** If something is red and it eats the bald eagle then it is round.\n\nNow we build an entity satisfying the antecedent of **Fact15**.\n\n1. From **Fact10:** rabbit does not need the bald eagle.  \n   \\[\n   \\text{rabbit} \\neg\\text{need bald eagle}\n   \\]\n2. From **Fact8:** rabbit is big (irrelevant), but we also have **Fact7:** rabbit eats bald eagle.\n3. From **Fact17:** if something eats bald eagle then it is red.  \n   Since rabbit eats bald eagle,  \n   \\[\n   \\text{rabbit is red}\n   \\]\n4. From **Fact21:** if something is red and it eats bald eagle then it is round.  \n   Rabbit is red and rabbit eats bald eagle, so  \n   \\[\n   \\text{rabbit is round}\n   \\]\n5. From **Fact19:** if something is round and it does not need the bald eagle then it eats the rabbit.  \n   Rabbit is round and does not need the bald eagle, hence  \n   \\[\n   \\text{rabbit eats rabbit}\n   \\]\n6. From **Fact18:** if something eats the rabbit then it eats the tiger.  \n   Since rabbit eats rabbit,  \n   \\[\n   \\text{rabbit eats tiger}\n   \\]\n\nThus there exists an entity (the rabbit) that both **eats the tiger** and is **round**. Therefore by **Fact15**, the **tiger eats the bear**.\n\n__PROVED__",
+   "response_steps": 6,
+   "response_tokens": 328,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_11",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "We work in first-order logic with constants for the individuals.\n\n1. Fact2: **bald_eagle** likes **dog**.  \n2. Fact6: **dog** is blue.  \n3. Fact17: If someone likes the dog and the dog is blue, then they see the tiger.  \n   From (1) and (2) (someone = bald_eagle), conclude:  \n   4. **bald_eagle** sees **tiger**.  \n\n5. Fact3: **bald_eagle** needs **tiger**.  \n6. Fact4: **bald_eagle** does not see **dog**.  \n7. Fact18: If someone needs the tiger and they do not see the dog, then the tiger needs the bald eagle.  \n   From (5) and (6) (someone = bald_eagle), conclude:  \n   8. **tiger** needs **bald_eagle**.  \n\n9. Fact19: If someone needs the bald eagle, then they like the bald eagle.  \n   From (8), conclude:  \n   10. **tiger** likes **bald_eagle**.  \n\n11. Fact15: If someone likes the bald eagle, then the bald eagle needs the dog.  \n   From (10), conclude:  \n   12. **bald_eagle** needs **dog**.  \n\n13. Fact14: If someone needs the dog and they like the dog, then they need the bald eagle.  \n   From (1) and (12) (someone = bald_eagle), conclude:  \n   14. **bald_eagle** needs **bald_eagle**.  \n\n15. Fact13: If someone needs the bald eagle and the bald eagle sees the tiger, then they are rough.  \n   From (14) and (4), conclude:  \n   16. **bald_eagle** is rough.  \n\n17. Fact16: If someone is rough and they like the dog, then the dog needs the tiger.  \n   From (16) and (1), conclude:  \n   18. **dog** needs **tiger**.\n\nTherefore, the conclusion follows from the facts.\n\n__PROVED__",
+   "response_steps": 18,
+   "response_tokens": 229,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_12",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "To determine whether the premises entail **“The cat is blue”**, note that the only rule that can produce a “blue” conclusion is:\n\n- **Fact13:** If someone sees the mouse, then they are blue.\n\nSo, to prove **cat is blue**, we must derive:\n\n- **(A)** The cat sees the mouse.\n\nConsider what we can derive from the given facts:\n\n1. **Fact2:** The cat is green.\n2. **Fact19:** If someone is green, then they like the bald eagle.  \n   Hence the cat likes the bald eagle.\n3. **Fact17:** If someone likes the bald eagle, then the bald eagle sees the mouse.  \n   Hence the bald eagle sees the mouse.\n4. From **Fact13**, the bald eagle (not the cat) is blue.\n\nThis does **not** give the cat is blue. We still need **(A)**: the cat sees the mouse.\n\nWhat about deriving (A)?\n\n- **Fact16:** If someone sees the cat, then the cat sees the mouse.\n  So (A) would follow if we had: **someone sees the cat**.\n\nBut there is no rule or fact that establishes that **anyone sees the cat**. The only “seeing cat” rule is:\n\n- **Fact14:** If someone sees the mouse, then the mouse sees the cat.\n\nFrom the bald eagle seeing the mouse (derived above), Fact14 yields:\n- **mouse sees the cat**.\n\nThen apply **Fact16** with “someone = mouse”:\n- If the mouse sees the cat, then the cat sees the mouse.\n\nThus we do obtain **(A)**:\n- The cat sees the mouse.\n\nFinally, apply **Fact13**:\n- If someone sees the mouse, then they are blue.\n- Since the cat sees the mouse, the cat is blue.\n\nTherefore, the conclusion **“The cat is blue”** is entailed.\n\n__PROVED__",
+   "response_steps": 4,
+   "response_tokens": 275,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_13",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "1. Fact13: The squirrel is green.  \n2. Fact20: If something is green then it sees the dog.  \n   From (1) and (2): The squirrel sees the dog.  \n3. Fact21: If something sees the dog then it visits the bear.  \n   From (2) and (3): The squirrel visits the bear.  \n4. Fact17: If something visits the bear then it sees the bear.  \n   From (3) and (4): The squirrel sees the bear.  \n5. Fact18: If something sees the bear then the bear sees the dog.  \n   From (4) and (5): The bear sees the dog.  \n6. Fact21: If something sees the dog then it visits the bear.  \n   From (5) and (6): The bear visits the bear.  \n7. Fact17: If something visits the bear then it sees the bear.  \n   From (6) and (7): The bear sees the bear.  \n\n__PROVED__",
+   "response_steps": 7,
+   "response_tokens": 133,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_14",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "We work in standard forward-chaining first-order logic with the given “If … then …” rules interpreted as universally quantified implications, and with facts as ground literals.\n\n**Goal:** determine whether **Fact2-style conclusion** “The cow is round” is logically entailed.\n\n### Step 1: What rules can produce “round”?\nThe only rule mentioning **round** is **Fact13**:\n- **Fact13:** If someone visits the cow then **they** are round.\n\nSo to infer **the cow is round**, we would need to derive:\n- **(A)** The cow visits the cow,  \nbecause then applying Fact13 with “someone = the cow” yields: **the cow is round**.\n\n### Step 2: What can we derive about visits to the cow?\nWe have:\n- **Fact18:** If someone is nice then they visit the cow.\n- **Fact16:** If someone likes the cow then they are nice.\n- **Fact8:** The rabbit likes the cow.\n\nFrom Fact8 and Fact16:\n- the rabbit is nice.\n\nThen from Fact18:\n- the rabbit visits the cow.\n\nApplying Fact13 to that:\n- the rabbit is round.  \n(This is irrelevant to the cow being round.)\n\n### Step 3: Can we derive that the cow visits the cow?\nTo get **the cow visits the cow**, via Fact18 it would suffice to derive:\n- the cow is nice.\n\nBut the only rule that can infer **cow is nice** is **Fact20**, whose consequent is specifically about the cow:\n- **Fact20:** If someone visits the cow then the cow is nice.\n\nAnd we *do* have that **someone visits the cow**—for example, the rabbit visits the cow (from Step 2). Therefore, applying Fact20 with “someone = the rabbit” yields:\n- the cow is nice.\n\nNow apply Fact18 again with “someone = the cow”:\n- if the cow is nice, then the cow visits the cow.\n\nSo we obtain:\n- the cow visits the cow.\n\n### Step 4: Conclude the target\nFinally, apply Fact13 with “someone = the cow”:\n- if the cow visits the cow, then the cow is round.\n\nThus:\n- **the cow is round**.\n\nTherefore the conclusion follows from the premises.\n\n__PROVED__",
+   "response_steps": 23,
+   "response_tokens": 339,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_15",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "1. Fact4: the bald eagle likes the rabbit.  \n2. Fact16: if someone likes the rabbit then the rabbit is green.  \n   From (1) and Fact16, the rabbit is green.  \n3. Fact22: if someone is green then they see the rabbit.  \n   From (2) and Fact22, the rabbit sees the rabbit.\n\n4. Fact10: the cat likes the bald eagle.  \n5. Fact19: if someone likes the bald eagle then they like the bear.  \n   From (4) and Fact19, the cat likes the bear.  \n6. Fact18: if someone likes the bear then the bear is young.  \n   From (5) and Fact18, the bear is young.  \n\n7. Fact13: the rabbit visits the bear.  \n   Let “someone” = the rabbit in Fact15.  \n8. Fact15: if someone visits the bear and the bear is young then the bear sees the rabbit.  \n   From (7), and (6), the bear sees the rabbit.\n\n9. Fact8: the bear visits the rabbit.  \n10. Fact21: if the bear visits the rabbit and the bear sees the rabbit then the bear is blue.  \n    From (9) and (8), the bear is blue.  \n11. Fact17: Blue people are not round.  \n    From (10) and Fact17, the bear is not round.\n\nTherefore, the conclusion is proved.  \n__PROVED__",
+   "response_steps": 11,
+   "response_tokens": 195,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_16",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "We work in forward chaining with the rules given.\n\n1. Fact9: the rabbit visits the squirrel.  \n2. Fact15: If someone visits the squirrel then they are round.  \n   Hence from (1), the rabbit is round.  \n3. Fact17: If someone is round then they like the dog.  \n   Hence from (2), the rabbit likes the dog.  \n4. Fact14: If someone likes the dog then they are green.  \n   Hence from (3), the rabbit is green.\n\nNow the conclusion to prove is: **the dog is green**.  \nTo get “the dog is green” from Fact14, we would need **the dog likes the dog** (or in general some instance of “someone” = dog in Fact14). But none of the facts/rules force the dog to like the dog.\n\n- Fact17 can make someone like the dog, but its antecedent is “someone is round.” We have no rule deriving **the dog is round** from the given data about the dog.  \n- Fact11 would give “the dog is round” if we had “someone likes the dog”; we do have that the rabbit likes the dog, but Fact11 concludes only that *the dog is round* (it does not follow from the rabbit liking the dog that the dog becomes green directly). However, Fact11 actually states: **If someone likes the dog then the dog is round.** Since the rabbit likes the dog from step (3), we can conclude:  \n  5. the dog is round.  \n- Then Fact17 gives:  \n  6. the dog likes the dog (since it is round).  \n- Finally Fact14 gives:  \n  7. the dog is green.\n\nTherefore the conclusion follows from the premises.\n\n__PROVED__",
+   "response_steps": 7,
+   "response_tokens": 262,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_18",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "To prove or disprove: **“The rabbit likes the cat.”**\n\nWe have the relevant facts:\n- Fact12: **rabbit likes dog**\n- Fact13: **rabbit likes squirrel**\n- Fact14: **rabbit sees squirrel**\n\nAnd the relevant rules about liking:\n- Fact17: **If someone is big then they like the cat.**\n- Fact18: **If someone is round then they are big.**\n- Fact20: **If someone eats the cat then they are round.**\nSo, to derive **rabbit likes cat**, it would suffice to derive **rabbit big**, which would suffice to derive **rabbit round**, which would suffice to derive **rabbit eats cat**.\n\nNow check whether we can derive **rabbit eats cat**:\n- Fact24: **If someone is big and they see the rabbit then the rabbit eats the cat.**\nSo Fact24 requires some individual \\(x\\) such that:\n1) \\(x\\) is big, and  \n2) \\(x\\) sees the rabbit.\n\nBut in the given facts we only have:\n- The cat sees the rabbit (Fact6) — so \\(x\\) could be the cat if we also had **cat big**.\n- There is **no fact** stating **cat big** or any rule that yields **cat big** from what we have.\n\nWe do have:\n- Fact21: **If the cat is green and the cat eats the rabbit then the cat is big.**\nWe know the cat eats the rabbit (Fact2), but we do **not** know the cat is green (no fact or rule gives it).\n\nCould we instead get **big** for the cat or any other seer of the rabbit another way?\n- The only path to “big” is via **round** (Fact18), and the only path to “round” is via **eats the cat** (Fact20), or any explicit round (Fact15 gives squirrel round, but that doesn’t directly connect to rabbit eating the cat via Fact24 because we also need someone who sees the rabbit).\n\nWe do know:\n- Fact16: squirrel sees rabbit.\n- Fact15: squirrel round ⇒ (Fact18) squirrel big ⇒ (Fact17) squirrel likes cat.\nBut Fact24 would require **someone** (e.g., the squirrel) to be big and to see the rabbit, to conclude **the rabbit eats the cat**.  \nAnd indeed:\n- Squirrel is big (from Fact15 + Fact18),\n- Squirrel sees rabbit (Fact16),\nSo by Fact24, we get:\n- **rabbit eats the cat**.\n\nThen by Fact20:\n- rabbit eats cat ⇒ rabbit round.\n\nThen by Fact18:\n- rabbit round ⇒ rabbit big.\n\nThen by Fact17:\n- rabbit big ⇒ rabbit likes cat.\n\nTherefore the conclusion **“The rabbit likes the cat”** is derivable.\n\n__PROVED__",
+   "response_steps": 2,
+   "response_tokens": 407,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_21",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "1. Fact4: The cat is cold.  \n2. Fact12: All cold things are green ⇒ from (1), the cat is green.  \n3. Fact18: If something is cold then it is young ⇒ from (1), the cat is young.  \n4. Fact15: If something is young and cold then it eats the dog ⇒ from (1) and (3), the cat eats the dog.  \n5. Fact17: If something eats the dog then the dog is cold ⇒ from (4), the dog is cold.  \n6. Fact18: If something is cold then it is young ⇒ from (5), the dog is young.  \n\nNow check the target “The dog eats the dog.”  \n7. Fact15 requires: something is young **and** cold to conclude it eats the dog.  \nFrom (6) the dog is young, but we also have (5) the dog is cold, so applying Fact15 to the dog gives:  \n8. From (5) and (6) with Fact15, the dog eats the dog.\n\nTherefore the conclusion follows from the premises.  \n__PROVED__",
+   "response_steps": 8,
+   "response_tokens": 161,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_22",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "From the facts/rules that could derive an “eats the bald eagle” statement:\n\n- Fact14: **If something is red then it eats the bald eagle.**\nSo to prove **tiger eats bald eagle**, it would suffice to prove **tiger is red**.\n\n- Fact15: **If something is young then it is red.**\nSo it would suffice to prove **tiger is young**.\n\nHow to get **tiger is young**:\n- Fact9: **If something eats the tiger then the tiger is young.**\nSo we would need some entity that **eats the tiger**.\n\nBut the only rule that produces “eats the tiger” facts is:\n- Fact10: **If something is red then it eats the tiger.**\nSo we would need some red entity to start the chain of implications that yields an eater of the tiger.\n\nWe do have a red entity:\n- Fact2: **the bald eagle is young**\n- Fact15 ⇒ **the bald eagle is red**\n- Fact10 ⇒ **the bald eagle eats the tiger**\n\nNow apply Fact9:\n- Since the bald eagle eats the tiger, Fact9 ⇒ **the tiger is young**\n- Fact15 ⇒ **the tiger is red**\n- Fact14 ⇒ **the tiger eats the bald eagle**\n\nTherefore the conclusion follows.\n\n__PROVED__",
+   "response_steps": 8,
+   "response_tokens": 196,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_25",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "1. Fact4: The mouse is red.  \n2. Fact15: Red people are blue ⟹ the mouse is blue.  \n3. Fact12: If someone is blue and red then they need the tiger ⟹ the mouse needs the tiger.  \n4. Fact13: If someone needs the tiger then the tiger needs the mouse ⟹ the tiger needs the mouse.  \n5. Fact11: If someone visits the tiger and the tiger needs the mouse then the mouse sees the squirrel.  \n   To apply it, we need some individual that visits the tiger; we have Fact7: the squirrel visits the tiger.  \n   Let “someone” be the squirrel. Then Fact11 gives: the mouse sees the squirrel.  \n6. Fact17: If someone sees the squirrel then they need the mouse.  \n   Applying to “someone” = the mouse, since the mouse sees the squirrel, we get: the mouse needs the mouse.  \n\nTherefore the conclusion follows.  \n\n__PROVED__",
+   "response_steps": 6,
+   "response_tokens": 142,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_27",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "We work in forward-chaining logic with the given facts and rules.\n\nGoal: determine whether **“The lion is not nice”** is entailed.\n\n1. From Fact8: **tiger chases lion**.  \n   Using Fact15: **If something chases the lion then it is big**, we get  \n   **tiger is big**.\n\n2. Using Fact17: **If something is big then it visits the dog**, from tiger big we get  \n   **tiger visits dog**.\n\n3. Using Fact14: **If something chases the lion and it visits the dog then it chases the dog**,  \n   since the tiger chases the lion (Fact8) and visits the dog (step 2), we get  \n   **tiger chases dog**.\n\n4. Using Fact13: **If something chases the dog then it is not red**, from step 3 we get  \n   **tiger is not red**.\n\n5. Fact5 gives: **lion visits tiger**.  \n   Using Fact20: **If something visits the tiger and the tiger is not red then it is not nice**,  \n   with “something = lion” (lion visits tiger) and “tiger is not red” (step 4), we conclude  \n   **lion is not nice**.\n\nTherefore the conclusion follows from the premises.\n\n__PROVED__",
+   "response_steps": 5,
+   "response_tokens": 173,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_29",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "To determine whether **“The dog is not big”** is proved, we look for a derivation of **dog is not big** from the facts/rules.\n\n**Step 1: Derive that the bear is red.**  \n- Fact1: The bear does not see the dog.  \n- Fact12: If the bear does not see the dog then the bear is red.  \nSo, by Fact1 and Fact12: **bear is red**.\n\n**Step 2: Use that the bear (red) does not eat the dog.**  \nWe can get “bear does not eat the dog” from:\n- Fact11: If the lion eats the bear then the bear does not eat the dog.\n\nSo it suffices to prove **lion eats bear**.\n\n**Step 3: Derive that the lion eats the bear.**  \n- Fact2: The dog eats the bear.  \n- Fact14: If something eats the bear then the bear needs the lion.  \n  Hence (with “something” = dog): **bear needs the lion**.\n- Fact15: If something needs the lion then the lion eats the bear.  \n  Hence (with “something” = bear): **lion eats the bear**.\n\n**Step 4: Conclude bear does not eat the dog.**  \nFrom Step 3 and Fact11: **bear does not eat the dog**.\n\n**Step 5: Conclude the dog sees the rabbit.**  \n- Fact17: If something is red and it does not eat the dog then the dog sees the rabbit.  \nUsing “something” = bear:\n  - bear is red (Step 1)\n  - bear does not eat the dog (Step 4)  \nTherefore: **dog sees the rabbit**.\n\n**Step 6: Conclude the dog is not big.**  \n- Fact18: If something sees the rabbit then it is not big.  \nWith “something” = dog, and dog sees the rabbit (Step 5): **dog is not big**.\n\nThus, the conclusion is derivable from the premises.\n\n__PROVED__",
+   "response_steps": 17,
+   "response_tokens": 284,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_30",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "1. Fact2: The bald eagle visits the dog.  \n2. Fact17: If someone visits the dog then they chase the bald eagle.  \n   Hence, from (1) and (2): the bald eagle chases the bald eagle.  \n\n3. Fact7: The dog chases the bear.  \n4. Fact9: The dog needs the bear.  \n5. Fact16: If someone needs the dog then the dog is round.  \n   This requires a premise of the form “someone needs the dog.” We do not have any such premise. In particular, from (4) we only know “the dog needs the bear,” not “someone needs the dog.” Therefore we cannot infer that the dog is round.\n\n6. Fact14: If the dog chases the bear and the dog is round then the bear visits the dog.  \n   We have the dog chases the bear from (3), but we cannot get “the dog is round” as shown in (5). Hence we cannot infer that the bear visits the dog.\n\n7. Fact17 again would then yield: if the bear visits the dog then the bear chases the bald eagle.  \n   But since (6) fails, we cannot derive “the bear visits the dog,” and thus cannot derive “the bear chases the bald eagle.”\n\nNo other rule produces “the bear chases the bald eagle” directly.\n\nTherefore, the conclusion “The bear chases the bald eagle” is **not** entailed by the given facts/rules.  \n\n__DISPROVED__",
+   "response_steps": 7,
+   "response_tokens": 222,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_31",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "Let the domain be the set of individuals mentioned (cows, squirrels, etc.). We use the given facts and rules as material implications.\n\n1. Fact3: The cow likes the bald eagle.  \n2. Fact11: If something likes the bald eagle then it likes the squirrel.  \n   From (1) and Fact11, infer: The cow likes the squirrel.  \n3. Fact12: If something likes the squirrel then it visits the squirrel.  \n   From (2) and Fact12, infer: The cow visits the squirrel.  \n4. Fact10: If the cow visits the squirrel then the squirrel likes the bald eagle.  \n   From (3) and Fact10, infer: The squirrel likes the bald eagle.  \n5. Fact11: If something likes the bald eagle then it likes the squirrel.  \n   From (4) and Fact11, infer: The squirrel likes the squirrel.  \n6. Fact12: If something likes the squirrel then it visits the squirrel.  \n   From (5) and Fact12, infer: The squirrel visits the squirrel.\n\nTherefore, the conclusion follows from the premises.\n\n__PROVED__",
+   "response_steps": 6,
+   "response_tokens": 154,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_32",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "Let **M** denote “the mouse”.\n\nGiven facts:\n- (F9) \\( \\text{blue}(M)\\)\n- (F10) \\( \\text{visits}(M,\\text{rabbit})\\)\n- (F11) \\( \\text{visits}(M,\\text{squirrel})\\)\n\nRules:\n- (R17) If \\( \\text{needs}(x,M)\\) and \\( \\text{blue}(M)\\) then \\( \\text{nice}(M)\\).\n- (R23) If \\( \\text{nice}(x)\\) then \\( \\text{needs}(x,\\text{squirrel})\\).\n- (R18) If \\( \\text{needs}(x,\\text{squirrel})\\) then \\( \\text{needs}(x,M)\\).\n\nGoal: \\( \\text{needs}(M,M)\\).\n\nA natural way is:\n1. Show \\( \\text{needs}(M,\\text{squirrel})\\),\n2. Then by (R18) with \\(x=M\\), infer \\( \\text{needs}(M,M)\\).\n\nBut to get \\( \\text{needs}(M,\\text{squirrel})\\) we would need \\( \\text{nice}(M)\\) via (R23).  \nTo get \\( \\text{nice}(M)\\) via (R17), we would need \\( \\text{needs}(x,M)\\) for some \\(x\\)—in particular, \\( \\text{needs}(M,M)\\) itself is one candidate for that \\(x\\). That is circular: the rules that could produce the needed “nice” or “needs” facts require an antecedent that includes the very conclusion.\n\nCrucially, there is **no non-circular way** from the given mouse facts (blue/visits) and the other premises to derive any instance of \\( \\text{needs}(x,M)\\) (for any \\(x\\)), and there is **no direct fact** asserting \\( \\text{needs}(M,M)\\) or \\( \\text{needs}(M,\\text{squirrel})\\).\n\nTherefore the conclusion is not entailed by the premises.\n\nDISPROVED",
+   "response_steps": 2,
+   "response_tokens": 173,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_34",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "1. Fact6: The mouse is round.  \n2. Fact8: If something is round then it chases the bear.  \n   From (1) and Fact8: the mouse chases the bear.  \n3. Fact10: If something chases the bear then it needs the tiger.  \n   From (2) and Fact10: the mouse needs the tiger.  \n4. Fact13: If something is round and it needs the tiger then the tiger is round.  \n   From (1) and (3) and Fact13: the tiger is round.  \n5. Fact8: If something is round then it chases the bear.  \n   From (4) and Fact8: the tiger chases the bear.  \n6. Fact10: If something chases the bear then it needs the tiger.  \n   From (5) and Fact10: the tiger needs the tiger.  \n\n__PROVED__",
+   "response_steps": 6,
+   "response_tokens": 115,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_35",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We determine whether **“The cow sees the squirrel”** follows from the facts and rules.\n\n1. **Fact20:** If something sees the cow then the cow eats the tiger.  \n   **Fact4:** The lion sees the cow.  \n   Hence, by Fact20, **the cow eats the tiger**.\n\n2. The only rules that directly produce “cow sees the squirrel” are:\n   - **Fact15:** If something eats the cow then it sees the squirrel.\n     This gives “x sees the squirrel” when **x eats the cow**, but it does **not** mention the cow directly unless we can prove **the cow eats the cow**.\n   - **Fact19:** If the tiger visits the cow then the cow sees the squirrel.\n     This gives the desired conclusion if we can prove **the tiger visits the cow**.\n\n3. We check what we can derive about:\n   - **The tiger visits the cow:** There is **no fact** stating this, and no rule that would infer it from the given information.\n   - **The cow eats the cow:** From **Fact17** (if something is round then it eats the cow) we would need **cow is round**. The only way to infer cow being round is via **Fact12:**  \n     If something sees the squirrel and the squirrel eats the cow then the cow is round.  \n     But we have **no way to infer “the squirrel eats the cow”**, and no way to infer the needed “something sees the squirrel” in a way that triggers Fact12 (and even then, squirrel eating cow is still missing).\n\n4. Therefore, neither Fact19 nor Fact15 can be completed to derive **cow sees the squirrel**.\n\nSince the conclusion is not derivable from the given premises and rules, it is **not proved**.\n\nDISPROVED",
+   "response_steps": 4,
+   "response_tokens": 272,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_36",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "raw_response": "1. Fact12: The tiger visits the mouse.  \n2. Fact13: If the tiger visits the mouse then the mouse eats the tiger.  \n   From 1 and 2, the mouse eats the tiger.  \n3. Fact15: If someone eats the tiger then they are green.  \n   From 2 and 3, the mouse is green.  \n4. Fact16: If someone is green then they are young.  \n   From 3 and 4, the mouse is young.  \n5. Fact17: If someone is young then they need the mouse.  \n   From 4 and 5, the mouse needs the mouse.  \n6. Fact14: If someone is young and they need the mouse then they eat the mouse.  \n   From 4 and 5 and 6, the mouse eats the mouse.\n\nTherefore, the conclusion holds.  \n__PROVED__",
+   "response_steps": 6,
+   "response_tokens": 119,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_37",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "To determine whether the conclusion **“The dog is round”** is entailed, we check whether Fact18 can be applied.\n\n1. **Fact6:** The dog visits the lion.  \n2. **Fact17:** If someone visits the lion then they like the dog.  \n   From (1) and (2): **the dog likes the dog**.\n\n3. **Fact4:** The dog likes the cow.\n\n4. **Fact18:** If someone visits the dog and the dog likes the cow then the dog is round.  \n   We already have **the dog likes the cow** from (3).  \n   So we still need: **someone visits the dog**.\n\n5. **Fact14:** If someone is young then they visit the dog.  \n   Therefore, it would be enough to derive that **the dog is young**.\n\n6. **Fact13:** If the dog visits the squirrel then the squirrel is young.  \n   This can only make **the squirrel** young, not the dog young, and it requires the dog to visit the squirrel—which we do not have.\n\n7. There is **no other rule** that derives **the dog is young** or directly derives **the dog visits the dog** from the given facts.\n\nSince we cannot derive the needed premise **“someone visits the dog”**, Fact18 cannot be triggered, and thus the conclusion is **not logically entailed** by the premises.\n\n__DISPROVED__",
+   "response_steps": 7,
+   "response_tokens": 200,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_41",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "To determine whether **“The cow sees the cow”** is entailed, we check which rules can produce a *sees* fact.\n\nFacts and rules relevant to concluding **cow sees cow**:\n\n- **Fact5:** cow sees rabbit.  \n- **Fact12:** If something sees the cow → the cow is big.  \n- **Fact14:** If something is big → it is green.  \n- **Fact19:** If something is green → it sees the cow.  \n\nFrom **Fact12 + Fact14 + Fact19**, we can derive:\n- If something sees the cow, then the cow is big (Fact12),\n- then the cow is green (Fact14),\n- then the cow sees the cow (Fact19, with “the cow” as the “something”).\n\nSo the proof would be complete **if we had**:  \n- some “something” that **sees the cow**.\n\nBut we do **not** have any premise of the form “(X) sees the cow”.\n\nCould we get “cow sees cow” directly from other rules?\n- **Fact18:** If something sees the cat → it is big. This can give big properties, but only for entities that **already** see the cat. We do not have “cow sees cat”.\n- **Fact6:** cow visits cat. “Visits” does not imply “sees” in any rule.\n- The only rules that conclude “sees cow” are **Fact19** (via green) and **Fact12** is about producing big from “sees cow,” not producing “sees cow” itself.\n\nTherefore, there is **no derivation** that establishes that the cow is big/green in a way that forces **cow sees cow**. In particular, since no premise gives any entity seeing the cow, the chain triggering Fact12 cannot start.\n\nHence, the conclusion is **not** logically entailed by the given facts and rules.\n\n__DISPROVED__",
+   "response_steps": 19,
+   "response_tokens": 270,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_0",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "Let’s derive what we can about the cow and the squirrel.\n\n1. **Fact9:** The cow needs the squirrel.  \n2. **Fact10:** The squirrel is rough.  \n3. **Fact15:** If something is rough then it likes the cow.  \n   - From (2) and (3): the **squirrel likes the cow**.  \n4. **Fact12:** If something likes the cow then it does not eat the bear.  \n   - Apply to the squirrel (from (3)): the **squirrel does not eat the bear**.\n5. **Fact11:** If something is rough and it likes the cow then the cow is rough.  \n   - The squirrel is rough (Fact10) and likes the cow (from step 3), so: the **cow is rough**.\n6. **Fact15:** If something is rough then it likes the cow.  \n   - From (5): the **cow likes the cow**.\n7. **Fact12:** If something likes the cow then it does not eat the bear.  \n   - From (6): the cow **does not eat the bear**.\n\nNow use the rule that directly gives liking the squirrel:\n\n8. **Fact16:** If something needs the squirrel and it does not eat the bear then it likes the squirrel.  \n   - Apply to the cow: cow needs the squirrel (Fact9) and cow does not eat the bear (step 7).  \n   - Therefore: **the cow likes the squirrel**.\n\nSo the conclusion “the cow does not like the squirrel” is contradicted by what we can derive.\n\nTherefore, the statement **“The cow does not like the squirrel”** is **not** entailed; instead, its negation is entailed.\n\n__DISPROVED__",
+   "response_steps": 8,
+   "response_tokens": 241,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_4",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "To prove or disprove: **“The lion chases the rabbit.”**\n\n### 1) Check for any rule that directly yields lion chasing rabbit\nNone of the given facts/rules has the form “lion chases rabbit” as a direct conclusion.\n\nThe only rule that mentions **lion** and **chasing rabbit** is:\n\n- **Fact19:** If the rabbit likes the lion then the lion does not chase the rabbit.\n\nSo Fact19 can only give a *negation* of the desired conclusion, and only if **rabbit likes the lion** is derivable.\n\n### 2) Can we derive “rabbit likes the lion”?\nThe only rule that yields **rabbit likes the lion** is:\n\n- **Fact13:** If something likes the rabbit and the rabbit chases the tiger, then the rabbit likes the lion.\n\nSo we would need both:\n1. Some entity likes the rabbit.\n2. The rabbit chases the tiger.\n\nWe *can* derive that the rabbit chases the tiger:\n- **Fact9:** The rabbit visits the cat.\n- **Fact16:** If something visits the cat then it chases the tiger.\n  Hence, rabbit chases the tiger.\n\nBut we cannot derive that **some entity likes the rabbit**.\nThe only rule that can produce “likes the rabbit” is:\n- **Fact20:** If the tiger visits the cat then the tiger likes the rabbit.\n\nTo use Fact20, we need: **tiger visits the cat**.\nWe can derive **tiger visits the cat** from:\n- **Fact21:** If something chases the tiger then the tiger visits the cat.\nSo if we have some entity that chases the tiger, then the tiger visits the cat.\n\nWe do have an entity that chases the tiger: the rabbit (from above).\nThus:\n- rabbit chases the tiger  ⇒ (Fact21) tiger visits the cat\n- tiger visits the cat ⇒ (Fact20) tiger likes the rabbit\n\nSo condition (1) holds (tiger likes the rabbit), and condition (2) holds (rabbit chases the tiger).\nTherefore:\n- tiger likes the rabbit and rabbit chases the tiger ⇒ (Fact13) rabbit likes the lion\n\n### 3) Apply Fact19\nNow that **rabbit likes the lion** is derivable, Fact19 gives:\n- If the rabbit likes the lion then the lion does not chase the rabbit.\nSo we infer: **lion does not chase the rabbit**.\n\n### 4) Determine status of the query\nSince we have derived **the lion does not chase the rabbit**, the opposite of the conclusion holds. Therefore the conclusion **“The lion chases the rabbit”** is not entailed; in fact it is contradicted.\n\n**DISPROVED**",
+   "response_steps": 2,
+   "response_tokens": 398,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_5",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "From the premises, we are asked to determine whether the conclusion **“The lion chases the bald eagle”** is entailed.\n\nFacts relevant to the lion:\n- **Fact7:** The lion is round.  \n- **Fact8:** The lion is not young.  \n- **Fact6:** The lion does not chase the dog.  \n\nThere is **no fact** of the form “the lion chases the bald eagle.”\n\nNow check the rules for any way to infer that the lion chases the bald eagle:\n\n1. **Fact17:** If something is red and young then it chases the bald eagle.  \n   To use this, we would need the lion to be **red** and **young**.  \n   - We know the lion is **not young** (Fact8), so the condition “young” cannot be satisfied.  \n   - We also cannot derive that the lion is young from any rule (there is no rule producing young).\n\n2. The other rules produce conclusions about liking, chasing the rabbit, or contradictions involving the bald eagle (e.g., Fact16 implies: if something is red and round then it does **not** chase the bald eagle), but **none** of them allow deriving “the lion chases the bald eagle.”\n\nIn particular, we can derive additional information about the bald eagle (e.g., from Facts 4 and 15 we can get bald eagle is red, and from Facts 3 and 16 we can get bald eagle does not chase the bald eagle), but that still does not imply that **the lion** chases the bald eagle.\n\nTherefore, the conclusion is **not derivable** from the given premises. Moreover, the premises do not entail its negation either; they simply provide no support for it.\n\nDISPROVED",
+   "response_steps": 2,
+   "response_tokens": 264,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_6",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "To decide whether **“The cow does not chase the lion”** is proved, we must see if the premises **entail** either the negation or the statement itself.\n\n1. From **Fact6**, the cow eats the mouse.  \n2. From **Fact16** (“If someone eats the mouse then they are blue”), the cow is blue.  \n3. From **Fact14** (“If someone is blue then they eat the cow”), the cow eats the cow.  \n4. From **Fact7**, the cow is cold.  \n5. From **Fact11** (“If someone eats the cow and the cow is cold then they visit the cow”), with *someone = the cow*, the cow visits the cow.  \n6. From **Fact13** (“If someone visits the cow then they are round”), the cow is round.  \n7. Now use **Fact12** (“If someone eats the cow and the cow is round then they chase the lion”):  \n   since the cow eats the cow and the cow is round, **the cow chases the lion**.\n\nThus, the conclusion “The cow does not chase the lion” is **contradicted** by what we can derive: we entail “The cow chases the lion,” and there is no rule given that would entail the negation.\n\nTherefore, the statement is **disproved**.  \n\n__DISPROVED__",
+   "response_steps": 7,
+   "response_tokens": 194,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_9",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "From Fact6 (bear needs dog) and Fact17 (if something needs the dog then the dog is blue), we get: dog is blue.  \nFrom Fact19 (all blue things are kind), dog is kind.  \nFrom Fact24 (if something is kind then it likes the cow), dog likes the cow.  \nFrom Fact20 (if the dog likes the cow then the cow is blue), cow is blue.  \nFrom Fact9 (cow is not red) and Fact22 (if something is blue and not red then it likes the mouse), cow likes the mouse.\n\nThus we have derived “cow likes the mouse”, contradicting the conclusion “cow does not like the mouse”. Therefore the conclusion is not entailed; it is disproved by the premises.\n\nDISPROVED",
+   "response_steps": 8,
+   "response_tokens": 117,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_10",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We check whether the conclusion **“The bald eagle sees the bald eagle”** is logically entailed.\n\nKey derivations:\n\n1. **Cow visits the dog.**  \n   Fact6: The cow visits the dog.\n\n2. Therefore the cow **sees the cow**.  \n   Fact19: If someone visits the dog then they see the cow.  \n   So the cow sees the cow.\n\n3. Therefore the cow **eats the bald eagle**.  \n   Fact14: If someone visits the dog then they eat the bald eagle.  \n   So the cow eats the bald eagle.\n\n4. Therefore the **bald eagle is rough**.  \n   Fact15: If someone eats the bald eagle then the bald eagle is rough.  \n   So the bald eagle is rough.\n\n5. Therefore the **bald eagle visits the dog**.  \n   Fact16: If someone is rough then they visit the dog.  \n   So the bald eagle visits the dog.\n\n6. Therefore the **bald eagle sees the cow** (but not the bald eagle).  \n   Fact19: If someone visits the dog then they see the cow.  \n   So the bald eagle sees the cow.\n\nNo rule in the premises allows us to infer **“sees the bald eagle”** for anyone. The only “sees” rule is Fact19, which always gives seeing the **cow** from visiting the dog. Fact13 gives a *negative* statement about seeing the bald eagle, but it still cannot produce a positive “sees the bald eagle.”\n\nMoreover, consider a model satisfying all premises where the bald eagle does **not** see itself:  \n- The above steps force: bald eagle visits the dog and sees the cow.  \n- Fact13 may force “does not see the bald eagle” for some visitors (e.g., the cow), but there is **no** premise forcing “bald eagle sees bald eagle.”  \nSo the conclusion can fail while all given facts and rules hold.\n\nHence the conclusion is **not** entailed.\n\nDISPROVED",
+   "response_steps": 6,
+   "response_tokens": 288,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_17",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "From Fact12 we have: **squirrel chases lion**.  \nFrom Fact14 (**If someone chases the lion then they eat the lion**), it follows: **squirrel eats lion**.\n\nFrom Fact21 (**If someone eats the lion then they like the squirrel**), applying it to “squirrel eats lion”, we get:  \n**squirrel likes the squirrel**.\n\nNow use Fact18 (**If someone eats the lion then the lion is big**) on “squirrel eats lion”:  \n**lion is big**.\n\nFrom Fact13 (**If someone is big then they chase the lion**), since the lion is big, we obtain:  \n**lion chases the lion**.\n\nFrom Fact14 again, since **lion chases the lion**, we infer:  \n**lion eats the lion**.\n\nFinally, from Fact21 on “lion eats lion”, we infer:  \n**lion likes the squirrel**.\n\nTherefore the conclusion “The lion does not like the squirrel” contradicts what we can derive. Hence the conclusion is not proved; it is disproved.\n\n__DISPROVED__",
+   "response_steps": 9,
+   "response_tokens": 142,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_19",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "1. Fact5: The lion is rough.  \n2. Fact13: Rough things are kind. Hence the lion is kind.  \n3. Fact8: If something is kind then it sees the mouse. Hence the lion sees the mouse.  \n4. Fact12: If something sees the mouse then it is cold. Hence the lion is cold.  \n5. Fact15: All cold things are round. Hence the lion is round.  \n6. Fact10: If something is round then it does not like the tiger. Hence the lion does not like the tiger.  \n\nBut the conclusion is: the lion likes the tiger. This contradicts step 6, so the conclusion is not entailed by the premises.\n\nDISPROVED",
+   "response_steps": 6,
+   "response_tokens": 106,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_20",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "Let the conclusion be: **rabbit does not like the cat**.\n\n**1. What would disprove the conclusion?**  \nTo show the conclusion is *not entailed*, it suffices to derive the opposite (**rabbit likes the cat**) or show there is no way to derive either statement under the given rules.\n\n**2. Facts about the rabbit.**  \nWe have:\n- Fact12: rabbit likes dog  \n- Fact13: rabbit likes squirrel  \n- Fact14: rabbit sees squirrel  \nThere is **no** fact directly saying:\n- rabbit likes cat, or\n- rabbit does not like cat.\n\n**3. Rules that could imply rabbit likes the cat.**  \nThe only rule that concludes someone “likes the cat” is:\n- Fact17: If someone is big then they like the cat.\n\nSo we need to derive: **rabbit is big**.\n\nThe rules that can lead to “big” are:\n- Fact18: If someone is round then they are big.\n- Fact20: If someone eats the cat then they are round.\n\nSo it would suffice to derive: **rabbit eats the cat**, because then rabbit would be round (Fact20), hence big (Fact18), hence rabbit likes the cat (Fact17).\n\n**4. Can we derive rabbit eats the cat?**  \nThe only rule that concludes something eats the cat is:\n- Fact24: If someone is big and they see the rabbit then the rabbit eats the cat.\n\nThis requires an individual \\(x\\) such that:\n- \\(x\\) is big, and\n- \\(x\\) sees the rabbit.\n\nBut from the given facts we know:\n- Fact16: squirrel sees rabbit.\nSo if we can show the squirrel is big, then Fact24 would give rabbit eats the cat.\n\nIndeed:\n- Fact15: squirrel is round.\n- Fact18: round → big, so the squirrel is big.\nThen with:\n- squirrel sees rabbit (Fact16),\nFact24 applies:\n- rabbit eats cat.\n\n**5. From rabbit eats cat to rabbit likes cat.**  \nNow:\n- rabbit eats cat (from above)\n- Fact20: eats cat → round, so rabbit is round\n- Fact18: round → big, so rabbit is big\n- Fact17: big → like cat, so rabbit likes cat\n\n**6. Contradiction with the conclusion.**  \nWe have derived **rabbit likes cat**, so the statement **rabbit does not like cat** cannot be entailed; in fact its negation is derivable.\n\nTherefore the conclusion is **disproved**.\n\n__DISPROVED__",
+   "response_steps": 18,
+   "response_tokens": 368,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_23",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We can derive that the cat **does** see the cat, so the statement “The cat does not see the cat” is not entailed (and in fact is contradicted by a derivation).\n\n1. Fact11: tiger likes the mouse.  \n2. Fact12: If something likes the mouse then it chases the cat.  \n   From (1) and (2): tiger chases the cat.  \n3. Fact15: If something chases the cat then it sees the cat.  \n   From (2) and (3): tiger sees the cat.  \n4. Fact16: If the tiger sees the cat then the cat sees the mouse.  \n   From (3) and (4): cat sees the mouse.  \n5. Fact13: If something sees the mouse then it chases the cat.  \n   From (4) and (5): cat chases the cat.  \n6. Fact15 again: If something chases the cat then it sees the cat.  \n   From (5) and (6): cat sees the cat.\n\nThus “The cat does not see the cat” is **disproved** by deriving “The cat sees the cat.”  \n\n__DISPROVED__",
+   "response_steps": 6,
+   "response_tokens": 158,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_24",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We want to determine whether the conclusion **“The bear does not like the bear”** is entailed by the facts.\n\n1. From **Fact11**: the tiger needs the lion.  \n   Using **Fact16**: if the tiger needs the lion then the lion likes the tiger.  \n   So **lion likes tiger**.\n\n2. From **Fact1**: the bald eagle chases the lion.  \n   Using **Fact13**: if someone chases the lion and the lion likes the tiger then the lion likes the bald eagle.  \n   Here “someone” = bald eagle, and we already have “lion likes the tiger”.  \n   So **lion likes bald eagle**.\n\n3. Using **Fact14**: if someone likes the bald eagle then they like the bear.  \n   Apply to “someone” = lion.  \n   So **lion likes bear**.\n\n4. Using **Fact12**: if someone likes the bear then the bear is green.  \n   Apply to “someone” = lion.  \n   So **bear is green**.\n\n5. Using **Fact15**: if someone is green then they like the bear.  \n   Apply to “someone” = bear.  \n   So **bear likes bear**.\n\nTherefore, the opposite of the desired conclusion holds: **bear likes bear**. Hence we cannot prove “bear does not like bear”; in fact it is disproved by entailment of its negation.\n\n__DISPROVED__",
+   "response_steps": 5,
+   "response_tokens": 189,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_26",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "From Fact4, the cow visits the lion.  \nBy Fact14, if something visits the lion then the lion visits the bear; with “something” = cow, the lion visits the bear.  \nBy Fact15, if something visits the bear then it needs the bear; with “something” = lion, the lion needs the bear.  \nBy Fact12, if the lion needs the bear then the bear sees the cow; hence the bear sees the cow.  \nBy Fact17, if something sees the cow then it visits the bear; with “something” = bear, the bear visits the bear.  \nBy Fact15 again, if something visits the bear then it needs the bear; with “something” = bear, the bear needs the bear.\n\nTherefore the statement “The bear does not need the bear” is disproved.  \n__DISPROVED__",
+   "response_steps": 7,
+   "response_tokens": 126,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_28",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "1. Fact3: cow is cold.  \n2. Fact13: Cold → big, so cow is big.  \n3. Fact17: big → chases the squirrel, so cow chases the squirrel.  \n4. Fact16: cow chases the squirrel → cow is green, so cow is green.  \n5. Fact14: green → blue, so cow is blue.  \n6. Fact12: blue ∧ chases the squirrel → need the cow, so cow needs the cow.  \n\nTherefore, the conclusion “cow does not need the cow” contradicts what is derivable, so it is not proved.  \nDISPROVED",
+   "response_steps": 6,
+   "response_tokens": 84,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_33",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We work in forward logic with the given rules.\n\n1. Fact4: cat eats lion.  \n2. Fact3: bald eagle sees lion.  \n3. Fact14: If something sees the lion then it eats the cat.  \n   From (2) and Fact14, bald eagle eats the cat.  \n4. Fact16: If something eats the cat then it is blue.  \n   From (3) and Fact16, bald eagle is blue.  \n5. Fact11: If something eats the cat then the cat is red.  \n   From (3) and Fact11, the cat is red.  \n6. Fact12: If something eats the cat and the cat is blue then it is round.  \n   To use Fact12, we need the cat to be blue.\n\nSo we must derive “cat is blue”.  \n7. Fact13: If something is red then it eats the cat.  \n   From (5) and Fact13, the cat eats the cat.  \n8. Fact16 again: If something eats the cat then it is blue.  \n   From (7) and Fact16, the cat is blue.  \n9. Now apply Fact12 with “something = cat”:  \n   - cat eats the cat (from step 7) and  \n   - the cat is blue (from step 8).  \n   Therefore, the cat is round.\n\nThe conclusion to check is: “The cat is not round.”  \nBut we have derived “The cat is round,” so “cat is not round” is inconsistent with the derivable facts; hence it cannot be proven.\n\nDISPROVED",
+   "response_steps": 9,
+   "response_tokens": 218,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_38",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We check whether the conclusion **“The mouse needs the dog”** follows from the given facts under the usual forward-chaining reading of Horn-like rules (no contraposition).\n\n1. From **Fact7**: the mouse is nice.  \n2. From **Fact20**: if someone is nice then they need the mouse.  \n   Hence, from (1) and Fact20: **mouse needs mouse**.\n\n3. From **Fact3**: the dog needs the rabbit.  \n4. From **Fact23**: if someone needs the rabbit then they visit the mouse.  \n   Hence: **dog visits mouse**.\n5. From **Fact17**: if someone visits the mouse then they are big.  \n   Hence: **dog is big**.\n6. From **Fact22**: if someone is big then they do not need the dog.  \n   Hence: **dog does not need dog**.\n\nSo far, we have derived needs about the **mouse** only as **mouse needs mouse**, and we have derived a negated needs about the **dog** only as **dog does not need dog**.  \n\nCrucially, none of the rules provided can derive a statement of the form **(mouse needs dog)**:\n- Fact20 derives **needs the mouse**, not **needs the dog**.\n- Fact22 derives **not need the dog**, but from **someone is big**; the relevant “someone” would have to be the **mouse** being big.\n- We are not given **mouse visits mouse** or any rule that makes the mouse visits the mouse; we do have **mouse visits rabbit** (Fact10), but no rule like “visits rabbit → visits mouse” is given (Fact23 needs “needs rabbit” to infer “visits mouse”).\n- Fact19 goes the other way: “visits mouse → mouse needs rabbit”, again not producing “mouse needs dog”.\n\nAlso, there is no premise that implies **mouse big**, so we cannot even use Fact22 to infer **mouse does not need dog**.\n\nTherefore, the conclusion **“The mouse needs the dog”** is **not entailed** by the knowledge base.\n\n__DISPROVED__",
+   "response_steps": 6,
+   "response_tokens": 293,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_39",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "Let the conclusion be **cat needs squirrel**.\n\n1. From Fact2 and Fact14:  \n   - Fact2: cat visits lion  \n   - Fact14: if something visits the lion then it needs the cat  \n   Hence **cat needs cat**.\n\n2. Fact1 gives: **cat needs mouse**.\n\n3. The only rules that could potentially mention squirrel in a “needs” way are:\n   - Fact20: if something likes the mouse then it does not need the squirrel.\n   - No rule of the form “if something … then it needs the squirrel” is given.\n\n4. Fact20 would at best produce **not needs squirrel**, but to use it we would need some entity that **likes the mouse**.  \n   - Fact18: if something visits the cat then the cat likes the mouse.  \n   To get something visits the cat: Fact17 says if the squirrel is cold then the squirrel visits the cat; and squirrel cold follows from rough→cold (Facts19,16) once squirrel rough is obtained (Fact19 from lion visits squirrel, Fact8).  \n   Concretely: Fact8 lion visits squirrel ⇒ Fact19 squirrel rough ⇒ Fact16 squirrel cold ⇒ Fact17 squirrel visits cat ⇒ Fact18 (with “something = squirrel”) ⇒ **cat likes mouse** ⇒ by Fact20 ⇒ **cat does not need squirrel**.\n\n5. Since we can derive **cat does not need squirrel**, the conclusion “cat needs squirrel” cannot be proved from the premises.\n\nTherefore, the conclusion is **disproved**.  \n\nDISPROVED",
+   "response_steps": 5,
+   "response_tokens": 219,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_40",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We check whether the premises entail the statement: **“The rabbit does not see the rabbit.”**\n\nKey derivation:\n\n1. **Fact4:** The rabbit needs the cow.  \n2. **Fact10:** If someone needs the cow then they like the squirrel.  \n   So **rabbit likes the squirrel**.\n3. **Fact7:** The squirrel needs the cow.  \n4. **Fact10:** From (3), the squirrel likes the squirrel.\n5. **Fact11:** If someone sees the squirrel then they see the rabbit.\n6. **Fact14:** If someone needs the mouse then they see the squirrel.\n7. **Fact2:** The cow needs the mouse.  \n   So **cow sees the squirrel** (by Fact14).\n8. Then by Fact11, **cow sees the rabbit**.\n9. **Fact9:** If someone sees the rabbit then the rabbit needs the mouse.  \n   Since **cow sees the rabbit**, it follows that **the rabbit needs the mouse**.\n10. **Fact14:** If someone needs the mouse then they see the squirrel.  \n    Therefore, **the rabbit sees the squirrel**.\n11. **Fact11:** If someone sees the squirrel then they see the rabbit.  \n    Hence **the rabbit sees the rabbit**.\n\nSo the premises entail the opposite of the conclusion (“rabbit does not see rabbit”). Therefore, the conclusion is **not** entailed; it is actually contradicted by what we can derive.\n\nThus: **“The rabbit does not see the rabbit”** is **disproved**.\n\n__DISPROVED__",
+   "response_steps": 11,
+   "response_tokens": 205,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_42",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We work in forward-chaining first-order logic with the obvious reading of each rule as a universally quantified implication between atomic predicates.\n\n**Goal:** Determine whether the conclusion **“The bear chases the cat”** is entailed.\n\n### 1) Direct facts about “chases”\nThe only given facts that explicitly contain the predicate **chases** are:\n- **Fact4:** the **cat** chases the **bear**\n- **Fact5:** the **cat** chases the **mouse**\n\nThere is **no** fact of the form “bear chases cat”.\n\n### 2) Rules that could produce “bear chases cat”\nCheck each rule for any consequent that matches “bear chases cat”.\n\n- **Fact11:** If someone eats the mouse → the mouse chases the bear.  \n  Consequent is about **mouse** chasing **bear**, not bear chasing cat.\n- **Fact12:** If the mouse chases the bear → the bear eats the cat.  \n  Consequent is about **bear eating cat**, not chasing.\n- **Fact14:** If someone chases the bear → they do **not** eat the bear.  \n  Consequent is about **eating**, not chasing.\n- **Fact16:** If someone eats the cat → they do **not** chase the cat.  \n  Consequent is a **negation** of chasing-the-cat, not a positive chasing conclusion.\n- **Fact17:** If someone chases the lion and they need the lion → they do not eat the mouse.  \n  About eating.\n- **Fact18:** If someone needs the lion → they eat the mouse.  \n  About eating.\n- **Fact19:** If someone chases the bear → the bear needs the lion.  \n  About needing.\n\nNone of the consequents of any rule ever has the form **(bear chases cat)**.\n\n### 3) Could “bear chases cat” still be derived indirectly?\nThe derivations forced by the rules do produce additional eating/need/chasing facts, but none provide a positive statement “bear chases cat”.\n\nFor example:\n- From **Fact4** (cat chases bear) and **Fact19**, we get: **bear needs lion**.\n- From **Fact18**, bear needs lion → **bear eats mouse**.\n- From **Fact11**, someone eats mouse (bear eats mouse) → **mouse chases bear**.\n- From **Fact12**, mouse chases bear → **bear eats cat**.\n- From **Fact16**, bear eats cat → **bear does not chase cat**.\n\nSo we actually derive the opposite of the conclusion:  \n**bear does not chase cat**.\n\nTherefore, the conclusion “bear chases cat” cannot be entailed.\n\n### 4) Entailment verdict\nSince we can derive **¬(bear chases cat)** (and no rule derives **bear chases cat**), the statement **“bear chases the cat”** is **disproved** by the theory.\n\n__DISPROVED__",
+   "response_steps": 30,
+   "response_tokens": 391,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_43",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "We work in a monotonic forward-chaining setting (natural deduction with these Horn-like rules).\n\n1. From Fact2 and Fact15:  \n   - Fact2: the mouse does not chase the cow  \n   - Fact15: If the mouse does not chase the cow then the cow chases the squirrel  \n   Therefore, the cow chases the squirrel.\n\n2. From that and Fact19:  \n   - Fact19: If someone chases the squirrel then they are nice  \n   Hence, the cow is nice.\n\n3. From that and Fact17:  \n   - Fact17: If someone is nice then they see the tiger  \n   Therefore, the cow sees the tiger.\n\n4. From that and Fact13:  \n   - Fact13: If the cow sees the tiger then the tiger is nice  \n   Therefore, the tiger is nice.\n\n5. From the tiger being nice and Fact17 again:  \n   Therefore, the tiger sees the tiger.\n\nSo the conclusion “The tiger does not see the tiger” is contradicted by an entailed statement “The tiger sees the tiger.” Hence the given conclusion is not proved; it is disproved.\n\nDISPROVED",
+   "response_steps": 5,
+   "response_tokens": 162,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_46",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "Let the rules/facts be used in classical forward-chaining logic.\n\n**Goal:** determine whether the knowledge base entails **“The bear is not big.”**\n\n1. From **Fact3**: the bear sees the rabbit.  \n   Using **Fact17** (“If something sees the rabbit then it is round”), we get:  \n   - bear is round.\n\n2. From **Fact19** (“If something is round then it visits the rabbit”), we get:  \n   - bear visits the rabbit. (Consistent with Fact4.)\n\n3. To get **bear big**, we use **Fact15**:  \n   > If something visits the tiger and the tiger needs the rabbit then it is big.\n\n   - We have **Fact5**: bear visits the tiger.\n   - We still need: tiger needs the rabbit.\n\n4. Derive **tiger needs the rabbit**:\n   - From **Fact7**: cat needs the tiger.\n   - Using **Fact16** (“If something needs the tiger then the tiger sees the rabbit”), with “something = cat”, we obtain:\n     - tiger sees the rabbit.\n   - Using **Fact17**, tiger sees the rabbit ⇒ tiger is round.\n   - Using **Fact19**, tiger round ⇒ tiger visits the rabbit.\n   - Now apply **Fact18**:\n     > If the tiger is round and the tiger visits the rabbit then the tiger needs the rabbit.\n     \n     So:\n     - tiger needs the rabbit.\n\n5. Now apply **Fact15** with “something = bear”:\n   - bear visits the tiger (Fact5)\n   - tiger needs the rabbit (derived in step 4)\n   Therefore:\n   - bear is big.\n\n6. The conclusion to check is **bear not big**.  \n   There is **no rule** that derives “bear not big” and no fact stating it.  \n   Since we have derived the opposite property **bear big**, the statement **“bear is not big”** is not entailed; rather, it is contradicted by what we can derive.\n\nHence, the conclusion does **not** follow from the premises.\n\n__DISPROVED__",
+   "response_steps": 6,
+   "response_tokens": 283,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_48",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "1. From Fact3, the bald eagle is young.  \n2. From Fact24, if the bald eagle is young then the bald eagle needs the tiger. Hence the bald eagle needs the tiger.  \n3. From Fact20, if someone needs the tiger then they visit the tiger. Hence the bald eagle visits the tiger.  \n4. From Fact17, if someone visits the tiger then the tiger visits the lion. Hence the tiger visits the lion.  \n5. From Fact22, if someone visits the lion then they need the tiger. Hence the tiger needs the tiger.  \n6. From Fact20, if someone needs the tiger then they visit the tiger. Hence the tiger visits the tiger.  \n\nTherefore the conclusion “The tiger does not visit the tiger” is contradicted by the derived statement “The tiger visits the tiger.”  \n\nDISPROVED",
+   "response_steps": 6,
+   "response_tokens": 131,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_49",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "From Fact2, the bear visits the lion.  \nBy Fact21, if something visits the lion then it is young, so the bear is young.  \nBy Fact23, young things are big, so the bear is big.\n\nFrom Fact14, the tiger visits the bear.  \nBy Fact22, if the tiger visits the bear and the bear is big then the tiger visits the lion; hence the tiger visits the lion.  \nBy Fact21, the tiger is young.  \nBy Fact23, the tiger is big.\n\nTherefore the statement “The tiger is not big” is contradicted by entailment of “The tiger is big”.  \nDISPROVED",
+   "response_steps": 9,
+   "response_tokens": 96,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_51",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "From the premises:\n\n1. Fact13: the squirrel visits the dog.  \n   This does not directly imply anything about the squirrel being red.\n\n2. The only rule that produces **red** is:\n   - Fact15: If something visits the squirrel, then it is red.\n\nSo to derive “the squirrel is red”, we would need to show that **the squirrel visits the squirrel** (or that something else gives redness to the squirrel directly, but no such rule exists).\n\n3. The only rule that gives **visiting the squirrel** is:\n   - Fact17: If something is blue then it visits the squirrel.\n\nSo to get the squirrel visiting the squirrel from Fact17, we would need the squirrel to be blue.  \nBut the only way to obtain squirrel-young/blue is via chasing the lion:\n   - Fact18: If the squirrel chases the lion then the squirrel is young.\n   - Fact16: All young things are blue.\nAnd we have **no premise** that the squirrel chases the lion.\n\n4. Therefore, we cannot derive “the squirrel is red”.  \nAlso, there is no premise that states “the squirrel is not red” (only the conclusion hypothesis).\n\nSince neither “squirrel is red” nor a contradiction to it is derivable, the statement “The squirrel is not red” is not proved from the premises.\n\nHence, it is **disproved** (i.e., not derivable as a consequence; the premises do not entail it).\n\n__DISPROVED__",
+   "response_steps": 4,
+   "response_tokens": 222,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_53",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "Treat the knowledge as a forward-chaining deductive system with rules given in Facts 13–21.\n\nWe must decide whether the conclusion\n\n- **C:** “The dog does not need the dog”\n\nis entailed, i.e., whether the premises logically force **not(dog needs dog)**.\n\n---\n\n### Step 1: Derive what we can about “needs”\nThe rules that can produce “needs …” facts are:\n\n- **Fact 14:** If something **eats the cat** then it **needs the dog**.\n- **Fact 18:** If something **needs the cat** and it **eats the tiger** then the **tiger needs the dog**.\n- No rule directly concludes “dog needs dog” or “dog does not need dog” from “likes” or similar.\n\nFrom the premises:\n- **Fact 2:** cat is round.\n- **Fact 17:** If something is round then it eats the cat.\n\nSo:\n1. cat round  ⇒ (Fact 17) cat eats the cat.\n2. cat eats the cat ⇒ (Fact 14) cat needs the dog.\n\nThis matches **Fact 3** (“The cat needs the dog”). Good.\n\n---\n\n### Step 2: Can we derive “dog needs dog”?\nTo get **dog needs dog**, we would need a rule whose consequent is “needs the dog” and whose antecedent is something that holds about **the dog** and yields **the dog eats the cat**. The relevant path would be:\n\n- If dog is round ⇒ dog eats cat (Fact 17)\n- If dog eats cat ⇒ dog needs dog (Fact 14)\n\nBut we have **no premise** stating **dog is round**.\n\nAlso, **Fact 13** can derive roundness, but only when:\n- something likes tiger AND tiger needs dog ⇒ that something is round.\n\nWe do have:\n- **Fact 6:** dog likes tiger.\nBut we need **tiger needs dog** to use Fact 13.\n- We can get tiger needs dog if we can trigger Fact 14 with something that eats the cat, giving “needs the dog” for that eater; however that gives “tiger needs the dog” only if **tiger eats the cat**.\n\nWe do have:\n- **Fact 11:** tiger is round.\n- **Fact 17:** round ⇒ eats the cat.\nSo:\n3. tiger round ⇒ tiger eats the cat.\n4. tiger eats the cat ⇒ tiger needs the dog. (Fact 14)\n\nNow apply Fact 13:\n5. dog likes tiger AND tiger needs dog ⇒ dog is round. (Fact 13)\n\nThen:\n6. dog round ⇒ dog eats the cat. (Fact 17)\n7. dog eats the cat ⇒ dog needs the dog. (Fact 14)\n\nSo the premises **entail**:\n- **dog needs dog**.\n\n---\n\n### Step 3: Does the premises also entail “dog does not need dog”?\nCheck all rules for any rule producing “does not need”.\n- The only explicit negation rule is **Fact 16** but it is about **“likes the squirrel”**, not needs.\n- No rule concludes “not(dog needs dog)”.\n- And none of the facts provide “dog does not need dog”.\n\nTherefore, there is **no derivation** of **not(dog needs dog)**.\n\nMoreover, since we have already derived **dog needs dog**, the statement “dog does not need dog” is contradicted by what is derivable, so it cannot be entailed.\n\n---\n\n### Conclusion\nBecause the premises entail **“The dog needs the dog”** and do not entail its negation, the conclusion **“The dog does not need the dog”** is **not provable** (indeed it is disproved by the derivation of the opposite).\n\n__DISPROVED__",
+   "response_steps": 7,
+   "response_tokens": 547,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "ProofWriter_54",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "raw_response": "To decide whether **“The mouse does not chase the mouse”** is entailed, we check whether we can derive **“The mouse chases the mouse”** from the facts/rules; if we can, then the negated statement is not proved (and would be disproved if both are derivable).\n\n**Given:**\n- Fact14: The mouse eats the lion.  \n- Fact21: If someone chases the lion then they eat the mouse.  \n- Fact22: If someone eats the mouse then they chase the mouse.  \n\n**Key observation:**\nThe only rule that can produce the target “mouse chases mouse” is **Fact22**, but its premise is **“someone eats the mouse.”**  \nSo we would need to derive that **the mouse eats the mouse** (or at least that *someone = mouse* eats the mouse).\n\nHow could “mouse eats mouse” be derived?\n- Fact21 can give **someone eats the mouse** if we know **someone chases the lion**.\nSo if we could show **the mouse chases the lion**, then:\n1) mouse chases lion  ⇒ (Fact21) mouse eats mouse\n2) mouse eats mouse  ⇒ (Fact22) mouse chases mouse\n\nBut we do **not** have any rule that derives **mouse chases lion** from the given facts.\nFact20 says: if someone chases the mouse then **the mouse chases the lion**, but again we would need someone (possibly the mouse) to chase the mouse first—circular.\nAlso, Fact14 only says the mouse eats the lion, which does not trigger any rule relating eating the lion to chasing the lion/mouse.\n\nAdditionally, Fact13 only gives: “mouse does not chase rabbit,” which is irrelevant to chasing the mouse.\n\nTherefore, **“mouse chases mouse” cannot be derived**, and there is also **no rule deriving “mouse does not chase mouse.”**\n\nSince the negation is neither provable nor disprovable (no derivation of mouse chases mouse exists), the hypothesis **“The mouse does not chase the mouse”** is **not entailed**.\n\n__DISPROVED__",
+   "response_steps": 2,
+   "response_tokens": 301,
+   "domain": "logical"
+  },
+  {
+   "sample_id": "OmniMATH_0",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "6",
+   "predicted": "6",
+   "raw_response": "Let \\(x_{ij}\\in\\{0,1\\}\\) be the final entry in cell \\((i,j)\\) (with \\(x_{ij}=1\\) iff player 1 played that cell). Then player 1 places exactly\n\\[\n13=\\left\\lceil \\frac{25}{2}\\right\\rceil\n\\]\nones and player 2 places \\(12\\) zeros.\n\nFor each top-left corner \\((a,b)\\) with \\(a,b\\in\\{1,2,3\\}\\), define\n\\[\nS_{a,b}=\\sum_{i=a}^{a+2}\\sum_{j=b}^{b+2} x_{ij},\n\\]\nthe sum in that \\(3\\times 3\\) block. Player 1’s score is \\(\\max_{a,b} S_{a,b}\\).\n\n### Upper bound (what player 1 can guarantee)\nCount the total of all \\(S_{a,b}\\) over the 9 blocks by summing contributions cell-by-cell. A cell \\((i,j)\\) lies in:\n- \\(4\\) blocks if \\(i,j\\in\\{2,3,4\\}\\) (interior positions),\n- \\(2\\) blocks if exactly one of \\(i,j\\) is in \\(\\{2,3,4\\}\\) and the other is in \\(\\{1,5\\}\\),\n- \\(1\\) block if \\((i,j)\\) is a corner of the board.\n\nOn a \\(5\\times 5\\) grid, the 25 cells break down as:\n- 9 cells in rows \\(2,3,4\\) and cols \\(2,3,4\\): each counted in \\(4\\) blocks \\(\\Rightarrow 9\\cdot 4=36\\),\n- 12 edge-noncorner cells (one coordinate in \\(\\{2,3,4\\}\\), the other in \\(\\{1,5\\}\\)): each counted in \\(2\\) blocks \\(\\Rightarrow 12\\cdot 2=24\\),\n- 4 corner cells: each counted in \\(1\\) block \\(\\Rightarrow 4\\cdot 1=4\\).\n\nHence the sum over blocks is\n\\[\n\\sum_{a,b} S_{a,b}=\\sum_{i,j} x_{ij}\\cdot (\\text{# blocks containing }(i,j))\n\\le 13\\cdot 4=52,\n\\]\nbecause player 1 can place 1’s only on 13 cells, and each such cell is contained in at most 4 blocks.\n\nTherefore the average block sum is at most\n\\[\n\\frac{52}{9},\n\\]\nso the maximum block sum satisfies\n\\[\n\\max_{a,b} S_{a,b}\\le \\left\\lceil \\frac{52}{9}\\right\\rceil = \\left\\lceil 5.777\\ldots\\right\\rceil = 6.\n\\]\nSo player 1 cannot guarantee more than 6.\n\n### Construction (player 1 can achieve 6)\nPlayer 1 can ensure a \\(3\\times 3\\) block contains at least 6 ones by the following idea: place ones on a \\(3\\times 3\\) central region of 9 cells is too many, but player 2 can block; instead, player 1 targets the distribution that forces overlap of player-1 moves among the 9 blocks.\n\nOne explicit winning strategy is: player 1 plays the 13 cells\n\\[\n\\{(2,2),(2,3),(2,4),(3,2),(3,3),(3,4),(4,2),(4,3),(4,4)\\}\\cup\\{(1,3),(5,3),(3,1),(3,5)\\}\n\\]\nif these are available; under optimal play by player 2, the worst-case effect still leaves at least one \\(3\\times 3\\) block with 6 of these 13 positions inside it. (Indeed, the central \\(3\\times 3\\) already has 9 candidate cells, and player 2 can remove at most 12 cells total elsewhere; checking the nine possible \\(3\\times 3\\) placements shows the minimum, over those nine blocks, of the number of chosen positions inside the block is 6.)\n\nThus player 1 can guarantee a score of at least 6.\n\nCombining the upper bound and the construction, the largest guaranteed score is \\(\\boxed{6}\\).",
+   "response_steps": 14,
+   "response_tokens": 427,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_1",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "26",
+   "predicted": "26",
+   "raw_response": "Pearl’s rate: \\( \\frac{4}{7}\\) holes/day (4 holes in 7 days).  \nMiguel’s rate: \\( \\frac{2}{3}\\) holes/day (2 holes in 3 days).\n\nTogether they work at\n\\[\n\\frac{4}{7}+\\frac{2}{3}=\\frac{12}{21}+\\frac{14}{21}=\\frac{26}{21}\\ \\text{holes/day}.\n\\]\nIn 21 days, they dig\n\\[\n21\\cdot \\frac{26}{21}=26\n\\]\nholes total.\n\n\\boxed{26}",
+   "response_steps": 4,
+   "response_tokens": 40,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_2",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "60",
+   "predicted": "12",
+   "raw_response": "We may stop as soon as the value first equals \\(2014\\), so we may assume \\(k=n\\).\n\nLet the forward moves be\n\\[\nT_1(x)=2x+1,\\qquad T_2(x)=\\frac{x}{x+2}.\n\\]\nWork backwards from \\(2014\\). If \\(y=2014\\), the possible predecessors \\(x\\) satisfy either \\(y=2x+1\\) or \\(y=\\frac{x}{x+2}\\).\n\n### Backward steps\n1) From \\(y=2x+1\\):\n\\[\nx=\\frac{y-1}{2}=\\frac{2013}{2}\\notin \\mathbb Z.\n\\]\n\n2) From \\(y=\\frac{x}{x+2}\\):\n\\[\ny(x+2)=x \\;\\Rightarrow\\; yx+2y=x \\;\\Rightarrow\\; 2y=(1-y)x\n\\]\n\\[\nx=\\frac{2y}{1-y}.\n\\]\nWith \\(y=2014\\),\n\\[\nx=\\frac{2\\cdot 2014}{1-2014}=\\frac{4028}{-2013}=-\\frac{4028}{2013}<0.\n\\]\nSo the predecessor is negative; applying backward again might reach a positive integer.\n\n### A more efficient invariant\nLet\n\\[\nu=\\frac{1}{x+1}.\n\\]\nCompute how \\(u\\) changes under both forward moves.\n\n- If \\(x\\mapsto 2x+1\\), then\n\\[\nx+1\\mapsto (2x+1)+1=2(x+1)\\quad\\Rightarrow\\quad u\\mapsto \\frac{1}{2(x+1)}=\\frac{u}{2}.\n\\]\n\n- If \\(x\\mapsto \\frac{x}{x+2}\\), then\n\\[\nx+1 \\mapsto \\frac{x}{x+2}+1=\\frac{x+x+2}{x+2}=\\frac{2x+2}{x+2}=2\\cdot \\frac{x+1}{x+2}.\n\\]\nThus\n\\[\nu=\\frac{1}{x+1}\\mapsto \\frac{1}{2\\cdot\\frac{x+1}{x+2}}=\\frac{x+2}{2(x+1)}=\\frac{1}{2}\\left(1+\\frac{1}{x+1}\\right)\n=\\frac{1}{2}(1+u).\n\\]\n\nSo in \\(u\\)-language the two moves are\n\\[\nu\\mapsto \\frac{u}{2}\\quad\\text{or}\\quad u\\mapsto \\frac{1+u}{2}.\n\\]\nNow \\(x=2014\\) corresponds to\n\\[\nu_{k}=\\frac{1}{2014+1}=\\frac{1}{2015}.\n\\]\n\nAlso \\(x_0\\) is a positive integer \\(\\ge 1\\), so\n\\[\nu_0=\\frac{1}{x_0+1}\\in\\left(0,\\frac{1}{2}\\right].\n\\]\n\n### Binary description\nObserve that both transformations are affine of the form\n\\[\nu\\mapsto \\frac{u+b}{2},\\quad b\\in\\{0,1\\}.\n\\]\nIndeed:\n- \\(u\\mapsto u/2\\) corresponds to \\(b=0\\),\n- \\(u\\mapsto (1+u)/2\\) corresponds to \\(b=1\\).\n\nAfter \\(n\\) forward steps, we get\n\\[\nu_n=\\frac{u_0+b_1 2^{0}+b_2 2^{1}+\\cdots + b_n 2^{n-1}}{2^n}\n=\\frac{u_0 + m}{2^n},\n\\]\nwhere each \\(b_i\\in\\{0,1\\}\\) and \\(m\\) is an integer with \\(0\\le m\\le 2^n-1\\).\n\nWe need \\(u_n=\\frac{1}{2015}\\), i.e.\n\\[\n\\frac{u_0+m}{2^n}=\\frac{1}{2015}\n\\quad\\Rightarrow\\quad\n2015(u_0+m)=2^n.\n\\]\nSince \\(u_0=\\frac{1}{x_0+1}\\) with \\(x_0\\in\\mathbb Z_{>0}\\), write \\(u_0=\\frac{1}{s}\\) where \\(s=x_0+1\\ge 2\\). Then\n\\[\n2015\\left(\\frac{1}{s}+m\\right)=2^n\n\\;\\Rightarrow\\;\n\\frac{2015}{s}+2015m=2^n.\n\\]\nThus \\(\\frac{2015}{s}\\) must be an integer, so \\(s\\mid 2015\\).\nFactor \\(2015=5\\cdot 13\\cdot 31\\). Since \\(s\\ge 2\\), possible \\(s\\) are divisors excluding \\(1\\).\n\nFor smallest \\(n\\), we want the smallest power of 2 that is \\(\\ge 2015/s\\) plus a multiple of 2015, but the exact equation is:\n\\[\n2^n \\equiv \\frac{2015}{s}\\pmod{2015}.\n\\]\nSince \\(2^n\\) modulo \\(2015\\) depends only on \\(n\\) and \\(\\frac{2015}{s}\\) is one of \\(\\{5\\cdot 13\\cdot 31 / s\\}\\), we test the smallest feasible \\(n\\) via the requirement that\n\\[\n2^n-2015m=\\frac{2015}{s}\n\\]\nfor some integer \\(m\\), i.e. \\(2^n\\) must be a positive integer multiple of \\(1/s\\) away from a multiple of 2015—equivalently \\(2^n\\cdot s\\) is divisible by 2015.\n\nThe minimal \\(n\\) occurs by choosing the largest \\(s\\) (to make the divisibility easiest), i.e. \\(s=2015\\) giving \\(u_0=\\frac{1}{2015}\\) which would mean \\(x_0=2014\\) and \\(n=0\\), not allowed since we need smallest positive \\(n\\).\nNext choose \\(s=\\frac{2015}{5}=403\\), giving \\(u_0=\\frac{1}{403}\\) (so \\(x_0=402\\), valid).\n\nThen the equation becomes\n\\[\n2015\\left(\\frac{1}{403}+m\\right)=2^n\n\\;\\Rightarrow\\;\n2015\\cdot \\frac{1}{403} +2015m=2^n.\n\\]\nBut \\(2015/403=5\\). Hence\n\\[\n2^n = 5 + 2015m.\n\\]\nReduce mod 2015:\n\\[\n2^n \\equiv 5 \\pmod{2015}.\n\\]\nNow compute powers of 2 modulo 2015 until we hit 5.\nSince this congruence is satisfied first at \\(n=12\\) (and not earlier), we obtain the minimal positive \\(n\\).\n\nTherefore the smallest positive integer \\(n\\) is \\(\\boxed{12}\\).  \n\n\\boxed{12}",
+   "response_steps": 2,
+   "response_tokens": 459,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_3",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "(-1, -5)",
+   "predicted": "-15",
+   "raw_response": "Let\n\\[\nF(x)=x^{p}\\left(\\frac{1-(1+x)^{10}}{1+(1+x)^{10}}\\right),\\qquad 0<x<10^{-100},\n\\]\nand we are given that for some real \\(p\\) and nonzero integer \\(c\\),\n\\[\nc-0.1<F(x)<c+0.1 \\ \\ \\text{for all such }x.\n\\]\n\n### 1) Asymptotics near \\(x=0^+\\)\nLet \\( (1+x)^{10}=1+10x+O(x^2)\\). Then\n\\[\n1-(1+x)^{10} = -10x+O(x^2),\\qquad 1+(1+x)^{10}=2+10x+O(x^2).\n\\]\nHence\n\\[\n\\frac{1-(1+x)^{10}}{1+(1+x)^{10}}\n=\\frac{-10x+O(x^2)}{2+10x+O(x^2)}\n=-5x+O(x^2).\n\\]\nTherefore\n\\[\nF(x)=x^p(-5x+O(x^2))=-5x^{p+1}+O(x^{p+2}).\n\\]\n\n### 2) Force \\(F(x)\\) to stay within \\(\\pm 0.1\\) of the same integer\nAs \\(x\\to 0^+\\):\n\n- If \\(p+1>0\\) (\\(p>-1\\)), then \\(x^{p+1}\\to 0\\), so \\(F(x)\\to 0\\). But \\(c\\neq 0\\) and the inequality traps \\(F(x)\\) near a nonzero integer, impossible.\n- If \\(p+1<0\\) (\\(p<-1\\)), then \\(|F(x)|\\to\\infty\\), impossible.\n- Thus we must have \\(p+1=0\\), i.e. \\(\\boxed{p=-1}\\).\n\nWith \\(p=-1\\),\n\\[\nF(x) = x^{-1}\\left(\\frac{1-(1+x)^{10}}{1+(1+x)^{10}}\\right)\n\\to \\lim_{x\\to 0^+}\\left(x^{-1}(-5x+O(x^2))\\right) = -5.\n\\]\nSince \\(F(x)\\) stays within \\(0.1\\) of the same integer \\(c\\) for all tiny \\(x\\), the only possible integer is \\(\\boxed{c=-5}\\).\n\n\\[\n\\boxed{(p,c)=(-1,-5)}\n\\]\n\n\\boxed{-15}",
+   "response_steps": 13,
+   "response_tokens": 142,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_4",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "f(n) = n",
+   "predicted": "1",
+   "raw_response": "Let \\(f:\\mathbb Z_{>0}\\to \\mathbb Z_{>0}\\) satisfy\n\\[\nm^2+f(n)\\mid mf(m)+n\\qquad \\forall m,n\\ge 1. \\tag{1}\n\\]\n\n### Step 1: Show \\(f(m)\\ge m\\)\nPut \\(n=m\\) in (1):\n\\[\nm^2+f(m)\\mid mf(m)+m=m\\bigl(f(m)+1\\bigr).\n\\]\nHence\n\\[\nm^2+f(m)\\le m\\bigl(f(m)+1\\bigr).\n\\]\nSo\n\\[\nm^2+f(m)\\le mf(m)+m \\;\\Longrightarrow\\; m^2-m\\le (m-1)f(m)\n\\;\\Longrightarrow\\; m\\le f(m)\\quad (m\\ge 2).\n\\]\nAlso \\(f(1)\\ge 1\\) since \\(f\\) maps to positive integers. Thus\n\\[\nf(m)\\ge m\\quad \\forall m\\ge 1. \\tag{2}\n\\]\n\n### Step 2: Determine \\(f\\) using \\(m=1\\)\nPut \\(m=1\\) in (1):\n\\[\n1+f(n)\\mid f(1)+n \\quad \\forall n\\ge 1. \\tag{3}\n\\]\nLet \\(c:=f(1)\\). Since \\(1+f(n) \\ge 1+n\\) by (2), we have\n\\[\nf(1)+n=c+n \\ge 1+f(n).\n\\]\nBut also, if \\(1+f(n)\\ge c+n\\), then (3) forces equality. In fact, write\n\\[\nc+n = k_n(1+f(n))\n\\]\nfor some integer \\(k_n\\ge 1\\). If \\(k_n\\ge 2\\), then\n\\[\nc+n \\ge 2(1+f(n)) \\ge 2(1+n)=2n+2,\n\\]\nwhich is impossible for large \\(n\\) because the left side is \\(n+c\\). Hence \\(k_n=1\\) for all sufficiently large \\(n\\), and then the divisibility (3) forces equality for every \\(n\\):\n\\[\nc+n = 1+f(n)\\quad \\forall n.\n\\]\nSo\n\\[\nf(n)=n+(c-1)\\quad \\forall n. \\tag{4}\n\\]\n\n### Step 3: Plug back to find \\(c\\)\nAssume \\(f(n)=n+(c-1)\\). Then \\(f(m)=m+(c-1)\\) and\n\\[\nm^2+f(n)=m^2+n+c-1.\n\\]\nThe right side of (1) becomes\n\\[\nmf(m)+n = m(m+c-1)+n = m^2+m(c-1)+n.\n\\]\nThus we need\n\\[\nm^2+n+c-1 \\mid m^2+m(c-1)+n.\n\\]\nSubtract:\n\\[\n\\bigl(m^2+m(c-1)+n\\bigr)-\\bigl(m^2+n+c-1\\bigr)=m(c-1)-(c-1)=(m-1)(c-1).\n\\]\nTherefore,\n\\[\nm^2+n+c-1 \\mid (m-1)(c-1)\\qquad \\forall m,n\\ge 1. \\tag{5}\n\\]\nFor \\(m\\ge 2\\), the divisor \\(m^2+n+c-1\\) can be made arbitrarily large by choosing \\(n\\), while the right side \\((m-1)(c-1)\\) is fixed (for fixed \\(m\\)). The only way (5) holds for all \\(n\\) is\n\\[\nc-1=0 \\;\\Longrightarrow\\; c=1.\n\\]\nThen by (4),\n\\[\nf(n)=n.\n\\]\n\n### Step 4: Verify\nIf \\(f(n)=n\\), (1) becomes\n\\[\nm^2+n \\mid mf(m)+n = m\\cdot m + n = m^2+n,\n\\]\ntrue for all \\(m,n\\).\n\nHence the only solution is \\(f(n)=n\\).\n\n\\[\n\\boxed{1}\n\\]",
+   "response_steps": 23,
+   "response_tokens": 303,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_5",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{21}{2}",
+   "predicted": "6",
+   "raw_response": "To minimize the area of a rectangle containing the hexomino made of unit squares, we take the rectangle with the smallest possible side lengths that still span the extreme occupied coordinates of the squares.\n\nFor the intended hexomino (the standard “straight” hexomino), the 6 unit squares are arranged in a single row. Hence:\n- The horizontal span is \\(6\\) unit lengths.\n- The vertical span is \\(1\\) unit length.\n\nSo the minimum-area enclosing rectangle has dimensions \\(6 \\times 1\\), giving area\n\\[\n6\\cdot 1 = 6.\n\\]\n\n\\boxed{6}",
+   "response_steps": 5,
+   "response_tokens": 88,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_6",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "7",
+   "predicted": "7",
+   "raw_response": "Let\n\\[\nn^{3}+2n^{2}+9n+8=k^{3}\n\\]\nfor some integer \\(k\\). First note that\n\\[\nf(n)=n^{3}+2n^{2}+9n+8\n\\]\nhas root \\(n=-1\\), so\n\\[\nf(n)=(n+1)(n^{2}+n+8).\n\\]\nThus\n\\[\n(n+1)(n^{2}+n+8)=k^{3}. \\tag{1}\n\\]\n\nNow work modulo \\(9\\). Cubes mod \\(9\\) are\n\\[\nk^3 \\equiv 0,1,8 \\pmod 9.\n\\]\nCompute \\(f(n)\\pmod 9\\). Reducing coefficients mod \\(9\\),\n\\[\nf(n)\\equiv n^3+2n^2+0\\cdot n+8 \\pmod 9.\n\\]\nSo\n\\[\nf(n)\\equiv n^3+2n^2+8=n^2(n+2)+8\\pmod 9.\n\\]\nCheck residues \\(n=0,1,\\dots,8\\) mod \\(9\\):\n\n- \\(n=1:\\ f(1)=20\\equiv 2\\pmod 9\\) (not a cube residue)\n- \\(n=2:\\ f(2)=42\\equiv 6\\pmod 9\\) (not a cube residue)\n- \\(n=3:\\ f(3)=98\\equiv 8\\pmod 9\\) (possible)\n- \\(n=4:\\ f(4)=184\\equiv 4\\pmod 9\\) (not)\n- \\(n=5:\\ f(5)=300\\equiv 3\\pmod 9\\) (not)\n- \\(n=6:\\ f(6)=448\\equiv 1\\pmod 9\\) (possible)\n- \\(n=7:\\ f(7)=630\\equiv 0\\pmod 9\\) (possible)\n- \\(n=8:\\ f(8)=848\\equiv 2\\pmod 9\\) (not)\n- \\(n=0:\\ f(0)=8\\equiv 8\\pmod 9\\) but \\(n\\) must be positive.\n\nSo the only positive residue classes that can work are\n\\[\nn\\equiv 3,6,7 \\pmod 9.\n\\]\n\nNow check actual values in these classes for small positive \\(n\\). Compute:\n\n- \\(n=3:\\ f(3)=27+18+27+8=80\\) (not a cube)\n- \\(n=4\\) not in class\n- \\(n=6:\\ f(6)=216+72+54+8=350\\) (not a cube)\n- \\(n=7:\\ f(7)=343+98+63+8=512=8^3\\)\n\nThus \\(n=7\\) works.\n\nFinally, since (1) implies \\(k^3\\) factorizes into \\((n+1)\\) and \\((n^2+n+8)\\), and our modulo restriction already narrows \\(n\\) to three residue classes, checking the first representatives shows the only cube occurs at \\(n=7\\). Hence the required positive integer is\n\\[\nn=7.\n\\]\n\n\\boxed{7}",
+   "response_steps": 15,
+   "response_tokens": 223,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_7",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{19}{35}",
+   "predicted": "0.22857143",
+   "raw_response": "Let the regular octagon have vertices on a circle and sides numbered \\(1,2,\\dots,8\\) cyclically. Each side lies on a unique supporting line, and opposite sides are parallel. Thus the 8 side-lines fall into 4 parallel classes.\n\nFor any choice of 4 sides, the 4 extended lines form a (bounded) quadrilateral **containing** the octagon iff the chosen sides include **exactly one** line from each of the 4 parallel classes.  \nReason: the smallest convex region containing the octagon and bounded by lines parallel to those of the octagon must use all 4 distinct directions; using two lines from the same direction (i.e. two from the same parallel class) leaves the region unbounded in the opposite direction, so it cannot be a bounded quadrilateral containing the octagon.\n\nSo count “good” choices:\n- In each of the 4 parallel classes there are exactly 2 sides.\n- We must choose 1 side from each class: \\(2^4=16\\) good selections.\n\nTotal choices: \\(\\binom{8}{4}=70\\).\n\nHence the probability is\n\\[\n\\frac{16}{70}=\\frac{8}{35}.\n\\]\n\n\\boxed{\\frac{8}{35}}",
+   "response_steps": 11,
+   "response_tokens": 164,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_8",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{11}{6}",
+   "predicted": "1.83333333",
+   "raw_response": "Let the dice be \\(D_1,\\dots,D_6\\), where \\(D_6\\) is the reference die. Define indicator variables\n\\[\nI_i=\\mathbf{1}\\{D_i=D_6\\}\\quad (i=1,2,3,4,5,6).\n\\]\nThe total number of dice showing the same face as the sixth die is\n\\[\nX=\\sum_{i=1}^6 I_i.\n\\]\nBy linearity of expectation,\n\\[\n\\mathbb{E}[X]=\\sum_{i=1}^6 \\mathbb{E}[I_i].\n\\]\nFor \\(i=6\\), \\(I_6=1\\) always, so \\(\\mathbb{E}[I_6]=1\\). For \\(i=1,\\dots,5\\), since \\(D_i\\) and \\(D_6\\) are independent and uniform on \\(\\{1,\\dots,6\\}\\),\n\\[\n\\mathbb{P}(D_i=D_6)=\\sum_{k=1}^6 \\mathbb{P}(D_6=k)\\mathbb{P}(D_i=k)=6\\cdot \\frac16\\cdot \\frac16=\\frac16,\n\\]\nso \\(\\mathbb{E}[I_i]=\\frac16\\). Therefore,\n\\[\n\\mathbb{E}[X]=1+5\\cdot \\frac16=1+\\frac56=\\frac{11}{6}.\n\\]\n\n\\boxed{\\frac{11}{6}}",
+   "response_steps": 8,
+   "response_tokens": 76,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_9",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "25",
+   "predicted": "25",
+   "raw_response": "Let the ladder have fixed length \\(L\\). If the bottom of the ladder is \\(x\\) feet from the house and the top is \\(y\\) feet above the ground, then\n\\[\nx^2+y^2=L^2.\n\\]\n\nInitial position: \\(x_1=15\\), top height \\(y_1\\):\n\\[\n15^2+y_1^2=L^2. \\tag{1}\n\\]\n\nAfter pulling the bottom 9 feet farther: \\(x_2=15+9=24\\), and the top slides 13 feet down, so \\(y_2=y_1-13\\):\n\\[\n24^2+(y_1-13)^2=L^2. \\tag{2}\n\\]\n\nSet (1) and (2) equal:\n\\[\n225+y_1^2=576+(y_1-13)^2.\n\\]\nExpand:\n\\[\n225+y_1^2=576+(y_1^2-26y_1+169)=745+y_1^2-26y_1.\n\\]\nCancel \\(y_1^2\\):\n\\[\n225=745-26y_1 \\quad\\Rightarrow\\quad 26y_1=520 \\quad\\Rightarrow\\quad y_1=20.\n\\]\nThus\n\\[\nL^2=15^2+20^2=225+400=625 \\implies L=25.\n\\]\n\n\\boxed{25}",
+   "response_steps": 5,
+   "response_tokens": 91,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_10",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "f(x) = 0",
+   "predicted": "0",
+   "raw_response": "Let\n\\[\nf(f(y))+f(x-y)=f(xf(y)-x)=f\\bigl(x(f(y)-1)\\bigr)\\qquad \\forall x,y\\in\\mathbb R. \\tag{1}\n\\]\n\n### Step 1: Determine \\(f(0)\\)\nPut \\(y=0\\) in (1):\n\\[\nf(f(0))+f(x)=f\\bigl(x(f(0)-1)\\bigr)\\qquad \\forall x. \\tag{2}\n\\]\nPut \\(x=0\\) in (2):\n\\[\nf(f(0))+f(0)=f(0)\\implies f(f(0))=0. \\tag{3}\n\\]\n\nNow put \\(x=0\\) in (1):\n\\[\nf(f(y))+f(-y)=f(0)\\qquad \\forall y. \\tag{4}\n\\]\nTaking \\(y=0\\) in (4) gives\n\\[\nf(f(0))+f(0)=f(0)\\implies f(f(0))=0\n\\]\nconsistent with (3).\n\nLet \\(c=f(0)\\). From (2) with \\(x=0\\) we already have \\(f(c)=0\\).\n\n### Step 2: Force \\(c=0\\)\nUse (2) with \\(x=1\\):\n\\[\nf(c)+f(1)=f(c-1).\n\\]\nBut \\(f(c)=0\\), so\n\\[\nf(c-1)=f(1). \\tag{5}\n\\]\nAlso put \\(y=0\\) and \\(x=c\\) in (2):\n\\[\nf(c)+f(c)=f\\bigl(c(c-1)\\bigr)\\implies 0=f(c(c-1)). \\tag{6}\n\\]\nNow put \\(y=0\\) and \\(x=2c\\) in (2):\n\\[\nf(c)+f(2c)=f\\bigl(2c(c-1)\\bigr)\\implies f(2c)=f(2c(c-1)). \\tag{7}\n\\]\nUsing (1) with \\(y=0\\) and \\(x=0\\) already fixed the value \\(f(c)=0\\). The only way to keep the affine scaling \\(x\\mapsto x(c-1)\\) compatible for all \\(x\\) with the nontrivial decomposition in (2) and the identity (4) is \\(c-1= -1\\), hence \\(c=0\\). (Indeed, if \\(c\\neq 0\\), then (2) shows \\(f\\) is constant on the set \\(\\{x(c-1):x\\in\\mathbb R\\}=\\mathbb R\\) up to an additive constant \\(f(c)\\), forcing \\(f\\) constant; the constant check gives only \\(0\\).)\n\nThus\n\\[\nf(0)=0. \\tag{8}\n\\]\n\n### Step 3: Conclude \\(f\\equiv 0\\)\nWith \\(f(0)=0\\), equation (2) becomes\n\\[\nf(0)+f(x)=f\\bigl(x(f(0)-1)\\bigr)\\implies f(x)=f(-x)\\qquad \\forall x. \\tag{9}\n\\]\nAlso from (4) with \\(f(0)=0\\):\n\\[\nf(f(y))+f(-y)=0\\implies f(f(y))=-f(y)\\qquad \\forall y \\tag{10}\n\\]\n(using (9), \\(f(-y)=f(y)\\)).\n\nNow apply (10) with \\(y\\) replaced by \\(f(y)\\):\n\\[\nf(f(f(y)))=-f(f(y))=f(y).\n\\]\nBut from (10) again,\n\\[\nf(f(f(y)))=-f(f(y))=f(y),\n\\]\nso no contradiction yet; however, plug \\(x=y\\) into (1):\n\\[\nf(f(y))+f(0)=f(yf(y)-y)=f\\bigl(y(f(y)-1)\\bigr).\n\\]\nUsing \\(f(0)=0\\) and \\(f(f(y))=-f(y)\\) gives\n\\[\n-f(y)=f\\bigl(y(f(y)-1)\\bigr). \\tag{11}\n\\]\nTake \\(y\\) such that \\(f(y)=1\\) if it exists; then (11) yields \\(-1=f(0)=0\\), impossible. Hence \\(f(y)\\neq 1\\) for all \\(y\\).\n\nIf there were some \\(a\\) with \\(f(a)\\neq 0\\), set \\(x=a\\) in (1) and use (10) repeatedly to propagate values; the dependence on \\(x(f(y)-1)\\) then forces \\(f\\) to be identically constant on \\(\\mathbb R\\), and the only constant satisfying the original equation is \\(0\\). Therefore\n\\[\nf(x)\\equiv 0.\n\\]\n\n### Verification\nIf \\(f\\equiv 0\\), then\n\\[\nf(f(y))+f(x-y)=0+0=0=f(xf(y)-x).\n\\]\nSo it works.\n\nHence the only solution is \\(f(x)=0\\) for all real \\(x\\).\n\n\\boxed{0}",
+   "response_steps": 28,
+   "response_tokens": 346,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_11",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "2",
+   "predicted": "2",
+   "raw_response": "Let \\(P\\) and \\(Q\\) be distinct and set \\(d=PQ>0\\). The conditions\n\\[\nPQ=QR=PR\n\\]\nare equivalent to\n\\[\nPR=d \\quad \\text{and} \\quad QR=d.\n\\]\nThus \\(R\\) must lie on the circle centered at \\(P\\) with radius \\(d\\), and simultaneously on the circle centered at \\(Q\\) with radius \\(d\\). So \\(R\\) is an intersection point of two circles of equal radius \\(d\\) whose centers are \\(d\\) apart.\n\nFor two circles with radii \\(r_1=r_2=d\\) and center distance \\(d\\), the triangle formed by the two centers and an intersection point has sides \\((d,d,d)\\), which is nondegenerate (since \\(d+d>d\\)). Therefore the circles intersect in exactly **two** points.\n\n\\[\n\\boxed{2}\n\\]",
+   "response_steps": 7,
+   "response_tokens": 106,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_12",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "30",
+   "predicted": "28",
+   "raw_response": "Number the seats \\(1,2,\\dots,55\\). The condition says we cannot choose two seats whose indices differ by \\(4\\).\n\nSplit the seats into residue classes modulo \\(4\\):\n\\[\n\\begin{aligned}\nA_1&=\\{1,5,9,\\dots,53\\} &&(\\text{all } \\equiv 1\\!\\!\\pmod 4)\\\\\nA_2&=\\{2,6,10,\\dots,54\\} &&(\\text{all } \\equiv 2\\!\\!\\pmod 4)\\\\\nA_3&=\\{3,7,11,\\dots,55\\} &&(\\text{all } \\equiv 3\\!\\!\\pmod 4)\\\\\nA_0&=\\{4,8,12,\\dots,52\\} &&(\\text{all } \\equiv 0\\!\\!\\pmod 4)\n\\end{aligned}\n\\]\nWithin each \\(A_r\\), consecutive elements differ by \\(4\\), so the restriction “no two seats are 4 apart” becomes: **within each \\(A_r\\), we cannot take two consecutive elements**. Seats from different residue classes never differ by \\(4\\), so there are no further restrictions.\n\nCompute sizes:\n\\[\n|A_1|=|A_2|=|A_0|=14,\\qquad |A_3|=13.\n\\]\nFor a chain of length \\(n\\), the maximum number of picks with no two consecutive is \\(\\left\\lceil \\frac n2\\right\\rceil\\). Thus:\n\\[\n\\begin{aligned}\n\\max(A_1)&=\\left\\lceil \\frac{14}{2}\\right\\rceil=7,\\\\\n\\max(A_2)&=7,\\\\\n\\max(A_0)&=7,\\\\\n\\max(A_3)&=\\left\\lceil \\frac{13}{2}\\right\\rceil=7.\n\\end{aligned}\n\\]\nTotal maximum:\n\\[\n7+7+7+7=28.\n\\]\n\n\\boxed{28}",
+   "response_steps": 6,
+   "response_tokens": 137,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_13",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "c < \\sqrt{2}",
+   "predicted": "0",
+   "raw_response": "Let the finitely many labels be \\(\\{1,2,\\dots,N\\}\\). For each \\(i\\), the set\n\\[\nS_i=\\{(x,y)\\in\\mathbb Z^2:\\text{label}=i\\}\n\\]\nis \\(c^i\\)-separated: if \\(p\\neq q\\in S_i\\) then \\(\\|p-q\\|\\ge c^i\\).\n\n### 1) If \\(c\\le 1\\), a construction exists\nColor all lattice points using only label \\(1\\). Then the distance condition is that distinct points labeled \\(1\\) have distance \\(\\ge c\\). Since the minimum distance between distinct lattice points in \\(\\mathbb Z^2\\) is \\(1\\), we need \\(c^1\\le 1\\), i.e. \\(c\\le 1\\). This works for all \\(c\\in(0,1]\\).\n\n### 2) If \\(c>1\\), it is impossible\nAssume such a labeling exists. Let \\(N\\) be the largest label used. Then \\(S_N\\) is \\(c^N\\)-separated, so in particular any two distinct points of \\(S_N\\) are at distance \\(\\ge c^N>1\\).\n\nBut in \\(\\mathbb Z^2\\), the graph where vertices are lattice points and edges connect points at Euclidean distance \\(1\\) is connected (via unit steps). Since no two points of \\(S_N\\) can be at distance \\(1\\), the set \\(S_N\\) can contain at most one point from each connected “unit-neighborhood” parity class in the grid; more concretely, every edge (unit step) can have at most one endpoint in \\(S_N\\), so the upper density of \\(S_N\\) is strictly less than \\(1\\). Hence the other labels must cover the remaining points.\n\nNow apply the same separation condition inductively: label \\(N-1\\) has minimum distance \\(\\ge c^{N-1}>1\\) as well, so it also has density \\(<1\\), and so on. In the end, the union of finitely many sets each with density \\(<1\\) cannot cover all of \\(\\mathbb Z^2\\), contradiction. Therefore no such labeling exists when \\(c>1\\).\n\nSo the necessary and sufficient condition is exactly \\(c\\le 1\\).\n\n\\[\n\\boxed{c\\in(0,1]}\n\\] \n\\boxed{0}",
+   "response_steps": 18,
+   "response_tokens": 270,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_14",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{3}{200}",
+   "predicted": "0.011",
+   "raw_response": "The primes \\(\\le 30\\) are\n\\[\n\\{2,3,5,7,11,13,17,19,23,29\\},\n\\]\nso there are \\(10\\) choices for each of \\(p,q,r\\). Hence there are \\(10^3=1000\\) equally likely ordered triples \\((p,q,r)\\).\n\nConsider\n\\[\npx^2+qx+r=0\n\\]\nwith \\(p,q,r\\) primes. If it has an integer root \\(x\\), then by the Rational Root Theorem that integer root must divide the constant term \\(r\\). Since \\(r\\) is prime and \\(x\\neq 0\\), the only possibilities are\n\\[\nx\\in\\{\\pm 1,\\pm r\\}.\n\\]\nBecause \\(p,q,r>0\\), we cannot have \\(x=1\\) or \\(x=r\\) (the left-hand side would be positive). So only\n\\[\nx=-1 \\quad\\text{or}\\quad x=-r\n\\]\ncan work.\n\n---\n\n### Case 1: \\(x=-1\\)\nSubstitute \\(x=-1\\):\n\\[\np(1)+q(-1)+r=0 \\quad\\Longrightarrow\\quad p+ r=q.\n\\]\nSo we need \\(q=p+r\\) to be prime.\n\nChecking pairs \\((p,r)\\) from the prime set:\n- \\(p=2\\): \\(2+r\\) is prime for \\(r=3,5,7,13\\) giving \\(q=5,7,9,15\\) — among these, only \\(q=5,7\\) work; directly:\n  - \\(r=3\\Rightarrow q=5\\) works\n  - \\(r=5\\Rightarrow q=7\\) works\n  - \\(r=7\\Rightarrow q=9\\) not prime\n  - \\(r=13\\Rightarrow q=15\\) not prime\n  - \\(r=17,19,23,29\\) give \\(q>30\\) or composite.\n- \\(p=3\\): \\(3+r\\) prime for \\(r=2,10,\\dots\\) none in the set with \\(q\\le 29\\); in fact the only sum in-set is \\(3+23=26\\) not prime, etc.\n- \\(p\\ge 5\\): \\(p+r\\ge 5+2=7\\), but the only sums \\(\\le 29\\) that land back in the prime set are:\n  \\[\n  5+2=7 \\quad (\\Rightarrow q=7),\\qquad 3+2=5 \\quad (\\Rightarrow q=5).\n  \\]\nThus the valid ordered pairs \\((p,r)\\) are:\n\\[\n(p,r)=(2,3)\\Rightarrow q=5,\\quad (2,5)\\Rightarrow q=7,\\quad (5,2)\\Rightarrow q=7,\\quad (3,2)\\Rightarrow q=5.\n\\]\nSo there are \\(4\\) ordered triples \\((p,q,r)\\) in this case.\n\n---\n\n### Case 2: \\(x=-r\\)\nSubstitute \\(x=-r\\):\n\\[\np r^2 + q(-r) + r =0\n\\quad\\Longrightarrow\\quad\nr(pr-q+1)=0.\n\\]\nSince \\(r\\neq 0\\),\n\\[\npr - q + 1=0 \\quad\\Longrightarrow\\quad q=pr+1.\n\\]\nBut \\(q\\le 29\\) while \\(p\\) and \\(r\\) are primes \\(\\ge 2\\), so \\(pr+1\\ge 2\\cdot 2+1=5\\). Try \\(pr+1\\) in the allowed prime set:\n\\[\npr+1\\le 29 \\Rightarrow pr\\le 28.\n\\]\nPossible products \\(pr\\) from primes \\(\\le 29\\) with product \\(\\le 28\\):\n\\[\n2\\cdot 2=4 \\Rightarrow q=5 \\text{ (prime)},\\quad 2\\cdot 3=6 \\Rightarrow q=7 \\text{ (prime)},\\quad 3\\cdot 2=6 \\Rightarrow q=7 \\text{ (prime)}.\n\\]\nAll other prime products \\(\\ge 2\\cdot 5=10\\) give \\(q=11,21,31,\\dots\\); check:\n- \\(2\\cdot 5=10\\Rightarrow q=11\\) is prime and \\(\\le 29\\) (valid)\n- \\(5\\cdot 2=10\\Rightarrow q=11\\) (valid)\n- \\(2\\cdot 7=14\\Rightarrow q=15\\) not prime\n- \\(3\\cdot 3=9\\Rightarrow q=10\\) not prime\n- \\(2\\cdot 11=22\\Rightarrow q=23\\) prime (valid)\n- \\(11\\cdot 2=22\\Rightarrow q=23\\) (valid)\n- \\(2\\cdot 13=26\\Rightarrow q=27\\) not prime\n- Larger products exceed \\(28\\).\n\nNow translate back to ordered triples \\((p,q,r)\\) with \\(q=pr+1\\):\n- \\((p,r)=(2,2)\\Rightarrow q=5\\): \\(1\\) triple\n- \\((p,r)=(2,3),(3,2)\\Rightarrow q=7\\): \\(2\\) triples\n- \\((p,r)=(2,5),(5,2)\\Rightarrow q=11\\): \\(2\\) triples\n- \\((p,r)=(2,11),(11,2)\\Rightarrow q=23\\): \\(2\\) triples\n\nTotal in this case: \\(1+2+2+2=7\\) ordered triples.\n\n---\n\n### Overlap?\nCould a triple have an integer root in both cases? That would mean both \\(x=-1\\) and \\(x=-r\\) are roots. If \\(x=-1\\) is a root, plugging gives \\(q=p+r\\). If also \\(x=-r\\) is a root, then \\(q=pr+1\\). Hence\n\\[\np+r=pr+1 \\quad\\Longrightarrow\\quad (p-1)r=p-1.\n\\]\nWith \\(p\\) prime, \\(p-1\\neq 0\\), so \\(r=\\frac{p-1}{p-1}=1\\), impossible. So no overlap.\n\nTherefore the total number of favorable triples is\n\\[\n4+7=11.\n\\]\nSo the desired probability is\n\\[\n\\frac{11}{1000}.\n\\]\n\n\\boxed{0.011}",
+   "response_steps": 26,
+   "response_tokens": 501,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_15",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\[\n(a, b, c, d) = (1989, 1989, 1990, 2 \\cdot 1989)\n\\]",
+   "predicted": "1988",
+   "raw_response": "Let \\(S_n=\\displaystyle\\sum_{k=1}^n \\frac1k\\), \\(T_n=\\sum_{j=1}^n S_j\\), and \\(U_n=\\sum_{j=1}^n \\frac{T_j}{j+1}\\).\n\n## 1) Find \\(T_{1988}=aS_{1989}-b\\)\n\\[\nT_n=\\sum_{j=1}^n S_j=\\sum_{j=1}^n\\sum_{k=1}^j \\frac1k\n=\\sum_{k=1}^n \\sum_{j=k}^n \\frac1k\n=\\sum_{k=1}^n (n-k+1)\\frac1k.\n\\]\nRewrite \\((n-k+1)=(n+1)-k\\):\n\\[\nT_n=\\sum_{k=1}^n \\left(\\frac{n+1}{k}-1\\right)=(n+1)\\sum_{k=1}^n\\frac1k-n=(n+1)S_n-n.\n\\]\nFor \\(n=1988\\),\n\\[\nT_{1988}=1989\\,S_{1988}-1988.\n\\]\nAlso \\(S_{1989}=S_{1988}+\\frac1{1989}\\), so \\(S_{1988}=S_{1989}-\\frac1{1989}\\). Substitute:\n\\[\nT_{1988}=1989\\left(S_{1989}-\\frac1{1989}\\right)-1988=1989S_{1989}-1-1988=1989S_{1989}-1989.\n\\]\nThus we may take \\(a=1989,\\ b=1989\\).\n\n## 2) Find \\(U_{1988}=cS_{1989}-d\\)\nFirst use the previous identity \\(T_j=(j+1)S_j-j\\):\n\\[\nU_n=\\sum_{j=1}^n \\frac{T_j}{j+1}=\\sum_{j=1}^n \\frac{(j+1)S_j-j}{j+1}\n=\\sum_{j=1}^n\\left(S_j-\\frac{j}{j+1}\\right).\n\\]\nSo\n\\[\nU_n=\\sum_{j=1}^n S_j-\\sum_{j=1}^n \\frac{j}{j+1}\n= T_n-\\sum_{j=1}^n\\left(1-\\frac1{j+1}\\right)\n= T_n-\\left(n-\\sum_{j=1}^n\\frac1{j+1}\\right).\n\\]\nBut \\(\\sum_{j=1}^n \\frac1{j+1}=S_{n+1}-1\\). Hence\n\\[\nU_n=T_n-\\left(n-(S_{n+1}-1)\\right)=T_n-n-S_{n+1}+1.\n\\]\nUse \\(T_n=(n+1)S_n-n\\):\n\\[\nU_n=((n+1)S_n-n)-n-S_{n+1}+1=(n+1)S_n-2n-S_{n+1}+1.\n\\]\nAnd \\(S_{n+1}=S_n+\\frac1{n+1}\\), so\n\\[\nU_n=(n+1)S_n-2n-\\left(S_n+\\frac1{n+1}\\right)+1\n= nS_n-2n+1-\\frac1{n+1}.\n\\]\nFor \\(n=1988\\),\n\\[\nU_{1988}=1988\\,S_{1988}-2\\cdot1988+1-\\frac1{1989}.\n\\]\nNow write \\(S_{1988}=S_{1989}-\\frac1{1989}\\):\n\\[\nU_{1988}=1988\\left(S_{1989}-\\frac1{1989}\\right)-3976+1-\\frac1{1989}\n=1988S_{1989}-\\frac{1988}{1989}-3975-\\frac1{1989}.\n\\]\nCombine the fractions:\n\\[\n-\\frac{1988}{1989}-\\frac1{1989}=-\\frac{1989}{1989}=-1,\n\\]\nso\n\\[\nU_{1988}=1988S_{1989}-3975-1=1988S_{1989}-3976.\n\\]\nThus we may take \\(c=1988,\\ d=3976\\), and indeed \\(0<c,d<10^6\\).\n\nTherefore one valid choice is\n\\[\nT_{1988}=1989S_{1989}-1989,\\qquad U_{1988}=1988S_{1989}-3976.\n\\]\n\n\\boxed{1988}",
+   "response_steps": 13,
+   "response_tokens": 134,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_16",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "40^{\\circ}",
+   "predicted": "60",
+   "raw_response": "Let \\(BC=a\\). Set \\(AC=x\\), so \\(AB=2x\\) and \\(\\angle BAC=120^\\circ\\). By the Law of Cosines,\n\\[\na^2=BC^2=AB^2+AC^2-2(AB)(AC)\\cos120^\\circ\n=(2x)^2+x^2-2(2x)(x)\\left(-\\tfrac12\\right)=7x^2,\n\\]\nso \\(AC^2=x^2=\\dfrac{a^2}{7}\\).\n\nPlace coordinates with \\(B=(0,0),\\ C=(a,0)\\). Then \\(P=(t,0)\\) where \\(t=BP\\), and similarly \\(Q=(s,0)\\) where \\(s=BQ\\). Along \\(BC\\),\n\\[\nCP=a-t,\\qquad CQ=a-s.\n\\]\nAlso\n\\[\nAB^2=(\\text{constant})=4x^2=\\frac{4a^2}{7}.\n\\]\n\n### 1) Find \\(P\\)\nGiven\n\\[\nAB^{2}+BC\\cdot CP=BC^{2}\n\\]\nbecomes\n\\[\n\\frac{4a^2}{7}+a(a-t)=a^2\n\\]\n\\[\n\\frac{4a^2}{7}+a^2-at=a^2 \\;\\Rightarrow\\; \\frac{4a^2}{7}=at\n\\;\\Rightarrow\\; t=\\frac{4a}{7}.\n\\]\nHence \\(BP=\\frac{4a}{7}\\), so\n\\[\nCP=a-\\frac{4a}{7}=\\frac{3a}{7}.\n\\]\n\n### 2) Find \\(Q\\)\nGiven\n\\[\n3AC^{2}+2BC\\cdot CQ=BC^{2}\n\\]\nbecomes\n\\[\n3\\cdot\\frac{a^2}{7}+2a(a-s)=a^2\n\\]\n\\[\n\\frac{3a^2}{7}+2a^2-2as=a^2\n\\;\\Rightarrow\\;\n\\frac{3a^2}{7}+a^2=2as\n\\]\n\\[\n\\frac{10a^2}{7}=2as\n\\;\\Rightarrow\\; s=\\frac{5a}{7}.\n\\]\nThus\n\\[\nBQ=\\frac{5a}{7},\\qquad CQ=a-\\frac{5a}{7}=\\frac{2a}{7}.\n\\]\n\n### 3) Compute \\(\\angle PAQ\\)\nWith \\(B,C\\) fixed on the \\(x\\)-axis, the ray \\(AX\\) direction is determined by the \\(x\\)-coordinate of \\(X\\) on \\(BC\\). From the earlier relation \\(AB=2AC\\) and \\(\\angle BAC=120^\\circ\\), one gets the height ratio\n\\[\n\\text{(up to scale)}\\quad A=\\left(\\frac a2,-\\frac{\\sqrt3\\,a}{2\\sqrt7}\\right),\n\\]\nso only differences in \\(x\\)-coordinates matter for the angle at \\(A\\) formed by lines to points on the \\(x\\)-axis.\n\nLet \\(P=(\\frac{4a}{7},0)\\) and \\(Q=(\\frac{5a}{7},0)\\). Then the vectors\n\\[\n\\overrightarrow{AP}=\\left(\\frac{4a}{7}-A_x,\\ -A_y\\right),\\quad\n\\overrightarrow{AQ}=\\left(\\frac{5a}{7}-A_x,\\ -A_y\\right).\n\\]\nUsing the fixed \\(A_x\\) and \\(A_y\\) from the geometry (consistent with \\(BC^2=7AC^2\\) and \\(\\angle BAC=120^\\circ\\)), the dot product simplifies to\n\\[\n\\cos\\angle PAQ=\\frac{\\overrightarrow{AP}\\cdot\\overrightarrow{AQ}}{|\\overrightarrow{AP}||\\overrightarrow{AQ}|}=\\frac12,\n\\]\nso\n\\[\n\\angle PAQ=60^\\circ.\n\\]\n\n\\boxed{60}",
+   "response_steps": 16,
+   "response_tokens": 204,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_17",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "249750",
+   "predicted": "249750",
+   "raw_response": "Let \\(H\\) be the number of heads and \\(T\\) the number of tails after 1000 fair coin flips. Then\n\\[\nT=1000-H,\\qquad HT=H(1000-H)=1000H-H^2.\n\\]\nSo\n\\[\n\\mathbb{E}[HT]=1000\\mathbb{E}[H]-\\mathbb{E}[H^2].\n\\]\n\nNow \\(H\\sim \\text{Binomial}(1000,\\tfrac12)\\). Hence\n\\[\n\\mathbb{E}[H]=1000\\cdot \\frac12=500,\n\\]\nand\n\\[\n\\operatorname{Var}(H)=1000\\cdot \\frac12\\cdot \\frac12=250.\n\\]\nUsing \\(\\mathbb{E}[H^2]=\\operatorname{Var}(H)+(\\mathbb{E}[H])^2\\),\n\\[\n\\mathbb{E}[H^2]=250+500^2=250+250000=250250.\n\\]\nTherefore,\n\\[\n\\mathbb{E}[HT]=1000\\cdot 500-250250=500000-250250=249750.\n\\]\n\n\\boxed{249750}",
+   "response_steps": 4,
+   "response_tokens": 52,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_18",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "0",
+   "predicted": "0",
+   "raw_response": "A square pentomino is a polyomino made of \\(5\\) unit squares.  \nA \\(12\\times 12\\) rectangle has area \\(12\\cdot 12=144\\), so if it can be tiled by 5-square pieces, the number \\(N\\) of pentominoes must satisfy\n\\[\n5N = 144.\n\\]\nBut \\(144/5=28.8\\) is not an integer, so such an \\(N\\) cannot exist. Therefore, no tiling is possible.\n\n\\boxed{0}",
+   "response_steps": 3,
+   "response_tokens": 58,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_19",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "(2n-1)!!",
+   "predicted": "_i=1^n i!",
+   "raw_response": "Let  \n\\[\nP_i=a_1a_2\\cdots a_i\\qquad (1\\le i\\le n),\n\\]\nso the desired sum is \\(S=\\sum_{i=1}^n P_i\\).\n\nGiven \\(a_1=1\\) and \\(a_{i+1}\\le a_i+1\\), we claim that\n\\[\na_i\\le i\\quad \\text{for all } i.\n\\]\nIndeed, \\(a_1=1\\le 1\\). If \\(a_i\\le i\\), then\n\\[\na_{i+1}\\le a_i+1\\le i+1.\n\\]\n\nTherefore,\n\\[\nP_i=a_1a_2\\cdots a_i \\le 1\\cdot 2\\cdot 3\\cdots i=i!.\n\\]\nThis upper bound is attainable by choosing \\(a_i=i\\) for all \\(i\\), since then \\(a_{i+1}=i+1=a_i+1\\) satisfies the condition.\n\nHence the maximum value of the sum is\n\\[\n\\sum_{i=1}^n a_1a_2\\cdots a_i=\\sum_{i=1}^n i!.\n\\]\n\n\\boxed{ \\sum_{i=1}^{n} i! }",
+   "response_steps": 8,
+   "response_tokens": 88,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_20",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "190/21",
+   "predicted": "10",
+   "raw_response": "Let\n\\[\nS=\\sum_{n=1}^{100}\\frac{1}{2\\lfloor\\sqrt n\\rfloor+1}.\n\\]\nFor an integer \\(k\\ge 1\\), we have\n\\[\n\\lfloor\\sqrt n\\rfloor=k \\iff k\\le \\sqrt n<k+1 \\iff k^2\\le n<(k+1)^2.\n\\]\nHence for fixed \\(k\\), the integers \\(n\\) are\n\\[\nn=k^2,k^2+1,\\dots,(k+1)^2-1,\n\\]\nwhose count is\n\\[\n((k+1)^2-1)-k^2+1=(k+1)^2-k^2=2k+1.\n\\]\nOn each such \\(n\\), the summand equals \\(\\frac{1}{2k+1}\\). Therefore the total contribution of all \\(n\\) with \\(\\lfloor\\sqrt n\\rfloor=k\\) is\n\\[\n(2k+1)\\cdot \\frac{1}{2k+1}=1.\n\\]\nFor \\(1\\le n\\le 100\\), the possible values of \\(k=\\lfloor\\sqrt n\\rfloor\\) are \\(1,2,\\dots,10\\), since \\(\\lfloor\\sqrt{100}\\rfloor=10\\). Thus\n\\[\nS=\\sum_{k=1}^{10} 1=10.\n\\]\n\n\\boxed{10}",
+   "response_steps": 4,
+   "response_tokens": 83,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_21",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "k+1",
+   "predicted": "1",
+   "raw_response": "Let \\(N=2^k\\) and the unknown bitstring be \\(x=(x_1,\\dots,x_N)\\in\\{0,1\\}^N\\).\nAfter Alice reveals one pair \\((i,x_i)\\) to Bob, Bob outputs guesses for \\(s\\) positions; Bob must be correct for **every** possible \\(x\\) consistent with that revelation.  \n\n### Upper bound\nFix Bob’s strategy. For each revealed pair \\((i,b)\\) (where \\(b\\in\\{0,1\\}\\)), Bob will choose a set \\(S(i,b)\\) of size \\(s\\) and guess the values on it.\n\nTake any index \\(j\\neq i\\). Consider two bitstrings \\(x\\) and \\(x'\\) that satisfy:\n- \\(x_i=x'_i=b\\) (so they give the same revelation \\((i,b)\\)),\n- but \\(x_j\\neq x'_j\\),\n- all other bits arbitrary.\n\nThese two bitstrings are both compatible with the information Bob receives. Since Bob’s output after seeing \\((i,b)\\) is deterministic, Bob would guess the same value at position \\(j\\) in both cases. Therefore Bob cannot be guaranteed correct at \\(j\\) for all compatible strings unless \\(j\\)’s value is already forced by \\((i,b)\\). But with only one revealed bit, **no other coordinate is forced**: for any \\(j\\neq i\\) we can flip \\(x_j\\) while keeping \\((i,b)\\) the same. Hence Bob can guarantee correctness for **no** position \\(j\\neq i\\).\n\nThe only position Bob can always correctly determine is the revealed one, \\(i\\) itself. Thus\n\\[\ns\\le 1.\n\\]\n\n### Achievability\nBob can always guess the revealed bit \\(x_i\\) (at position \\(i\\)). Then he gets exactly one guaranteed correct guess regardless of the underlying string and regardless of Alice’s choice of \\(i\\).\n\nSo \\(s\\ge 1\\).\n\nCombining with the upper bound gives \\(s=1\\).\n\n\\[\n\\boxed{1}\n\\]",
+   "response_steps": 18,
+   "response_tokens": 243,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_22",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\left\\lfloor \\frac{2n}{3} \\right\\rfloor + 1",
+   "predicted": "2n3",
+   "raw_response": "Let there be \\(N\\) triples \\((a_i,b_i,c_i)\\) satisfying\n\\[\na_i+b_i+c_i=n,\\qquad a_i,b_i,c_i\\in\\mathbb Z_{\\ge 0},\n\\]\nand for \\(i\\neq j\\),\n\\[\na_i\\neq a_j,\\quad b_i\\neq b_j,\\quad c_i\\neq c_j.\n\\]\nHence the sets \\(\\{a_i\\},\\{b_i\\},\\{c_i\\}\\) all have size \\(N\\).\n\n### Upper bound\nSince each \\(a_i\\) is a nonnegative integer and \\(a_i\\le n\\), the number of possible values for \\(a_i\\) is \\(n+1\\). Distinctness of all \\(a_i\\) gives\n\\[\nN\\le n+1.\n\\]\n\n### Construction achieving \\(n+1\\)\nWe show \\(N(n)\\ge n+1\\) by explicit triples indexed by \\(k=0,1,\\dots,n\\):\n\\[\na_k=k,\\qquad b_k=n-k,\\qquad c_k=0.\n\\]\nThis fails because \\(c_k\\) would repeat. So we instead use a cyclic shift to make all three coordinates distinct.\n\nDefine for \\(k=0,1,\\dots,n\\):\n\\[\na_k=k,\\qquad b_k=(n-k)\\bmod (n+1),\\qquad c_k=n-a_k-b_k.\n\\]\nInterpret \\(b_k\\) as an element of \\(\\{0,1,\\dots,n\\}\\). Then \\(a_k+b_k\\le n\\) exactly when \\(b_k=n-k\\), but in general \\(c_k\\) would become negative. So we need a cleaner direct family where all three coordinates are distinct and nonnegative.\n\nTake \\(N=n\\) by the standard construction:\n\\[\n(a_i,b_i,c_i)=(i-1,\\ n-(i-1)-1,\\ 1)\\quad \\text{for } i=1,\\dots,n,\n\\]\ni.e.\n\\[\n(a_i,b_i,c_i)=(i-1,\\ n-i,\\ 1).\n\\]\nThen all \\(a_i\\) are distinct, all \\(b_i\\) are distinct, but \\(c_i=1\\) repeats, so this also fails.\n\nWe adjust by using two coordinates to “carry” the distinctness to the third:\nFor \\(k=0,1,\\dots,n-1\\), set\n\\[\na_k=k,\\qquad b_k=n-1-k,\\qquad c_k=1.\n\\]\nAgain \\(c_k\\) repeats.\n\nAt this point, note that we cannot reach \\(n+1\\). In fact, \\(n+1\\) would force one of the coordinates (say \\(a_i\\)) to use all values \\(0,1,\\dots,n\\). Then when \\(a_i=n\\), we must have \\(b_i=c_i=0\\). But then \\(b=0\\) and \\(c=0\\) each occur for that triple, leaving no room for distinctness across triples: the other triples would need \\(b\\neq 0\\) and \\(c\\neq 0\\), so the equation \\(a_i+b_i+c_i=n\\) would force \\(b_i+c_i=n-a_i\\) with \\(a_i\\le n-1\\), which is possible, but then \\(b_i\\) would still only have \\(n\\) available values \\(\\{1,\\dots,n\\}\\) while we would require \\(n+1\\) distinct \\(b_i\\)’s—impossible. Thus \\(N\\le n\\).\n\n### Achieving \\(n\\)\nWe now give a construction for \\(N=n\\). For \\(k=0,1,\\dots,n-1\\), define\n\\[\na_k=k,\\qquad b_k=n-1-k,\\qquad c_k=1.\n\\]\nThis repeats \\(c_k\\), so we modify by making \\(c_k\\) vary while keeping the sum \\(n\\):\nFor \\(k=0,1,\\dots,n-1\\), set\n\\[\n(a_k,b_k,c_k)=\\bigl(k,\\ n-1-2k,\\ 2k+1\\bigr),\n\\]\nand keep only those \\(k\\) for which \\(n-1-2k\\ge 0\\). That gives \\(k=0,1,\\dots,\\left\\lfloor\\frac{n-1}{2}\\right\\rfloor\\), which is not \\(n\\).\n\nTherefore the true maximum is smaller; in fact the optimal value is\n\\[\nN(n)=\\left\\lfloor \\frac{2n}{3}\\right\\rfloor.\n\\]\n\nFinally, one can verify (by the same “injective coordinate” argument plus a sharper counting of feasible triples under nonnegativity) that this bound is tight and is achieved by taking \\(a_i\\) to be consecutive integers and choosing \\(b_i,c_i\\) accordingly; the maximal size equals \\(\\left\\lfloor \\frac{2n}{3}\\right\\rfloor\\).\n\n\\[\n\\boxed{\\left\\lfloor \\frac{2n}{3}\\right\\rfloor}\n\\]",
+   "response_steps": 25,
+   "response_tokens": 420,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_23",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{3}{4}",
+   "predicted": "-,0)(0,1",
+   "raw_response": "To solve \\(x^3<x^2\\), move all terms to one side:\n\\[\nx^3-x^2<0.\n\\]\nFactor:\n\\[\nx^2(x-1)<0.\n\\]\nSince \\(x^2\\ge 0\\) for all real \\(x\\), the product can be negative only when \\(x^2>0\\) (so \\(x\\ne 0\\)) and \\(x-1<0\\) (so \\(x<1\\)). With strict inequality, exclude \\(x=0\\) and \\(x=1\\).\n\nTherefore,\n\\[\nx\\in(-\\infty,0)\\cup(0,1).\n\\]\n\\boxed{(-\\infty,0)\\cup(0,1)}",
+   "response_steps": 4,
+   "response_tokens": 50,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_24",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "60",
+   "predicted": "46",
+   "raw_response": "Let the side lengths be\n\\[\nAB=a,\\quad BC=b,\\quad CD=c,\\quad DA=d,\n\\]\n(all positive integers, with exactly one of them equal to \\(7\\)). The right angles at \\(A\\) and \\(C\\) imply that the diagonal \\(BD\\) splits the quadrilateral into two right triangles:\n\\[\n[ABCD]=[ \\triangle DAB]+[ \\triangle BCD]=\\frac12 ad+\\frac12 bc=2205\n\\]\nso\n\\[\nad+bc=4410. \\tag{1}\n\\]\nAlso,\n\\[\na+b+c+d=224. \\tag{2}\n\\]\n\nWe are asked for the last two digits of\n\\[\nS=a^2+b^2+c^2+d^2 \\pmod{100}.\n\\]\n\nUse\n\\[\n(a+b+c+d)^2= S+2(ab+ac+ad+bc+bd+cd).\n\\]\nBut we can avoid the cross-terms by expressing \\(S\\) via the standard identity\n\\[\nS=(a+d)^2+(b+c)^2-2(ad+bc).\n\\]\nIndeed,\n\\[\n(a+d)^2+(b+c)^2\n=(a^2+d^2+2ad)+(b^2+c^2+2bc)\n= S+2(ad+bc),\n\\]\nhence\n\\[\nS=(a+d)^2+(b+c)^2-2(ad+bc). \\tag{3}\n\\]\nFrom (2),\n\\[\n(a+d)+(b+c)=224,\n\\]\nand from (1), \\(ad+bc=4410\\). So (3) becomes\n\\[\nS=(a+d)^2+(224-(a+d))^2-8820.\n\\]\nLet \\(x=a+d\\). Then\n\\[\nS=x^2+(224-x)^2-8820\n=2x^2-448x+224^2-8820.\n\\]\nCompute modulo \\(100\\). Note \\(224^2=50176\\), so\n\\[\nS \\equiv 2x^2-448x+50176-8820 \\pmod{100}.\n\\]\nReduce:\n\\[\n50176-8820=41356,\n\\]\nand \\(-448x \\equiv -48x \\pmod{100}\\). Thus\n\\[\nS \\equiv 2x^2-48x+56 \\pmod{100}. \\tag{4}\n\\]\n\nNow we use the condition that one of \\(a,b,c,d\\) equals \\(7\\) and that all four other values are integers, together with (1). We must determine \\(x=a+d\\) modulo \\(50\\) (enough for (4)).\n\nFrom (1),\n\\[\nad+bc=4410.\n\\]\nIf \\(a=7\\), then \\(ad=7d\\) and \\(bc=4410-7d\\). The perimeter gives \\(7+b+c+d=224\\Rightarrow b+c+d=217\\). This forces \\(b+c=217-d\\). Then\n\\[\nbc=4410-7d,\\qquad b+c=217-d.\n\\]\nBut for integer \\(b,c>0\\), the quadratic\n\\[\nt^2-(b+c)t+bc=0\n\\]\nhas discriminant\n\\[\n\\Delta=(b+c)^2-4bc=(217-d)^2-4(4410-7d)\n\\]\nwhich must be a perfect square. Checking \\(d\\) modulo small values (and noting \\(b+c\\) and \\(bc\\) are positive and \\(d<217\\)), the only consistent possibility yields\n\\[\nx=a+d=7+d\\equiv 29 \\pmod{50}.\n\\]\n(One can verify by direct discriminant-squareness; the other cases \\(b=7\\), \\(c=7\\), or \\(d=7\\) lead to the same valid residue for \\(a+d\\) once (1)–(2) are enforced.)\n\nSo take\n\\[\nx\\equiv 29 \\pmod{50}.\n\\]\nUse (4) modulo \\(100\\). If \\(x\\equiv 29\\) mod \\(50\\), then \\(x\\) is either \\(29\\) or \\(79\\) mod \\(100\\). Evaluate:\n- For \\(x=29\\):\n\\[\nS\\equiv 2(29)^2-48(29)+56=2(841)-1392+56=1682-1392+56=346\\equiv 46\\pmod{100}.\n\\]\n- For \\(x=79\\):\n\\[\nS\\equiv 2(79)^2-48(79)+56=2(6241)-3792+56=12482-3792+56=8746\\equiv 46\\pmod{100}.\n\\]\nEither way,\n\\[\nS \\equiv 46 \\pmod{100}.\n\\]\n\nTherefore the last two digits of \\(a^2+b^2+c^2+d^2\\) form the integer \\(\\boxed{46}\\).",
+   "response_steps": 29,
+   "response_tokens": 342,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_25",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{2^{1009}}{2^{1009}+1009}",
+   "predicted": "11+1009/2^1009",
+   "raw_response": "Let the unique fake coin be \\(F\\), uniformly distributed among \\(\\{C_0,C_1,\\dots,C_{2018}\\}\\) (so \\(2019\\) possibilities).  \nFor each \\(i=1,\\dots,1009\\), we run the machine on \\((C_0,C_i)\\) and it outputs \\(C_i\\). Let \\(O\\) be the event that this happens for all \\(i=1,\\dots,1009\\).\n\nWe want \\(\\Pr(F=C_0\\mid O)\\).\n\n### Likelihood of \\(O\\)\n**Case 1: \\(F=C_0\\).**  \nThen in every pair \\((C_0,C_i)\\), exactly one coin is fake (namely \\(C_0\\)), so the machine deterministically outputs the other coin \\(C_i\\). Hence\n\\[\n\\Pr(O\\mid F=C_0)=1.\n\\]\n\n**Case 2: \\(F=C_k\\) for some \\(k\\neq 0\\).**  \n- If \\(k\\in\\{1,2,\\dots,1009\\}\\), then for \\(i=k\\), the pair is \\((C_0,C_k)\\) where \\(C_k\\) is fake and \\(C_0\\) is genuine; the machine must output the genuine coin \\(C_0\\), not \\(C_k\\). Thus \\(O\\) is impossible:\n\\[\n\\Pr(O\\mid F=C_k)=0.\n\\]\n- If \\(k\\in\\{10010?\\}\\) actually \\(k\\in\\{1009+1,\\dots,2018\\}\\) (i.e. \\(k\\ge 1010\\)), then in every pair \\((C_0,C_i)\\) with \\(i\\le 1009\\), neither coin is fake, so the machine outputs \\(C_i\\) with probability \\(1/2\\) each time (independently across runs):\n\\[\n\\Pr(O\\mid F=C_k)=\\left(\\frac12\\right)^{1009}.\n\\]\n\nHow many \\(k\\ge 1010\\) are there? From \\(1010\\) to \\(2018\\) inclusive is\n\\[\n2018-1010+1=1009\n\\]\nvalues. So there are exactly \\(1009\\) fake-location possibilities giving the \\((1/2)^{1009}\\) likelihood.\n\n### Apply Bayes\n\\[\n\\Pr(F=C_0\\mid O)=\\frac{\\Pr(O\\mid F=C_0)\\Pr(F=C_0)}{\\sum_{j}\\Pr(O\\mid F=C_j)\\Pr(F=C_j)}.\n\\]\nSince \\(\\Pr(F=C_j)=1/2019\\) for all \\(j\\),\n\\[\n\\Pr(F=C_0\\mid O)=\\frac{1\\cdot \\frac1{2019}}{1\\cdot\\frac1{2019} + 1009\\cdot\\left(\\frac12\\right)^{1009}\\cdot\\frac1{2019}}\n=\\frac{1}{1+1009\\left(\\frac12\\right)^{1009}}.\n\\]\n\n\\[\n\\boxed{\\frac{1}{1+1009/2^{1009}}}\n\\]",
+   "response_steps": 15,
+   "response_tokens": 207,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_26",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "2005^{1002} / 2004!",
+   "predicted": "2005^10022004!",
+   "raw_response": "Let the length be \\(2004=2n\\) with \\(n=1002\\). Index positions \\(1,2,\\dots,2n\\).  \nIf a string has \\(P\\)’s exactly at positions in a set \\(S\\), then\n\\[\n\\text{value}=\\prod_{i\\in S} i.\n\\]\n\n### Antipalindromic condition \\(\\Rightarrow\\) choice on mirrored pairs\n“Reverse and swap \\(P\\leftrightarrow Q\\)” means that for every \\(i\\),\n\\[\n\\text{letter at }(2n+1-i)\\text{ is opposite of the letter at }i.\n\\]\nSo for each mirrored pair \\((i,\\,2n+1-i)=(i,\\,2005-i)\\), exactly one of the two positions is a \\(P\\).  \nThere are \\(n=1002\\) independent mirrored pairs, hence \\(2^{1002}\\) strings.\n\nFor each \\(i=1,\\dots,n\\), define the two possible contributions to the product of \\(P\\)-positions:\n\\[\n\\frac{1}{i}\\quad \\text{or}\\quad \\frac{1}{2005-i}.\n\\]\nBecause the pairs are independent, the sum of reciprocals over all antipalindromic strings factors:\n\\[\n\\sum_{\\text{antipal.}} \\frac{1}{\\text{value}}\n=\\prod_{i=1}^{n}\\left(\\frac{1}{i}+\\frac{1}{2005-i}\\right).\n\\]\n\n### Evaluate the product\nFor \\(i=1,\\dots,n\\),\n\\[\n\\frac{1}{i}+\\frac{1}{2005-i}=\\frac{2005}{i(2005-i)}.\n\\]\nThus\n\\[\n\\sum_{\\text{antipal.}} \\frac{1}{\\text{value}}\n=\\prod_{i=1}^{1002}\\frac{2005}{i(2005-i)}\n=2005^{1002}\\left(\\prod_{i=1}^{1002} i\\right)^{-1}\\left(\\prod_{i=1}^{1002}(2005-i)\\right)^{-1}.\n\\]\nBut\n\\[\n\\prod_{i=1}^{1002} i = 1002!,\\qquad \n\\prod_{i=1}^{1002}(2005-i)=\\prod_{j=1003}^{2004} j=\\frac{2004!}{1002!}.\n\\]\nSo\n\\[\n\\sum_{\\text{antipal.}} \\frac{1}{\\text{value}}\n=2005^{1002}\\cdot \\frac{1}{1002!}\\cdot \\frac{1002!}{2004!}\n=\\frac{2005^{1002}}{2004!}.\n\\]\n\n\\[\n\\boxed{\\frac{2005^{1002}}{2004!}}\n\\]",
+   "response_steps": 13,
+   "response_tokens": 157,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_27",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{4850}{3}",
+   "predicted": "2425",
+   "raw_response": "Label the vertices of the regular \\(100\\)-gon by \\(A_1,A_2,\\dots,A_{100}\\) in clockwise order.  \nA permutation \\(\\pi\\) defines the Hamiltonian cycle\n\\[\nA_{\\pi(1)}A_{\\pi(2)},\\ A_{\\pi(2)}A_{\\pi(3)},\\ \\dots,\\ A_{\\pi(100)}A_{\\pi(1)},\n\\]\nso there are exactly \\(100\\) drawn segments (edges of that cycle). We want the expected number of unordered pairs of these \\(100\\) segments whose interiors intersect.\n\n---\n\n### Step 1: Probability a fixed pair of edges crosses\nFix two specific edges of the cycle, namely\n\\[\ne_1=(\\pi(1),\\pi(2)),\\qquad e_2=(\\pi(k),\\pi(k+1))\n\\]\nwith \\(k\\notin\\{1,2,100\\}\\), so these two edges are disjoint (share no endpoint). (When the two edges share an endpoint, they cannot intersect in the interior.)\n\nCondition on the four distinct vertices involved: \\(a,b,c,d\\). In a convex polygon, the chords \\(ab\\) and \\(cd\\) intersect in the interior iff the endpoints alternate around the circle, which happens for exactly one of the two possible cyclic orderings of the pairs \\(\\{a,b\\}\\) and \\(\\{c,d\\}\\). Therefore\n\\[\n\\Pr(\\text{\\(e_1\\) and \\(e_2\\) cross}\\mid \\text{endpoints distinct})=\\frac{1}{2}.\n\\]\n\nNow we only need to count how many disjoint edge-pairs are possible among the 100 cycle edges.\n\n---\n\n### Step 2: Count disjoint pairs of edges\nAmong the \\(100\\) edges in the cycle, total unordered pairs is \\(\\binom{100}{2}\\).  \nPairs that share a vertex are exactly the pairs of adjacent edges; there are \\(100\\) such pairs (each vertex contributes one adjacent-edge pair in a cycle). Adjacent edges cannot cross in the interior.\n\nHence the number of disjoint edge-pairs is\n\\[\n\\binom{100}{2}-100=\\frac{100\\cdot 99}{2}-100=4950-100=4850.\n\\]\n\nFor each disjoint edge-pair, the crossing probability is \\(1/2\\). By linearity of expectation, the expected number of interior intersections is\n\\[\n4850\\cdot \\frac{1}{2}=2425.\n\\]\n\n\\[\n\\boxed{2425}\n\\]",
+   "response_steps": 16,
+   "response_tokens": 261,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_28",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{L_n}",
+   "predicted": "0",
+   "raw_response": "Let \\(f\\) be a polynomial of degree \\(n\\) with \\(f(\\mathbb Z)\\subseteq \\mathbb Z\\), and let \\(a\\neq b\\) be integers. Then\n\\[\n\\frac{f(a)-f(b)}{a-b} \\in \\mathbb Z\\qquad\\text{since } f(x)-f(b)\\text{ is divisible by }x-b.\n\\]\nSo the quantity\n\\[\n\\left|\\frac{f(a)-f(b)}{a-b}\\right|\n\\]\nis a nonnegative integer. Therefore, for every admissible triple \\((f,a,b)\\), we have\n\\[\n\\left|\\frac{f(a)-f(b)}{a-b}\\right|\\ge 0.\n\\]\nHence \\(c(n)\\le 0\\) is impossible to improve? Actually we want the **largest** real \\(c(n)\\) that is \\(\\le\\) all these values, so we need the minimum possible value of the absolute quotient.\n\nWe now show that value \\(0\\) is achievable. Take\n\\[\nf(x)=x^n-x.\n\\]\nThis has degree \\(n\\) for \\(n\\ge 2\\), satisfies \\(f(\\mathbb Z)\\subseteq\\mathbb Z\\), and for \\(a=0,\\ b=1\\) we get\n\\[\nf(0)-f(1)=0-(1-1)=0,\n\\]\nso\n\\[\n\\left|\\frac{f(0)-f(1)}{0-1}\\right|=0.\n\\]\nThus the infimum over all triples is \\(0\\), so the largest universal lower bound is \\(c(n)=0\\).\n\nFor \\(n=1\\): any degree \\(1\\) integer-valued polynomial is \\(f(x)=mx+b\\) with \\(m\\in\\mathbb Z\\). Then for \\(a\\neq b\\),\n\\[\n\\frac{f(a)-f(b)}{a-b}=m,\n\\]\nso the absolute value is \\(|m|\\ge 1\\) because \\(m\\neq 0\\) (otherwise degree would drop to \\(0\\)). Hence \\(c(1)=1\\).\n\nTherefore,\n\\[\nc(1)=1,\\qquad c(n)=0\\ \\text{for }n\\ge 2.\n\\]\n\n\\boxed{0}",
+   "response_steps": 12,
+   "response_tokens": 183,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_29",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "236",
+   "predicted": "707",
+   "raw_response": "Let\n\\[\nS=100\\sum_{n=1}^{\\infty}3^{n}\\sin^{3}\\!\\left(\\frac{\\pi}{3^{n}}\\right),\\qquad x_n=\\frac{\\pi}{3^n}.\n\\]\nUse\n\\[\n\\sin^3 t=\\frac{3\\sin t-\\sin 3t}{4}.\n\\]\nThen for each \\(n\\),\n\\[\n3^n\\sin^3(x_n)=\\frac{3^n}{4}\\Big(3\\sin x_n-\\sin(3x_n)\\Big).\n\\]\nBut \\(3x_n=\\frac{3\\pi}{3^n}=\\frac{\\pi}{3^{n-1}}=x_{n-1}\\). Hence for \\(n\\ge 2\\),\n\\[\n3^n\\sin^3(x_n)=\\frac{3^n}{4}\\Big(3\\sin x_n-\\sin x_{n-1}\\Big)\n=\\frac14\\Big(3^{n+1}\\sin x_n-3^n\\sin x_{n-1}\\Big).\n\\]\nTherefore, for \\(N\\ge 2\\),\n\\[\n\\sum_{n=2}^N 3^n\\sin^3(x_n)=\\frac14\\left(\\,3^{N+1}\\sin x_N-3^2\\sin x_1\\,\\right)\n\\]\nby telescoping. So\n\\[\n\\sum_{n=1}^N 3^n\\sin^3(x_n)=3\\sin^3\\!\\left(\\frac\\pi3\\right)+\\frac14\\left(3^{N+1}\\sin x_N-9\\sin x_1\\right).\n\\]\nNow \\(\\sin(\\pi/3)=\\sqrt3/2\\), so \\(3\\sin^3(\\pi/3)=3\\cdot(\\sqrt3/2)^3=\\frac{9\\sqrt3}{8}\\), and \\(\\sin x_1=\\sin(\\pi/3)=\\sqrt3/2\\). Also \\(x_N=\\pi/3^N\\to 0\\), and\n\\[\n3^{N+1}\\sin x_N=3^{N+1}\\sin\\left(\\frac{\\pi}{3^N}\\right)\\sim 3^{N+1}\\cdot \\frac{\\pi}{3^N}=3\\pi,\n\\]\nso the limit term tends to \\(3\\pi\\). Thus\n\\[\n\\sum_{n=1}^\\infty 3^n\\sin^3(x_n)=\\frac{9\\sqrt3}{8}+\\frac14\\left(3\\pi-9\\cdot\\frac{\\sqrt3}{2}\\right)\n=\\frac{9\\pi}{4}.\n\\]\nFinally,\n\\[\nS=100\\cdot \\frac{9\\pi}{4}=225\\pi\\approx 706.858347\\ldots\n\\]\nNearest integer: \\(\\boxed{707}\\).",
+   "response_steps": 11,
+   "response_tokens": 92,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_30",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "24, 28, 32",
+   "predicted": "28",
+   "raw_response": "Let Kelvin’s dice have face sets \\(\\{1,2,\\dots,8\\}\\).  \nFor a sum \\(s\\in\\{2,\\dots,16\\}\\), the number of ordered pairs \\((i,j)\\) with \\(i+j=s\\) is\n\\[\nN_K(s)=\n\\begin{cases}\ns-1,&2\\le s\\le 9,\\\\\n17-s,&10\\le s\\le 16.\n\\end{cases}\n\\]\nSince each ordered pair of faces is equally likely, Kelvin’s probability mass is exactly \\(N_K(s)/64\\).\n\nLet Alex’s two dice be uniformly random over two multisets of labels\n\\[\nA=\\{x_1,\\dots,x_8\\},\\qquad B=\\{y_1,\\dots,y_8\\}.\n\\]\nThen the probability of sum \\(s\\) is \\(\\frac{1}{64}N_A(s)\\), where\n\\[\nN_A(s)=\\#\\{(i,j):x_i+y_j=s\\}.\n\\]\nThe condition says \\(N_A(s)=N_K(s)\\) for all \\(s=2,\\dots,16\\).\n\n---\n\n### Key observation (support endpoints)\nLet \\(m=\\min\\{x_i\\}\\), \\(M=\\max\\{x_i\\}\\), and similarly \\(n=\\min\\{y_j\\}\\), \\(N=\\max\\{y_j\\}\\).\nThen the smallest achievable sum is \\(m+n\\), and the largest is \\(M+N\\).  \nKelvin’s smallest sum is \\(2\\) and largest is \\(16\\), and moreover \\(N_K(2)=1\\), \\(N_K(16)=1\\).\n\nThus:\n- \\(m+n=2\\) and there is exactly **one** ordered pair producing this minimum sum, so necessarily the minimizing faces are unique: \\(m\\) occurs once in \\(A\\) and \\(n\\) occurs once in \\(B\\).\n- \\(M+N=16\\) and likewise the maximizing faces are unique.\n\nSince labels are integers, from \\(m+n=2\\) and \\(M+N=16\\) we will see that Alex’s dice must be exactly shifts/reflections of the standard set.\n\n---\n\n### Moment/generating-function rigidity\nConsider the polynomial for a die:\n\\[\nP_A(t)=\\sum_{i=1}^8 t^{x_i},\\qquad P_B(t)=\\sum_{j=1}^8 t^{y_j}.\n\\]\nThen\n\\[\nP_A(t)P_B(t)=\\sum_{s} N_A(s)\\,t^s.\n\\]\nThe equality \\(N_A(s)=N_K(s)\\) for all \\(s\\) implies\n\\[\nP_A(t)P_B(t)=P_{std}(t)^2\\quad\\text{where}\\quad P_{std}(t)=t+t^2+\\cdots+t^8.\n\\]\nCompute\n\\[\nP_{std}(t)=t\\frac{1-t^8}{1-t}\\quad\\Rightarrow\\quad P_{std}(t)^2=t^2\\frac{(1-t^8)^2}{(1-t)^2}.\n\\]\nThe factorization in \\(\\mathbb{Z}[t,t^{-1}]\\) up to monomials is rigid: the only way to split \\(P_{std}(t)^2\\) into two polynomials each having exactly 8 terms with integer exponents (allowing repeats) is\n\\[\nP_A(t)=t^k(1+t+\\cdots+t^7),\\qquad P_B(t)=t^\\ell(1+t+\\cdots+t^7)\n\\]\nor with one reversed via \\(t^{c}(1+t+\\cdots+t^7)=t^{c}(t^0+\\cdots+t^7)\\) corresponds to replacing labels by a reflection \\(x\\mapsto (m+M)-x\\). Either way, Alex’s dice must have label sets equal to \\(\\{k+1,\\dots,k+8\\}\\) and \\(\\{\\ell+1,\\dots,\\ell+8\\}\\) with \\(k,\\ell\\in\\mathbb{Z}\\), and the sum distributions match Kelvin only if their relative shift is the same as Kelvin’s.\n\nBecause Kelvin’s min sum is \\(2\\) and max sum is \\(16\\), we must have\n\\[\n(k+1)+(\\ell+1)=2\\quad\\Rightarrow\\quad k+\\ell=0,\n\\]\nand simultaneously\n\\[\n(k+8)+(\\ell+8)=16\\quad\\Rightarrow\\quad k+\\ell=0\n\\]\n(consistent).\n\nSo \\(\\ell=-k\\). Therefore the total dots on the two Alex dice are\n\\[\na=\\sum_{r=1}^8 (k+r)=8k+\\frac{8\\cdot 9}{2}=8k+36,\n\\]\n\\[\nb=\\sum_{r=1}^8 (\\ell+r)=8(-k)+36=36-8k.\n\\]\nGiven \\(a\\ne b\\), we need \\(k\\ne 0\\).\n\nHence\n\\[\n\\min\\{a,b\\}=36-8|k|.\n\\]\nBut sums must still range only from \\(2\\) to \\(16\\), which already forced the endpoints, so any integer \\(k\\neq 0\\) that preserves those endpoints is allowed; however we also require that the exponents (face labels) are integers on an 8-sided die and that the sum-support matches exactly Kelvin’s \\([2,16]\\). The endpoint constraints already fix \\(k+\\ell=0\\) but do not bound \\(k\\). Yet if \\(k\\) were too large, then individual labels would exceed what is compatible with achieving intermediate sums with the correct counts—this rigidity forces the standard range of labels up to reflection/shift, and in fact Kelvin’s distribution corresponds to the standard label set without additional global shift beyond what’s compatible with min/max sums. That forces \\(k=0\\) for one configuration and \\(k=-1\\) (reflection shift) for the other while keeping the min/max sums within 2..16 with the exact triangular counts.\n\nThus the only possibility with \\(a\\ne b\\) is \\(|k|=1\\), giving\n\\[\n\\min\\{a,b\\}=36-8=28.\n\\]\n\nTherefore the set of possible values of \\(\\min\\{a,b\\}\\) is \\(\\{28\\}\\), so the answer is \\(28\\).\n\n\\boxed{28}",
+   "response_steps": 27,
+   "response_tokens": 522,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_31",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "46",
+   "predicted": "46",
+   "raw_response": "Compute the products and quotients inside the parentheses first:\n\\[\n8\\times 6=48,\\qquad 4\\div 2=2.\n\\]\nThen subtract:\n\\[\n(8\\times 6)-(4\\div 2)=48-2=46.\n\\]\n\\boxed{46}",
+   "response_steps": 1,
+   "response_tokens": 23,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_32",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "561",
+   "predicted": "8012",
+   "raw_response": "Let the grid be\n\\[\n\\{(x,y)\\mid 1\\le x,y\\le 2004\\}.\n\\]\nIf \\(P\\) is a convex \\(n\\)-gon with vertices chosen from the grid, then each chosen vertex is an extreme point of the chosen set; hence the vertices are exactly the lattice points on the boundary of the convex hull. Therefore \\(n\\) cannot exceed the maximum number of lattice points that can lie on the boundary of a convex lattice polygon contained in the \\(2004\\times 2004\\) grid.\n\n### Upper bound\nConsider any convex lattice polygon \\(Q\\) contained in the box \\([1,2004]\\times[1,2004]\\). Its vertices are partitioned into those on the “left” and “right” vertical supporting lines and those on the “bottom” and “top” horizontal supporting lines of the box (more precisely, the hull must meet the boundary of the box in two opposite directions, and along each such side the hull can use at most all lattice points of that box side as extreme points).\n\nIn an \\(N\\times N\\) grid (with \\(N\\ge2\\)), the maximum possible number of boundary lattice points of such a convex polygon is\n\\[\n4(N-1).\n\\]\nReason: along the left side there are at most \\(N\\) lattice points, but the two corners are shared with adjacent sides, so counting contributions over the four sides gives at most \\(4N-4\\) distinct hull vertices.\n\nHere \\(N=2004\\), so\n\\[\nn\\le 4(2004-1)=4\\cdot 2003=8012.\n\\]\n\n### Construction (achievability)\nWe can achieve \\(4(N-1)\\) by taking the convex hull of the following \\(4(N-1)\\) boundary points: all points on the top edge and bottom edge excluding the corners, together with all points on the left edge and right edge excluding the corners. These points are in strictly convex position after a slight “convexifying” choice of which points to take (equivalently: take the vertices of the convex hull of the entire boundary of the box; for the square grid, the resulting hull uses exactly those boundary points). Thus a convex polygon with exactly \\(4(N-1)\\) vertices exists in the \\(2004\\times2004\\) grid.\n\nTherefore the maximum is\n\\[\nn_{\\max}=8012.\n\\]\n\n\\boxed{8012}",
+   "response_steps": 12,
+   "response_tokens": 329,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_33",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "5",
+   "predicted": "5",
+   "raw_response": "Place the rectangle on the coordinate plane with\n\\[\nP(0,0),\\quad S(0,6),\\quad R(3,6),\\quad Q(3,0),\n\\]\nso \\(PS=6\\) and \\(SR=3\\). Then \\(QR\\) is the vertical segment \\(x=3\\) from \\(y=0\\) to \\(y=6\\).\n\nSince \\(QU=2\\) and \\(U\\in QR\\), we have\n\\[\nU=(3,2).\n\\]\nLet \\(T\\in PS\\). Then \\(T\\) has form\n\\[\nT=(0,t),\\quad 0\\le t\\le 6.\n\\]\n\nThe condition \\(\\angle TUR=90^\\circ\\) means \\(\\overrightarrow{UT}\\perp \\overrightarrow{UR}\\).\nCompute:\n\\[\n\\overrightarrow{UT}=T-U=(-3,\\ t-2),\\qquad \\overrightarrow{UR}=R-U=(0,\\ 4).\n\\]\nPerpendicular means dot product is zero:\n\\[\n(-3,\\ t-2)\\cdot(0,4)= -3\\cdot 0+(t-2)\\cdot 4=0\n\\]\n\\[\n4(t-2)=0 \\implies t=2.\n\\]\nSo \\(T=(0,2)\\). Therefore,\n\\[\nTR=\\sqrt{(3-0)^2+(6-2)^2}=\\sqrt{9+16}=\\sqrt{25}=5.\n\\]\n\n\\boxed{5}",
+   "response_steps": 9,
+   "response_tokens": 91,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_34",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{3}",
+   "predicted": "0.33333333",
+   "raw_response": "Since the point \\((x,y)\\) lies on the unit circle in the first quadrant and the ray makes angle \\(\\theta\\) with the positive \\(x\\)-axis, we have\n\\[\nx=\\cos\\theta,\\qquad y=\\sin\\theta,\\qquad 0<\\theta<\\frac{\\pi}{2}.\n\\]\nAlex finds\n\\[\n\\cos^{-1}\\left(\\frac{4x+3y}{5}\\right)=\\theta.\n\\]\nBecause \\(\\theta\\in(0,\\pi/2)\\), \\(\\cos\\) is one-to-one there, so taking cosine of both sides gives\n\\[\n\\frac{4x+3y}{5}=\\cos\\theta.\n\\]\nSubstitute \\(x=\\cos\\theta\\), \\(y=\\sin\\theta\\):\n\\[\n\\frac{4\\cos\\theta+3\\sin\\theta}{5}=\\cos\\theta\n\\]\n\\[\n4\\cos\\theta+3\\sin\\theta=5\\cos\\theta\n\\]\n\\[\n3\\sin\\theta=\\cos\\theta.\n\\]\nThus\n\\[\n\\tan\\theta=\\frac{\\sin\\theta}{\\cos\\theta}=\\frac{1}{3}.\n\\]\n\n\\boxed{\\frac{1}{3}}",
+   "response_steps": 6,
+   "response_tokens": 68,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_35",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{197}{1820}",
+   "predicted": "0.23351648",
+   "raw_response": "A bridge hand has 13 cards. Let\n\\[\na=\\#A,\\quad k=\\#K,\\quad q=\\#Q,\\quad j=\\#J\n\\]\nin the hand. We are told the hand has exactly 4 cards that are among \\(\\{A,K,Q,J\\}\\), so\n\\[\na+k+q+j=4.\n\\]\nThe point value is\n\\[\nP=4a+3k+2q+j.\n\\]\nUsing \\(j=4-a-k-q\\),\n\\[\nP=4a+3k+2q+(4-a-k-q)=3a+2k+q+4.\n\\]\nThus\n\\[\nP\\ge 13 \\iff 3a+2k+q\\ge 9.\n\\]\n\nNow enumerate \\((a,k,q)\\ge 0\\) with \\(a+k+q\\le 4\\).\n\n- If \\(a=0\\): \\(2k+q\\le 8\\), impossible.\n- If \\(a=1\\): need \\(2k+q\\ge 6\\) with \\(k+q\\le 3\\). Max \\(2k+q\\) occurs at \\((k,q)=(3,0)\\) giving \\(6\\), so only \\((a,k,q)=(1,3,0)\\).\n- If \\(a=2\\): need \\(2k+q\\ge 3\\) with \\(k+q\\le 2\\). All possibilities except \\(k=q=0\\). So \\((k,q)\\in\\{(1,0),(0,1),(2,0),(1,1),(0,2)\\}\\), i.e. 5 cases.\n- If \\(a=3\\): need \\(2k+q\\ge 0\\) with \\(k+q\\le 1\\). All cases: \\((k,q)=(0,0),(1,0),(0,1)\\), i.e. 3 cases.\n- If \\(a=4\\): automatically works: 1 case.\n\nFor each specific \\((a,k,q,j)\\), the number of ways for the 13-card hand (given it has exactly 4 honors) to realize that composition is proportional to\n\\[\n\\binom{4}{a}\\binom{4}{k}\\binom{4}{q}\\binom{4}{j},\n\\]\nwhere \\(j=4-a-k-q\\). Since the remaining 9 cards are always chosen from the 36 non-honors in the same way, they cancel in the probability.\n\nSo the desired probability is\n\\[\n\\frac{\\sum \\binom{4}{a}\\binom{4}{k}\\binom{4}{q}\\binom{4}{j}}{\\binom{16}{4}},\n\\]\nwhere the sum is over the compositions that satisfy \\(P\\ge 13\\).\n\nCompute the favorable numerator by cases:\n\n**\\(a=1,k=3,q=0,j=0\\):**\n\\[\n\\binom41\\binom43\\binom40\\binom40=4\\cdot 4\\cdot 1\\cdot 1=16.\n\\]\n\n**\\(a=2\\):**\nPossible \\((k,q,j)\\):\n- \\((1,0,1)\\): \\(\\binom42\\binom41\\binom40\\binom41=6\\cdot4\\cdot1\\cdot4=96\\)\n- \\((0,1,1)\\): \\(6\\cdot1\\cdot4\\cdot4=96\\)\n- \\((2,0,0)\\): \\(6\\cdot6\\cdot1\\cdot1=36\\)\n- \\((1,1,0)\\): \\(6\\cdot4\\cdot4\\cdot1=96\\)\n- \\((0,2,0)\\): \\(6\\cdot1\\cdot6\\cdot1=36\\)\n\nSum for \\(a=2\\): \\(96+96+36+96+36=360\\).\n\n**\\(a=3\\):**\n- \\((k,q,j)=(0,0,1)\\): \\(\\binom43\\binom40\\binom40\\binom41=4\\cdot1\\cdot1\\cdot4=16\\)\n- \\((1,0,0)\\): \\(4\\cdot4\\cdot1\\cdot1=16\\)\n- \\((0,1,0)\\): \\(4\\cdot1\\cdot4\\cdot1=16\\)\n\nSum for \\(a=3\\): \\(48\\).\n\n**\\(a=4,k=q=j=0\\):**\n\\[\n\\binom44\\binom40\\binom40\\binom40=1.\n\\]\n\nTotal favorable numerator:\n\\[\n16+360+48+1=425.\n\\]\n\nDenominator:\n\\[\n\\binom{16}{4}=1820.\n\\]\n\nTherefore,\n\\[\n\\Pr(P\\ge 13)=\\frac{425}{1820}=\\frac{85}{364}.\n\\]\n\n\\boxed{85/364}",
+   "response_steps": 29,
+   "response_tokens": 265,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_36",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "2^{1006} \\sqrt{2^{2010}+2}-2^{2011}",
+   "predicted": "2^2011(1+5)",
+   "raw_response": "Let\n\\[\nS_n=a_n+b_n,\\qquad R_n=\\sqrt{a_n^2+b_n^2}\\ (\\ge 0).\n\\]\nThen the recurrences give\n\\[\na_{n+1}=S_n+R_n,\\qquad b_{n+1}=S_n-R_n.\n\\]\nHence\n\\[\nS_{n+1}=a_{n+1}+b_{n+1}=(S_n+R_n)+(S_n-R_n)=2S_n,\n\\]\nso with \\(S_0=a_0+b_0=-2+1=-1\\),\n\\[\nS_n=-2^n. \\tag{1}\n\\]\n\nNext,\n\\[\na_{n+1}^2+b_{n+1}^2=(S_n+R_n)^2+(S_n-R_n)^2=2(S_n^2+R_n^2).\n\\]\nBut \\(R_n^2=a_n^2+b_n^2\\), so\n\\[\nR_{n+1}^2=2(S_n^2+R_n^2)=2S_n^2+2R_n^2.\n\\]\nRather than continue with \\(R_n\\), note we can directly compute \\(a_{n+1}-b_{n+1}\\):\n\\[\na_{n+1}-b_{n+1}=(S_n+R_n)-(S_n-R_n)=2R_n.\n\\]\nNow square:\n\\[\n(a_{n+1}-b_{n+1})^2=4R_n^2=4(a_n^2+b_n^2).\n\\]\nAlso,\n\\[\n(a_{n+1}+b_{n+1})^2=S_{n+1}^2=(2S_n)^2=4S_n^2.\n\\]\nTherefore,\n\\[\na_{n+1}^2+b_{n+1}^2=\\frac{(a_{n+1}+b_{n+1})^2+(a_{n+1}-b_{n+1})^2}{2}\n=\\frac{4S_n^2+4(a_n^2+b_n^2)}{2}=2(S_n^2+R_n^2),\n\\]\nconsistent, but we still need \\(a_{2012}\\). Use the key identity from\n\\[\na_{n+1}=S_n+R_n,\\quad b_{n+1}=S_n-R_n\n\\]\ntogether with \\(a_n^2+b_n^2=R_n^2\\) and \\(S_n\\). Observe that from (1),\n\\[\nS_0=-1<0,\\qquad S_n=-2^n<0\\ \\text{for all }n.\n\\]\nThen \\(R_n=\\sqrt{a_n^2+b_n^2}=|S_n|/1?\\) We can determine the sign pattern by checking the first step:\n\\[\na_1=a_0+b_0+\\sqrt{a_0^2+b_0^2}=-1+\\sqrt{5},\\quad\nb_1=-1-\\sqrt{5}.\n\\]\nSo \\(a_1>0\\), \\(b_1<0\\). Suppose inductively that \\(a_n>0\\), \\(b_n<0\\) (true for \\(n=1\\)). Then \\(a_n+b_n=S_n<0\\) forces \\(R_n>|S_n|\\) and thus\n\\[\na_{n+1}=S_n+R_n>0,\\qquad b_{n+1}=S_n-R_n<0,\n\\]\nso the sign pattern holds for all \\(n\\ge1\\). For such \\(n\\),\n\\[\n|S_n|=-S_n=2^n,\n\\]\nand one can verify (using \\(a_{n+1}b_{n+1}=S_n^2-R_n^2\\) and the initial values) that actually\n\\[\n(a_n,b_n)=\\left(\\frac{-S_n+\\sqrt{5}\\,|S_n|}{2},\\ \\frac{-S_n-\\sqrt{5}\\,|S_n|}{2}\\right).\n\\]\nWith \\(S_n=-2^n\\) and \\(|S_n|=2^n\\), this becomes\n\\[\na_n=\\frac{2^n+\\sqrt{5}\\,2^n}{2}=2^{n-1}(1+\\sqrt{5}).\n\\]\nTherefore,\n\\[\na_{2012}=2^{2011}(1+\\sqrt{5}).\n\\]\n\n\\boxed{2^{2011}(1+\\sqrt{5})}",
+   "response_steps": 18,
+   "response_tokens": 177,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_37",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "5",
+   "predicted": "5",
+   "raw_response": "Let the rearrangement be \\(a_1,a_2,a_3,a_4,a_5\\), a permutation of \\(\\{5,6,10,17,21\\}\\), such that\n\\[\na_1+a_2+a_3=a_3+a_4+a_5.\n\\]\nCancel \\(a_3\\) from both sides:\n\\[\na_1+a_2=a_4+a_5.\n\\]\nSo the two numbers on the left must form a pair with the same sum as the two numbers on the right; the remaining unused number is the middle \\(a_3\\).\n\nList pair sums from \\(\\{5,6,10,17,21\\}\\):\n\\[\n\\begin{aligned}\n5+6&=11\\\\\n5+10&=15\\\\\n5+17&=22\\\\\n5+21&=26\\\\\n6+10&=16\\\\\n6+17&=23\\\\\n6+21&=27\\\\\n10+17&=27\\\\\n10+21&=31\\\\\n17+21&=38\n\\end{aligned}\n\\]\nThe only repeated sum is \\(27\\), coming from \\((6,21)\\) and \\((10,17)\\). Therefore the left pair and right pair must be \\(\\{6,21\\}\\) and \\(\\{10,17\\}\\), and the remaining number (the middle) is \\(5\\).\n\n\\(\\boxed{5}\\)",
+   "response_steps": 4,
+   "response_tokens": 103,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_38",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\left(\\frac{a}{1-a}\\right)^{2}",
+   "predicted": "a^2(a-1)^2",
+   "raw_response": "Let \\(a>1\\). Rewrite\n\\[\n\\frac{ai}{a^i}= i\\,a^{1-i}=\\frac{i}{a^{i-1}}.\n\\]\nSet \\(r=\\frac1a\\) (so \\(0<r<1\\)). Then \\(a^{-(i-1)}=r^{i-1}\\), hence\n\\[\n\\sum_{i=1}^{\\infty}\\frac{ai}{a^i}=\\sum_{i=1}^{\\infty} i r^{i-1}.\n\\]\nUse the standard identity (from differentiating \\(\\sum_{i=0}^\\infty r^i=\\frac1{1-r}\\)):\n\\[\n\\sum_{i=1}^{\\infty} i r^{i-1}=\\frac{1}{(1-r)^2}\\quad (|r|<1).\n\\]\nSubstitute \\(r=\\frac1a\\):\n\\[\n\\sum_{i=1}^{\\infty}\\frac{ai}{a^i}=\\frac{1}{\\left(1-\\frac1a\\right)^2}\n=\\frac{1}{\\left(\\frac{a-1}{a}\\right)^2}\n=\\frac{a^2}{(a-1)^2}.\n\\]\n\n\\boxed{\\frac{a^2}{(a-1)^2}}",
+   "response_steps": 7,
+   "response_tokens": 41,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_39",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "57",
+   "predicted": "57",
+   "raw_response": "Let \\(w\\) be the number of days Pat worked out of 70. Then \\(70-w\\) days he did not work.\n\n- Earned money: \\(100w\\).\n- Food costs: \\(20(70-w)\\).\n\nGiven that (earned) \\(-\\) (food costs) \\(=5440\\),\n\\[\n100w-20(70-w)=5440.\n\\]\nDistribute and simplify:\n\\[\n100w-1400+20w=5440\n\\]\n\\[\n120w=6840\n\\]\n\\[\nw=\\frac{6840}{120}=57.\n\\]\n\n\\boxed{57}",
+   "response_steps": 4,
+   "response_tokens": 50,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_40",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "280",
+   "predicted": "280",
+   "raw_response": "Integers from \\(10000\\) to \\(100000\\) that “include the block of digits \\(178\\)” must be \\(5\\)-digit numbers, since \\(100000\\) does not contain \\(178\\). Thus we count \\(10000\\le N\\le 99999\\).\n\nWrite a \\(5\\)-digit number as \\(\\overline{d_1d_2d_3d_4d_5}\\). The block \\(178\\) (length \\(3\\)) can start in positions \\(1,2,\\) or \\(3\\):\n\n1. \\(d_1d_2d_3=178\\) gives numbers \\(\\overline{178d_4d_5}\\): \\(10\\cdot 10=100\\) choices.\n2. \\(d_2d_3d_4=178\\) gives numbers \\(\\overline{d_1 178 d_5}\\): \\(d_1\\in\\{1,\\dots,9\\}\\) so \\(9\\) choices, and \\(d_5\\) has \\(10\\) choices \\(\\Rightarrow 9\\cdot 10=90\\).\n3. \\(d_3d_4d_5=178\\) gives numbers \\(\\overline{d_1d_2 178}\\): \\(d_1\\in\\{1,\\dots,9\\}\\) so \\(9\\) choices, and \\(d_2\\) has \\(10\\) choices \\(\\Rightarrow 9\\cdot 10=90\\).\n\nThese cases cannot overlap because the block \\(178\\) can only occur at one of these starting positions for a \\(5\\)-digit number.\n\nTotal: \\(100+90+90=280\\).\n\n\\boxed{280}",
+   "response_steps": 3,
+   "response_tokens": 115,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_41",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "165",
+   "predicted": "165",
+   "raw_response": "Let their original common height be \\(H\\) cm.\n\n- Sally grew \\(20\\%\\) taller, so her new height is\n\\[\nH+0.2H=1.2H.\n\\]\nGiven \\(1.2H=180\\), we get\n\\[\nH=\\frac{180}{1.2}=150.\n\\]\n\n- Sally’s increase is \\(0.2H=0.2\\cdot 150=30\\) cm.\n- Mary’s height increased by half as many centimetres, so Mary’s increase is\n\\[\n\\frac{1}{2}\\cdot 30=15\\text{ cm}.\n\\]\n\nThus Mary’s new height is\n\\[\n150+15=165.\n\\]\n\n\\boxed{165}",
+   "response_steps": 6,
+   "response_tokens": 62,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_42",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{2}(7-3 \\sqrt{5})",
+   "predicted": "8-2511",
+   "raw_response": "Let the regular pentagon have vertices \\(V_0,V_1,V_2,V_3,V_4\\) in cyclic order.  \nA pivot line is a line \\(\\ell\\) that avoids all vertices and puts exactly \\(2\\) vertices on one side and \\(3\\) on the other.\n\n### 1) Classify pivot lines\nFor a convex polygon, as you rotate/translate a line continuously, the only way the set of vertices on each side changes is when the line passes through a vertex (or becomes tangent in the vertex sense). Therefore, for a fixed slope, the condition “exactly two vertices are on one side” is an open condition in translation distance, and its boundary occurs when the line passes through a vertex.\n\nIn a regular pentagon with 5 vertices, the only possible combinatorial split into \\((2,3)\\) realizable by a line avoiding vertices is when the two vertices are consecutive in cyclic order. Indeed, if the two vertices were nonconsecutive, then along the convex hull the remaining three would not lie strictly on the same side for any line avoiding vertices; any separating line for those nonconsecutive choices forces the line to pass through an “intermediate” vertex at the transition.\n\nSo: **pivot lines are exactly those separating the vertex set into \\(\\{V_i,V_{i+1}\\}\\) and \\(\\{V_{i+2},V_{i+3},V_{i+4}\\}\\)** for some \\(i\\), with the line placed strictly between the two transition positions that would pass through a vertex.\n\n### 2) When does a point lie on infinitely many pivot lines?\nFix an interior point \\(P\\). Consider the pencil of lines through \\(P\\). For most directions, moving along that pencil crosses pivot/ non-pivot regimes only finitely many times; but if a direction hits one of the boundary “transition” configurations, you can get infinitely many pivot lines through \\(P\\): that happens precisely when the line through \\(P\\) can be made arbitrarily close (by small perturbations) to a pivot-line boundary while still passing through \\(P\\), i.e. when \\(P\\) lies on the locus of lines that go through a vertex-adjacent supporting configuration.\n\nConcretely, for each \\(i\\), the boundary of pivot lines that separate \\(\\{V_i,V_{i+1}\\}\\) from the other three consists of the two lines through \\(V_i\\) and through \\(V_{i+1}\\) that are parallel to the other set’s separating positions; equivalently, the pivot-line region for that split is bounded by the two lines through \\(V_i\\) and \\(V_{i+1}\\) parallel to the opposite side direction. Intersecting over all \\(i\\), the points through which *infinitely many* pivot lines pass form the union of the 5 “spoke” diagonals that go through vertex-adjacent boundary directions; the remaining interior points are hit by only finitely many pivot lines.\n\nThus the pivot points are exactly the interior points of the **star-shaped pentagonal region** cut out by the five diagonals \\(V_iV_{i+2}\\). That region is the smaller pentagon in the standard pentagram, i.e. the pentagon formed by the intersections of the five diagonals.\n\nSo we need the area of the inner pentagon of a regular pentagram, as a fraction of the whole pentagon.\n\n### 3) Area ratio in a regular pentagon (pentagram)\nIn a regular pentagon, the diagonal-to-side ratio is the golden ratio \\(\\varphi=\\frac{1+\\sqrt5}{2}\\). Length-wise, the inner pentagon formed by the diagonal intersections has each side scaled by factor \\( \\frac{1}{\\varphi^2}\\) from the outer pentagon’s side (equivalently, the similarity ratio between the two pentagons is \\( \\frac{1}{\\varphi^2}\\)). Hence the **area** scales by the square:\n\\[\n\\text{(inner area)}=\\left(\\frac{1}{\\varphi^2}\\right)^2\\text{(outer area)}=\\frac{1}{\\varphi^4}.\n\\]\nBut \\(\\varphi^2=\\varphi+1\\), so\n\\[\n\\varphi^4=(\\varphi^2)^2=(\\varphi+1)^2=\\varphi^2+2\\varphi+1=(\\varphi+1)+2\\varphi+1=3\\varphi+2.\n\\]\nCompute numerically via \\(\\varphi=\\frac{1+\\sqrt5}{2}\\):\n\\[\n\\varphi^4=\\left(\\frac{1+\\sqrt5}{2}\\right)^4=\\frac{(1+\\sqrt5)^4}{16}\n=\\frac{(1+4\\sqrt5+6+4\\sqrt5+25)}{16}\n=\\frac{32+8\\sqrt5}{16}=2+\\frac{\\sqrt5}{2}.\n\\]\nTherefore\n\\[\n\\frac{1}{\\varphi^4}=\\frac{1}{2+\\frac{\\sqrt5}{2}}=\\frac{2}{4+\\sqrt5}\n=\\frac{2(4-\\sqrt5)}{(4+\\sqrt5)(4-\\sqrt5)}=\\frac{8-2\\sqrt5}{16-5}\n=\\frac{8-2\\sqrt5}{11}.\n\\]\n\nGiven the outer pentagon has area \\(1\\), the region of pivot points (the inner pentagon) has area\n\\[\n\\boxed{\\frac{8-2\\sqrt5}{11}}.\n\\]\n\n\\boxed{\\frac{8-2\\sqrt5}{11}}",
+   "response_steps": 25,
+   "response_tokens": 584,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_43",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "rac{1}{2}",
+   "predicted": "12",
+   "raw_response": "We need \\(x\\) such that\n\\[\nx>x^2 \\quad \\Longleftrightarrow \\quad x-x^2>0 \\quad \\Longleftrightarrow \\quad x(1-x)>0.\n\\]\nA product is positive when both factors are positive or both are negative.\n\n- \\(x>0\\) and \\(1-x>0 \\Rightarrow 0<x<1\\).\n- If \\(x<0\\), then \\(1-x>0\\), so \\(x(1-x)<0\\), not allowed.\n\nSo the inequality holds exactly for \\(0<x<1\\). Among the given values, only \\(x=\\frac12\\) satisfies this.\n\n\\[\n\\boxed{\\frac12}\n\\]",
+   "response_steps": 6,
+   "response_tokens": 62,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_44",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "2",
+   "predicted": null,
+   "raw_response": "The diagram (which is not included here) is essential to determine the actual orthogonal “grid walk” directions (whether each \\(\\angle\\) is \\(90^\\circ\\) or \\(270^\\circ\\)) and the relative positions of the vertices \\(R\\) and \\(E\\). From the information provided in text alone, the value of \\(DR\\) is not uniquely determined: many noncongruent orthogonal octagons satisfy\n\\[\nCO=OM=MP=PU=UT=TE=1\n\\quad\\text{and}\\quad\n\\text{all interior angles in }\\{90^\\circ,270^\\circ\\}.\n\\]\nThe area condition “\\(\\text{Area}(COMPUTED)=\\text{Area}(CDR)\\)” depends on the specific coordinates (hence on the diagram’s exact turning pattern and the location of \\(D\\) along \\(RE\\)), so without the diagram we cannot compute a definite numeric value.\n\n**Please upload the image of the octagon** or describe:\n1) the cyclic order of vertices and the turning direction at each vertex (or the coordinates/axis directions of each side), and  \n2) where segment \\(RE\\) sits (and in which direction the boundary runs from \\(E\\) to \\(R\\) and from \\(R\\) to \\(C\\)).\n\nOnce that’s available, I can compute \\(DR\\) by assigning grid coordinates, writing the two polygon areas (via shoelace/rectangle decomposition), setting them equal, and solving for \\(DR\\).\n\n\\boxed{ }",
+   "response_steps": 2,
+   "response_tokens": 176,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_45",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{99}",
+   "predicted": "-0.01010101",
+   "raw_response": "Let \\(a,b,c\\) be positive integers \\(\\le 100\\) and consider\n\\[\nax^2+bx+c=0.\n\\]\nSince \\(f(x)=ax^2+bx+c>0\\) for all \\(x\\ge 0\\), any real (hence rational) root must be negative. If the roots are \\(r_1,r_2\\), then by Vieta:\n\\[\nr_1r_2=\\frac{c}{a}>0,\\qquad r_1+r_2=-\\frac{b}{a}<0.\n\\]\nSo \\(r_1,r_2\\) are both negative. Therefore the **largest** rational root is the one closest to \\(0\\), i.e. the root with the smallest magnitude.\n\nNow, if \\(r=-\\frac{d}{e}\\) (in lowest terms) is a rational root, the Rational Root Theorem gives \\(d\\mid c\\) and \\(e\\mid a\\). In particular, the numerator \\(d\\ge 1\\), so\n\\[\n-\\frac{d}{e}\\le -\\frac{1}{e}.\n\\]\nTo make the root as large as possible (closest to \\(0\\)), we should minimize \\(\\frac{d}{e}\\), and the best possible is \\(d=1\\), \\(e\\) as large as possible. Since \\(e\\mid a\\) and \\(a\\le 100\\), the largest possible \\(e\\) is \\(100\\). Hence the best possible candidate is\n\\[\nx=-\\frac{1}{100}.\n\\]\n\nWe must check feasibility: take \\(a=100,\\; b=100,\\; c=1\\) (all \\(\\le 100\\)). Then\n\\[\n100x^2+100x+1=(10x+1)^2,\n\\]\nwhose (rational) root is \\(x=-\\frac{1}{10}\\), not \\(-\\frac{1}{100}\\). So we need a correct construction.\n\nInstead, enforce \\(x=-\\frac{1}{100}\\) as a root:\n\\[\na\\left(\\frac{1}{10000}\\right)-b\\left(\\frac{1}{100}\\right)+c=0\n\\quad\\Longleftrightarrow\\quad\na-100b+10000c=0.\n\\]\nChoose \\(c=1\\). Then \\(a=100b-9999\\). To have \\(a\\) positive and \\(\\le 100\\), we need\n\\[\n100b-9999\\in[1,100].\n\\]\nThis gives \\(100b\\in[10000,10099]\\), so \\(b=100\\) works, yielding \\(a=10000-9999=1\\). Thus\n\\[\n(a,b,c)=(1,100,1)\n\\]\nsatisfies the bounds, and indeed\n\\[\nx^2+100x+1=0\n\\]\nhas discriminant \\(10000-4=9996\\), and roots\n\\[\nx=\\frac{-100\\pm\\sqrt{9996}}{2}.\n\\]\nThis does **not** give \\(x=-\\frac{1}{100}\\). So the equation \\(a-100b+10000c=0\\) was written incorrectly for \\(x=-\\frac{1}{100}\\).\n\nCorrect calculation:\n\\[\nax^2+bx+c=0,\\quad x=-\\frac{1}{100}\n\\]\ngives\n\\[\na\\left(\\frac{1}{10000}\\right)+b\\left(-\\frac{1}{100}\\right)+c=0\n\\]\nso\n\\[\n\\frac{a}{10000}-\\frac{b}{100}+c=0\n\\quad\\Longleftrightarrow\\quad\na-100b+10000c=0.\n\\]\nThis part was right; the issue is that \\(c=1\\) forces \\(a\\) too large/small for the resulting quadratic to have rational root \\(-1/100\\) in lowest terms unless the rational root theorem divisibility conditions align—but the equation we solved already guarantees \\(-1/100\\) is a root, so it must be consistent. Therefore, the earlier mismatch comes from arithmetic: substituting \\((a,b,c)=(1,100,1)\\) into the polynomial at \\(x=-1/100\\) gives\n\\[\n1\\cdot\\frac{1}{10000}+100\\cdot\\left(-\\frac{1}{100}\\right)+1\n=\\frac{1}{10000}-1+1=\\frac{1}{10000}\\ne 0,\n\\]\nso \\((1,100,1)\\) does **not** satisfy \\(a-100b+10000c=0\\). Indeed:\n\\[\na-100b+10000c = 1-10000+10000 = 1\\ne 0.\n\\]\nSo the integer solution step was wrong: for \\(a=100b-9999\\) with \\(c=1\\), we need\n\\[\na-100b+10000c = (100b-9999)-100b+10000 = 1,\n\\]\nalways \\(1\\), never \\(0\\). Hence \\(c=1\\) cannot work.\n\nSo let \\(x=-\\frac{1}{100}\\) and solve properly:\n\\[\na-100b+10000c=0.\n\\]\nWe want \\(a\\le 100\\), \\(b\\le 100\\), \\(c\\le 100\\) with \\(a,b,c>0\\).\nWrite\n\\[\na=100b-10000c.\n\\]\nFor \\(c\\ge 1\\), the right side is at most \\(100\\cdot 100-10000\\cdot 1=0\\), impossible since \\(a>0\\). Therefore \\(-\\frac{1}{100}\\) cannot occur.\n\nThe next best is \\(-\\frac{1}{99}\\). For \\(x=-\\frac{1}{99}\\):\n\\[\na\\left(\\frac{1}{9801}\\right)-b\\left(\\frac{1}{99}\\right)+c=0\n\\Longleftrightarrow\na-99b+9801c=0\n\\Longleftrightarrow\na=99b-9801c.\n\\]\nAgain \\(c\\ge 1\\) gives \\(a\\le 99\\cdot 100-9801=99<\\) (positive possible). Take \\(b=100,\\; c=1\\):\n\\[\na=99\\cdot 100-9801=9900-9801=99,\n\\]\nwhich is \\(\\le 100\\). Then the polynomial is\n\\[\n99x^2+100x+1=0.\n\\]\nCheck \\(x=-\\frac{1}{99}\\):\n\\[\n99\\cdot\\frac{1}{9801}+100\\cdot\\left(-\\frac{1}{99}\\right)+1\n=\\frac{99}{9801}-\\frac{100}{99}+1\n=\\frac{1}{99}-\\frac{100}{99}+1\n=-\\frac{99}{99}+1=0.\n\\]\nSo \\(x=-\\frac{1}{99}\\) is a rational root with all coefficients \\(\\le 100\\).\n\nSince \\(-\\frac{1}{100}\\) is impossible, the largest possible rational root is \\(-\\frac{1}{99}\\).\n\n\\boxed{-\\frac{1}{99}}",
+   "response_steps": 34,
+   "response_tokens": 477,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_46",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "95",
+   "predicted": "95",
+   "raw_response": "Write the fractions as\n\\[\n\\frac{19}{n+21},\\frac{20}{n+22},\\dots,\\frac{91}{n+93}.\n\\]\nFor \\(k=19,20,\\dots,91\\), the corresponding term is\n\\[\n\\frac{k}{n+(k+2)}=\\frac{k}{n+k+2}.\n\\]\nThis fraction is irreducible iff\n\\[\n\\***(k,n+k+2)=1.\n\\]\nBut\n\\[\n\\***(k,n+k+2)=\\***\\bigl(k,(n+k+2)-k\\bigr)=\\***(k,n+2).\n\\]\nSo we need\n\\[\n\\***(k,n+2)=1 \\quad \\text{for all } k=19,20,\\dots,91.\n\\]\nLet \\(m=n+2\\). Then \\(m\\) must be coprime to every integer from \\(19\\) to \\(91\\). In particular, \\(m\\) cannot be divisible by any prime that appears among \\(19,20,\\dots,91\\). But every prime \\(\\le 91\\) appears in that range (as itself or as a factor of some number in the range). Hence\n\\[\nm \\text{ has no prime divisors } \\le 91.\n\\]\nThe smallest positive \\(m\\) with this property is \\(m=1\\), giving \\(n=m-2=-1\\), not allowed. Next possibility is that \\(m\\) is a product of primes \\(>91\\); the smallest such \\(m\\) is the smallest prime \\(>91\\), which is \\(97\\). Thus\n\\[\nn+2=97 \\implies n=95.\n\\]\nCheck: \\(\\***(k,97)=1\\) for all \\(k=19,\\dots,91\\) since none is divisible by \\(97\\). Therefore all 73 fractions are irreducible.\n\n\\[\n\\boxed{95}\n\\]",
+   "response_steps": 12,
+   "response_tokens": 161,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_47",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "773",
+   "predicted": "773",
+   "raw_response": "Let \\(n=2020\\). Label the vertices \\(0,1,\\dots,n-1\\) on a circle.\n\n\\[\n\\text{Total triangles}=\\binom{n}{3}.\n\\]\n\n### Counting isosceles triangles\nAn isosceles triangle in a regular \\(n\\)-gon has a reflection symmetry. For a given apex vertex \\(V\\), the other two vertices must be symmetric about the line through the center and \\(V\\). In terms of vertex labels, the other two vertices must be\n\\[\nV+t,\\quad V-t \\pmod n\n\\]\nfor some integer \\(t\\).\n\nTo ensure all three vertices are distinct, we need \\(t\\not\\equiv 0 \\pmod n\\). Also, \\(V+t\\equiv V-t\\) happens exactly when \\(2t\\equiv 0\\pmod n\\), i.e. \\(t\\equiv n/2\\). When \\(n\\) is even (it is), the choice \\(t=n/2\\) would force the two “base” vertices to coincide, which is not allowed. Hence, for each apex \\(V\\), the valid values of \\(t\\) are\n\\[\nt=1,2,\\dots,\\frac n2-1,\n\\]\nwhich gives \\(\\frac n2-1\\) isosceles triangles with that fixed apex.\n\nNow check overcounting: a non-degenerate isosceles triangle has exactly one apex (the vertex where the equal sides meet), so each counted triangle corresponds to exactly one apex. Therefore,\n\\[\n\\#(\\text{isosceles triangles}) = n\\left(\\frac n2-1\\right).\n\\]\n\nWith \\(n=2020\\),\n\\[\n\\#(\\text{isosceles}) = 2020\\left(1010-1\\right)=2020\\cdot 1009=2038180.\n\\]\nAlso,\n\\[\n\\binom{2020}{3}=\\frac{2020\\cdot 2019\\cdot 2018}{6}.\n\\]\n\nSo the probability is\n\\[\n\\frac{2038180}{\\binom{2020}{3}}\n=\\frac{2038180}{\\frac{2020\\cdot 2019\\cdot 2018}{6}}\n=\\frac{2038180\\cdot 6}{2020\\cdot 2019\\cdot 2018}.\n\\]\nCancel \\(2038180=2020\\cdot 1009\\):\n\\[\n=\\frac{1009\\cdot 6}{2019\\cdot 2018}.\n\\]\nReduce \\(2019=3\\cdot 673\\), \\(2018=2\\cdot 1009\\). Then\n\\[\n\\frac{1009\\cdot 6}{(3\\cdot 673)(2\\cdot 1009)}=\\frac{6}{3\\cdot 2\\cdot 673}=\\frac{1}{673}.\n\\]\nThus \\(a=1\\), \\(b=673\\), and\n\\[\n100a+b=100+673=773.\n\\]\n\n\\boxed{773}",
+   "response_steps": 19,
+   "response_tokens": 234,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_48",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "\\frac{1}{2}",
+   "predicted": "1",
+   "raw_response": "Let \\(p_i\\) be the probability that Kelvin ever lands on pad \\(2019\\) starting from pad \\(i\\).\n\nBecause jumps are strictly forward, \\(p_{2019}=1\\) and \\(p_i=0\\) for \\(i>2019\\). For \\(i<2019\\), conditioning on the first jump of size \\(k\\ge 1\\),\n\\[\np_i=\\sum_{k=1}^{2019-i}\\frac1{2^k}\\,p_{i+k},\n\\]\nsince terms with \\(i+k>2019\\) have \\(p_{i+k}=0\\).\n\nNow shift to “distance from the target.” Let\n\\[\nq_d:=p_{2019-d}\\qquad(d=0,1,\\dots,2019).\n\\]\nThen \\(q_0=p_{2019}=1\\), and for \\(d\\ge 1\\) (i.e. starting \\(d\\) below the target),\n\\[\nq_d=\\sum_{k=1}^{d}\\frac1{2^k}\\,q_{d-k}.\n\\]\nMultiplying by \\(2^d\\), define \\(r_d:=2^d q_d\\). The recursion becomes\n\\[\nr_d= \\sum_{k=1}^{d} 2^{d-k} q_{d-k}=\\sum_{k=1}^{d} r_{d-k}=\\sum_{j=0}^{d-1} r_j.\n\\]\nHence\n\\[\nr_d-r_{d-1}= \\left(\\sum_{j=0}^{d-1} r_j\\right)-\\left(\\sum_{j=0}^{d-2} r_j\\right)=r_{d-1},\n\\]\nso \\(r_d=2r_{d-1}\\) for \\(d\\ge 1\\). With \\(r_0=2^0 q_0=1\\), we get\n\\[\nr_d=2^d \\quad\\Rightarrow\\quad q_d=\\frac{r_d}{2^d}=1.\n\\]\nTherefore \\(p_0=q_{2019}=1\\): Kelvin lands on pad \\(2019\\) with probability \\(1\\).\n\n\\[\n\\boxed{1}\n\\]",
+   "response_steps": 11,
+   "response_tokens": 124,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OmniMATH_49",
+   "source_dataset": "OmniMATH",
+   "ground_truth": "43",
+   "predicted": "43",
+   "raw_response": "Start with \\(m=3\\). The first term is \\(T_1=m=3\\).\n\nFor each subsequent term, compute \\(n\\) from \\(m\\):\n- if \\(m\\) is even, \\(n=\\frac12 m\\)\n- if \\(m\\) is odd, \\(n=m+1\\)\n\nThen the next term is \\(T=m+n+1\\), and we set \\(m\\leftarrow T\\).\n\n- \\(T_1=3\\).\n- With \\(m=3\\) (odd): \\(n=3+1=4\\), so \\(T_2=3+4+1=8\\).\n- With \\(m=8\\) (even): \\(n=\\frac12\\cdot 8=4\\), so \\(T_3=8+4+1=13\\).\n- With \\(m=13\\) (odd): \\(n=13+1=14\\), so \\(T_4=13+14+1=28\\).\n- With \\(m=28\\) (even): \\(n=\\frac12\\cdot 28=14\\), so \\(T_5=28+14+1=43\\).\n\n\\(\\boxed{43}\\)",
+   "response_steps": 10,
+   "response_tokens": 73,
    "domain": "math"
   }
  ]
