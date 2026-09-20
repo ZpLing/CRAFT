@@ -944,16 +944,6 @@
    "tot_depth": 2
   },
   {
-   "sample_id": "FOLIO_201",
-   "source_dataset": "FOLIO",
-   "ground_truth": "__DISPROVED__",
-   "predicted": null,
-   "response_steps": 2.0,
-   "response_tokens": 29.0,
-   "domain": "logical",
-   "tot_depth": 2
-  },
-  {
    "sample_id": "FOLIO_293",
    "source_dataset": "FOLIO",
    "ground_truth": "__DISPROVED__",
@@ -1854,16 +1844,6 @@
    "tot_depth": 2
   },
   {
-   "sample_id": "OlympiadBench_19",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "79",
-   "predicted": null,
-   "response_steps": 19.0,
-   "response_tokens": 240.0,
-   "domain": "math",
-   "tot_depth": 2
-  },
-  {
    "sample_id": "OlympiadBench_20",
    "source_dataset": "OlympiadBench",
    "ground_truth": "309",
@@ -1984,16 +1964,6 @@
    "tot_depth": 2
   },
   {
-   "sample_id": "OlympiadBench_32",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "1510",
-   "predicted": null,
-   "response_steps": 41.0,
-   "response_tokens": 344.0,
-   "domain": "math",
-   "tot_depth": 2
-  },
-  {
    "sample_id": "OlympiadBench_33",
    "source_dataset": "OlympiadBench",
    "ground_truth": "20",
@@ -2045,16 +2015,6 @@
    "tot_depth": 2
   },
   {
-   "sample_id": "OlympiadBench_38",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$n(n-1)$",
-   "predicted": null,
-   "response_steps": 24.0,
-   "response_tokens": 349.0,
-   "domain": "math",
-   "tot_depth": 2
-  },
-  {
    "sample_id": "OlympiadBench_39",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$\\frac{3 \\pi}{4}$",
@@ -2071,16 +2031,6 @@
    "predicted": "- $n=18: |(18-2)(324-90+3)| = |16  2",
    "response_steps": 9.0,
    "response_tokens": 314.0,
-   "domain": "math",
-   "tot_depth": 2
-  },
-  {
-   "sample_id": "OlympiadBench_41",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "1344",
-   "predicted": null,
-   "response_steps": 34.0,
-   "response_tokens": 381.0,
    "domain": "math",
    "tot_depth": 2
   },
@@ -2121,16 +2071,6 @@
    "predicted": "102-143",
    "response_steps": 3.0,
    "response_tokens": 361.0,
-   "domain": "math",
-   "tot_depth": 2
-  },
-  {
-   "sample_id": "OlympiadBench_46",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "256",
-   "predicted": null,
-   "response_steps": 2.0,
-   "response_tokens": 452.0,
    "domain": "math",
    "tot_depth": 2
   },

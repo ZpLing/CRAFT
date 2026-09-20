@@ -2,16 +2,16 @@
  "setting": "RAP (MCTS+UCB, 8 iterations)",
  "setting_key": "rap",
  "overall": {
-  "accuracy": 0.7071,
+  "accuracy": 0.7121,
   "macro_f1": null,
-  "avg_steps": 8.54,
-  "std_steps": 7.88,
-  "avg_tokens": 178.5,
-  "std_tokens": 137.7,
+  "avg_steps": 9.27,
+  "std_steps": 10.67,
+  "avg_tokens": 189.9,
+  "std_tokens": 175.8,
   "n_total": 198,
-  "n_correct": 140,
-  "n_no_pred": 13,
-  "no_pred_rate": 0.0657,
+  "n_correct": 141,
+  "n_no_pred": 1,
+  "no_pred_rate": 0.0051,
   "n_blocked": 2,
   "by_domain": {
    "logical": {
@@ -45,17 +45,17 @@
     "domain": "logical"
    },
    "math": {
-    "accuracy": 0.6263,
+    "accuracy": 0.6364,
     "macro_f1": null,
-    "precision_answered": 0.7209,
-    "avg_steps": 10.79,
-    "std_steps": 10.1,
-    "avg_tokens": 163.1,
-    "std_tokens": 147.6,
+    "precision_answered": 0.6429,
+    "avg_steps": 12.26,
+    "std_steps": 14.11,
+    "avg_tokens": 186.3,
+    "std_tokens": 215.4,
     "n_total": 99,
-    "n_correct": 62,
-    "n_no_pred": 13,
-    "no_pred_rate": 0.1313,
+    "n_correct": 63,
+    "n_no_pred": 1,
+    "no_pred_rate": 0.0101,
     "n_blocked": 1,
     "domain": "math"
    }
@@ -138,17 +138,17 @@
     "domain": "math"
    },
    "OlympiadBench": {
-    "accuracy": 0.3265,
+    "accuracy": 0.3469,
     "macro_f1": null,
-    "precision_answered": 0.4444,
-    "avg_steps": 17.8,
-    "std_steps": 10.32,
-    "avg_tokens": 266.8,
-    "std_tokens": 148.8,
+    "precision_answered": 0.3542,
+    "avg_steps": 20.78,
+    "std_steps": 16.01,
+    "avg_tokens": 313.6,
+    "std_tokens": 247.1,
     "n_total": 49,
-    "n_correct": 16,
-    "n_no_pred": 13,
-    "no_pred_rate": 0.2653,
+    "n_correct": 17,
+    "n_no_pred": 1,
+    "no_pred_rate": 0.0204,
     "n_blocked": 1,
     "domain": "math"
    }
@@ -1684,16 +1684,6 @@
    "rap_depth": 3
   },
   {
-   "sample_id": "OlympiadBench_2",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$\\lceil n / 2\\rceil+1$",
-   "predicted": null,
-   "response_steps": 30.0,
-   "response_tokens": 464.0,
-   "domain": "math",
-   "rap_depth": 2
-  },
-  {
    "sample_id": "OlympiadBench_3",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$5,-2$",
@@ -1754,26 +1744,6 @@
    "rap_depth": 3
   },
   {
-   "sample_id": "OlympiadBench_9",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "(1,7,103, 105), (3, 5, 101, 107)",
-   "predicted": null,
-   "response_steps": 14.0,
-   "response_tokens": 311.0,
-   "domain": "math",
-   "rap_depth": 2
-  },
-  {
-   "sample_id": "OlympiadBench_10",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$-(n-1) / 2$",
-   "predicted": null,
-   "response_steps": 22.0,
-   "response_tokens": 335.0,
-   "domain": "math",
-   "rap_depth": 3
-  },
-  {
    "sample_id": "OlympiadBench_11",
    "source_dataset": "OlympiadBench",
    "ground_truth": "3",
@@ -1794,16 +1764,6 @@
    "rap_depth": 2
   },
   {
-   "sample_id": "OlympiadBench_13",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "11",
-   "predicted": null,
-   "response_steps": 28.0,
-   "response_tokens": 589.0,
-   "domain": "math",
-   "rap_depth": 3
-  },
-  {
    "sample_id": "OlympiadBench_14",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$\\frac{4}{7}$",
@@ -1822,26 +1782,6 @@
    "response_tokens": 189.0,
    "domain": "math",
    "rap_depth": 3
-  },
-  {
-   "sample_id": "OlympiadBench_16",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$n^{2}-n+1$",
-   "predicted": null,
-   "response_steps": 29.0,
-   "response_tokens": 496.0,
-   "domain": "math",
-   "rap_depth": 2
-  },
-  {
-   "sample_id": "OlympiadBench_17",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$\\frac{4 \\cdot 999^{4}}{27}$",
-   "predicted": null,
-   "response_steps": 22.0,
-   "response_tokens": 471.0,
-   "domain": "math",
-   "rap_depth": 2
   },
   {
    "sample_id": "OlympiadBench_18",
@@ -1880,16 +1820,6 @@
    "predicted": "2916",
    "response_steps": 22.0,
    "response_tokens": 185.0,
-   "domain": "math",
-   "rap_depth": 2
-  },
-  {
-   "sample_id": "OlympiadBench_22",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$2021 \\cdot 505 \\cdot 337$",
-   "predicted": null,
-   "response_steps": 24.0,
-   "response_tokens": 406.0,
    "domain": "math",
    "rap_depth": 2
   },
@@ -1954,16 +1884,6 @@
    "rap_depth": 3
   },
   {
-   "sample_id": "OlympiadBench_29",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "960",
-   "predicted": null,
-   "response_steps": 30.0,
-   "response_tokens": 541.0,
-   "domain": "math",
-   "rap_depth": 3
-  },
-  {
    "sample_id": "OlympiadBench_30",
    "source_dataset": "OlympiadBench",
    "ground_truth": "25",
@@ -1984,16 +1904,6 @@
    "rap_depth": 2
   },
   {
-   "sample_id": "OlympiadBench_32",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "1510",
-   "predicted": null,
-   "response_steps": 35.0,
-   "response_tokens": 434.0,
-   "domain": "math",
-   "rap_depth": 2
-  },
-  {
    "sample_id": "OlympiadBench_33",
    "source_dataset": "OlympiadBench",
    "ground_truth": "20",
@@ -2002,16 +1912,6 @@
    "response_tokens": 152.0,
    "domain": "math",
    "rap_depth": 2
-  },
-  {
-   "sample_id": "OlympiadBench_34",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "11",
-   "predicted": null,
-   "response_steps": 26.0,
-   "response_tokens": 392.0,
-   "domain": "math",
-   "rap_depth": 3
   },
   {
    "sample_id": "OlympiadBench_35",
@@ -2043,26 +1943,6 @@
    "response_tokens": 273.0,
    "domain": "math",
    "rap_depth": 2
-  },
-  {
-   "sample_id": "OlympiadBench_38",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$n(n-1)$",
-   "predicted": null,
-   "response_steps": 19.0,
-   "response_tokens": 334.0,
-   "domain": "math",
-   "rap_depth": 3
-  },
-  {
-   "sample_id": "OlympiadBench_39",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$\\frac{3 \\pi}{4}$",
-   "predicted": null,
-   "response_steps": 26.0,
-   "response_tokens": 303.0,
-   "domain": "math",
-   "rap_depth": 3
   },
   {
    "sample_id": "OlympiadBench_40",
@@ -2125,16 +2005,6 @@
    "rap_depth": 2
   },
   {
-   "sample_id": "OlympiadBench_46",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "256",
-   "predicted": null,
-   "response_steps": 25.0,
-   "response_tokens": 404.0,
-   "domain": "math",
-   "rap_depth": 2
-  },
-  {
    "sample_id": "OlympiadBench_47",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$\\frac{50}{37}$",
@@ -2161,6 +2031,136 @@
    "predicted": "19",
    "response_steps": 5.0,
    "response_tokens": 68.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_2",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\lceil n / 2\\rceil+1$",
+   "predicted": "n",
+   "response_steps": 27.0,
+   "response_tokens": 315.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_9",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "(1,7,103, 105), (3, 5, 101, 107)",
+   "predicted": "3,5101107",
+   "response_steps": 33.0,
+   "response_tokens": 522.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_10",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$-(n-1) / 2$",
+   "predicted": "-n2",
+   "response_steps": 28.0,
+   "response_tokens": 471.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_13",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "11",
+   "predicted": "22",
+   "response_steps": 30.0,
+   "response_tokens": 438.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_16",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$n^{2}-n+1$",
+   "predicted": "n-1",
+   "response_steps": 37.0,
+   "response_tokens": 901.0,
+   "domain": "math",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "OlympiadBench_17",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{4 \\cdot 999^{4}}{27}$",
+   "predicted": "62250250000",
+   "response_steps": 48.0,
+   "response_tokens": 876.0,
+   "domain": "math",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "OlympiadBench_22",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$2021 \\cdot 505 \\cdot 337$",
+   "predicted": "687207366",
+   "response_steps": 47.0,
+   "response_tokens": 772.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_29",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "960",
+   "predicted": "59",
+   "response_steps": 52.0,
+   "response_tokens": 976.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_32",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "1510",
+   "predicted": "10",
+   "response_steps": 81.0,
+   "response_tokens": 1015.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_34",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "11",
+   "predicted": "11",
+   "response_steps": 15.0,
+   "response_tokens": 303.0,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_38",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$n(n-1)$",
+   "predicted": null,
+   "response_steps": 3.125,
+   "response_tokens": 100.25,
+   "domain": "math",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "OlympiadBench_39",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{3 \\pi}{4}$",
+   "predicted": "34",
+   "response_steps": 36.0,
+   "response_tokens": 468.0,
+   "domain": "math",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "OlympiadBench_46",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "256",
+   "predicted": "3",
+   "response_steps": 39.0,
+   "response_tokens": 616.0,
    "domain": "math",
    "rap_depth": 3
   }

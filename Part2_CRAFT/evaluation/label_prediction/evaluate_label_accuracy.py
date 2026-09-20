@@ -17,7 +17,8 @@ predicted labels directly from pipeline output files.
 Usage:
     RUN=craft_runs/craft_k5_full_fld_gemini
     python evaluation/label_prediction/evaluate_label_accuracy.py \\
-        --datasets dataset/label_prediction/logical/FLD.json dataset/label_prediction/logical/FOLIO.json \\
+        --datasets dataset/label_prediction/logical/FLD.json \\
+                   dataset/label_prediction/logical/ProofWriter.json \\
         --k_traces_file    $RUN/k_traces.json \\
         --cleaned_file     $RUN/cleaned.json \\
         --synthesized_step $RUN/synthesized_step_by_step.json \\
@@ -1394,7 +1395,7 @@ def main() -> None:
     )
     # Datasets
     parser.add_argument("--datasets",    nargs="+", required=True,
-                        help="FLD.json or FOLIO.json files")
+                        help="the dataset JSONs the run was generated from")
     parser.add_argument("--test_file",   default=None,
                         help="JSON file with test sample_ids (auto-split if absent)")
     parser.add_argument("--test_ratio",  type=float, default=0.2)

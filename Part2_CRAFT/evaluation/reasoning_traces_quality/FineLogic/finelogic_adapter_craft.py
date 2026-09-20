@@ -82,7 +82,7 @@ def main() -> None:
     ap.add_argument("--craft_dir", required=True,
                     help="CRAFT run directory (k_traces_*_samples.json + synthesized*.json)")
     ap.add_argument("--dataset", required=True,
-                    help="The FLD.json / FOLIO.json the run was generated from")
+                    help="The FLD.json / ProofWriter.json the run was generated from")
     ap.add_argument("--output_dir", default="CRAFT_evaluation_results/reasoning_traces_quality/FineLogic",
                     help="Where the {dataset}_{raw,craft}.json pair is written; "
                          "a relative path resolves under the results root")

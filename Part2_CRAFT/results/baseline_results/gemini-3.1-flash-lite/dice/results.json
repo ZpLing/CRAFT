@@ -1684,16 +1684,6 @@
    "n_subs": 4
   },
   {
-   "sample_id": "OlympiadBench_2",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$\\lceil n / 2\\rceil+1$",
-   "predicted": null,
-   "response_steps": 22.0,
-   "response_tokens": 398.0,
-   "domain": "math",
-   "n_subs": 4
-  },
-  {
    "sample_id": "OlympiadBench_3",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$5,-2$",
@@ -2045,32 +2035,12 @@
    "n_subs": 4
   },
   {
-   "sample_id": "OlympiadBench_38",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$n(n-1)$",
-   "predicted": null,
-   "response_steps": 15.0,
-   "response_tokens": 361.0,
-   "domain": "math",
-   "n_subs": 4
-  },
-  {
    "sample_id": "OlympiadBench_39",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$\\frac{3 \\pi}{4}$",
    "predicted": "0.75",
    "response_steps": 4.0,
    "response_tokens": 279.0,
-   "domain": "math",
-   "n_subs": 4
-  },
-  {
-   "sample_id": "OlympiadBench_40",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$\\frac{1}{9}$",
-   "predicted": null,
-   "response_steps": 5.0,
-   "response_tokens": 305.0,
    "domain": "math",
    "n_subs": 4
   },

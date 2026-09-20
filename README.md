@@ -22,6 +22,12 @@ traces, drops the steps they disagree on, aggregates the survivors into a consen
 Label-prediction accuracy (%). CRAFT also wins on average steps, and its post-processed
 traces score higher under ROSCOE, ReCEval and FineLogic.
 
+> These numbers are from the previous benchmark. FOLIO and GSM8K have since been
+> replaced — both backbones had run out of room on them, a median 49/50 on GSM8K
+> and 46/50 on FOLIO, where no method can show a difference — by ProofWriter
+> depth-5 and Omni-MATH. The table is regenerated from the runs over the four
+> datasets now in `dataset/label_prediction/`.
+
 ## Installation
 
 ```bash
@@ -87,7 +93,7 @@ python framework/module3_synthesis/synthesize_trace.py --input $RUN/cleaned.json
     --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
 ```
 
-GSM8K and OlympiadBench take `--domain math` on every stage. `extract_terms.py` is not a
+Omni-MATH and OlympiadBench take `--domain math` on every stage. `extract_terms.py` is not a
 pipeline stage — it dumps the TF-IRF terms for inspection, and the filters call its
 functions directly.
 
@@ -109,8 +115,8 @@ framework of §3.2.
 ├── Part2_CRAFT/                     § 3.2  The CRAFT framework
 │   ├── dataset/                       mirrors evaluation/ below
 │   │   ├── label_prediction/
-│   │   │   ├── logical/             FLD (with its published proofs), FOLIO
-│   │   │   └── math/                GSM8K, OlympiadBench
+│   │   │   ├── logical/             FLD (with its published proofs), ProofWriter
+│   │   │   └── math/                Omni-MATH, OlympiadBench
 │   │   └── reasoning_traces_quality/
 │   │       ├── roscoe/              CosmosQA, DROP, eSNLI, GSM8K (125 each)
 │   │       ├── receval/             FLD, FOLIO — the traces ReCEval scores
@@ -133,6 +139,33 @@ framework of §3.2.
 │                                    code does
 └── config.py                        API credentials (local only, git-ignored)
 ```
+
+### The four datasets
+
+Two logical and two mathematical, chosen so that no column is decided before a
+method is applied. Zero-shot accuracy on 30 samples, which is what a backbone
+reaches without any of the methods being compared:
+
+| dataset | | GPT-5.4-nano | Gemini-3.1-flash-lite |
+| --- | --- | ---: | ---: |
+| FLD | logical | .667 | .800 |
+| ProofWriter (depth-5, RelNeg-OWA) | logical | .667 | .667 |
+| Omni-MATH | math | .400 | .500 |
+| OlympiadBench | math | .533 | .800 |
+
+500 samples each, the logical two balanced between proved and disproved.
+
+ProofWriter is taken at question depth 5 — the answer needs a five-step
+deduction — and from its RelNeg-OWA configuration, relational predicates with
+negation. It is the only one of the five configurations where both backbones
+have room: AttNeg-OWA is 1.00 on both. Its test and validation splits are used,
+never train.
+
+Omni-MATH drops the problems that cannot be scored rather than scoring them
+wrong: those that depend on a figure, and those whose gold answer describes a
+family of solutions ("All positive integers n with prime factors 1 mod 4")
+rather than naming a value. Six hundred of those would deduct the same points
+from every method, measuring the scorer rather than the method.
 
 Each part is self-contained: its inputs live in `<part>/dataset/` and every artifact it
 produces lands in `<part>/results/`. A script resolves a **relative** `--output` /

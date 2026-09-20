@@ -68,6 +68,10 @@ def _strip_wrappers(s: str) -> str:
     while s.startswith("$") and s.endswith("$") and len(s) > 2:
         s = s[1:-1].strip()
     s = s.replace("$", " ")
+    # Display and inline math delimiters wrap the answer without changing it:
+    # Omni-MATH writes some answers as "\[ 2047 \]" and some as "\[\boxed{2018}\]".
+    s = re.sub(r"\\[\[\]()]", " ", s)
+    s = re.sub(r"\\boxed\s*\{(.+)\}\s*$", r"\1", s.strip(), flags=re.S)
     s = s.replace("\\left", "").replace("\\right", "")
     s = re.sub(r"\\[,;:!]", " ", s)
     s = re.sub(r"\\quad|\\qquad", " ", s)
@@ -125,9 +129,12 @@ def _latex_to_expr_text(s: str) -> str:
     s = re.sub(r"\\d?binom\s*\{([^{}]*)\}\s*\{([^{}]*)\}", r"binomial(\1,\2)", s)
     s = re.sub(r"\\(ln|log|exp|sin|cos|tan|cot|sec|csc|arcsin|arccos|arctan|sinh|cosh|tanh)\b",
                r"\1", s)
-    s = s.replace("\\pi", "pi").replace("\\infty", "oo")
+    # A LaTeX command ends where its name ends, not where a space is, so
+    # "\pi\sqrt{3}" is pi times sqrt(3). Replacing without a boundary glues the
+    # names into one symbol, "pisqrt", and the two spellings stop matching.
+    s = s.replace("\\pi", " pi ").replace("\\infty", " oo ")
     for g in _GREEK:
-        s = s.replace("\\" + g, g)
+        s = s.replace("\\" + g, f" {g} ")
     s = re.sub(r"\\!|\\ ", " ", s)
     s = re.sub(r"\\[a-zA-Z]+", " ", s)          # anything left over is decoration
 
@@ -467,12 +474,6 @@ def match_olympiadbench(pred: str, gold: str, answer_type: Optional[str] = None)
     return _scalar_equal(vp, vg)
 
 
-def match_gsm8k(pred: str, gold: str, answer_type: Optional[str] = None) -> bool:
-    """GSM8K: the answer is one number. Compared as a number, not as text."""
-    p, g = _to_sympy(pred or ""), _to_sympy(gold or "")
-    return _scalar_equal(p, g, gold_text=gold)
-
-
 def normalise_label(label: Optional[str]) -> Optional[str]:
     if not label:
         return None
@@ -492,11 +493,18 @@ def match_label(pred: str, gold: str, answer_type: Optional[str] = None) -> bool
     return p is not None and p == g
 
 
+# One adapter per dataset in the benchmark: FLD and ProofWriter answer with a
+# label, OlympiadBench and Omni-MATH with a competition-math answer that has to
+# be compared for meaning rather than spelling.
+#
+# GSM8K and FOLIO were the other two until both backbones ran out of room on
+# them — a median 49/50 on GSM8K and 46/50 on FOLIO, where no method can show a
+# difference — and they were replaced by Omni-MATH and ProofWriter depth-5.
 ADAPTERS = {
-    "OlympiadBench": match_olympiadbench,
-    "GSM8K":         match_gsm8k,
     "FLD":           match_label,
-    "FOLIO":         match_label,
+    "ProofWriter":   match_label,
+    "OlympiadBench": match_olympiadbench,
+    "OmniMATH":      match_olympiadbench,
 }
 
 

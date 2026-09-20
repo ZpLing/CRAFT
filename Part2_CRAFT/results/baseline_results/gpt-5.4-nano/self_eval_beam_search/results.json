@@ -4,14 +4,14 @@
  "overall": {
   "accuracy": 0.4444,
   "macro_f1": null,
-  "avg_steps": 1.84,
-  "std_steps": 1.47,
-  "avg_tokens": 51.7,
-  "std_tokens": 54.1,
+  "avg_steps": 1.8,
+  "std_steps": 1.38,
+  "avg_tokens": 49.4,
+  "std_tokens": 42.5,
   "n_total": 198,
   "n_correct": 88,
-  "n_no_pred": 1,
-  "no_pred_rate": 0.0051,
+  "n_no_pred": 0,
+  "no_pred_rate": 0.0,
   "n_blocked": 2,
   "by_domain": {
    "logical": {
@@ -47,15 +47,15 @@
    "math": {
     "accuracy": 0.2121,
     "macro_f1": null,
-    "precision_answered": 0.2143,
-    "avg_steps": 2.51,
-    "std_steps": 1.68,
-    "avg_tokens": 46.4,
-    "std_tokens": 63.9,
+    "precision_answered": 0.2121,
+    "avg_steps": 2.42,
+    "std_steps": 1.56,
+    "avg_tokens": 41.6,
+    "std_tokens": 42.0,
     "n_total": 99,
     "n_correct": 21,
-    "n_no_pred": 1,
-    "no_pred_rate": 0.0101,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
     "n_blocked": 1,
     "domain": "math"
    }
@@ -140,15 +140,15 @@
    "OlympiadBench": {
     "accuracy": 0.0204,
     "macro_f1": null,
-    "precision_answered": 0.0208,
-    "avg_steps": 3.02,
-    "std_steps": 2.02,
-    "avg_tokens": 69.9,
-    "std_tokens": 82.9,
+    "precision_answered": 0.0204,
+    "avg_steps": 2.86,
+    "std_steps": 1.84,
+    "avg_tokens": 60.2,
+    "std_tokens": 50.7,
     "n_total": 49,
     "n_correct": 1,
-    "n_no_pred": 1,
-    "no_pred_rate": 0.0204,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
     "n_blocked": 1,
     "domain": "math"
    }
@@ -2155,17 +2155,6 @@
    "domain": "math"
   },
   {
-   "sample_id": "OlympiadBench_31",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "5",
-   "predicted": null,
-   "beam_score": 0.3763,
-   "raw_response": "Since \\(501\\) is odd, after each minute the number of on switches changes by an odd number, so from the initial \\(0\\) (even) the number of on switches after an odd number of minutes is odd, and after an even number of minutes is even; because \\(2001\\) is odd, escaping requires an odd number of minutes, so \\(E(2001,501)\\) must be odd.\nSince each minute flips exactly \\(501\\) switches, the parity of the number of on switches flips every minute, so after \\(t\\) minutes the number on equals \\(t\\cdot 501 \\pmod 2\\); to have all \\(2001\\) switches on (which is odd) we must have \\(t\\) odd, hence \\(E(2001,501)\\ge 1\\) and is odd.\nSince \\(501\\equiv 1\\pmod 2\\), at the end of \\(t\\) minutes the number of on switches has the same parity as \\(t\\); thus with all \\(2001\\) switches on (odd), we must have \\(t\\) odd, and in particular the minimum number of minutes satisfies \\(E(2001,501)\\ge 3\\).\nObserve that for any time \\(t\\), the number of switches that are on is congruent to \\(t\\cdot 501\\equiv t\\pmod 2\\), and since \\(2001\\) is odd we need \\(t\\) odd; moreover, in one minute she flips \\(501\\) switches, so to reach the all-on state from all-off she must have \\(t\\ge \\left\\lceil \\frac{2001}{501}\\right\\rceil=5\\), and the smallest odd such \\(t\\) is \\(5\\).\nSince \\(t\\) must be an odd number with \\(t\\ge 5\\), we have \\(E(2001,501)\\ge 5\\), and it remains to determine whether escape is possible in exactly \\(t=5\\) minutes.\nIn 5 minutes she flips \\(5\\cdot 501=2505\\) switches total, so each switch must be flipped an odd number of times, and since \\(2505-2001=504\\) there must be exactly \\(504\\) “extra” flips beyond the required 1 flip per switch, i.e. exactly \\(504/2=252\\) switches are flipped 3 times (and the remaining \\(2001-252=1749\\) switches are flipped exactly once).\nIn 5 minutes, the set of switches flipped **3 times** must have size \\(252\\), so we need to partition the total of \\(5\\cdot 501\\) flips into 5 minutes such that each minute flips 501 distinct switches and, overall, exactly 252 switches appear in exactly 3 of the 5 minute-sets (and the other \\(1749\\) switches appear in exactly 1 of the 5 minute-sets).\nOne valid construction is to label the 5 minutes by sets \\(A_1,\\dots,A_5\\) of size \\(501\\) with \\(|A_i\\cap A_j\\cap A_\\ell| \\) arranged so that exactly \\(252\\) switches lie in exactly three of the sets and the remaining \\(1749\\) lie in exactly one; for instance, let \\(252\\) switches each be included in \\(A_1,A_2,A_3\\), and let the other \\(1749\\) switches be distributed so that \\(A_1\\) receives \\(501-252=249\\) new switches, \\(A_2\\) receives \\(501-252=249\\) new switches, \\(A_3\\) receives \\(501-252=249\\) new switches, \\(A_4\\) receives \\(501\\) new switches, and \\(A_5\\) receives \\(501\\) new switches (\nTo finish checking \\(t=5\\) is possible, note that \\(A_1,A_2,A_3\\) can each contain the same \\(252\\) “triple” switches, so they use \\(252\\) spots each and then contribute \\(501-252=249\\) distinct new switches to make\n\\[\n|A_1\\cup A_2\\cup A_3|=252+3\\cdot 249=999,\n\\]\nwhile \\(A_4,A_5\\) must each consist entirely of new switches not in \\(A_1\\cup A_2\\cup A_3\\); choosing \\(A_4\\) and \\(A_5\\) disjoint with each other and disjoint from \\(A_1\\cup A_2\\cup A_3\\) gives total distinct switches\n\\[\n999+501+501=2001,\n\\]\nso every one of the \\(200",
-   "response_steps": 9.0,
-   "response_tokens": 524.0,
-   "domain": "math"
-  },
-  {
    "sample_id": "OlympiadBench_32",
    "source_dataset": "OlympiadBench",
    "ground_truth": "1510",
@@ -2362,6 +2351,17 @@
    "raw_response": "\\[\nBC^2=AB^2+AC^2-2(AB)(AC)\\cos 60^\\circ\n\\]",
    "response_steps": 1.0,
    "response_tokens": 4.0,
+   "domain": "math"
+  },
+  {
+   "sample_id": "OlympiadBench_31",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "5",
+   "predicted": "so \\(mk n 2.\\)",
+   "beam_score": 0.61,
+   "raw_response": "Let \\(m\\) be the number of minutes; then after \\(m\\) minutes the total number of flips performed is \\(mk\\), so the number of switches that are on equals the number of switches flipped an odd number of times, and therefore\n\\[\nmk \\equiv \\#\\{\\text{switches on}\\}\\equiv n \\pmod 2,\n\\]\nso \\(mk\\equiv n\\pmod 2.\\)",
+   "response_steps": 1,
+   "response_tokens": 53,
    "domain": "math"
   }
  ]

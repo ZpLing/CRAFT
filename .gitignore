@@ -20,6 +20,10 @@ Part2_CRAFT/results/*
 # The analyses behind the appendix are small — kilobytes — and are what the
 # appendix numbers are read from, so they are tracked too.
 !Part2_CRAFT/results/CRAFT_evaluation_results/
+# Backups the eviction tool leaves behind are working files, not results.
+*.bak
+*.jsonl.bak
+*.json.bak
 
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/

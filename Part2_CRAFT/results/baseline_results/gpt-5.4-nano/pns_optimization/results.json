@@ -4,14 +4,14 @@
  "overall": {
   "accuracy": 0.7374,
   "macro_f1": null,
-  "avg_steps": 7.78,
-  "std_steps": 6.81,
-  "avg_tokens": 145.9,
-  "std_tokens": 108.8,
+  "avg_steps": 7.7,
+  "std_steps": 6.68,
+  "avg_tokens": 144.4,
+  "std_tokens": 106.3,
   "n_total": 198,
   "n_correct": 146,
-  "n_no_pred": 1,
-  "no_pred_rate": 0.0051,
+  "n_no_pred": 0,
+  "no_pred_rate": 0.0,
   "n_blocked": 2,
   "by_domain": {
    "logical": {
@@ -47,15 +47,15 @@
    "math": {
     "accuracy": 0.6566,
     "macro_f1": null,
-    "precision_answered": 0.6633,
-    "avg_steps": 9.94,
-    "std_steps": 8.94,
-    "avg_tokens": 154.0,
-    "std_tokens": 132.2,
+    "precision_answered": 0.6566,
+    "avg_steps": 9.78,
+    "std_steps": 8.77,
+    "avg_tokens": 151.0,
+    "std_tokens": 128.2,
     "n_total": 99,
     "n_correct": 65,
-    "n_no_pred": 1,
-    "no_pred_rate": 0.0101,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
     "n_blocked": 1,
     "domain": "math"
    }
@@ -140,15 +140,15 @@
    "OlympiadBench": {
     "accuracy": 0.4082,
     "macro_f1": null,
-    "precision_answered": 0.4167,
-    "avg_steps": 15.94,
-    "std_steps": 9.19,
-    "avg_tokens": 238.2,
-    "std_tokens": 141.5,
+    "precision_answered": 0.4082,
+    "avg_steps": 15.61,
+    "std_steps": 9.07,
+    "avg_tokens": 232.1,
+    "std_tokens": 137.5,
     "n_total": 49,
     "n_correct": 20,
-    "n_no_pred": 1,
-    "no_pred_rate": 0.0204,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
     "n_blocked": 1,
     "domain": "math"
    }
@@ -1793,16 +1793,6 @@
    "steps_dropped": 96
   },
   {
-   "sample_id": "OlympiadBench_13",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "11",
-   "predicted": null,
-   "response_steps": 27.0,
-   "response_tokens": 475.0,
-   "domain": "math",
-   "steps_dropped": 81
-  },
-  {
    "sample_id": "OlympiadBench_14",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$\\frac{4}{7}$",
@@ -2161,6 +2151,16 @@
    "response_tokens": 58.0,
    "domain": "math",
    "steps_dropped": 94
+  },
+  {
+   "sample_id": "OlympiadBench_13",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "11",
+   "predicted": "22",
+   "response_steps": 11.0,
+   "response_tokens": 174.0,
+   "domain": "math",
+   "steps_dropped": 74
   }
  ]
 }

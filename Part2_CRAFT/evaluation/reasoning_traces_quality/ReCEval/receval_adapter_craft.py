@@ -118,7 +118,7 @@ def main():
     ap.add_argument("--craft_dir", required=True,
                     help="CRAFT pipeline output directory (contains k_traces_*.json and synthesized_traces.json)")
     ap.add_argument("--dataset", required=True,
-                    help="Source dataset JSON (FLD.json / FOLIO.json) for hypothesis+premises lookup")
+                    help="Source dataset JSON (FLD.json / ProofWriter.json) for hypothesis+premises lookup")
     ap.add_argument("--output", default="CRAFT_evaluation_results/reasoning_traces_quality/ReCEval/receval_input.json",
                     help="Output JSON in ReCEval schema; relative paths resolve under the results root")
     ap.add_argument("--synth_file", default=None,

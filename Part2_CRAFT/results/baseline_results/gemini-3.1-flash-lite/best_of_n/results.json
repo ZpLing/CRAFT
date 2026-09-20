@@ -1514,15 +1514,6 @@
    "domain": "math"
   },
   {
-   "sample_id": "OlympiadBench_0",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$\\frac{4}{3}$",
-   "predicted": null,
-   "response_steps": 35.0,
-   "response_tokens": 391.0,
-   "domain": "math"
-  },
-  {
    "sample_id": "OlympiadBench_1",
    "source_dataset": "OlympiadBench",
    "ground_truth": "$18.8^{\\circ}$",
@@ -1592,15 +1583,6 @@
    "predicted": "6045",
    "response_steps": 6.0,
    "response_tokens": 329.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "OlympiadBench_9",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "(1,7,103, 105), (3, 5, 101, 107)",
-   "predicted": null,
-   "response_steps": 4.0,
-   "response_tokens": 368.0,
    "domain": "math"
   },
   {
@@ -1685,39 +1667,12 @@
    "domain": "math"
   },
   {
-   "sample_id": "OlympiadBench_19",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "79",
-   "predicted": null,
-   "response_steps": 9.0,
-   "response_tokens": 354.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "OlympiadBench_20",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "309",
-   "predicted": null,
-   "response_steps": 32.0,
-   "response_tokens": 325.0,
-   "domain": "math"
-  },
-  {
    "sample_id": "OlympiadBench_21",
    "source_dataset": "OlympiadBench",
    "ground_truth": "2916",
    "predicted": "2916",
    "response_steps": 18.0,
    "response_tokens": 315.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "OlympiadBench_22",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$2021 \\cdot 505 \\cdot 337$",
-   "predicted": null,
-   "response_steps": 3.0,
-   "response_tokens": 462.0,
    "domain": "math"
   },
   {
@@ -1944,15 +1899,6 @@
    "predicted": "d^2 = 2(1 - 1",
    "response_steps": 22.0,
    "response_tokens": 345.0,
-   "domain": "math"
-  },
-  {
-   "sample_id": "OlympiadBench_48",
-   "source_dataset": "OlympiadBench",
-   "ground_truth": "$-\\frac{8}{3}$",
-   "predicted": null,
-   "response_steps": 37.0,
-   "response_tokens": 427.0,
    "domain": "math"
   },
   {
