@@ -59,15 +59,15 @@ from framework.module1_generation_filtering.anomaly_filter import (
 #########################
 import importlib.util as _ilu, pathlib as _pl
 
-# Import normalise_math_answer from evaluate_direct_accuracy for consistent normalization
+# normalise_math_answer comes from extract_label, the one copy of it.
 def _normalise_math_pred(s: Optional[str]) -> Optional[str]:
-    """Normalize a math pred_label before storing — delegates to evaluate_direct_accuracy."""
+    """Normalize a math pred_label before storing — delegates to extract_label."""
     try:
         import sys as _sys
         _eval_dir = str(_pl.Path(__file__).resolve().parents[2] / "evaluation" / "label_prediction")
         if _eval_dir not in _sys.path:
             _sys.path.insert(0, _eval_dir)
-        from evaluate_direct_accuracy import normalise_math_answer
+        from extract_label import normalise_math_answer
         return normalise_math_answer(s)
     except ImportError:
         pass

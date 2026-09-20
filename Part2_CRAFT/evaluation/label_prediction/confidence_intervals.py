@@ -36,7 +36,7 @@ except ImportError:
     resolve_input = resolve_output = Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from evaluate_direct_accuracy import LOADERS, compute_metrics
+from evaluate_accuracy import LOADERS, compute_metrics
 
 Z_95 = 1.959963984540054
 

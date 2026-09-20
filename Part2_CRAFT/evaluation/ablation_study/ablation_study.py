@@ -50,7 +50,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]
                        / "evaluation" / "label_prediction"))
-from evaluate_direct_accuracy import LOADERS, compute_metrics
+from evaluate_accuracy import LOADERS, compute_metrics
 
 FULL = "CRAFT (full)"
 VARIANT_ROWS = ("w/o RKG", "w/o Weighted Edges Fusion", "Embedding Cosine Similarity")
@@ -64,7 +64,7 @@ def find_one(run_dir: Path, pattern: str) -> Optional[Path]:
 
 
 def score(path: Path, source: str) -> Dict[str, Any]:
-    """One row, scored exactly as evaluate_direct_accuracy would score it."""
+    """One row, scored exactly as evaluate_accuracy would score it."""
     metrics = compute_metrics(LOADERS[source](path))
     return {"accuracy": round(100.0 * metrics["accuracy"], 1),
             "macro_f1": metrics["macro_f1"],

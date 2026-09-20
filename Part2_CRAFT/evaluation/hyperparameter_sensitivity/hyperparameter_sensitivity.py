@@ -40,7 +40,7 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]
                        / "evaluation" / "label_prediction"))
 try:
-    from evaluate_direct_accuracy import normalise_math_answer
+    from extract_label import normalise_math_answer
 except ImportError:
     def normalise_math_answer(s):  # noqa: D103
         return (s or "").strip() or None

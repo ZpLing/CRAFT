@@ -227,7 +227,7 @@ Gemini-3.1-flash-lite.
 RTQ=evaluation/reasoning_traces_quality
 
 # label prediction — the main table, and the A–E ablation
-python evaluation/label_prediction/evaluate_direct_accuracy.py --input $RUN/synthesized.json --source synthesized
+python evaluation/label_prediction/evaluate_accuracy.py score --input $RUN/synthesized.json --source synthesized
 
 # reasoning trace quality — pair raw CoT with the CRAFT trace, score, tabulate
 python $RTQ/ReCEval/receval_adapter_craft.py   --craft_dir $RUN \
