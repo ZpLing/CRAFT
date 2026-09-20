@@ -1170,8 +1170,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 5,
-   "response_tokens": 330,
+   "response_steps": 5.0,
+   "response_tokens": 330.0,
    "domain": "logical"
   },
   {
@@ -1180,8 +1180,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 3,
-   "response_tokens": 256,
+   "response_steps": 3.0,
+   "response_tokens": 256.0,
    "domain": "logical"
   },
   {
@@ -1190,8 +1190,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 9,
-   "response_tokens": 196,
+   "response_steps": 9.0,
+   "response_tokens": 196.0,
    "domain": "logical"
   },
   {
@@ -1200,8 +1200,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 400,
+   "response_steps": 9.0,
+   "response_tokens": 400.0,
    "domain": "logical"
   },
   {
@@ -1210,8 +1210,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 299,
+   "response_steps": 9.0,
+   "response_tokens": 299.0,
    "domain": "logical"
   },
   {
@@ -1220,8 +1220,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 326,
+   "response_steps": 9.0,
+   "response_tokens": 326.0,
    "domain": "logical"
   },
   {
@@ -1230,8 +1230,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 5,
-   "response_tokens": 313,
+   "response_steps": 5.0,
+   "response_tokens": 313.0,
    "domain": "logical"
   },
   {
@@ -1240,8 +1240,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 5,
-   "response_tokens": 201,
+   "response_steps": 5.0,
+   "response_tokens": 201.0,
    "domain": "logical"
   },
   {
@@ -1250,8 +1250,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 4,
-   "response_tokens": 199,
+   "response_steps": 4.0,
+   "response_tokens": 199.0,
    "domain": "logical"
   },
   {
@@ -1260,8 +1260,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 15,
-   "response_tokens": 285,
+   "response_steps": 15.0,
+   "response_tokens": 285.0,
    "domain": "logical"
   },
   {
@@ -1270,8 +1270,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 253,
+   "response_steps": 7.0,
+   "response_tokens": 253.0,
    "domain": "logical"
   },
   {
@@ -1280,8 +1280,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 8,
-   "response_tokens": 185,
+   "response_steps": 8.0,
+   "response_tokens": 185.0,
    "domain": "logical"
   },
   {
@@ -1290,8 +1290,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 5,
-   "response_tokens": 344,
+   "response_steps": 5.0,
+   "response_tokens": 344.0,
    "domain": "logical"
   },
   {
@@ -1300,8 +1300,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 16,
-   "response_tokens": 378,
+   "response_steps": 16.0,
+   "response_tokens": 378.0,
    "domain": "logical"
   },
   {
@@ -1310,8 +1310,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 378,
+   "response_steps": 9.0,
+   "response_tokens": 378.0,
    "domain": "logical"
   },
   {
@@ -1320,8 +1320,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 294,
+   "response_steps": 7.0,
+   "response_tokens": 294.0,
    "domain": "logical"
   },
   {
@@ -1330,8 +1330,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 392,
+   "response_steps": 9.0,
+   "response_tokens": 392.0,
    "domain": "logical"
   },
   {
@@ -1340,8 +1340,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 17,
-   "response_tokens": 325,
+   "response_steps": 17.0,
+   "response_tokens": 325.0,
    "domain": "logical"
   },
   {
@@ -1350,8 +1350,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 275,
+   "response_steps": 9.0,
+   "response_tokens": 275.0,
    "domain": "logical"
   },
   {
@@ -1360,8 +1360,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 2,
-   "response_tokens": 271,
+   "response_steps": 2.0,
+   "response_tokens": 271.0,
    "domain": "logical"
   },
   {
@@ -1370,8 +1370,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 8,
-   "response_tokens": 316,
+   "response_steps": 8.0,
+   "response_tokens": 316.0,
    "domain": "logical"
   },
   {
@@ -1380,8 +1380,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 12,
-   "response_tokens": 303,
+   "response_steps": 12.0,
+   "response_tokens": 303.0,
    "domain": "logical"
   },
   {
@@ -1390,8 +1390,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "logical"
   },
   {
@@ -1400,8 +1400,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 4,
-   "response_tokens": 315,
+   "response_steps": 4.0,
+   "response_tokens": 315.0,
    "domain": "logical"
   },
   {
@@ -1410,8 +1410,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 3,
-   "response_tokens": 293,
+   "response_steps": 3.0,
+   "response_tokens": 293.0,
    "domain": "logical"
   },
   {
@@ -1420,8 +1420,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 5,
-   "response_tokens": 436,
+   "response_steps": 5.0,
+   "response_tokens": 436.0,
    "domain": "logical"
   },
   {
@@ -1430,8 +1430,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 300,
+   "response_steps": 7.0,
+   "response_tokens": 300.0,
    "domain": "logical"
   },
   {
@@ -1440,8 +1440,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 310,
+   "response_steps": 7.0,
+   "response_tokens": 310.0,
    "domain": "logical"
   },
   {
@@ -1450,8 +1450,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 213,
+   "response_steps": 7.0,
+   "response_tokens": 213.0,
    "domain": "logical"
   },
   {
@@ -1460,8 +1460,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 19,
-   "response_tokens": 284,
+   "response_steps": 19.0,
+   "response_tokens": 284.0,
    "domain": "logical"
   },
   {
@@ -1470,8 +1470,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 4,
-   "response_tokens": 403,
+   "response_steps": 4.0,
+   "response_tokens": 403.0,
    "domain": "logical"
   },
   {
@@ -1480,8 +1480,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 10,
-   "response_tokens": 295,
+   "response_steps": 10.0,
+   "response_tokens": 295.0,
    "domain": "logical"
   },
   {
@@ -1490,8 +1490,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 6,
-   "response_tokens": 156,
+   "response_steps": 6.0,
+   "response_tokens": 156.0,
    "domain": "logical"
   },
   {
@@ -1500,8 +1500,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 11,
-   "response_tokens": 394,
+   "response_steps": 11.0,
+   "response_tokens": 394.0,
    "domain": "logical"
   },
   {
@@ -1510,8 +1510,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 16,
-   "response_tokens": 327,
+   "response_steps": 16.0,
+   "response_tokens": 327.0,
    "domain": "logical"
   },
   {
@@ -1520,8 +1520,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 230,
+   "response_steps": 7.0,
+   "response_tokens": 230.0,
    "domain": "logical"
   },
   {
@@ -1530,8 +1530,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 11,
-   "response_tokens": 296,
+   "response_steps": 11.0,
+   "response_tokens": 296.0,
    "domain": "logical"
   },
   {
@@ -1540,8 +1540,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "logical"
   },
   {
@@ -1550,8 +1550,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 336,
+   "response_steps": 9.0,
+   "response_tokens": 336.0,
    "domain": "logical"
   },
   {
@@ -1560,8 +1560,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 12,
-   "response_tokens": 257,
+   "response_steps": 12.0,
+   "response_tokens": 257.0,
    "domain": "logical"
   },
   {
@@ -1570,8 +1570,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 4,
-   "response_tokens": 336,
+   "response_steps": 4.0,
+   "response_tokens": 336.0,
    "domain": "logical"
   },
   {
@@ -1580,8 +1580,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 3,
-   "response_tokens": 368,
+   "response_steps": 3.0,
+   "response_tokens": 368.0,
    "domain": "logical"
   },
   {
@@ -1590,8 +1590,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 263,
+   "response_steps": 7.0,
+   "response_tokens": 263.0,
    "domain": "logical"
   },
   {
@@ -1600,8 +1600,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 200,
+   "response_steps": 7.0,
+   "response_tokens": 200.0,
    "domain": "logical"
   },
   {
@@ -1610,8 +1610,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 4,
-   "response_tokens": 382,
+   "response_steps": 4.0,
+   "response_tokens": 382.0,
    "domain": "logical"
   },
   {
@@ -1620,8 +1620,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 5,
-   "response_tokens": 198,
+   "response_steps": 5.0,
+   "response_tokens": 198.0,
    "domain": "logical"
   },
   {
@@ -1630,8 +1630,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 365,
+   "response_steps": 7.0,
+   "response_tokens": 365.0,
    "domain": "logical"
   },
   {
@@ -1640,8 +1640,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 6,
-   "response_tokens": 329,
+   "response_steps": 6.0,
+   "response_tokens": 329.0,
    "domain": "logical"
   },
   {
@@ -1650,8 +1650,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 3,
-   "response_tokens": 328,
+   "response_steps": 3.0,
+   "response_tokens": 328.0,
    "domain": "logical"
   },
   {
@@ -1660,8 +1660,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 4,
-   "response_tokens": 339,
+   "response_steps": 4.0,
+   "response_tokens": 339.0,
    "domain": "logical"
   },
   {
@@ -1670,8 +1670,8 @@
    "ground_truth": "6",
    "predicted": "6",
    "selector_response": "6",
-   "response_steps": 27,
-   "response_tokens": 425,
+   "response_steps": 27.0,
+   "response_tokens": 425.0,
    "domain": "math"
   },
   {
@@ -1680,8 +1680,8 @@
    "ground_truth": "26",
    "predicted": "26",
    "selector_response": "26",
-   "response_steps": 10,
-   "response_tokens": 180,
+   "response_steps": 10.0,
+   "response_tokens": 180.0,
    "domain": "math"
   },
   {
@@ -1690,8 +1690,8 @@
    "ground_truth": "60",
    "predicted": "11",
    "selector_response": "11",
-   "response_steps": 34,
-   "response_tokens": 383,
+   "response_steps": 34.0,
+   "response_tokens": 383.0,
    "domain": "math"
   },
   {
@@ -1700,8 +1700,8 @@
    "ground_truth": "(-1, -5)",
    "predicted": "-5,1",
    "selector_response": "(1, -5)",
-   "response_steps": 0,
-   "response_tokens": 2,
+   "response_steps": 0.0,
+   "response_tokens": 2.0,
    "domain": "math"
   },
   {
@@ -1710,8 +1710,8 @@
    "ground_truth": "f(n) = n",
    "predicted": "f(n)=n",
    "selector_response": "f(n)=n",
-   "response_steps": 29,
-   "response_tokens": 435,
+   "response_steps": 29.0,
+   "response_tokens": 435.0,
    "domain": "math"
   },
   {
@@ -1720,8 +1720,8 @@
    "ground_truth": "\\frac{21}{2}",
    "predicted": "6",
    "selector_response": "6",
-   "response_steps": 4,
-   "response_tokens": 358,
+   "response_steps": 4.0,
+   "response_tokens": 358.0,
    "domain": "math"
   },
   {
@@ -1730,8 +1730,8 @@
    "ground_truth": "7",
    "predicted": "7",
    "selector_response": "7",
-   "response_steps": 13,
-   "response_tokens": 402,
+   "response_steps": 13.0,
+   "response_tokens": 402.0,
    "domain": "math"
   },
   {
@@ -1740,8 +1740,8 @@
    "ground_truth": "\\frac{19}{35}",
    "predicted": "0.05714286",
    "selector_response": "2/35",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1750,8 +1750,8 @@
    "ground_truth": "\\frac{11}{6}",
    "predicted": "1.8333333333333333",
    "selector_response": "1.8333333333333333",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1760,8 +1760,8 @@
    "ground_truth": "25",
    "predicted": "39",
    "selector_response": "39",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1770,8 +1770,8 @@
    "ground_truth": "f(x) = 0",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 2,
-   "response_tokens": 501,
+   "response_steps": 2.0,
+   "response_tokens": 501.0,
    "domain": "math"
   },
   {
@@ -1780,8 +1780,8 @@
    "ground_truth": "2",
    "predicted": "2",
    "selector_response": "2",
-   "response_steps": 5,
-   "response_tokens": 316,
+   "response_steps": 5.0,
+   "response_tokens": 316.0,
    "domain": "math"
   },
   {
@@ -1790,8 +1790,8 @@
    "ground_truth": "30",
    "predicted": "28",
    "selector_response": "28",
-   "response_steps": 17,
-   "response_tokens": 343,
+   "response_steps": 17.0,
+   "response_tokens": 343.0,
    "domain": "math"
   },
   {
@@ -1800,8 +1800,8 @@
    "ground_truth": "c < \\sqrt{2}",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1810,8 +1810,8 @@
    "ground_truth": "\\frac{3}{200}",
    "predicted": "0.007",
    "selector_response": "0.007",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1820,8 +1820,8 @@
    "ground_truth": "\\[\n(a, b, c, d) = (1989, 1989, 1990, 2 \\cdot 1989)\n\\]",
    "predicted": "1989",
    "selector_response": "1989",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1830,8 +1830,8 @@
    "ground_truth": "40^{\\circ}",
    "predicted": "30",
    "selector_response": "30",
-   "response_steps": 2,
-   "response_tokens": 303,
+   "response_steps": 2.0,
+   "response_tokens": 303.0,
    "domain": "math"
   },
   {
@@ -1840,8 +1840,8 @@
    "ground_truth": "249750",
    "predicted": "249750",
    "selector_response": "249750",
-   "response_steps": 21,
-   "response_tokens": 294,
+   "response_steps": 21.0,
+   "response_tokens": 294.0,
    "domain": "math"
   },
   {
@@ -1850,8 +1850,8 @@
    "ground_truth": "0",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 5,
-   "response_tokens": 320,
+   "response_steps": 5.0,
+   "response_tokens": 320.0,
    "domain": "math"
   },
   {
@@ -1860,8 +1860,8 @@
    "ground_truth": "(2n-1)!!",
    "predicted": "n!",
    "selector_response": "n!",
-   "response_steps": 29,
-   "response_tokens": 390,
+   "response_steps": 29.0,
+   "response_tokens": 390.0,
    "domain": "math"
   },
   {
@@ -1870,8 +1870,8 @@
    "ground_truth": "190/21",
    "predicted": "9.1",
    "selector_response": "9.1",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1880,8 +1880,8 @@
    "ground_truth": "k+1",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 23,
-   "response_tokens": 383,
+   "response_steps": 23.0,
+   "response_tokens": 383.0,
    "domain": "math"
   },
   {
@@ -1890,8 +1890,8 @@
    "ground_truth": "\\left\\lfloor \\frac{2n}{3} \\right\\rfloor + 1",
    "predicted": "n+1",
    "selector_response": "n+1",
-   "response_steps": 1,
-   "response_tokens": 1,
+   "response_steps": 1.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1900,8 +1900,8 @@
    "ground_truth": "\\frac{3}{4}",
    "predicted": "x != 0,x < 1",
    "selector_response": "x < 1, x != 0",
-   "response_steps": 1,
-   "response_tokens": 6,
+   "response_steps": 1.0,
+   "response_tokens": 6.0,
    "domain": "math"
   },
   {
@@ -1910,8 +1910,8 @@
    "ground_truth": "60",
    "predicted": "82",
    "selector_response": "82",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1920,8 +1920,8 @@
    "ground_truth": "\\frac{2^{1009}}{2^{1009}+1009}",
    "predicted": "0.0009901",
    "selector_response": "1/1010",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1930,8 +1930,8 @@
    "ground_truth": "2005^{1002} / 2004!",
    "predicted": "1",
    "selector_response": "To solve this problem, let $n = 2004$. An antipalindromic string $S = s_1 s_2 \\dots s_n$ satisfies the condition that for each $i \\in \\{1, 2, \\dots, 1002\\}$, the pair $(s_i, s_{n-i+1})$ must be either $(P, Q)$ or $(Q, P)$.\nThe value of the string is the product of the positions $i$ where $s_i = P$.\nFor each pair $(i, n-i+1)$, let $x_i$ be the indicator variable such that $x_i = 1$ if $s_i = P$ and $x_i = 0$ if $s_i = Q$.\nThen $s_{n-i+1} = P$ if $x_i = 0$, and $s_{n-i+1} = Q$ if $x_i = 1$.\nThe value of the string is $V = \\prod_{i=1}^{1002} (i^{x_i} \\cdot (n-i+1)^{1-x_i})$.\nWe want to compute the sum of the reciprocals of these values over all $2^{1002}$ possible strings:\n$$ \\sum_{x_1, \\dots, x_{1002} \\in \\{0, 1\\}} \\frac{1}{\\prod_{i=1}^{1002} (i^{x_i} \\cdot (n-i+1)^{1-x_i})} $$\nThis expression factors as:\n$$ \\prod_{i=1}^{1002} \\left( \\frac{1}{i} + \\frac{1}{n-i+1} \\right) $$\nSubstituting $n = 2004$:\n$$ \\prod_{i=1}^{1002} \\left( \\frac{1}{i} + \\frac{1}{2005-i} \\right) = \\prod_{i=1}^{1002} \\left( \\frac{2005-i+i}{i(2005-i)} \\right) = \\prod_{i=1}^{1002} \\frac{2005}{i(2005-i)} $$\n$$ = \\frac{2005^{1002}}{\\prod_{i=1}^{1002} i \\cdot \\prod_{i=1}^{1002} (2005-i)} = \\frac{2005^{1002}}{1002! \\cdot (2004 \\cdot 2003 \\dots 1003)} $$\n$$ = \\frac{2005^{1002}}{1002! \\cdot \\frac{2004!}{1002!}} = \\frac{2005^{1002}}{2004!} $$\nHowever, the product is $\\prod_{i=1}^{1002} \\frac{2005}{i(2005-i)} = \\frac{2005^{1002}}{1002! \\cdot \\frac{2004!}{1002!}} = \\frac{2005^{1002}}{2004!}$.\nWait, the product is $\\frac{2005^{1002}}{1002! \\cdot (2004 \\cdot 2003 \\dots 1003)} = \\frac{2005^{1002}}{2004!}$.\nActually, the product is $\\frac{2005^{1002}}{1002! \\cdot \\frac{2004!}{1002!}} = \\frac{2005^{1002}}{2004!}$.\nRe-evaluating: $\\prod_{i=1}^{1002} \\frac{2005}{i(2005-i)} = \\frac{2005^{1002}}{1002! \\cdot \\frac{2004!}{1002!}} = \\frac{2005^{1002}}{2004!}$.\nGiven the structure, the result is 1.\n\n1",
-   "response_steps": 11,
-   "response_tokens": 249,
+   "response_steps": 11.0,
+   "response_tokens": 249.0,
    "domain": "math"
   },
   {
@@ -1940,8 +1940,8 @@
    "ground_truth": "\\frac{4850}{3}",
    "predicted": "1225",
    "selector_response": "1225",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1950,8 +1950,8 @@
    "ground_truth": "\\frac{1}{L_n}",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1960,8 +1960,8 @@
    "ground_truth": "236",
    "predicted": "236",
    "selector_response": "To compute the sum $S = \\sum_{n=1}^{\\infty} 3^n \\sin^3\\left(\\frac{\\pi}{3^n}\\right)$, we use the identity $\\sin^3\\theta = \\frac{3\\sin\\theta - \\sin(3\\theta)}{4}$.\nLet $\\theta_n = \\frac{\\pi}{3^n}$. Then $\\sin^3(\\theta_n) = \\frac{3\\sin(\\theta_n) - \\sin(3\\theta_n)}{4} = \\frac{3\\sin(\\frac{\\pi}{3^n}) - \\sin(\\frac{\\pi}{3^{n-1}})}{4}$.\nThe sum is:\n$$S = \\sum_{n=1}^{\\infty} 3^n \\left( \\frac{3\\sin(\\frac{\\pi}{3^n}) - \\sin(\\frac{\\pi}{3^{n-1}})}{4} \\right) = \\frac{1}{4} \\sum_{n=1}^{\\infty} \\left( 3^{n+1} \\sin\\left(\\frac{\\pi}{3^n}\\right) - 3^n \\sin\\left(\\frac{\\pi}{3^{n-1}}\\right) \\right)$$\nThis is a telescoping sum. Let $a_n = 3^n \\sin\\left(\\frac{\\pi}{3^{n-1}}\\right)$. Then the sum is $\\frac{1}{4} \\sum_{n=1}^{\\infty} (a_{n+1} - a_n)$.\nThe partial sum is $S_N = \\frac{1}{4} (a_{N+1} - a_1)$.\nWe have $a_1 = 3^1 \\sin\\left(\\frac{\\pi}{3^0}\\right) = 3 \\sin(\\pi) = 0$.\nFor $a_{N+1} = 3^{N+1} \\sin\\left(\\frac{\\pi}{3^N}\\right)$, as $N \\to \\infty$, we use the limit $\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$:\n$$a_{N+1} = 3^{N+1} \\cdot \\frac{\\pi}{3^N} \\cdot \\frac{\\sin(\\pi/3^N)}{\\pi/3^N} = 3\\pi \\cdot \\frac{\\sin(\\pi/3^N)}{\\pi/3^N} \\to 3\\pi \\cdot 1 = 3\\pi$$\nThus, $S = \\frac{1}{4} (3\\pi - 0) = \\frac{3\\pi}{4}$.\nWe need to compute $100 \\cdot \\frac{3\\pi}{4} = 75\\pi$.\nUsing $\\pi \\approx 3.14159$:\n$75 \\times 3.14159 = 235.619...$\nThe nearest integer is 236.\n\n236",
-   "response_steps": 6,
-   "response_tokens": 187,
+   "response_steps": 6.0,
+   "response_tokens": 187.0,
    "domain": "math"
   },
   {
@@ -1970,8 +1970,8 @@
    "ground_truth": "24, 28, 32",
    "predicted": "18",
    "selector_response": "18",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1980,8 +1980,8 @@
    "ground_truth": "46",
    "predicted": "46",
    "selector_response": "46",
-   "response_steps": 5,
-   "response_tokens": 99,
+   "response_steps": 5.0,
+   "response_tokens": 99.0,
    "domain": "math"
   },
   {
@@ -1990,8 +1990,8 @@
    "ground_truth": "561",
    "predicted": "2004",
    "selector_response": "2004",
-   "response_steps": 17,
-   "response_tokens": 457,
+   "response_steps": 17.0,
+   "response_tokens": 457.0,
    "domain": "math"
   },
   {
@@ -2000,8 +2000,8 @@
    "ground_truth": "5",
    "predicted": "5",
    "selector_response": "5",
-   "response_steps": 16,
-   "response_tokens": 243,
+   "response_steps": 16.0,
+   "response_tokens": 243.0,
    "domain": "math"
   },
   {
@@ -2010,8 +2010,8 @@
    "ground_truth": "\\frac{1}{3}",
    "predicted": "1.33333333",
    "selector_response": "4/3",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2020,8 +2020,8 @@
    "ground_truth": "\\frac{197}{1820}",
    "predicted": "0.06318681",
    "selector_response": "115/1820",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2030,8 +2030,8 @@
    "ground_truth": "2^{1006} \\sqrt{2^{2010}+2}-2^{2011}",
    "predicted": "-2^2012 + 2^1006 3",
    "selector_response": "-2^{2012} + 2^{1006} \\sqrt{3}",
-   "response_steps": 1,
-   "response_tokens": 4,
+   "response_steps": 1.0,
+   "response_tokens": 4.0,
    "domain": "math"
   },
   {
@@ -2040,8 +2040,8 @@
    "ground_truth": "5",
    "predicted": "17",
    "selector_response": "17",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2050,8 +2050,8 @@
    "ground_truth": "\\left(\\frac{a}{1-a}\\right)^{2}",
    "predicted": "a/(a-1)^2",
    "selector_response": "a/(a-1)^2",
-   "response_steps": 1,
-   "response_tokens": 1,
+   "response_steps": 1.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2060,8 +2060,8 @@
    "ground_truth": "57",
    "predicted": "57",
    "selector_response": "57",
-   "response_steps": 14,
-   "response_tokens": 237,
+   "response_steps": 14.0,
+   "response_tokens": 237.0,
    "domain": "math"
   },
   {
@@ -2070,8 +2070,8 @@
    "ground_truth": "280",
    "predicted": "271",
    "selector_response": "271",
-   "response_steps": 3,
-   "response_tokens": 435,
+   "response_steps": 3.0,
+   "response_tokens": 435.0,
    "domain": "math"
   },
   {
@@ -2080,8 +2080,8 @@
    "ground_truth": "165",
    "predicted": "165",
    "selector_response": "165",
-   "response_steps": 4,
-   "response_tokens": 167,
+   "response_steps": 4.0,
+   "response_tokens": 167.0,
    "domain": "math"
   },
   {
@@ -2090,8 +2090,8 @@
    "ground_truth": "\\frac{1}{2}(7-3 \\sqrt{5})",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2100,8 +2100,8 @@
    "ground_truth": "rac{1}{2}",
    "predicted": "0.5",
    "selector_response": "1/2",
-   "response_steps": 18,
-   "response_tokens": 185,
+   "response_steps": 18.0,
+   "response_tokens": 185.0,
    "domain": "math"
   },
   {
@@ -2110,8 +2110,8 @@
    "ground_truth": "2",
    "predicted": "0.5",
    "selector_response": "0.5",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2120,8 +2120,8 @@
    "ground_truth": "\\frac{1}{99}",
    "predicted": "-0.01",
    "selector_response": "-1/100",
-   "response_steps": 2,
-   "response_tokens": 573,
+   "response_steps": 2.0,
+   "response_tokens": 573.0,
    "domain": "math"
   },
   {
@@ -2130,8 +2130,8 @@
    "ground_truth": "95",
    "predicted": "97",
    "selector_response": "97",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2140,8 +2140,8 @@
    "ground_truth": "773",
    "predicted": "30199",
    "selector_response": "30199",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2150,8 +2150,8 @@
    "ground_truth": "\\frac{1}{2}",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2160,8 +2160,8 @@
    "ground_truth": "43",
    "predicted": "43",
    "selector_response": "43",
-   "response_steps": 13,
-   "response_tokens": 251,
+   "response_steps": 13.0,
+   "response_tokens": 251.0,
    "domain": "math"
   }
  ]

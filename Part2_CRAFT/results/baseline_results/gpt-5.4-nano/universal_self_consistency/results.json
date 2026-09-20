@@ -1170,8 +1170,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 274,
+   "response_steps": 9.0,
+   "response_tokens": 274.0,
    "domain": "logical"
   },
   {
@@ -1180,8 +1180,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 12,
-   "response_tokens": 216,
+   "response_steps": 12.0,
+   "response_tokens": 216.0,
    "domain": "logical"
   },
   {
@@ -1190,8 +1190,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 10,
-   "response_tokens": 206,
+   "response_steps": 10.0,
+   "response_tokens": 206.0,
    "domain": "logical"
   },
   {
@@ -1200,8 +1200,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 6,
-   "response_tokens": 132,
+   "response_steps": 6.0,
+   "response_tokens": 132.0,
    "domain": "logical"
   },
   {
@@ -1210,8 +1210,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 15,
-   "response_tokens": 261,
+   "response_steps": 15.0,
+   "response_tokens": 261.0,
    "domain": "logical"
   },
   {
@@ -1220,8 +1220,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 18,
-   "response_tokens": 487,
+   "response_steps": 18.0,
+   "response_tokens": 487.0,
    "domain": "logical"
   },
   {
@@ -1230,8 +1230,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 14,
-   "response_tokens": 213,
+   "response_steps": 14.0,
+   "response_tokens": 213.0,
    "domain": "logical"
   },
   {
@@ -1240,8 +1240,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 13,
-   "response_tokens": 142,
+   "response_steps": 13.0,
+   "response_tokens": 142.0,
    "domain": "logical"
   },
   {
@@ -1250,8 +1250,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 10,
-   "response_tokens": 188,
+   "response_steps": 10.0,
+   "response_tokens": 188.0,
    "domain": "logical"
   },
   {
@@ -1260,8 +1260,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 12,
-   "response_tokens": 247,
+   "response_steps": 12.0,
+   "response_tokens": 247.0,
    "domain": "logical"
   },
   {
@@ -1270,8 +1270,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 16,
-   "response_tokens": 298,
+   "response_steps": 16.0,
+   "response_tokens": 298.0,
    "domain": "logical"
   },
   {
@@ -1280,8 +1280,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 5,
-   "response_tokens": 109,
+   "response_steps": 5.0,
+   "response_tokens": 109.0,
    "domain": "logical"
   },
   {
@@ -1290,8 +1290,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 15,
-   "response_tokens": 290,
+   "response_steps": 15.0,
+   "response_tokens": 290.0,
    "domain": "logical"
   },
   {
@@ -1300,8 +1300,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 13,
-   "response_tokens": 231,
+   "response_steps": 13.0,
+   "response_tokens": 231.0,
    "domain": "logical"
   },
   {
@@ -1310,8 +1310,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "logical"
   },
   {
@@ -1320,8 +1320,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 13,
-   "response_tokens": 279,
+   "response_steps": 13.0,
+   "response_tokens": 279.0,
    "domain": "logical"
   },
   {
@@ -1330,8 +1330,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 8,
-   "response_tokens": 252,
+   "response_steps": 8.0,
+   "response_tokens": 252.0,
    "domain": "logical"
   },
   {
@@ -1340,8 +1340,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 287,
+   "response_steps": 7.0,
+   "response_tokens": 287.0,
    "domain": "logical"
   },
   {
@@ -1350,8 +1350,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 10,
-   "response_tokens": 170,
+   "response_steps": 10.0,
+   "response_tokens": 170.0,
    "domain": "logical"
   },
   {
@@ -1360,8 +1360,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 8,
-   "response_tokens": 286,
+   "response_steps": 8.0,
+   "response_tokens": 286.0,
    "domain": "logical"
   },
   {
@@ -1370,8 +1370,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 14,
-   "response_tokens": 238,
+   "response_steps": 14.0,
+   "response_tokens": 238.0,
    "domain": "logical"
   },
   {
@@ -1380,8 +1380,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 8,
-   "response_tokens": 333,
+   "response_steps": 8.0,
+   "response_tokens": 333.0,
    "domain": "logical"
   },
   {
@@ -1390,8 +1390,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 10,
-   "response_tokens": 173,
+   "response_steps": 10.0,
+   "response_tokens": 173.0,
    "domain": "logical"
   },
   {
@@ -1400,8 +1400,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 11,
-   "response_tokens": 351,
+   "response_steps": 11.0,
+   "response_tokens": 351.0,
    "domain": "logical"
   },
   {
@@ -1410,8 +1410,8 @@
    "ground_truth": "__PROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 8,
-   "response_tokens": 302,
+   "response_steps": 8.0,
+   "response_tokens": 302.0,
    "domain": "logical"
   },
   {
@@ -1420,8 +1420,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 15,
-   "response_tokens": 260,
+   "response_steps": 15.0,
+   "response_tokens": 260.0,
    "domain": "logical"
   },
   {
@@ -1430,8 +1430,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 17,
-   "response_tokens": 279,
+   "response_steps": 17.0,
+   "response_tokens": 279.0,
    "domain": "logical"
   },
   {
@@ -1440,8 +1440,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 364,
+   "response_steps": 9.0,
+   "response_tokens": 364.0,
    "domain": "logical"
   },
   {
@@ -1450,8 +1450,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 14,
-   "response_tokens": 165,
+   "response_steps": 14.0,
+   "response_tokens": 165.0,
    "domain": "logical"
   },
   {
@@ -1460,8 +1460,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 13,
-   "response_tokens": 254,
+   "response_steps": 13.0,
+   "response_tokens": 254.0,
    "domain": "logical"
   },
   {
@@ -1470,8 +1470,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 27,
-   "response_tokens": 363,
+   "response_steps": 27.0,
+   "response_tokens": 363.0,
    "domain": "logical"
   },
   {
@@ -1480,8 +1480,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 18,
-   "response_tokens": 296,
+   "response_steps": 18.0,
+   "response_tokens": 296.0,
    "domain": "logical"
   },
   {
@@ -1490,8 +1490,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 106,
+   "response_steps": 7.0,
+   "response_tokens": 106.0,
    "domain": "logical"
   },
   {
@@ -1500,8 +1500,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 13,
-   "response_tokens": 398,
+   "response_steps": 13.0,
+   "response_tokens": 398.0,
    "domain": "logical"
   },
   {
@@ -1510,8 +1510,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "logical"
   },
   {
@@ -1520,8 +1520,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 10,
-   "response_tokens": 175,
+   "response_steps": 10.0,
+   "response_tokens": 175.0,
    "domain": "logical"
   },
   {
@@ -1530,8 +1530,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 8,
-   "response_tokens": 160,
+   "response_steps": 8.0,
+   "response_tokens": 160.0,
    "domain": "logical"
   },
   {
@@ -1540,8 +1540,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 131,
+   "response_steps": 9.0,
+   "response_tokens": 131.0,
    "domain": "logical"
   },
   {
@@ -1550,8 +1550,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__PROVED__",
    "selector_response": "__PROVED__",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "logical"
   },
   {
@@ -1560,8 +1560,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 14,
-   "response_tokens": 497,
+   "response_steps": 14.0,
+   "response_tokens": 497.0,
    "domain": "logical"
   },
   {
@@ -1570,8 +1570,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 301,
+   "response_steps": 9.0,
+   "response_tokens": 301.0,
    "domain": "logical"
   },
   {
@@ -1580,8 +1580,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 12,
-   "response_tokens": 368,
+   "response_steps": 12.0,
+   "response_tokens": 368.0,
    "domain": "logical"
   },
   {
@@ -1590,8 +1590,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 6,
-   "response_tokens": 195,
+   "response_steps": 6.0,
+   "response_tokens": 195.0,
    "domain": "logical"
   },
   {
@@ -1600,8 +1600,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 13,
-   "response_tokens": 162,
+   "response_steps": 13.0,
+   "response_tokens": 162.0,
    "domain": "logical"
   },
   {
@@ -1610,8 +1610,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 11,
-   "response_tokens": 273,
+   "response_steps": 11.0,
+   "response_tokens": 273.0,
    "domain": "logical"
   },
   {
@@ -1620,8 +1620,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 13,
-   "response_tokens": 226,
+   "response_steps": 13.0,
+   "response_tokens": 226.0,
    "domain": "logical"
   },
   {
@@ -1630,8 +1630,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 7,
-   "response_tokens": 172,
+   "response_steps": 7.0,
+   "response_tokens": 172.0,
    "domain": "logical"
   },
   {
@@ -1640,8 +1640,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 9,
-   "response_tokens": 228,
+   "response_steps": 9.0,
+   "response_tokens": 228.0,
    "domain": "logical"
   },
   {
@@ -1650,8 +1650,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 14,
-   "response_tokens": 394,
+   "response_steps": 14.0,
+   "response_tokens": 394.0,
    "domain": "logical"
   },
   {
@@ -1660,8 +1660,8 @@
    "ground_truth": "__DISPROVED__",
    "predicted": "__DISPROVED__",
    "selector_response": "__DISPROVED__",
-   "response_steps": 6,
-   "response_tokens": 128,
+   "response_steps": 6.0,
+   "response_tokens": 128.0,
    "domain": "logical"
   },
   {
@@ -1670,8 +1670,8 @@
    "ground_truth": "6",
    "predicted": "8",
    "selector_response": "8",
-   "response_steps": 54,
-   "response_tokens": 1106,
+   "response_steps": 54.0,
+   "response_tokens": 1106.0,
    "domain": "math"
   },
   {
@@ -1680,8 +1680,8 @@
    "ground_truth": "26",
    "predicted": "26",
    "selector_response": "26",
-   "response_steps": 6,
-   "response_tokens": 72,
+   "response_steps": 6.0,
+   "response_tokens": 72.0,
    "domain": "math"
   },
   {
@@ -1690,8 +1690,8 @@
    "ground_truth": "60",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1700,8 +1700,8 @@
    "ground_truth": "(-1, -5)",
    "predicted": "-1,0",
    "selector_response": "(-1,0)",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1710,8 +1710,8 @@
    "ground_truth": "f(n) = n",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 68,
-   "response_tokens": 933,
+   "response_steps": 68.0,
+   "response_tokens": 933.0,
    "domain": "math"
   },
   {
@@ -1720,8 +1720,8 @@
    "ground_truth": "\\frac{21}{2}",
    "predicted": "6",
    "selector_response": "6",
-   "response_steps": 6,
-   "response_tokens": 97,
+   "response_steps": 6.0,
+   "response_tokens": 97.0,
    "domain": "math"
   },
   {
@@ -1730,8 +1730,8 @@
    "ground_truth": "7",
    "predicted": "2",
    "selector_response": "2",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1740,8 +1740,8 @@
    "ground_truth": "\\frac{19}{35}",
    "predicted": "0.14285714",
    "selector_response": "1/7",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1750,8 +1750,8 @@
    "ground_truth": "\\frac{11}{6}",
    "predicted": "2",
    "selector_response": "2",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1760,8 +1760,8 @@
    "ground_truth": "25",
    "predicted": "25",
    "selector_response": "25",
-   "response_steps": 13,
-   "response_tokens": 183,
+   "response_steps": 13.0,
+   "response_tokens": 183.0,
    "domain": "math"
   },
   {
@@ -1770,8 +1770,8 @@
    "ground_truth": "f(x) = 0",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 58,
-   "response_tokens": 526,
+   "response_steps": 58.0,
+   "response_tokens": 526.0,
    "domain": "math"
   },
   {
@@ -1780,8 +1780,8 @@
    "ground_truth": "2",
    "predicted": "2",
    "selector_response": "2",
-   "response_steps": 14,
-   "response_tokens": 212,
+   "response_steps": 14.0,
+   "response_tokens": 212.0,
    "domain": "math"
   },
   {
@@ -1790,8 +1790,8 @@
    "ground_truth": "30",
    "predicted": "40",
    "selector_response": "40",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1800,8 +1800,8 @@
    "ground_truth": "c < \\sqrt{2}",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 2,
-   "response_tokens": 927,
+   "response_steps": 2.0,
+   "response_tokens": 927.0,
    "domain": "math"
   },
   {
@@ -1810,8 +1810,8 @@
    "ground_truth": "\\frac{3}{200}",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1820,8 +1820,8 @@
    "ground_truth": "\\[\n(a, b, c, d) = (1989, 1989, 1990, 2 \\cdot 1989)\n\\]",
    "predicted": "1989",
    "selector_response": "1989",
-   "response_steps": 17,
-   "response_tokens": 133,
+   "response_steps": 17.0,
+   "response_tokens": 133.0,
    "domain": "math"
   },
   {
@@ -1830,8 +1830,8 @@
    "ground_truth": "40^{\\circ}",
    "predicted": "90",
    "selector_response": "90",
-   "response_steps": 40,
-   "response_tokens": 440,
+   "response_steps": 40.0,
+   "response_tokens": 440.0,
    "domain": "math"
   },
   {
@@ -1840,8 +1840,8 @@
    "ground_truth": "249750",
    "predicted": "249750",
    "selector_response": "249750",
-   "response_steps": 8,
-   "response_tokens": 120,
+   "response_steps": 8.0,
+   "response_tokens": 120.0,
    "domain": "math"
   },
   {
@@ -1850,8 +1850,8 @@
    "ground_truth": "0",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 3,
-   "response_tokens": 83,
+   "response_steps": 3.0,
+   "response_tokens": 83.0,
    "domain": "math"
   },
   {
@@ -1860,8 +1860,8 @@
    "ground_truth": "(2n-1)!!",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1870,8 +1870,8 @@
    "ground_truth": "190/21",
    "predicted": "10",
    "selector_response": "10",
-   "response_steps": 8,
-   "response_tokens": 81,
+   "response_steps": 8.0,
+   "response_tokens": 81.0,
    "domain": "math"
   },
   {
@@ -1880,8 +1880,8 @@
    "ground_truth": "k+1",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 29,
-   "response_tokens": 498,
+   "response_steps": 29.0,
+   "response_tokens": 498.0,
    "domain": "math"
   },
   {
@@ -1890,8 +1890,8 @@
    "ground_truth": "\\left\\lfloor \\frac{2n}{3} \\right\\rfloor + 1",
    "predicted": "8",
    "selector_response": "8",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1900,8 +1900,8 @@
    "ground_truth": "\\frac{3}{4}",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1910,8 +1910,8 @@
    "ground_truth": "60",
    "predicted": "621",
    "selector_response": "621",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1920,8 +1920,8 @@
    "ground_truth": "\\frac{2^{1009}}{2^{1009}+1009}",
    "predicted": "0.9992851099",
    "selector_response": "0.9992851099",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1930,8 +1930,8 @@
    "ground_truth": "2005^{1002} / 2004!",
    "predicted": "0",
    "selector_response": "0",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1940,8 +1940,8 @@
    "ground_truth": "\\frac{4850}{3}",
    "predicted": "6025",
    "selector_response": "6025",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1950,8 +1950,8 @@
    "ground_truth": "\\frac{1}{L_n}",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 45,
-   "response_tokens": 610,
+   "response_steps": 45.0,
+   "response_tokens": 610.0,
    "domain": "math"
   },
   {
@@ -1960,8 +1960,8 @@
    "ground_truth": "236",
    "predicted": "300",
    "selector_response": "300",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1970,8 +1970,8 @@
    "ground_truth": "24, 28, 32",
    "predicted": "8",
    "selector_response": "8",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -1980,8 +1980,8 @@
    "ground_truth": "46",
    "predicted": "46",
    "selector_response": "46",
-   "response_steps": 4,
-   "response_tokens": 34,
+   "response_steps": 4.0,
+   "response_tokens": 34.0,
    "domain": "math"
   },
   {
@@ -1990,8 +1990,8 @@
    "ground_truth": "561",
    "predicted": "4008",
    "selector_response": "4008",
-   "response_steps": 21,
-   "response_tokens": 475,
+   "response_steps": 21.0,
+   "response_tokens": 475.0,
    "domain": "math"
   },
   {
@@ -2000,8 +2000,8 @@
    "ground_truth": "5",
    "predicted": "3.5",
    "selector_response": "3.5",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2010,8 +2010,8 @@
    "ground_truth": "\\frac{1}{3}",
    "predicted": "3",
    "selector_response": "3",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2020,8 +2020,8 @@
    "ground_truth": "\\frac{197}{1820}",
    "predicted": "0.34375",
    "selector_response": "0.34375",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2030,8 +2030,8 @@
    "ground_truth": "2^{1006} \\sqrt{2^{2010}+2}-2^{2011}",
    "predicted": "-2^2012",
    "selector_response": "-2^2012",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2040,8 +2040,8 @@
    "ground_truth": "5",
    "predicted": "10",
    "selector_response": "10",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2050,8 +2050,8 @@
    "ground_truth": "\\left(\\frac{a}{1-a}\\right)^{2}",
    "predicted": "a^2/(a-1)^2",
    "selector_response": "a^2/(a-1)^2",
-   "response_steps": 1,
-   "response_tokens": 1,
+   "response_steps": 1.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2060,8 +2060,8 @@
    "ground_truth": "57",
    "predicted": "57",
    "selector_response": "57",
-   "response_steps": 7,
-   "response_tokens": 146,
+   "response_steps": 7.0,
+   "response_tokens": 146.0,
    "domain": "math"
   },
   {
@@ -2070,8 +2070,8 @@
    "ground_truth": "280",
    "predicted": "300",
    "selector_response": "300",
-   "response_steps": 3,
-   "response_tokens": 131,
+   "response_steps": 3.0,
+   "response_tokens": 131.0,
    "domain": "math"
   },
   {
@@ -2080,8 +2080,8 @@
    "ground_truth": "165",
    "predicted": "165",
    "selector_response": "165",
-   "response_steps": 8,
-   "response_tokens": 105,
+   "response_steps": 8.0,
+   "response_tokens": 105.0,
    "domain": "math"
   },
   {
@@ -2090,8 +2090,8 @@
    "ground_truth": "\\frac{1}{2}(7-3 \\sqrt{5})",
    "predicted": "0.2",
    "selector_response": "0.2",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2100,8 +2100,8 @@
    "ground_truth": "rac{1}{2}",
    "predicted": "0.5",
    "selector_response": "0.5",
-   "response_steps": 10,
-   "response_tokens": 158,
+   "response_steps": 10.0,
+   "response_tokens": 158.0,
    "domain": "math"
   },
   {
@@ -2110,8 +2110,8 @@
    "ground_truth": "2",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 20,
-   "response_tokens": 467,
+   "response_steps": 20.0,
+   "response_tokens": 467.0,
    "domain": "math"
   },
   {
@@ -2120,8 +2120,8 @@
    "ground_truth": "\\frac{1}{99}",
    "predicted": "-0.01",
    "selector_response": "-1/100",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2130,8 +2130,8 @@
    "ground_truth": "95",
    "predicted": "1",
    "selector_response": "1",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2140,8 +2140,8 @@
    "ground_truth": "773",
    "predicted": "3",
    "selector_response": "3",
-   "response_steps": 0,
-   "response_tokens": 1,
+   "response_steps": 0.0,
+   "response_tokens": 1.0,
    "domain": "math"
   },
   {
@@ -2150,8 +2150,8 @@
    "ground_truth": "\\frac{1}{2}",
    "predicted": "0.5",
    "selector_response": "0.5",
-   "response_steps": 25,
-   "response_tokens": 312,
+   "response_steps": 25.0,
+   "response_tokens": 312.0,
    "domain": "math"
   },
   {
@@ -2160,8 +2160,8 @@
    "ground_truth": "43",
    "predicted": "43",
    "selector_response": "43",
-   "response_steps": 8,
-   "response_tokens": 146,
+   "response_steps": 8.0,
+   "response_tokens": 146.0,
    "domain": "math"
   }
  ]
