@@ -347,6 +347,14 @@ def _load_json(path: Path):
     return data.get("results", data) if isinstance(data, dict) else data
 
 
+# Whether a prediction is the gold answer is decided in answer_match, shared
+# with the baselines, so CRAFT and a baseline are measured by the same rule.
+# normalise_math_answer stays for display and grouping; it is no longer what
+# decides correctness, because a canonical spelling cannot represent
+# \frac{1}{2}, 1/2 and 0.5 as one string without also merging answers that differ.
+from answer_match import answers_match  # noqa: E402
+
+
 def _is_math_sample(r: Dict) -> bool:
     """Detect math domain from a pipeline output record."""
     return (r.get("domain") == "math" or
@@ -354,15 +362,17 @@ def _is_math_sample(r: Dict) -> bool:
 
 
 def _extract_pred(text: str, is_math: bool) -> Optional[str]:
+    """The answer the trace states, as written. Comparison happens later."""
     if is_math:
-        return normalise_math_answer(extract_math_answer(text))
+        raw = extract_math_answer(text)
+        return str(raw).strip() if raw else None
     return extract_label(text)
 
 
 def _get_gt(r: Dict, is_math: bool) -> Optional[str]:
     raw = r.get("ground_truth") or r.get("target_answer")
     if is_math:
-        return normalise_math_answer(str(raw)) if raw else None
+        return str(raw).strip() if raw else None
     return normalise_label(raw)
 
 
@@ -397,7 +407,8 @@ def load_k_traces(path: Path) -> List[Dict[str, Any]]:
         for t in r.get("traces", []):
             text = t.get("reasoning_text") or t.get("raw_response", "")
             if is_math:
-                pred = normalise_math_answer(t.get("label") or extract_math_answer(text))
+                _raw = t.get("label") or extract_math_answer(text)
+                pred = str(_raw).strip() if _raw else None
             else:
                 pred = normalise_label(t.get("label")) or extract_label(text)
             traces.append({"predicted": pred, "text": text,
@@ -467,19 +478,24 @@ def compute_metrics(samples: List[Dict]) -> Dict[str, Any]:
 
     if domain == "math":
         for s in samples:
-            gt   = normalise_math_answer(str(s.get("ground_truth", "") or ""))
-            pred = normalise_math_answer(str(s.get("predicted", "") or ""))
+            gt   = str(s.get("ground_truth", "") or "").strip()
+            pred = str(s.get("predicted", "") or "").strip()
+            ds   = s.get("source_dataset")
             if not gt:
                 continue
             valid_total += 1
             if not pred:
                 no_pred += 1
-            elif pred == gt:
+            elif answers_match(pred, gt, dataset=ds,
+                               answer_type=s.get("answer_type"), domain="math"):
                 correct += 1
             for t in s.get("traces", []):
-                tp = normalise_math_answer(str(t.get("predicted", "") or ""))
-                if tp is not None:
-                    per_trace_acc.append(1.0 if tp == gt else 0.0) if gt else None
+                tp = str(t.get("predicted", "") or "").strip()
+                if tp:
+                    per_trace_acc.append(
+                        1.0 if answers_match(tp, gt, dataset=ds,
+                                             answer_type=s.get("answer_type"),
+                                             domain="math") else 0.0)
                 if t.get("n_steps") is not None:
                     all_steps.append(float(t["n_steps"]))
                 if t.get("n_tokens") is not None:
