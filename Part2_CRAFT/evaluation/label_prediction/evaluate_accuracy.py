@@ -262,29 +262,30 @@ def print_metrics(m: Dict, label: str = "", indent: str = "") -> None:
 
 
 def print_per_dataset(per_ds: Dict[str, Dict], indent: str = "") -> None:
-    """One line per dataset, each reporting the metric that dataset has.
+    """One line per dataset: accuracy always, macro-F1 where there are classes.
 
-    A logical dataset carries a two-class label, so what it has to report is
-    macro-F1 over PROVED and DISPROVED; a maths dataset has no classes to
-    average over, so accuracy is the whole of it and an F1 there would just be
-    accuracy under another name. Both report steps, since that is the column
-    they are compared on and it is the one place the cost of a method shows.
-
-    Printing the full metrics block per dataset buried this: four blocks of
-    ten lines, with the number that matters in a different row each time.
+    A logical dataset carries a two-class label, so it reports accuracy and
+    macro-F1 over PROVED and DISPROVED — the two answer different questions
+    when the classes are unbalanced in what a method predicts, so both are
+    reported. A maths dataset has no classes to average over, and an F1 there
+    would be accuracy under another name, so the column is left blank. Steps
+    are reported for every dataset, since that is the column the methods are
+    compared on and the only place a method's cost shows.
     """
     order = ["FLD", "ProofWriter", "OmniMATH", "OlympiadBench"]
     names = [d for d in order if d in per_ds] + [d for d in sorted(per_ds) if d not in order]
     if not names:
         return
-    print(f"{indent}  {'dataset':<16}{'metric':>12}{'steps':>9}{'n':>7}")
+    print(f"{indent}  {'dataset':<16}{'acc':>8}{'macro-F1':>10}{'steps':>9}{'n':>7}")
     for ds in names:
         m = per_ds[ds]
-        if m.get("domain") == "math" or m.get("macro_f1") is None:
-            cell = f"acc {m['accuracy']:.3f}"
+        f1 = m.get("macro_f1")
+        f1_cell = "     —" if f1 is None else f"{f1:>10.3f}"
+        if f1 is not None:
+            f1_cell = f"{f1:>10.3f}"
         else:
-            cell = f"F1  {m['macro_f1']:.3f}"
-        print(f"{indent}  {ds:<16}{cell:>12}{m['avg_steps']:>9.1f}{m['n_total']:>7}")
+            f1_cell = f"{'—':>10}"
+        print(f"{indent}  {ds:<16}{m['accuracy']:>8.3f}{f1_cell}{m['avg_steps']:>9.1f}{m['n_total']:>7}")
 
 
 def _infer_dataset(sample_id: str) -> str:
