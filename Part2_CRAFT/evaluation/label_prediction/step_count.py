@@ -2,27 +2,28 @@
 """Counting the reasoning steps in a trace, the same way for every system.
 
 average steps is a reported comparison and lower is better, so the number has to
-mean the same thing on both sides of it. It did not. CRAFT counts its own steps
-exactly — its synthesis emits one step per node of the consensus RKG and keeps
-them as a list — while a baseline's trace was measured by counting its non-empty
-lines and capping the count at 30. On the runs finished so far that fallback
-fired on 91% of traces, and 17% of them hit the cap, where the real length is
-unknown and only known to be at least 30. Capping the longest traces at 30
-flatters exactly the baselines that ramble, and counting newlines makes a trace's
-score depend on how it happens to be formatted.
+mean the same thing on both sides of it. CRAFT counts its own steps with
+`extract_reasoning_steps` in module I, and the list it produces is what its
+synthesis carries forward and what every later stage reads. Measuring a baseline
+by any other rule compares two different quantities and calls them one column.
 
-The rule here is CRAFT's: a step is a discrete reasoning move that the trace
-itself delimits.
+So the rule here is CRAFT's rule, copied from
+framework/module1_generation_filtering/generate_traces.py rather than
+reinvented:
 
-    1. A trace that declares its steps — "Step 3:", "3.", "3)" — is counted by
-       those markers. This is what CRAFT's own reasoning_steps list contains, so
-       the list and the markers give the same number and CRAFT is measured by
-       the same rule as everything else.
-    2. A trace that declares nothing is segmented into sentences. A sentence is
-       the smallest thing that can carry a reasoning move; a line is a typesetting
-       artifact.
+    1. A trace that declares its steps — lines beginning "Step 3:" — is those
+       lines, plus any conclusion line not already among them. A conclusion is
+       a reasoning move and CRAFT keeps it so the RKG can find the conclusion
+       node; dropping it here would make the same trace count one step shorter
+       on the baseline side than on CRAFT's.
+    2. A trace that declares nothing is its non-empty lines, one step each.
     3. Nothing is capped. A long trace counts as long, which is the point of
        reporting the number.
+
+When CRAFT's own `reasoning_steps` list is at hand, that list is the count: it
+is this same function's output, already computed upstream and then narrowed by
+the anomaly filter, so recomputing it from the rendered text would measure the
+trace before filtering instead of after.
 
 `basis()` reports which rule produced a count, so the proportion measured each
 way can be stated rather than assumed.
@@ -33,53 +34,46 @@ from __future__ import annotations
 import re
 from typing import List, Optional
 
-# "Step 3:", "Step 3.", "步骤3:" at the start of a line.
-_STEP_MARKER = re.compile(r"^\s*(?:step|步骤)\s*\d+\s*[:.、]", re.IGNORECASE | re.MULTILINE)
-# "3." or "3)" or "(3)" at the start of a line — an enumerated reasoning list.
-_ENUM_MARKER = re.compile(r"^\s*\(?\d{1,2}[.)]\s+\S", re.MULTILINE)
-# A sentence ends at . ! ? or their full-width forms, or at a newline that
-# follows one. Decimal points and common abbreviations are not sentence ends.
-_SENT_SPLIT = re.compile(r"(?<![0-9])[.!?。！？]+(?=\s|$)|\n{2,}")
-
-_BOILERPLATE = re.compile(
-    r"^\s*(?:__(?:PROVED|DISPROVED)__|\\boxed\{[^}]*\}|answer\s*[:=]|"
-    r"final answer\s*[:=]|conclusion\s*[:=])\s*$",
-    re.IGNORECASE)
+# Copied from generate_traces.py. A step is a line that says it is one.
+_STEP_PATTERN = re.compile(r"^Step\s*\d+\s*:", re.IGNORECASE)
+_FINAL_CONCLUSION_PATTERN = re.compile(
+    r"Final\s+Conclusion\s*:\s*(__PROVED__|__DISPROVED__)", re.IGNORECASE)
+_LABEL_TOKEN_PATTERN = re.compile(r"__PROVED__|__DISPROVED__", re.IGNORECASE)
 
 
-def _sentences(text: str) -> List[str]:
-    parts = [p.strip() for p in _SENT_SPLIT.split(text) if p and p.strip()]
-    # A fragment with no letters is punctuation or a stray number, not a step.
-    return [p for p in parts if re.search(r"[A-Za-z一-鿿]", p) and len(p) > 2]
+def extract_reasoning_steps(text: str) -> List[str]:
+    """CRAFT's step segmentation, applied to any trace."""
+    if not text:
+        return []
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    steps = [line for line in lines if _STEP_PATTERN.match(line)]
+    if steps:
+        conclusion_lines = [l for l in lines
+                            if _FINAL_CONCLUSION_PATTERN.search(l)
+                            or _LABEL_TOKEN_PATTERN.search(l)]
+        for cl in conclusion_lines:
+            if cl not in steps:
+                steps.append(cl)
+        return steps
+    return lines
 
 
 def basis(text: str, reasoning_steps: Optional[List] = None) -> str:
-    """Which rule decides this trace's step count: list, markers, enum, sentences."""
+    """Which rule decides this trace's step count: list, markers, or lines."""
     if reasoning_steps and isinstance(reasoning_steps, list):
         return "list"
     if not text:
         return "empty"
-    if _STEP_MARKER.search(text):
+    if any(_STEP_PATTERN.match(l.strip()) for l in text.splitlines()):
         return "markers"
-    if len(_ENUM_MARKER.findall(text)) >= 2:
-        return "enumerated"
-    return "sentences"
+    return "lines"
 
 
 def count_steps(text: str, reasoning_steps: Optional[List] = None) -> int:
     """The number of reasoning steps in a trace. Never capped."""
     if reasoning_steps and isinstance(reasoning_steps, list):
         return len([s for s in reasoning_steps if s and str(s).strip()])
-    if not text:
-        return 0
-    marks = _STEP_MARKER.findall(text)
-    if marks:
-        return len(marks)
-    enum = _ENUM_MARKER.findall(text)
-    if len(enum) >= 2:
-        return len(enum)
-    sents = [s for s in _sentences(text) if not _BOILERPLATE.match(s)]
-    return len(sents)
+    return len(extract_reasoning_steps(text))
 
 
 def count_tokens(text: str) -> int:
