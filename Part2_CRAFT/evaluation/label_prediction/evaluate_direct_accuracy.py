@@ -61,7 +61,6 @@ except ImportError:
 VALID_LABELS = {"__PROVED__", "__DISPROVED__"}
 
 _LABEL_RE      = re.compile(r"(__PROVED__|__DISPROVED__)", re.IGNORECASE)
-_STEP_RE       = re.compile(r"^Step\s*\d+\s*[:\.]", re.IGNORECASE | re.MULTILINE)
 _NL_DISPROVED  = re.compile(r"\b(disproved|false|incorrect|refuted)\b", re.IGNORECASE)
 _NL_PROVED     = re.compile(r"\b(proved|proven|true|correct|holds)\b", re.IGNORECASE)
 def _extract_boxed_content(text: str) -> list:
@@ -280,22 +279,7 @@ def normalise_math_answer(ans: Optional[str]) -> Optional[str]:
 # Step / token counting
 # ---------------------------------------------------------------------------
 
-def count_steps(text: str, reasoning_steps: Optional[list] = None) -> int:
-    """Count reasoning steps in a trace text."""
-    if reasoning_steps and isinstance(reasoning_steps, list):
-        return len([s for s in reasoning_steps if s and str(s).strip()])
-    if not text:
-        return 0
-    matches = _STEP_RE.findall(text)
-    if matches:
-        return len(matches)
-    lines = [l.strip() for l in text.splitlines() if l.strip()]
-    return min(len(lines), 30)  # cap at 30 to avoid noise
-
-
-def count_tokens(text: str) -> int:
-    """Approximate token count via whitespace split (~0.75× real BPE tokens)."""
-    return len(text.split()) if text else 0
+# count_steps and count_tokens come from step_count, shared with the baselines.
 
 
 def _infer_dataset(sample_id: str) -> str:
@@ -353,6 +337,7 @@ def _load_json(path: Path):
 # decides correctness, because a canonical spelling cannot represent
 # \frac{1}{2}, 1/2 and 0.5 as one string without also merging answers that differ.
 from answer_match import answers_match  # noqa: E402
+from step_count import count_steps, count_tokens  # noqa: E402
 
 
 def _is_math_sample(r: Dict) -> bool:

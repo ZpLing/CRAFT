@@ -64,7 +64,6 @@ logger = logging.getLogger(__name__)
 VALID_LABELS  = {"__PROVED__", "__DISPROVED__"}
 BINARY_LABELS = ["__PROVED__", "__DISPROVED__"]
 _LABEL_RE     = re.compile(r"(__PROVED__|__DISPROVED__)", re.IGNORECASE)
-_STEP_RE      = re.compile(r"^Step\s*\d+\s*[:\.]", re.IGNORECASE | re.MULTILINE)
 def _extract_boxed_content(text: str) -> list:
     """Extract \\boxed{...} contents handling nested braces."""
     results = []
@@ -251,17 +250,12 @@ def normalise_math_answer(ans: Optional[str]) -> Optional[str]:
     return _normalise_single(ans)
 
 
-def count_steps(text: str, reasoning_steps: Optional[list] = None) -> int:
-    if reasoning_steps and isinstance(reasoning_steps, list):
-        return len([s for s in reasoning_steps if s and str(s).strip()])
-    if not text:
-        return 0
-    m = _STEP_RE.findall(text)
-    return len(m) if m else min(len([l for l in text.splitlines() if l.strip()]), 30)
+# count_steps and count_tokens come from step_count, shared with the baselines
+# and with evaluate_direct_accuracy, so the ablation's steps are counted the same
+# way as everything else they are compared against.
 
 
-def count_tokens(text: str) -> int:
-    return len(text.split()) if text else 0
+from step_count import count_steps, count_tokens  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
