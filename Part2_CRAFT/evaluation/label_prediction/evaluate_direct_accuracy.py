@@ -471,7 +471,7 @@ def compute_metrics(samples: List[Dict]) -> Dict[str, Any]:
         domain = "logical"
     BINARY_LABELS = ["__PROVED__", "__DISPROVED__"]
 
-    correct = no_pred = valid_total = 0
+    correct = no_pred = valid_total = n_blocked = 0
     per_trace_acc: List[float] = []
     all_steps:  List[float] = []
     all_tokens: List[float] = []
@@ -482,6 +482,12 @@ def compute_metrics(samples: List[Dict]) -> Dict[str, Any]:
             pred = str(s.get("predicted", "") or "").strip()
             ds   = s.get("source_dataset")
             if not gt:
+                continue
+            # Refused by the API gateway before the model saw it: not evidence
+            # about the model, so it leaves the denominator rather than counting
+            # as a failure. Same rule as the baselines use.
+            if s.get("gateway_blocked"):
+                n_blocked += 1
                 continue
             valid_total += 1
             if not pred:
@@ -504,11 +510,13 @@ def compute_metrics(samples: List[Dict]) -> Dict[str, Any]:
         accuracy = correct / valid_total if valid_total else 0.0
         total_predicted = valid_total - no_pred
         precision = correct / total_predicted if total_predicted > 0 else 0.0
-        math_f1 = (2 * precision * accuracy / (precision + accuracy)
-                   if (precision + accuracy) > 0 else 0.0)
+        # No F1 on the math datasets: there are no classes to average over,
+        # and 2PA/(P+A) equals the accuracy whenever every sample is answered.
+        # FLD and FOLIO keep a real macro-F1 over PROVED/DISPROVED.
         return {
             "accuracy":    round(accuracy, 4),
-            "macro_f1":    round(math_f1, 4),
+            "macro_f1":    None,
+            "precision_answered": round(precision, 4),
             "avg_steps":   round(float(np.mean(all_steps)),  2) if all_steps  else 0.0,
             "std_steps":   round(float(np.std(all_steps)),   2) if all_steps  else 0.0,
             "avg_tokens":  round(float(np.mean(all_tokens)), 1) if all_tokens else 0.0,
@@ -518,6 +526,7 @@ def compute_metrics(samples: List[Dict]) -> Dict[str, Any]:
             "n_total":     valid_total,
             "n_correct":   correct,
             "n_no_pred":   no_pred,
+        "n_blocked":    n_blocked,
             "no_pred_rate": round(no_pred / valid_total if valid_total else 0.0, 4),
             "per_class_f1": {},
             "confusion_matrix": {},
@@ -531,6 +540,9 @@ def compute_metrics(samples: List[Dict]) -> Dict[str, Any]:
         gt   = s["ground_truth"]
         pred = s["predicted"]
         if gt not in BINARY_LABELS:
+            continue
+        if s.get("gateway_blocked"):
+            n_blocked += 1
             continue
         valid_total += 1
         if pred not in BINARY_LABELS:
@@ -574,6 +586,7 @@ def compute_metrics(samples: List[Dict]) -> Dict[str, Any]:
         "n_total":     valid_total,
         "n_correct":   correct,
         "n_no_pred":   no_pred,
+        "n_blocked":    n_blocked,
         "no_pred_rate": round(no_pred / valid_total if valid_total else 0.0, 4),
         "per_class_f1": f1s,
         "confusion_matrix": confusion,
@@ -604,7 +617,10 @@ def print_metrics(m: Dict, label: str = "", indent: str = "") -> None:
     if domain == "math":
         print(f"{indent}  Metric           : exact-match on numeric answer")
     else:
-        print(f"{indent}  Macro-F1         : {m['macro_f1']:.4f}")
+        if m.get("macro_f1") is None:
+            print(f"{indent}  Macro-F1         : FLD/FOLIO only")
+        else:
+            print(f"{indent}  Macro-F1         : {m['macro_f1']:.4f}")
     print(f"{indent}  Avg steps/trace  : {m['avg_steps']:.2f} ± {m['std_steps']:.2f}")
     print(f"{indent}  Avg tokens/trace : {m['avg_tokens']:.1f} ± {m['std_tokens']:.1f}")
     if m.get("std_trace_acc", 0) > 0:
@@ -636,7 +652,9 @@ def print_comparison_table(results: List[Tuple[str, Dict]]) -> None:
     for label, m in results:
         steps_str  = f"{m['avg_steps']:.2f}±{m['std_steps']:.2f}"
         tokens_str = f"{m['avg_tokens']:.1f}±{m['std_tokens']:.1f}"
-        print(f"  {label:<42}  {m['accuracy']:>9.4f}  {m['macro_f1']:>9.4f}"
+        _f1 = m.get("macro_f1")
+        _f1c = f"{_f1:>9.4f}" if _f1 is not None else f"{'—':>9s}"
+        print(f"  {label:<42}  {m['accuracy']:>9.4f}  {_f1c}"
               f"  {steps_str:>12}  {tokens_str:>13}  {m['n_total']}")
     print("═"*112)
 
