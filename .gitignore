@@ -12,7 +12,11 @@ secrets.*
 # Part 1's results are the pilot study's evidence and are small enough to track
 # (11 MB); Part 2's craft_runs are 3.2 GB and stay local.
 /results/
-Part2_CRAFT/results/
+Part2_CRAFT/results/*
+# The baselines' runs are the evidence for the main table, so they are tracked:
+# results.json is the data, traces.jsonl the generations behind it, which is what
+# lets the table be re-scored without paying for the runs again.
+!Part2_CRAFT/results/baseline_results/
 
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/

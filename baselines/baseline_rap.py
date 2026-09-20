@@ -17,9 +17,10 @@ from pathlib import Path
 import aiohttp
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import baseline_common  # noqa: E402
 from baseline_common import (  # noqa: E402
     load_raw_dataset, compute_metrics, compute_per_dataset, print_metrics,
-    DEFAULT_MODEL, OPENAI_API_KEY, OPENAI_BASE_URL, default_output, save_run, by_domain,
+    DEFAULT_MODEL, OPENAI_API_KEY, OPENAI_BASE_URL, default_output, save_run, by_domain, run_chunked,
     resume_filter,
 )
 from baseline_common_extended import run_rap  # noqa: E402
@@ -38,12 +39,11 @@ async def run(args) -> None:
         return
     sem = asyncio.Semaphore(args.concurrency)
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
-        preds = await by_domain(run_rap, samples, args.model, args.api_key, args.base_url, sem, session, iterations=args.rap_iterations, branch=args.rap_branch, max_depth=args.rap_depth)
-    preds = previous + preds
+        preds = await run_chunked(run_rap, samples, previous, args.output, LABEL, "rap", args.chunk,
+            {"model": args.model, "shots": args.shots, "seed": args.seed, "per_dataset": args.per_dataset}, args.model, args.api_key, args.base_url, sem, session, iterations=args.rap_iterations, branch=args.rap_branch, max_depth=args.rap_depth)
     m = compute_metrics(preds)
     m["per_dataset"] = compute_per_dataset(preds)
     print_metrics(m, LABEL)
-    save_run(args.output, LABEL, m, preds, "rap", append_traces=True, model=args.model, shots=args.shots, seed=args.seed, per_dataset=args.per_dataset)
 
 
 def main() -> None:
@@ -51,6 +51,12 @@ def main() -> None:
     p.add_argument("--datasets", nargs="+", required=True)
     p.add_argument("--per_dataset", type=int, default=100)
     p.add_argument("--max_samples", type=int, default=None)
+    p.add_argument("--chunk", type=int, default=200,
+                   help="save after this many samples, so a run that dies "
+                        "loses at most one chunk")
+    p.add_argument("--max_tokens", type=int, default=0,
+                   help="raise the output budget floor for every call (0 = leave each "
+                        "call's own ceiling alone). OlympiadBench needs about 2048.")
     p.add_argument("--no_resume", dest="resume", action="store_false",
                    help="re-run every sample instead of continuing from what is on disk")
     p.add_argument("--seed", type=int, default=42)
@@ -66,6 +72,8 @@ def main() -> None:
                    help="Default: baseline_results/<model>/rap/results.json "
                         "under Part2_CRAFT/results")
     args = p.parse_args()
+    if args.max_tokens:
+        baseline_common.MAX_TOKENS_FLOOR = args.max_tokens
     args.output = args.output or default_output("rap", args.model)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     asyncio.run(run(args))

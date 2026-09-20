@@ -198,6 +198,39 @@ async def by_domain(runner, samples: List[Dict], *args, **kwargs) -> List[Dict]:
     return mark_blocked(preds, samples)
 
 
+async def run_chunked(runner, samples: List[Dict], previous: List[Dict],
+                      output, label: str, setting_key: str, chunk: int,
+                      meta: Dict, *args, **kwargs) -> List[Dict]:
+    """Run a baseline in chunks, saving after each one.
+
+    Everything used to be held in memory until the run ended and written once, so
+    a run that died — a dropped connection, a restarted login node, a killed
+    tmux — lost all of it. At 2000 samples that is hours of calls for nothing,
+    and the resume machinery could not help because nothing had reached the disk.
+
+    Saving after each chunk means a death costs at most one chunk. The artifacts
+    of a chunk are dropped once written, or the next save would append the same
+    trace lines again.
+    """
+    done: List[Dict] = list(previous)
+    total = len(previous) + len(samples)
+    for i in range(0, len(samples), chunk):
+        batch = samples[i:i + chunk]
+        preds = await runner_call(runner, batch, *args, **kwargs)
+        done.extend(preds)
+        m = compute_metrics(done)
+        m["per_dataset"] = compute_per_dataset(done)
+        save_run(output, label, m, done, setting_key, append_traces=True, **meta)
+        for p_ in preds:
+            p_.pop(ARTIFACTS_KEY, None)
+        logger.info("checkpoint: %d/%d samples saved", len(done), total)
+    return done
+
+
+async def runner_call(runner, samples, *args, **kwargs):
+    return await by_domain(runner, samples, *args, **kwargs)
+
+
 def mark_blocked(predictions: List[Dict], samples: List[Dict]) -> List[Dict]:
     """Flag the samples the gateway refused, so scoring can leave them out.
 
@@ -624,6 +657,14 @@ def build_zeroshot_prompt(problem: str, domain: str = "logical") -> str:
 # recorded here and the samples carrying them are marked, so they can be
 # excluded from the accuracy rather than counted as failures.
 BLOCKED_PROMPTS: set = set()
+
+# A floor on the output budget, raised by --max_tokens. OlympiadBench's
+# derivations run past the 1024 tokens the baselines ask for — 10% of its
+# samples come back cut off mid-derivation and are then scored as having failed
+# to answer, which measures the budget rather than the model. Raising the floor
+# lets those finish; it changes nothing for a sample that was already finishing,
+# because max_tokens is a ceiling and not an allocation.
+MAX_TOKENS_FLOOR = 0
 _BLOCK_MARKERS = ("sensitive word", "content filter", "content_filter",
                   "invalid input", "safety")
 
@@ -647,6 +688,8 @@ async def call_llm(
     # o4-mini / deepseek-r1: reasoning tokens eat into max_tokens budget, leaving content empty.
     # Use a large max_tokens for the total budget, and add max_output_tokens to reserve space
     # for the visible response (Bosch API specific parameter, mirrors OpenAI SDK extra_body usage).
+    if MAX_TOKENS_FLOOR:
+        max_tokens = max(max_tokens, MAX_TOKENS_FLOOR)
     is_reasoning_model = model in ("o4-mini", "deepseek-r1", "o4-mini-2025-04-16")
     if is_reasoning_model:
         max_tokens = max(max_tokens, 16000)

@@ -22,8 +22,9 @@ import aiohttp
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import baseline_common  # noqa: E402
 from baseline_common import (  # noqa: E402
-    attach, save_run, by_domain, resume_filter,
+    attach, save_run, by_domain, run_chunked, resume_filter,
     SYSTEM_LOGICIAN, SYSTEM_MATH, build_zeroshot_prompt, call_llm, compute_metrics,
     compute_per_dataset, count_steps, count_tokens, load_raw_dataset, print_metrics,
     _extract_pred, DEFAULT_MODEL, OPENAI_API_KEY, OPENAI_BASE_URL, default_output,
@@ -96,13 +97,12 @@ async def run(args) -> None:
         return
     sem = asyncio.Semaphore(args.concurrency)
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=1800)) as session:
-        preds = await by_domain(run_best_of_n, samples, args.shots, args.model, args.api_key,
+        preds = await run_chunked(run_best_of_n, samples, previous, args.output, LABEL, "best_of_n", args.chunk,
+            {"model": args.model, "shots": args.shots, "seed": args.seed, "per_dataset": args.per_dataset}, args.shots, args.model, args.api_key,
                                     args.base_url, sem, session)
-    preds = previous + preds
     m = compute_metrics(preds)
     m["per_dataset"] = compute_per_dataset(preds)
     print_metrics(m, LABEL)
-    save_run(args.output, LABEL, m, preds, "best_of_n", append_traces=True, model=args.model, shots=args.shots, seed=args.seed, per_dataset=args.per_dataset)
 
 
 def main() -> None:
@@ -110,6 +110,12 @@ def main() -> None:
     p.add_argument("--datasets", nargs="+", required=True)
     p.add_argument("--per_dataset", type=int, default=100)
     p.add_argument("--max_samples", type=int, default=None)
+    p.add_argument("--chunk", type=int, default=200,
+                   help="save after this many samples, so a run that dies "
+                        "loses at most one chunk")
+    p.add_argument("--max_tokens", type=int, default=0,
+                   help="raise the output budget floor for every call (0 = leave each "
+                        "call's own ceiling alone). OlympiadBench needs about 2048.")
     p.add_argument("--no_resume", dest="resume", action="store_false",
                    help="re-run every sample instead of continuing from what is on disk")
     p.add_argument("--seed", type=int, default=42)
@@ -122,6 +128,8 @@ def main() -> None:
                    help="Default: baseline_results/<model>/best_of_n/results.json "
                         "under Part2_CRAFT/results")
     args = p.parse_args()
+    if args.max_tokens:
+        baseline_common.MAX_TOKENS_FLOOR = args.max_tokens
     args.output = args.output or default_output("best_of_n", args.model)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     asyncio.run(run(args))

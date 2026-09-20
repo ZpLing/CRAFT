@@ -1,0 +1,2166 @@
+{
+ "setting": "LCoT2Tree (K=10)",
+ "setting_key": "lcot2tree",
+ "overall": {
+  "accuracy": 0.8434,
+  "macro_f1": null,
+  "avg_steps": 8.81,
+  "std_steps": 7.99,
+  "avg_tokens": 233.6,
+  "std_tokens": 104.1,
+  "n_total": 198,
+  "n_correct": 167,
+  "n_no_pred": 0,
+  "no_pred_rate": 0.0,
+  "n_blocked": 2,
+  "by_domain": {
+   "logical": {
+    "accuracy": 0.9293,
+    "macro_f1": 0.929,
+    "avg_steps": 5.89,
+    "std_steps": 2.97,
+    "avg_tokens": 227.9,
+    "std_tokens": 96.9,
+    "n_total": 99,
+    "n_correct": 92,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
+    "n_blocked": 1,
+    "per_class_f1": {
+     "__PROVED__": 0.9247,
+     "__DISPROVED__": 0.9333
+    },
+    "confusion_matrix": {
+     "__PROVED__": {
+      "__PROVED__": 43,
+      "__DISPROVED__": 6,
+      "none": 0
+     },
+     "__DISPROVED__": {
+      "__PROVED__": 1,
+      "__DISPROVED__": 49,
+      "none": 0
+     }
+    },
+    "domain": "logical"
+   },
+   "math": {
+    "accuracy": 0.7576,
+    "macro_f1": null,
+    "precision_answered": 0.7576,
+    "avg_steps": 11.92,
+    "std_steps": 10.02,
+    "avg_tokens": 244.0,
+    "std_tokens": 106.1,
+    "n_total": 99,
+    "n_correct": 75,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
+    "n_blocked": 1,
+    "domain": "math"
+   }
+  },
+  "domain": "mixed",
+  "per_dataset": {
+   "FLD": {
+    "accuracy": 0.9184,
+    "macro_f1": 0.9181,
+    "avg_steps": 5.96,
+    "std_steps": 3.53,
+    "avg_tokens": 266.5,
+    "std_tokens": 83.7,
+    "n_total": 49,
+    "n_correct": 45,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
+    "n_blocked": 1,
+    "per_class_f1": {
+     "__PROVED__": 0.913,
+     "__DISPROVED__": 0.9231
+    },
+    "confusion_matrix": {
+     "__PROVED__": {
+      "__PROVED__": 21,
+      "__DISPROVED__": 3,
+      "none": 0
+     },
+     "__DISPROVED__": {
+      "__PROVED__": 1,
+      "__DISPROVED__": 24,
+      "none": 0
+     }
+    },
+    "domain": "logical"
+   },
+   "FOLIO": {
+    "accuracy": 0.94,
+    "macro_f1": 0.9398,
+    "avg_steps": 5.82,
+    "std_steps": 2.3,
+    "avg_tokens": 190.1,
+    "std_tokens": 94.0,
+    "n_total": 50,
+    "n_correct": 47,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
+    "n_blocked": 0,
+    "per_class_f1": {
+     "__PROVED__": 0.9362,
+     "__DISPROVED__": 0.9434
+    },
+    "confusion_matrix": {
+     "__PROVED__": {
+      "__PROVED__": 22,
+      "__DISPROVED__": 3,
+      "none": 0
+     },
+     "__DISPROVED__": {
+      "__PROVED__": 0,
+      "__DISPROVED__": 25,
+      "none": 0
+     }
+    },
+    "domain": "logical"
+   },
+   "GSM8K": {
+    "accuracy": 0.98,
+    "macro_f1": null,
+    "precision_answered": 0.98,
+    "avg_steps": 7.22,
+    "std_steps": 3.63,
+    "avg_tokens": 162.6,
+    "std_tokens": 45.0,
+    "n_total": 50,
+    "n_correct": 49,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
+    "n_blocked": 0,
+    "domain": "math"
+   },
+   "OlympiadBench": {
+    "accuracy": 0.5306,
+    "macro_f1": null,
+    "precision_answered": 0.5306,
+    "avg_steps": 16.71,
+    "std_steps": 12.0,
+    "avg_tokens": 327.1,
+    "std_tokens": 83.7,
+    "n_total": 49,
+    "n_correct": 26,
+    "n_no_pred": 0,
+    "no_pred_rate": 0.0,
+    "n_blocked": 1,
+    "domain": "math"
+   }
+  }
+ },
+ "run": {
+  "model": "gemini-3.1-flash-lite",
+  "shots": 18,
+  "seed": 42,
+  "per_dataset": 50
+ },
+ "traces_file": "traces.jsonl",
+ "predictions": [
+  {
+   "sample_id": "FLD_76",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 343.0,
+   "domain": "logical",
+   "tree_score": 0.2716
+  },
+  {
+   "sample_id": "FLD_195",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 274.0,
+   "domain": "logical",
+   "tree_score": 0.2236
+  },
+  {
+   "sample_id": "FLD_381",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 277.0,
+   "domain": "logical",
+   "tree_score": 0.1958
+  },
+  {
+   "sample_id": "FLD_262",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 323.0,
+   "domain": "logical",
+   "tree_score": 0.2389
+  },
+  {
+   "sample_id": "FLD_257",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 182.0,
+   "domain": "logical",
+   "tree_score": 0.3375
+  },
+  {
+   "sample_id": "FLD_348",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 243.0,
+   "domain": "logical",
+   "tree_score": 0.2483
+  },
+  {
+   "sample_id": "FLD_13",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 314.0,
+   "domain": "logical",
+   "tree_score": 0.1833
+  },
+  {
+   "sample_id": "FLD_364",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 168.0,
+   "domain": "logical",
+   "tree_score": 0.375
+  },
+  {
+   "sample_id": "FLD_397",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 222.0,
+   "domain": "logical",
+   "tree_score": 0.35
+  },
+  {
+   "sample_id": "FLD_231",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 71.0,
+   "domain": "logical",
+   "tree_score": 0.25
+  },
+  {
+   "sample_id": "FLD_4",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 225.0,
+   "domain": "logical",
+   "tree_score": 0.372
+  },
+  {
+   "sample_id": "FLD_90",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 301.0,
+   "domain": "logical",
+   "tree_score": 0.3
+  },
+  {
+   "sample_id": "FLD_26",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 377.0,
+   "domain": "logical",
+   "tree_score": 0.2569
+  },
+  {
+   "sample_id": "FLD_173",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 351.0,
+   "domain": "logical",
+   "tree_score": 0.3056
+  },
+  {
+   "sample_id": "FLD_426",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 283.0,
+   "domain": "logical",
+   "tree_score": 0.3458
+  },
+  {
+   "sample_id": "FLD_167",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 273.0,
+   "domain": "logical",
+   "tree_score": 0.2792
+  },
+  {
+   "sample_id": "FLD_235",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 289.0,
+   "domain": "logical",
+   "tree_score": 0.2489
+  },
+  {
+   "sample_id": "FLD_37",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": null,
+   "response_steps": 0.0,
+   "response_tokens": 0.0,
+   "domain": "logical",
+   "gateway_blocked": true
+  },
+  {
+   "sample_id": "FLD_213",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 227.0,
+   "domain": "logical",
+   "tree_score": 0.375
+  },
+  {
+   "sample_id": "FLD_219",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 228.0,
+   "domain": "logical",
+   "tree_score": 0.5375
+  },
+  {
+   "sample_id": "FLD_401",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 260.0,
+   "domain": "logical",
+   "tree_score": 0.325
+  },
+  {
+   "sample_id": "FLD_485",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 258.0,
+   "domain": "logical",
+   "tree_score": 0.3075
+  },
+  {
+   "sample_id": "FLD_107",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 345.0,
+   "domain": "logical",
+   "tree_score": 0.1833
+  },
+  {
+   "sample_id": "FLD_51",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 154.0,
+   "domain": "logical",
+   "tree_score": 0.5514
+  },
+  {
+   "sample_id": "FLD_269",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 192.0,
+   "domain": "logical",
+   "tree_score": 0.2625
+  },
+  {
+   "sample_id": "FLD_131",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 2.0,
+   "response_tokens": 397.0,
+   "domain": "logical",
+   "tree_score": 0.2556
+  },
+  {
+   "sample_id": "FLD_408",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 238.0,
+   "domain": "logical",
+   "tree_score": 0.1792
+  },
+  {
+   "sample_id": "FLD_330",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 329.0,
+   "domain": "logical",
+   "tree_score": 0.206
+  },
+  {
+   "sample_id": "FLD_346",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 2.0,
+   "response_tokens": 107.0,
+   "domain": "logical",
+   "tree_score": 0.2808
+  },
+  {
+   "sample_id": "FLD_423",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 240.0,
+   "domain": "logical",
+   "tree_score": 0.3608
+  },
+  {
+   "sample_id": "FLD_190",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 254.0,
+   "domain": "logical",
+   "tree_score": 0.2792
+  },
+  {
+   "sample_id": "FLD_295",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 371.0,
+   "domain": "logical",
+   "tree_score": 0.2347
+  },
+  {
+   "sample_id": "FLD_427",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 295.0,
+   "domain": "logical",
+   "tree_score": 0.5917
+  },
+  {
+   "sample_id": "FLD_153",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 231.0,
+   "domain": "logical",
+   "tree_score": 0.2917
+  },
+  {
+   "sample_id": "FLD_361",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 117.0,
+   "domain": "logical",
+   "tree_score": 0.2417
+  },
+  {
+   "sample_id": "FLD_360",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 115.0,
+   "domain": "logical",
+   "tree_score": 0.1942
+  },
+  {
+   "sample_id": "FLD_130",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 253.0,
+   "domain": "logical",
+   "tree_score": 0.2292
+  },
+  {
+   "sample_id": "FLD_67",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 357.0,
+   "domain": "logical",
+   "tree_score": 0.2389
+  },
+  {
+   "sample_id": "FLD_294",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 207.0,
+   "domain": "logical",
+   "tree_score": 0.3236
+  },
+  {
+   "sample_id": "FLD_139",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 363.0,
+   "domain": "logical",
+   "tree_score": 0.2694
+  },
+  {
+   "sample_id": "FLD_488",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 2.0,
+   "response_tokens": 146.0,
+   "domain": "logical",
+   "tree_score": 0.5917
+  },
+  {
+   "sample_id": "FLD_303",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 259.0,
+   "domain": "logical",
+   "tree_score": 0.1458
+  },
+  {
+   "sample_id": "FLD_490",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 364.0,
+   "domain": "logical",
+   "tree_score": 0.3083
+  },
+  {
+   "sample_id": "FLD_187",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 298.0,
+   "domain": "logical",
+   "tree_score": 0.2731
+  },
+  {
+   "sample_id": "FLD_365",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 374.0,
+   "domain": "logical",
+   "tree_score": 0.1242
+  },
+  {
+   "sample_id": "FLD_250",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 258.0,
+   "domain": "logical",
+   "tree_score": 0.2361
+  },
+  {
+   "sample_id": "FLD_116",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 308.0,
+   "domain": "logical",
+   "tree_score": 0.2986
+  },
+  {
+   "sample_id": "FLD_86",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 424.0,
+   "domain": "logical",
+   "tree_score": 0.1861
+  },
+  {
+   "sample_id": "FLD_142",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 160.0,
+   "domain": "logical",
+   "tree_score": 0.3417
+  },
+  {
+   "sample_id": "FLD_237",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 414.0,
+   "domain": "logical",
+   "tree_score": 0.305
+  },
+  {
+   "sample_id": "FOLIO_408",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 103.0,
+   "domain": "logical",
+   "tree_score": 0.2482
+  },
+  {
+   "sample_id": "FOLIO_238",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 223.0,
+   "domain": "logical",
+   "tree_score": 0.2444
+  },
+  {
+   "sample_id": "FOLIO_236",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 344.0,
+   "domain": "logical",
+   "tree_score": 0.2608
+  },
+  {
+   "sample_id": "FOLIO_342",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 149.0,
+   "domain": "logical",
+   "tree_score": 0.2458
+  },
+  {
+   "sample_id": "FOLIO_11",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 269.0,
+   "domain": "logical",
+   "tree_score": 0.2742
+  },
+  {
+   "sample_id": "FOLIO_393",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 120.0,
+   "domain": "logical",
+   "tree_score": 0.4139
+  },
+  {
+   "sample_id": "FOLIO_321",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 255.0,
+   "domain": "logical",
+   "tree_score": 0.2597
+  },
+  {
+   "sample_id": "FOLIO_50",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 106.0,
+   "domain": "logical",
+   "tree_score": 0.3125
+  },
+  {
+   "sample_id": "FOLIO_415",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 49.0,
+   "domain": "logical",
+   "tree_score": 0.3708
+  },
+  {
+   "sample_id": "FOLIO_97",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 92.0,
+   "domain": "logical",
+   "tree_score": 0.5
+  },
+  {
+   "sample_id": "FOLIO_182",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 201.0,
+   "domain": "logical",
+   "tree_score": 0.2339
+  },
+  {
+   "sample_id": "FOLIO_258",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 342.0,
+   "domain": "logical",
+   "tree_score": 0.2375
+  },
+  {
+   "sample_id": "FOLIO_166",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 182.0,
+   "domain": "logical",
+   "tree_score": 0.2483
+  },
+  {
+   "sample_id": "FOLIO_490",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 101.0,
+   "domain": "logical",
+   "tree_score": 0.1475
+  },
+  {
+   "sample_id": "FOLIO_273",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 255.0,
+   "domain": "logical",
+   "tree_score": 0.4808
+  },
+  {
+   "sample_id": "FOLIO_326",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 167.0,
+   "domain": "logical",
+   "tree_score": 0.2979
+  },
+  {
+   "sample_id": "FOLIO_110",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 55.0,
+   "domain": "logical",
+   "tree_score": 0.5625
+  },
+  {
+   "sample_id": "FOLIO_81",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 90.0,
+   "domain": "logical",
+   "tree_score": 0.2514
+  },
+  {
+   "sample_id": "FOLIO_132",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 142.0,
+   "domain": "logical",
+   "tree_score": 0.4667
+  },
+  {
+   "sample_id": "FOLIO_252",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 3.0,
+   "response_tokens": 203.0,
+   "domain": "logical",
+   "tree_score": 0.4736
+  },
+  {
+   "sample_id": "FOLIO_31",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 107.0,
+   "domain": "logical",
+   "tree_score": 0.3675
+  },
+  {
+   "sample_id": "FOLIO_485",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 127.0,
+   "domain": "logical",
+   "tree_score": 0.4208
+  },
+  {
+   "sample_id": "FOLIO_412",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 401.0,
+   "domain": "logical",
+   "tree_score": 0.2875
+  },
+  {
+   "sample_id": "FOLIO_365",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 199.0,
+   "domain": "logical",
+   "tree_score": 0.2056
+  },
+  {
+   "sample_id": "FOLIO_372",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 79.0,
+   "domain": "logical",
+   "tree_score": 0.3903
+  },
+  {
+   "sample_id": "FOLIO_142",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 309.0,
+   "domain": "logical",
+   "tree_score": 0.3806
+  },
+  {
+   "sample_id": "FOLIO_94",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 249.0,
+   "domain": "logical",
+   "tree_score": 0.2277
+  },
+  {
+   "sample_id": "FOLIO_302",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 378.0,
+   "domain": "logical",
+   "tree_score": 0.1727
+  },
+  {
+   "sample_id": "FOLIO_201",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 93.0,
+   "domain": "logical",
+   "tree_score": 0.2742
+  },
+  {
+   "sample_id": "FOLIO_293",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 87.0,
+   "domain": "logical",
+   "tree_score": 0.2508
+  },
+  {
+   "sample_id": "FOLIO_36",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 235.0,
+   "domain": "logical",
+   "tree_score": 0.3008
+  },
+  {
+   "sample_id": "FOLIO_457",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 153.0,
+   "domain": "logical",
+   "tree_score": 0.2282
+  },
+  {
+   "sample_id": "FOLIO_389",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 118.0,
+   "domain": "logical",
+   "tree_score": 0.1975
+  },
+  {
+   "sample_id": "FOLIO_483",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 207.0,
+   "domain": "logical",
+   "tree_score": 0.1842
+  },
+  {
+   "sample_id": "FOLIO_458",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 335.0,
+   "domain": "logical",
+   "tree_score": 0.3442
+  },
+  {
+   "sample_id": "FOLIO_354",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 321.0,
+   "domain": "logical",
+   "tree_score": 0.3861
+  },
+  {
+   "sample_id": "FOLIO_343",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 234.0,
+   "domain": "logical",
+   "tree_score": 0.2267
+  },
+  {
+   "sample_id": "FOLIO_195",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 299.0,
+   "domain": "logical",
+   "tree_score": 0.3278
+  },
+  {
+   "sample_id": "FOLIO_20",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 85.0,
+   "domain": "logical",
+   "tree_score": 0.4808
+  },
+  {
+   "sample_id": "FOLIO_319",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 218.0,
+   "domain": "logical",
+   "tree_score": 0.415
+  },
+  {
+   "sample_id": "FOLIO_445",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 162.0,
+   "domain": "logical",
+   "tree_score": 0.4675
+  },
+  {
+   "sample_id": "FOLIO_1",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 128.0,
+   "domain": "logical",
+   "tree_score": 0.4308
+  },
+  {
+   "sample_id": "FOLIO_230",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 314.0,
+   "domain": "logical",
+   "tree_score": 0.3908
+  },
+  {
+   "sample_id": "FOLIO_363",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 86.0,
+   "domain": "logical",
+   "tree_score": 0.2861
+  },
+  {
+   "sample_id": "FOLIO_377",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 296.0,
+   "domain": "logical",
+   "tree_score": 0.2444
+  },
+  {
+   "sample_id": "FOLIO_297",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 120.0,
+   "domain": "logical",
+   "tree_score": 0.2549
+  },
+  {
+   "sample_id": "FOLIO_276",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 80.0,
+   "domain": "logical",
+   "tree_score": 0.2417
+  },
+  {
+   "sample_id": "FOLIO_399",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 118.0,
+   "domain": "logical",
+   "tree_score": 0.1815
+  },
+  {
+   "sample_id": "FOLIO_289",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 294.0,
+   "domain": "logical",
+   "tree_score": 0.2301
+  },
+  {
+   "sample_id": "FOLIO_280",
+   "source_dataset": "FOLIO",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 223.0,
+   "domain": "logical",
+   "tree_score": 0.2708
+  },
+  {
+   "sample_id": "GSM8K_0",
+   "source_dataset": "GSM8K",
+   "ground_truth": "5",
+   "predicted": "5",
+   "response_steps": 3.0,
+   "response_tokens": 142.0,
+   "domain": "math",
+   "tree_score": 0.3014
+  },
+  {
+   "sample_id": "GSM8K_1",
+   "source_dataset": "GSM8K",
+   "ground_truth": "134",
+   "predicted": "134",
+   "response_steps": 4.0,
+   "response_tokens": 147.0,
+   "domain": "math",
+   "tree_score": 0.3222
+  },
+  {
+   "sample_id": "GSM8K_2",
+   "source_dataset": "GSM8K",
+   "ground_truth": "9",
+   "predicted": "9",
+   "response_steps": 3.0,
+   "response_tokens": 182.0,
+   "domain": "math",
+   "tree_score": 0.3375
+  },
+  {
+   "sample_id": "GSM8K_3",
+   "source_dataset": "GSM8K",
+   "ground_truth": "44",
+   "predicted": "44",
+   "response_steps": 16.0,
+   "response_tokens": 284.0,
+   "domain": "math",
+   "tree_score": 0.4236
+  },
+  {
+   "sample_id": "GSM8K_4",
+   "source_dataset": "GSM8K",
+   "ground_truth": "220",
+   "predicted": "220",
+   "response_steps": 10.0,
+   "response_tokens": 174.0,
+   "domain": "math",
+   "tree_score": 0.5653
+  },
+  {
+   "sample_id": "GSM8K_5",
+   "source_dataset": "GSM8K",
+   "ground_truth": "4",
+   "predicted": "4",
+   "response_steps": 4.0,
+   "response_tokens": 136.0,
+   "domain": "math",
+   "tree_score": 0.3917
+  },
+  {
+   "sample_id": "GSM8K_6",
+   "source_dataset": "GSM8K",
+   "ground_truth": "3600",
+   "predicted": "3600",
+   "response_steps": 9.0,
+   "response_tokens": 159.0,
+   "domain": "math",
+   "tree_score": 0.3333
+  },
+  {
+   "sample_id": "GSM8K_7",
+   "source_dataset": "GSM8K",
+   "ground_truth": "24",
+   "predicted": "24",
+   "response_steps": 13.0,
+   "response_tokens": 275.0,
+   "domain": "math",
+   "tree_score": 0.2931
+  },
+  {
+   "sample_id": "GSM8K_8",
+   "source_dataset": "GSM8K",
+   "ground_truth": "24",
+   "predicted": "24",
+   "response_steps": 4.0,
+   "response_tokens": 122.0,
+   "domain": "math",
+   "tree_score": 0.3792
+  },
+  {
+   "sample_id": "GSM8K_9",
+   "source_dataset": "GSM8K",
+   "ground_truth": "350",
+   "predicted": "350",
+   "response_steps": 4.0,
+   "response_tokens": 119.0,
+   "domain": "math",
+   "tree_score": 0.3569
+  },
+  {
+   "sample_id": "GSM8K_10",
+   "source_dataset": "GSM8K",
+   "ground_truth": "11",
+   "predicted": "11",
+   "response_steps": 8.0,
+   "response_tokens": 160.0,
+   "domain": "math",
+   "tree_score": 0.4889
+  },
+  {
+   "sample_id": "GSM8K_11",
+   "source_dataset": "GSM8K",
+   "ground_truth": "3",
+   "predicted": "3",
+   "response_steps": 7.0,
+   "response_tokens": 164.0,
+   "domain": "math",
+   "tree_score": 0.5236
+  },
+  {
+   "sample_id": "GSM8K_12",
+   "source_dataset": "GSM8K",
+   "ground_truth": "12",
+   "predicted": "12",
+   "response_steps": 9.0,
+   "response_tokens": 126.0,
+   "domain": "math",
+   "tree_score": 0.35
+  },
+  {
+   "sample_id": "GSM8K_13",
+   "source_dataset": "GSM8K",
+   "ground_truth": "75",
+   "predicted": "75",
+   "response_steps": 8.0,
+   "response_tokens": 162.0,
+   "domain": "math",
+   "tree_score": 0.5042
+  },
+  {
+   "sample_id": "GSM8K_14",
+   "source_dataset": "GSM8K",
+   "ground_truth": "25",
+   "predicted": "25",
+   "response_steps": 4.0,
+   "response_tokens": 239.0,
+   "domain": "math",
+   "tree_score": 0.2431
+  },
+  {
+   "sample_id": "GSM8K_15",
+   "source_dataset": "GSM8K",
+   "ground_truth": "266",
+   "predicted": "266",
+   "response_steps": 11.0,
+   "response_tokens": 192.0,
+   "domain": "math",
+   "tree_score": 0.5514
+  },
+  {
+   "sample_id": "GSM8K_16",
+   "source_dataset": "GSM8K",
+   "ground_truth": "9",
+   "predicted": "9",
+   "response_steps": 3.0,
+   "response_tokens": 141.0,
+   "domain": "math",
+   "tree_score": 0.2792
+  },
+  {
+   "sample_id": "GSM8K_17",
+   "source_dataset": "GSM8K",
+   "ground_truth": "25",
+   "predicted": "25",
+   "response_steps": 9.0,
+   "response_tokens": 161.0,
+   "domain": "math",
+   "tree_score": 0.325
+  },
+  {
+   "sample_id": "GSM8K_18",
+   "source_dataset": "GSM8K",
+   "ground_truth": "33",
+   "predicted": "33",
+   "response_steps": 16.0,
+   "response_tokens": 272.0,
+   "domain": "math",
+   "tree_score": 0.2375
+  },
+  {
+   "sample_id": "GSM8K_19",
+   "source_dataset": "GSM8K",
+   "ground_truth": "83",
+   "predicted": "83",
+   "response_steps": 7.0,
+   "response_tokens": 117.0,
+   "domain": "math",
+   "tree_score": 0.6389
+  },
+  {
+   "sample_id": "GSM8K_20",
+   "source_dataset": "GSM8K",
+   "ground_truth": "7",
+   "predicted": "7",
+   "response_steps": 7.0,
+   "response_tokens": 178.0,
+   "domain": "math",
+   "tree_score": 0.4681
+  },
+  {
+   "sample_id": "GSM8K_21",
+   "source_dataset": "GSM8K",
+   "ground_truth": "165",
+   "predicted": "165",
+   "response_steps": 10.0,
+   "response_tokens": 131.0,
+   "domain": "math",
+   "tree_score": 0.5347
+  },
+  {
+   "sample_id": "GSM8K_22",
+   "source_dataset": "GSM8K",
+   "ground_truth": "1500",
+   "predicted": "1500",
+   "response_steps": 4.0,
+   "response_tokens": 137.0,
+   "domain": "math",
+   "tree_score": 0.3125
+  },
+  {
+   "sample_id": "GSM8K_23",
+   "source_dataset": "GSM8K",
+   "ground_truth": "260",
+   "predicted": "260",
+   "response_steps": 6.0,
+   "response_tokens": 165.0,
+   "domain": "math",
+   "tree_score": 0.3556
+  },
+  {
+   "sample_id": "GSM8K_24",
+   "source_dataset": "GSM8K",
+   "ground_truth": "245",
+   "predicted": "245",
+   "response_steps": 4.0,
+   "response_tokens": 116.0,
+   "domain": "math",
+   "tree_score": 0.2808
+  },
+  {
+   "sample_id": "GSM8K_25",
+   "source_dataset": "GSM8K",
+   "ground_truth": "5",
+   "predicted": "5",
+   "response_steps": 4.0,
+   "response_tokens": 188.0,
+   "domain": "math",
+   "tree_score": 0.4125
+  },
+  {
+   "sample_id": "GSM8K_26",
+   "source_dataset": "GSM8K",
+   "ground_truth": "132",
+   "predicted": "132",
+   "response_steps": 10.0,
+   "response_tokens": 203.0,
+   "domain": "math",
+   "tree_score": 0.5236
+  },
+  {
+   "sample_id": "GSM8K_27",
+   "source_dataset": "GSM8K",
+   "ground_truth": "6",
+   "predicted": "6",
+   "response_steps": 8.0,
+   "response_tokens": 176.0,
+   "domain": "math",
+   "tree_score": 0.4458
+  },
+  {
+   "sample_id": "GSM8K_28",
+   "source_dataset": "GSM8K",
+   "ground_truth": "57",
+   "predicted": "57",
+   "response_steps": 3.0,
+   "response_tokens": 108.0,
+   "domain": "math",
+   "tree_score": 0.3125
+  },
+  {
+   "sample_id": "GSM8K_29",
+   "source_dataset": "GSM8K",
+   "ground_truth": "14",
+   "predicted": "14",
+   "response_steps": 4.0,
+   "response_tokens": 97.0,
+   "domain": "math",
+   "tree_score": 0.2792
+  },
+  {
+   "sample_id": "GSM8K_30",
+   "source_dataset": "GSM8K",
+   "ground_truth": "468",
+   "predicted": "468",
+   "response_steps": 15.0,
+   "response_tokens": 229.0,
+   "domain": "math",
+   "tree_score": 0.6389
+  },
+  {
+   "sample_id": "GSM8K_31",
+   "source_dataset": "GSM8K",
+   "ground_truth": "130",
+   "predicted": "130",
+   "response_steps": 10.0,
+   "response_tokens": 184.0,
+   "domain": "math",
+   "tree_score": 0.2833
+  },
+  {
+   "sample_id": "GSM8K_32",
+   "source_dataset": "GSM8K",
+   "ground_truth": "55",
+   "predicted": "55",
+   "response_steps": 9.0,
+   "response_tokens": 139.0,
+   "domain": "math",
+   "tree_score": 0.4889
+  },
+  {
+   "sample_id": "GSM8K_33",
+   "source_dataset": "GSM8K",
+   "ground_truth": "20",
+   "predicted": "20",
+   "response_steps": 3.0,
+   "response_tokens": 175.0,
+   "domain": "math",
+   "tree_score": 0.3792
+  },
+  {
+   "sample_id": "GSM8K_34",
+   "source_dataset": "GSM8K",
+   "ground_truth": "23",
+   "predicted": "23",
+   "response_steps": 8.0,
+   "response_tokens": 137.0,
+   "domain": "math",
+   "tree_score": 0.2736
+  },
+  {
+   "sample_id": "GSM8K_35",
+   "source_dataset": "GSM8K",
+   "ground_truth": "4",
+   "predicted": "4",
+   "response_steps": 7.0,
+   "response_tokens": 177.0,
+   "domain": "math",
+   "tree_score": 0.3431
+  },
+  {
+   "sample_id": "GSM8K_36",
+   "source_dataset": "GSM8K",
+   "ground_truth": "1",
+   "predicted": "1",
+   "response_steps": 10.0,
+   "response_tokens": 183.0,
+   "domain": "math",
+   "tree_score": 0.3903
+  },
+  {
+   "sample_id": "GSM8K_37",
+   "source_dataset": "GSM8K",
+   "ground_truth": "16000",
+   "predicted": "16000",
+   "response_steps": 7.0,
+   "response_tokens": 127.0,
+   "domain": "math",
+   "tree_score": 0.5139
+  },
+  {
+   "sample_id": "GSM8K_38",
+   "source_dataset": "GSM8K",
+   "ground_truth": "23",
+   "predicted": "23",
+   "response_steps": 4.0,
+   "response_tokens": 87.0,
+   "domain": "math",
+   "tree_score": 0.3875
+  },
+  {
+   "sample_id": "GSM8K_39",
+   "source_dataset": "GSM8K",
+   "ground_truth": "6",
+   "predicted": "12",
+   "response_steps": 4.0,
+   "response_tokens": 198.0,
+   "domain": "math",
+   "tree_score": 0.5083
+  },
+  {
+   "sample_id": "GSM8K_40",
+   "source_dataset": "GSM8K",
+   "ground_truth": "120",
+   "predicted": "120",
+   "response_steps": 7.0,
+   "response_tokens": 150.0,
+   "domain": "math",
+   "tree_score": 0.6319
+  },
+  {
+   "sample_id": "GSM8K_41",
+   "source_dataset": "GSM8K",
+   "ground_truth": "28",
+   "predicted": "28",
+   "response_steps": 3.0,
+   "response_tokens": 96.0,
+   "domain": "math",
+   "tree_score": 0.2958
+  },
+  {
+   "sample_id": "GSM8K_42",
+   "source_dataset": "GSM8K",
+   "ground_truth": "5",
+   "predicted": "5",
+   "response_steps": 5.0,
+   "response_tokens": 183.0,
+   "domain": "math",
+   "tree_score": 0.2625
+  },
+  {
+   "sample_id": "GSM8K_43",
+   "source_dataset": "GSM8K",
+   "ground_truth": "8",
+   "predicted": "8",
+   "response_steps": 8.0,
+   "response_tokens": 125.0,
+   "domain": "math",
+   "tree_score": 0.5764
+  },
+  {
+   "sample_id": "GSM8K_44",
+   "source_dataset": "GSM8K",
+   "ground_truth": "32",
+   "predicted": "32",
+   "response_steps": 3.0,
+   "response_tokens": 103.0,
+   "domain": "math",
+   "tree_score": 0.3514
+  },
+  {
+   "sample_id": "GSM8K_45",
+   "source_dataset": "GSM8K",
+   "ground_truth": "135",
+   "predicted": "135",
+   "response_steps": 15.0,
+   "response_tokens": 234.0,
+   "domain": "math",
+   "tree_score": 0.2389
+  },
+  {
+   "sample_id": "GSM8K_46",
+   "source_dataset": "GSM8K",
+   "ground_truth": "6",
+   "predicted": "6",
+   "response_steps": 11.0,
+   "response_tokens": 190.0,
+   "domain": "math",
+   "tree_score": 0.3958
+  },
+  {
+   "sample_id": "GSM8K_47",
+   "source_dataset": "GSM8K",
+   "ground_truth": "160",
+   "predicted": "160",
+   "response_steps": 8.0,
+   "response_tokens": 140.0,
+   "domain": "math",
+   "tree_score": 0.6972
+  },
+  {
+   "sample_id": "GSM8K_48",
+   "source_dataset": "GSM8K",
+   "ground_truth": "9",
+   "predicted": "9",
+   "response_steps": 9.0,
+   "response_tokens": 162.0,
+   "domain": "math",
+   "tree_score": 0.2667
+  },
+  {
+   "sample_id": "GSM8K_49",
+   "source_dataset": "GSM8K",
+   "ground_truth": "21",
+   "predicted": "21",
+   "response_steps": 3.0,
+   "response_tokens": 139.0,
+   "domain": "math",
+   "tree_score": 0.2625
+  },
+  {
+   "sample_id": "OlympiadBench_0",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{4}{3}$",
+   "predicted": "2",
+   "response_steps": 33.0,
+   "response_tokens": 370.0,
+   "domain": "math",
+   "tree_score": 0.2472
+  },
+  {
+   "sample_id": "OlympiadBench_1",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$18.8^{\\circ}$",
+   "predicted": "18.8",
+   "response_steps": 5.0,
+   "response_tokens": 149.0,
+   "domain": "math",
+   "tree_score": 0.4097
+  },
+  {
+   "sample_id": "OlympiadBench_2",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\lceil n / 2\\rceil+1$",
+   "predicted": "n/2  + 1",
+   "response_steps": 10.0,
+   "response_tokens": 370.0,
+   "domain": "math",
+   "tree_score": 0.2361
+  },
+  {
+   "sample_id": "OlympiadBench_3",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$5,-2$",
+   "predicted": "-2,5",
+   "response_steps": 5.0,
+   "response_tokens": 228.0,
+   "domain": "math",
+   "tree_score": 0.2306
+  },
+  {
+   "sample_id": "OlympiadBench_4",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$-1$,$2$,$-2$",
+   "predicted": "-2,-1,2",
+   "response_steps": 13.0,
+   "response_tokens": 239.0,
+   "domain": "math",
+   "tree_score": 0.2389
+  },
+  {
+   "sample_id": "OlympiadBench_5",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "101",
+   "predicted": "101",
+   "response_steps": 7.0,
+   "response_tokens": 185.0,
+   "domain": "math",
+   "tree_score": 0.3597
+  },
+  {
+   "sample_id": "OlympiadBench_6",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{5 \\sqrt{2}}{2}$",
+   "predicted": "22",
+   "response_steps": 3.0,
+   "response_tokens": 384.0,
+   "domain": "math",
+   "tree_score": 0.2347
+  },
+  {
+   "sample_id": "OlympiadBench_7",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{67 \\pi}{3}$",
+   "predicted": "10 -",
+   "response_steps": 28.0,
+   "response_tokens": 530.0,
+   "domain": "math",
+   "tree_score": 0.2389
+  },
+  {
+   "sample_id": "OlympiadBench_8",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "6048",
+   "predicted": "6048",
+   "response_steps": 4.0,
+   "response_tokens": 430.0,
+   "domain": "math",
+   "tree_score": 0.1675
+  },
+  {
+   "sample_id": "OlympiadBench_9",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "(1,7,103, 105), (3, 5, 101, 107)",
+   "predicted": "(3,1,101,103,105),107,5,7",
+   "response_steps": 4.0,
+   "response_tokens": 343.0,
+   "domain": "math",
+   "tree_score": 0.3208
+  },
+  {
+   "sample_id": "OlympiadBench_10",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$-(n-1) / 2$",
+   "predicted": "-0.5",
+   "response_steps": 24.0,
+   "response_tokens": 313.0,
+   "domain": "math",
+   "tree_score": 0.2458
+  },
+  {
+   "sample_id": "OlympiadBench_11",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "3",
+   "predicted": "3",
+   "response_steps": 35.0,
+   "response_tokens": 376.0,
+   "domain": "math",
+   "tree_score": 0.2403
+  },
+  {
+   "sample_id": "OlympiadBench_12",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "81",
+   "predicted": "81",
+   "response_steps": 14.0,
+   "response_tokens": 286.0,
+   "domain": "math",
+   "tree_score": 0.2889
+  },
+  {
+   "sample_id": "OlympiadBench_13",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "11",
+   "predicted": "11",
+   "response_steps": 14.0,
+   "response_tokens": 454.0,
+   "domain": "math",
+   "tree_score": 0.2486
+  },
+  {
+   "sample_id": "OlympiadBench_14",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{4}{7}$",
+   "predicted": "0.57142857",
+   "response_steps": 48.0,
+   "response_tokens": 458.0,
+   "domain": "math",
+   "tree_score": 0.2347
+  },
+  {
+   "sample_id": "OlympiadBench_15",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$3-\\sqrt{2}$",
+   "predicted": "3-2",
+   "response_steps": 22.0,
+   "response_tokens": 284.0,
+   "domain": "math",
+   "tree_score": 0.2931
+  },
+  {
+   "sample_id": "OlympiadBench_16",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$n^{2}-n+1$",
+   "predicted": "n^2-n+1",
+   "response_steps": 25.0,
+   "response_tokens": 355.0,
+   "domain": "math",
+   "tree_score": 0.2403
+  },
+  {
+   "sample_id": "OlympiadBench_17",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{4 \\cdot 999^{4}}{27}$",
+   "predicted": "for $n=999,t = 999^2(999^2-1)4 = 99",
+   "response_steps": 23.0,
+   "response_tokens": 394.0,
+   "domain": "math",
+   "tree_score": 0.2681
+  },
+  {
+   "sample_id": "OlympiadBench_18",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$(27,20,13), (18,20,22)$",
+   "predicted": "(27,13,18,20,20,22)",
+   "response_steps": 4.0,
+   "response_tokens": 322.0,
+   "domain": "math",
+   "tree_score": 0.2444
+  },
+  {
+   "sample_id": "OlympiadBench_19",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "79",
+   "predicted": "4n = 328  rev(328) =",
+   "response_steps": 31.0,
+   "response_tokens": 372.0,
+   "domain": "math",
+   "tree_score": 0.2639
+  },
+  {
+   "sample_id": "OlympiadBench_20",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "309",
+   "predicted": "309",
+   "response_steps": 27.0,
+   "response_tokens": 242.0,
+   "domain": "math",
+   "tree_score": 0.2833
+  },
+  {
+   "sample_id": "OlympiadBench_21",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "2916",
+   "predicted": "2916",
+   "response_steps": 20.0,
+   "response_tokens": 340.0,
+   "domain": "math",
+   "tree_score": 0.3639
+  },
+  {
+   "sample_id": "OlympiadBench_22",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$2021 \\cdot 505 \\cdot 337$",
+   "predicted": "343943885",
+   "response_steps": 18.0,
+   "response_tokens": 404.0,
+   "domain": "math",
+   "tree_score": 0.2375
+  },
+  {
+   "sample_id": "OlympiadBench_23",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "108",
+   "predicted": "108",
+   "response_steps": 4.0,
+   "response_tokens": 342.0,
+   "domain": "math",
+   "tree_score": 0.3
+  },
+  {
+   "sample_id": "OlympiadBench_24",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{1}{6} \\pi, \\frac{5}{6} \\pi, \\frac{1}{4} \\pi, \\frac{3}{4} \\pi$",
+   "predicted": "4,6,34,56",
+   "response_steps": 13.0,
+   "response_tokens": 213.0,
+   "domain": "math",
+   "tree_score": 0.2597
+  },
+  {
+   "sample_id": "OlympiadBench_25",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{17}{145}$",
+   "predicted": "0.05977011",
+   "response_steps": 31.0,
+   "response_tokens": 389.0,
+   "domain": "math",
+   "tree_score": 0.2347
+  },
+  {
+   "sample_id": "OlympiadBench_26",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "1002001",
+   "predicted": "4",
+   "response_steps": 5.0,
+   "response_tokens": 209.0,
+   "domain": "math",
+   "tree_score": 0.4528
+  },
+  {
+   "sample_id": "OlympiadBench_27",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{1}{3},1,\\frac{1}{9}$",
+   "predicted": "0.11111111,0.33333333,1",
+   "response_steps": 17.0,
+   "response_tokens": 200.0,
+   "domain": "math",
+   "tree_score": 0.2958
+  },
+  {
+   "sample_id": "OlympiadBench_28",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "16",
+   "predicted": "16",
+   "response_steps": 5.0,
+   "response_tokens": 242.0,
+   "domain": "math",
+   "tree_score": 0.2458
+  },
+  {
+   "sample_id": "OlympiadBench_29",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "960",
+   "predicted": "2^60-1",
+   "response_steps": 32.0,
+   "response_tokens": 375.0,
+   "domain": "math",
+   "tree_score": 0.2514
+  },
+  {
+   "sample_id": "OlympiadBench_30",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "25",
+   "predicted": "25",
+   "response_steps": 2.0,
+   "response_tokens": 359.0,
+   "domain": "math",
+   "tree_score": 0.2625
+  },
+  {
+   "sample_id": "OlympiadBench_31",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "5",
+   "predicted": "2(x_1+x_2+x_3+x_4",
+   "response_steps": 30.0,
+   "response_tokens": 367.0,
+   "domain": "math",
+   "tree_score": 0.2375
+  },
+  {
+   "sample_id": "OlympiadBench_32",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "1510",
+   "predicted": "2012",
+   "response_steps": 36.0,
+   "response_tokens": 342.0,
+   "domain": "math",
+   "tree_score": 0.4125
+  },
+  {
+   "sample_id": "OlympiadBench_33",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "20",
+   "predicted": "20",
+   "response_steps": 4.0,
+   "response_tokens": 272.0,
+   "domain": "math",
+   "tree_score": 0.2375
+  },
+  {
+   "sample_id": "OlympiadBench_34",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "11",
+   "predicted": "11",
+   "response_steps": 11.0,
+   "response_tokens": 298.0,
+   "domain": "math",
+   "tree_score": 0.461
+  },
+  {
+   "sample_id": "OlympiadBench_35",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "8",
+   "predicted": null,
+   "response_steps": 0.0,
+   "response_tokens": 0.0,
+   "domain": "math",
+   "gateway_blocked": true
+  },
+  {
+   "sample_id": "OlympiadBench_36",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "3",
+   "predicted": "3",
+   "response_steps": 4.0,
+   "response_tokens": 244.0,
+   "domain": "math",
+   "tree_score": 0.4917
+  },
+  {
+   "sample_id": "OlympiadBench_37",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "2,4,3",
+   "predicted": "2,3,4",
+   "response_steps": 3.0,
+   "response_tokens": 323.0,
+   "domain": "math",
+   "tree_score": 0.2333
+  },
+  {
+   "sample_id": "OlympiadBench_38",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$n(n-1)$",
+   "predicted": "set",
+   "response_steps": 22.0,
+   "response_tokens": 330.0,
+   "domain": "math",
+   "tree_score": 0.2556
+  },
+  {
+   "sample_id": "OlympiadBench_39",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{3 \\pi}{4}$",
+   "predicted": "0.75",
+   "response_steps": 6.0,
+   "response_tokens": 344.0,
+   "domain": "math",
+   "tree_score": 0.2472
+  },
+  {
+   "sample_id": "OlympiadBench_40",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{1}{9}$",
+   "predicted": "n=12: |p(",
+   "response_steps": 26.0,
+   "response_tokens": 363.0,
+   "domain": "math",
+   "tree_score": 0.2597
+  },
+  {
+   "sample_id": "OlympiadBench_41",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "1344",
+   "predicted": "try $n = 1346",
+   "response_steps": 35.0,
+   "response_tokens": 437.0,
+   "domain": "math",
+   "tree_score": 0.2403
+  },
+  {
+   "sample_id": "OlympiadBench_42",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "10,11,12,13,14,-2,-1,0,1,2",
+   "predicted": "(10,-1,-2,0,1,11,12,13,14,2)",
+   "response_steps": 2.0,
+   "response_tokens": 252.0,
+   "domain": "math",
+   "tree_score": 0.2764
+  },
+  {
+   "sample_id": "OlympiadBench_43",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "8",
+   "predicted": "8",
+   "response_steps": 20.0,
+   "response_tokens": 313.0,
+   "domain": "math",
+   "tree_score": 0.2806
+  },
+  {
+   "sample_id": "OlympiadBench_44",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "24",
+   "predicted": "24",
+   "response_steps": 12.0,
+   "response_tokens": 292.0,
+   "domain": "math",
+   "tree_score": 0.2514
+  },
+  {
+   "sample_id": "OlympiadBench_45",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{1}{54}$",
+   "predicted": "102-1",
+   "response_steps": 28.0,
+   "response_tokens": 433.0,
+   "domain": "math",
+   "tree_score": 0.2528
+  },
+  {
+   "sample_id": "OlympiadBench_46",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "256",
+   "predicted": "if $x = \\1,",
+   "response_steps": 31.0,
+   "response_tokens": 480.0,
+   "domain": "math",
+   "tree_score": 0.25
+  },
+  {
+   "sample_id": "OlympiadBench_47",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$\\frac{50}{37}$",
+   "predicted": "1.35135135",
+   "response_steps": 17.0,
+   "response_tokens": 307.0,
+   "domain": "math",
+   "tree_score": 0.2903
+  },
+  {
+   "sample_id": "OlympiadBench_48",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "$-\\frac{8}{3}$",
+   "predicted": "-2.66666667",
+   "response_steps": 2.0,
+   "response_tokens": 317.0,
+   "domain": "math",
+   "tree_score": 0.2833
+  },
+  {
+   "sample_id": "OlympiadBench_49",
+   "source_dataset": "OlympiadBench",
+   "ground_truth": "19",
+   "predicted": "19",
+   "response_steps": 4.0,
+   "response_tokens": 158.0,
+   "domain": "math",
+   "tree_score": 0.2958
+  }
+ ]
+}
