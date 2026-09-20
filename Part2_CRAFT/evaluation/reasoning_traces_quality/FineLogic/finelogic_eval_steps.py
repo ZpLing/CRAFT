@@ -53,10 +53,19 @@ if not OPENAI_API_KEY:
 HEADERS = {"Authorization": f"Bearer {OPENAI_API_KEY}"}
 OPENAI_BASE_URL = OPENAI_BASE_URL.rstrip("/")
 CHAT_URL = f"{OPENAI_BASE_URL}/chat/completions"
-# The judge, in preference order — a model that errors falls through to the next.
+# The judge. FineLogic's own evaluator is GPT-4.1-mini, but the backbones being
+# compared here are a GPT and a Gemini, and a judge from either family scores its
+# own relatives' traces with a known self-preference. The judge is therefore from
+# a third family: Qwen3-32B, which current LLM-as-a-judge work uses by name and
+# whose weights are Apache 2.0, so the judgements behind a reported number can be
+# reproduced exactly rather than taken on trust in an API.
+#
+# EVAL_MODELS overrides, as a comma-separated list tried in order. A step no
+# listed model answers for is dropped and counted in judge_failed_steps, rather
+# than scored by whichever model happened to answer.
 _models_env = os.getenv("EVAL_MODELS")
 MODELS = ([m.strip() for m in _models_env.split(",")] if _models_env
-          else ["gemini-3.1-flash-lite", "gpt-5.4-nano"])
+          else ["qwen3-32b"])
 
 # ---- Step header ----
 STEP_RE = re.compile(r"^\s*Step\s*(\d+)\s*[:\.]", re.I | re.M)

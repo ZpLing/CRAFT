@@ -250,8 +250,11 @@ logical sets annotate a step count — FLD in its proof string, ProofWriter in
 all four. FLD's own proofs run 1–7 steps, so the [10, 20] band FineLogic's paper
 reports on is empty on this selection and [1–9] is the one that covers it. ROSCOE
 fetches upstream's two scoring files on first use; FineLogic's step evaluator is
-our natural-language adaptation of upstream's, and judges with
-Gemini-3.1-flash-lite.
+our natural-language adaptation of upstream's. It judges with Qwen3-32B rather
+than upstream's GPT-4.1-mini: the backbones being compared are a GPT and a
+Gemini, so a judge from either family would be scoring its own relatives, and
+Qwen3-32B's weights are Apache 2.0, so a reported number's judgements can be
+reproduced rather than taken on trust in an API.
 
 ```bash
 RTQ=evaluation/reasoning_traces_quality
