@@ -2,44 +2,44 @@
  "setting": "RAP (MCTS+UCB, 8 iterations)",
  "setting_key": "rap",
  "overall": {
-  "accuracy": 0.6515,
+  "accuracy": 0.7329,
   "macro_f1": null,
-  "avg_steps": 9.64,
-  "std_steps": 8.44,
-  "avg_tokens": 269.7,
-  "std_tokens": 102.6,
-  "n_total": 198,
-  "n_correct": 129,
-  "n_no_pred": 4,
-  "no_pred_rate": 0.0202,
-  "n_blocked": 2,
+  "avg_steps": 12.0,
+  "std_steps": 6.34,
+  "avg_tokens": 236.3,
+  "std_tokens": 102.4,
+  "n_total": 745,
+  "n_correct": 546,
+  "n_no_pred": 6,
+  "no_pred_rate": 0.0081,
+  "n_blocked": 5,
   "by_domain": {
    "logical": {
-    "accuracy": 0.7475,
-    "macro_f1": 0.7524,
-    "avg_steps": 6.41,
-    "std_steps": 3.34,
-    "avg_tokens": 239.9,
-    "std_tokens": 87.6,
-    "n_total": 99,
-    "n_correct": 74,
-    "n_no_pred": 2,
-    "no_pred_rate": 0.0202,
-    "n_blocked": 1,
+    "accuracy": 0.7601,
+    "macro_f1": 0.7648,
+    "avg_steps": 11.93,
+    "std_steps": 5.37,
+    "avg_tokens": 227.7,
+    "std_tokens": 97.0,
+    "n_total": 646,
+    "n_correct": 491,
+    "n_no_pred": 4,
+    "no_pred_rate": 0.0062,
+    "n_blocked": 4,
     "per_class_f1": {
-     "__PROVED__": 0.7013,
-     "__DISPROVED__": 0.8034
+     "__PROVED__": 0.7652,
+     "__DISPROVED__": 0.7644
     },
     "confusion_matrix": {
      "__PROVED__": {
-      "__PROVED__": 27,
-      "__DISPROVED__": 20,
-      "none": 2
+      "__PROVED__": 246,
+      "__DISPROVED__": 123,
+      "none": 3
      },
      "__DISPROVED__": {
-      "__PROVED__": 3,
-      "__DISPROVED__": 47,
-      "none": 0
+      "__PROVED__": 28,
+      "__DISPROVED__": 245,
+      "none": 1
      }
     },
     "domain": "logical"
@@ -63,31 +63,31 @@
   "domain": "mixed",
   "per_dataset": {
    "FLD": {
-    "accuracy": 0.8776,
-    "macro_f1": 0.8771,
-    "avg_steps": 6.67,
-    "std_steps": 3.55,
-    "avg_tokens": 210.5,
-    "std_tokens": 82.7,
-    "n_total": 49,
-    "n_correct": 43,
-    "n_no_pred": 0,
-    "no_pred_rate": 0.0,
-    "n_blocked": 1,
+    "accuracy": 0.8649,
+    "macro_f1": 0.8683,
+    "avg_steps": 11.7,
+    "std_steps": 5.03,
+    "avg_tokens": 216.2,
+    "std_tokens": 100.7,
+    "n_total": 496,
+    "n_correct": 429,
+    "n_no_pred": 2,
+    "no_pred_rate": 0.004,
+    "n_blocked": 4,
     "per_class_f1": {
-     "__PROVED__": 0.8696,
-     "__DISPROVED__": 0.8846
+     "__PROVED__": 0.8649,
+     "__DISPROVED__": 0.8718
     },
     "confusion_matrix": {
      "__PROVED__": {
-      "__PROVED__": 20,
-      "__DISPROVED__": 4,
-      "none": 0
+      "__PROVED__": 208,
+      "__DISPROVED__": 38,
+      "none": 1
      },
      "__DISPROVED__": {
-      "__PROVED__": 2,
-      "__DISPROVED__": 23,
-      "none": 0
+      "__PROVED__": 27,
+      "__DISPROVED__": 221,
+      "none": 1
      }
     },
     "domain": "logical"
@@ -108,25 +108,25 @@
     "domain": "math"
    },
    "ProofWriter": {
-    "accuracy": 0.62,
-    "macro_f1": 0.5951,
-    "avg_steps": 6.16,
-    "std_steps": 3.09,
-    "avg_tokens": 268.8,
-    "std_tokens": 82.4,
-    "n_total": 50,
-    "n_correct": 31,
+    "accuracy": 0.4133,
+    "macro_f1": 0.4137,
+    "avg_steps": 12.67,
+    "std_steps": 6.29,
+    "avg_tokens": 265.6,
+    "std_tokens": 71.5,
+    "n_total": 150,
+    "n_correct": 62,
     "n_no_pred": 2,
-    "no_pred_rate": 0.04,
+    "no_pred_rate": 0.0133,
     "n_blocked": 0,
     "per_class_f1": {
-     "__PROVED__": 0.4516,
-     "__DISPROVED__": 0.7385
+     "__PROVED__": 0.4691,
+     "__DISPROVED__": 0.3582
     },
     "confusion_matrix": {
      "__PROVED__": {
-      "__PROVED__": 7,
-      "__DISPROVED__": 16,
+      "__PROVED__": 38,
+      "__DISPROVED__": 85,
       "none": 2
      },
      "__DISPROVED__": {
@@ -158,7 +158,7 @@
   "model": "gemini-3.1-flash-lite",
   "shots": 10,
   "seed": 42,
-  "per_dataset": 50
+  "per_dataset": 500
  },
  "traces_file": "traces.jsonl",
  "predictions": [
@@ -2162,6 +2162,5509 @@
    "response_steps": 11.0,
    "response_tokens": 206.0,
    "domain": "math",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_50",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 123.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_51",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 128.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_52",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 188.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_55",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 389.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_57",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 286.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_58",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 293.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_60",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 271.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_61",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 166.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_63",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 96.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_66",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 80.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_69",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 157.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_70",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 276.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_72",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 98.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_74",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 230.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_75",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 163.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_76",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 71.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_79",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 284.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_82",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 324.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_84",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 22.0,
+   "response_tokens": 344.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_86",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 99.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_88",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 173.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_89",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 337.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_91",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 381.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_92",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 320.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_93",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 123.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_97",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 349.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_99",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 317.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_101",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 239.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_102",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 61.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_105",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 194.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_106",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 75.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_107",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 115.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_110",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 368.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_111",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 98.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_112",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 264.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_113",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 207.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_114",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 260.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_116",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 99.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_117",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 125.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_122",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 195.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_123",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 168.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_127",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 32.0,
+   "response_tokens": 413.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_128",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 97.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_129",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 92.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_131",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 79.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_132",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 107.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_134",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 149.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_136",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 156.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_137",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 110.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_138",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 115.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_140",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 142.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_142",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 253.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_143",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 60.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_145",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 299.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_151",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 151.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_154",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 171.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_155",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 122.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_156",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 329.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_158",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 296.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_159",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 283.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_163",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 299.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_164",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 230.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_166",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 212.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_168",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 235.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_169",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 193.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_173",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 154.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_179",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 254.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_183",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 228.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_184",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 59.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_186",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 80.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_187",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 95.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_188",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 142.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_189",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 95.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_194",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 319.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_198",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 119.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_199",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 203.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_200",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 151.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_202",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 273.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_203",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 184.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_204",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 178.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_206",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 80.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_210",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 77.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_211",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 125.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_215",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 235.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_216",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 122.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_219",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 126.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_220",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 137.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_222",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 341.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_226",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 185.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_229",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 106.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_238",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 177.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_240",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 230.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_244",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 263.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_247",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 169.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_248",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 247.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_250",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 100.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_251",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 150.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_253",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 197.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_255",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 133.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_257",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 212.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_258",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 192.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_263",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 235.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_266",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 146.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_274",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 161.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_276",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 181.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_278",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 348.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_282",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 139.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_287",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 201.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_288",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 186.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_292",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 151.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_293",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 246.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_294",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 216.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_296",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 207.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_298",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 158.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_299",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 200.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_300",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 224.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_301",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 188.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_302",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 294.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_303",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 408.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_304",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 426.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_306",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 142.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_308",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 99.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_310",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 22.0,
+   "response_tokens": 371.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_314",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 129.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_315",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 354.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_316",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 71.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_317",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 175.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_318",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 91.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_320",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 453.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_323",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 182.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_324",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 171.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_325",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 218.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_326",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 175.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_329",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 272.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_330",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 197.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_331",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 117.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_332",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 96.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_336",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 205.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_337",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 309.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_340",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 317.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_344",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 315.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_345",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 173.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_347",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 122.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_348",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 254.0,
+   "domain": "logical",
+   "rap_depth": 4
+  },
+  {
+   "sample_id": "FLD_349",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 172.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_350",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 145.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_355",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 338.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_356",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 168.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_360",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 164.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_363",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 240.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_364",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 285.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_366",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 214.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_367",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 110.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_369",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": null,
+   "response_steps": 0.0,
+   "response_tokens": 0.0,
+   "domain": "logical",
+   "rap_depth": 0,
+   "gateway_blocked": true
+  },
+  {
+   "sample_id": "FLD_370",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 394.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_372",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 132.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_373",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 139.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_376",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 57.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_382",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 191.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_383",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 25.0,
+   "response_tokens": 270.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_385",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 336.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_386",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 122.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_388",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 172.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_389",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 398.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_392",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 415.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_393",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 69.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_395",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 224.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_396",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 149.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_397",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 176.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_398",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 106.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_399",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 386.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_400",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 356.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_401",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 156.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_403",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 281.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_404",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 131.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_405",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 186.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_406",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 290.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_408",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": null,
+   "response_steps": 4.0,
+   "response_tokens": 31.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_411",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 284.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_414",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 295.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_416",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 122.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_418",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 210.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_420",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 160.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_421",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 114.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_429",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 525.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_430",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 204.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_431",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 151.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_432",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 218.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_434",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 310.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_435",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 208.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_436",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 30.0,
+   "response_tokens": 449.0,
+   "domain": "logical",
+   "rap_depth": 1
+  },
+  {
+   "sample_id": "FLD_437",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 110.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_439",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 99.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_441",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 224.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_442",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 118.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_443",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 101.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_444",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 47.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_446",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 107.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_448",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 93.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_450",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 27.0,
+   "response_tokens": 407.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_452",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 24.0,
+   "response_tokens": 338.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_453",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 190.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_454",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 226.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_455",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 402.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_456",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 313.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_457",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 25.0,
+   "response_tokens": 445.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_462",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": null,
+   "response_steps": 0.0,
+   "response_tokens": 0.0,
+   "domain": "logical",
+   "rap_depth": 0,
+   "gateway_blocked": true
+  },
+  {
+   "sample_id": "FLD_465",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 90.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_468",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 74.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_472",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 175.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_474",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 334.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_478",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 87.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_479",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 145.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_481",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 133.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_482",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 138.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_483",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 366.0,
+   "domain": "logical",
+   "rap_depth": 1
+  },
+  {
+   "sample_id": "FLD_485",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 327.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_486",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 206.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_487",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 163.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_489",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 414.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_491",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 85.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_492",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 440.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_497",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 138.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_498",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 132.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_499",
+   "source_dataset": "FLD",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 190.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_53",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 214.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_54",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 383.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_56",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 327.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_59",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 391.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_62",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 248.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_64",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 191.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_65",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 366.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_67",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 373.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_68",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 289.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_71",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 202.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_73",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 231.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_77",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 265.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_78",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 62.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_80",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 169.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_81",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 422.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_83",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 281.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_85",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 98.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_87",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 182.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_90",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 333.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_94",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 281.0,
+   "domain": "logical",
+   "rap_depth": 1
+  },
+  {
+   "sample_id": "FLD_95",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 163.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_96",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 151.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_98",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 210.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_100",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 266.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_103",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 24.0,
+   "response_tokens": 361.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_104",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 83.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_108",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 113.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_109",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 334.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_115",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 131.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_118",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 184.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_119",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 331.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_120",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 152.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_121",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 138.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_124",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 355.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_125",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 163.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_126",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 455.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_130",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 340.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_133",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 135.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_135",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 157.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_139",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 297.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_141",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 151.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_144",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 155.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_146",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 255.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_147",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 320.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_148",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 118.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_149",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 123.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_150",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 415.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_152",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 213.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_153",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 134.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_157",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 217.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_160",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 312.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_161",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 137.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_162",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 123.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_165",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 139.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_167",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 249.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_170",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 264.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_171",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 360.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_172",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 185.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_174",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 300.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_175",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 177.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_176",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 306.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_177",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 284.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_178",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 147.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_180",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 64.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_181",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 252.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_182",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 127.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_185",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 305.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_190",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 317.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_191",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 138.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_192",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 289.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_193",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 72.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_195",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 147.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_196",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 196.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_197",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 245.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_201",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 259.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_205",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 344.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_207",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 113.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_208",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 195.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_209",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 326.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_212",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 69.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_213",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 167.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_214",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 145.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_217",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 138.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_218",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 193.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_221",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 148.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_223",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 308.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_224",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 261.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_225",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 191.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_227",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 303.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_228",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 259.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_230",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 72.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_231",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 149.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_232",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 139.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_233",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 305.0,
+   "domain": "logical",
+   "rap_depth": 1
+  },
+  {
+   "sample_id": "FLD_234",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 188.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_235",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 25.0,
+   "response_tokens": 409.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_236",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 205.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_237",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 297.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_239",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 192.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_241",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 124.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_242",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 266.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_243",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 141.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_245",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 203.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_246",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 200.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_249",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 423.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_252",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 454.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_254",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 44.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_256",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 187.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_259",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 249.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_260",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 114.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_261",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 99.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_262",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 234.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_264",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 69.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_265",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 378.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_267",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 208.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_268",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 61.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_269",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 393.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_270",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 107.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_271",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 24.0,
+   "response_tokens": 439.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_272",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 186.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_273",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 228.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_275",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 269.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_277",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 352.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_279",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 297.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_280",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 173.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_281",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 335.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_283",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 215.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_284",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 243.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_285",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 318.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_286",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 26.0,
+   "response_tokens": 319.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_289",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 25.0,
+   "response_tokens": 389.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_290",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 303.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_291",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 103.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_295",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 145.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_297",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 318.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_305",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 65.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_307",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 373.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_309",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 337.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_311",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 283.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_312",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 287.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_313",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 225.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_319",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 233.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_321",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 287.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_322",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 138.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_327",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 230.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_328",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 293.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_333",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 149.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_334",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 134.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_335",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 316.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_338",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 121.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_339",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 145.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_341",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 91.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_342",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 213.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_343",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 337.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_346",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 114.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_351",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 385.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_352",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 141.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_353",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 198.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_354",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 73.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_357",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 5.0,
+   "response_tokens": 186.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_358",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 344.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_359",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 376.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_361",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 218.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_362",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 156.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_365",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 217.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_368",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 140.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_371",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 297.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_374",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 216.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_375",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 87.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_377",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 231.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_378",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 155.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_379",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 4.0,
+   "response_tokens": 40.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_380",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 269.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_381",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 87.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_384",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 357.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_387",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 194.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_390",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 333.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_391",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 327.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_394",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 328.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_402",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 319.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_407",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 160.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_409",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 23.0,
+   "response_tokens": 365.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_410",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 360.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_412",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 123.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_413",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 71.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_415",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 86.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_417",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 282.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_419",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 471.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_422",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 248.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_423",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 155.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_424",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 112.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_425",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 249.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_426",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 353.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_427",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": null,
+   "response_steps": 1.0,
+   "response_tokens": 10.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_428",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 271.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_433",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 369.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_438",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 168.0,
+   "domain": "logical",
+   "rap_depth": 4
+  },
+  {
+   "sample_id": "FLD_440",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 294.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_445",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 328.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_447",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 343.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_449",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 133.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_451",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 23.0,
+   "response_tokens": 302.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_458",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 25.0,
+   "response_tokens": 325.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_459",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 160.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_460",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 115.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_461",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": null,
+   "response_steps": 0.0,
+   "response_tokens": 0.0,
+   "domain": "logical",
+   "rap_depth": 0,
+   "gateway_blocked": true
+  },
+  {
+   "sample_id": "FLD_463",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 122.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_464",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 153.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_466",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 128.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_467",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 169.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_469",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 120.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_470",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 140.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_471",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 237.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_473",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 292.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_475",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 215.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_476",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 6.0,
+   "response_tokens": 53.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_477",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 183.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_480",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 394.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_484",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 396.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_488",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 7.0,
+   "response_tokens": 94.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_490",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 291.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_493",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 538.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_494",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 371.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "FLD_495",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 269.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "FLD_496",
+   "source_dataset": "FLD",
+   "ground_truth": "__DISPROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 129.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_44",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 242.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_45",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 271.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_47",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 22.0,
+   "response_tokens": 304.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_50",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 318.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_52",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 192.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_55",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 125.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_56",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 341.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_58",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 171.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_59",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 276.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_60",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 330.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_61",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 232.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_62",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 283.0,
+   "domain": "logical",
+   "rap_depth": 4
+  },
+  {
+   "sample_id": "ProofWriter_63",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 23.0,
+   "response_tokens": 341.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_66",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 22.0,
+   "response_tokens": 352.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_67",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 299.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_73",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 205.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_76",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 325.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_78",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 238.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_81",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 348.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_82",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 280.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_83",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 357.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_84",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 342.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_85",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 179.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_89",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 155.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_90",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 250.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_91",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 10.0,
+   "response_tokens": 235.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_92",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 241.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_95",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 31.0,
+   "response_tokens": 320.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_97",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 207.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_99",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 189.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_100",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 213.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_101",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 245.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_102",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 317.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_103",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 283.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_105",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 141.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_106",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 196.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_108",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 31.0,
+   "response_tokens": 292.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_109",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 19.0,
+   "response_tokens": 320.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_110",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 120.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_114",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 22.0,
+   "response_tokens": 274.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_115",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 376.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_116",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 370.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_117",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 266.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_118",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 296.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_126",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 271.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_127",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 251.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_132",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 252.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_133",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 308.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_134",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 356.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_137",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 150.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_142",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 302.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_143",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 196.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_144",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 272.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_147",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 23.0,
+   "response_tokens": 382.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_149",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 145.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_152",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 293.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_153",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 23.0,
+   "response_tokens": 304.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_154",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 254.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_155",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 234.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_156",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 292.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_158",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 191.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_160",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 175.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_161",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 330.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_162",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 353.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_163",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 209.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_165",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 300.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_169",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 220.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_172",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 17.0,
+   "response_tokens": 243.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_174",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 243.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_175",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 272.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_179",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 11.0,
+   "response_tokens": 155.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_180",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 296.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_184",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 211.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_186",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 306.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_189",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 311.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_190",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 220.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_192",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 212.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_193",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 332.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_195",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 188.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_196",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 384.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_199",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 256.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_203",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 269.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_205",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 22.0,
+   "response_tokens": 263.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_206",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 14.0,
+   "response_tokens": 225.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_207",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 25.0,
+   "response_tokens": 341.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_209",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 160.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_210",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 22.0,
+   "response_tokens": 275.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_211",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 9.0,
+   "response_tokens": 179.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_212",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 16.0,
+   "response_tokens": 294.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_214",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 18.0,
+   "response_tokens": 194.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_216",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 230.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_219",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 24.0,
+   "response_tokens": 331.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_221",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 370.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_230",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__PROVED__",
+   "response_steps": 8.0,
+   "response_tokens": 173.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_231",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 259.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_234",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 13.0,
+   "response_tokens": 278.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_237",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 12.0,
+   "response_tokens": 267.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_241",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 15.0,
+   "response_tokens": 307.0,
+   "domain": "logical",
+   "rap_depth": 2
+  },
+  {
+   "sample_id": "ProofWriter_242",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 21.0,
+   "response_tokens": 252.0,
+   "domain": "logical",
+   "rap_depth": 3
+  },
+  {
+   "sample_id": "ProofWriter_244",
+   "source_dataset": "ProofWriter",
+   "ground_truth": "__PROVED__",
+   "predicted": "__DISPROVED__",
+   "response_steps": 20.0,
+   "response_tokens": 408.0,
+   "domain": "logical",
    "rap_depth": 2
   }
  ]
