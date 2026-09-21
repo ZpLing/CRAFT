@@ -1136,8 +1136,17 @@ def process_sample(
     """
     traces = sample.get("traces", []) or sample.get("cleaned_traces", [])
     if not traces:
+        # A sample whose generation produced nothing still carries its identity
+        # and its answer. Dropping them here made the filtered file disagree
+        # with the k-trace file about which samples exist: the vote over raw
+        # traces counted such a sample as unanswered and the vote over filtered
+        # traces excluded it, so the two ablation rows were scored over
+        # different sets and their difference was read as the filter's effect.
         return {
             "sample_id": sample.get("sample_id"),
+            "source_dataset": sample.get("source_dataset"),
+            "source_index": sample.get("source_index"),
+            "target_answer": sample.get("target_answer"),
             "original_traces": [],
             "cleaned_traces": [],
             "anomalous_steps": [],

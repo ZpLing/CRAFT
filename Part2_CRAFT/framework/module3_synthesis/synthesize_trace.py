@@ -802,6 +802,7 @@ def build_rkg_synthesis_prompt(
     total_steps: int = 1,
     mv_label: Optional[str] = None,
     mv_answer: Optional[str] = None,
+    mv_strength: Optional[float] = None,
     gt_label: Optional[str] = None,
     step_terms_summary: Optional[Dict[int, Dict]] = None,
     previous_steps: Optional[List[str]] = None,
@@ -940,9 +941,24 @@ suggestion, not a settled result):
                     f"Generate reasoning that rigorously leads to this conclusion.\n"
                 )
             elif mv_label and not gt_label and domain == "logical":
+                # The vote is a prior, not the answer. Telling the model to
+                # "generate reasoning that leads to" the majority label makes the
+                # conclusion a copy of the vote, so synthesis can never revisit a
+                # unanimous one — and on the depth-5 ProofWriter slice the five
+                # traces agree and are still wrong on a third of the samples they
+                # agree on. The maths branch above has always phrased its prior as
+                # something to verify against the derivation; this is the same
+                # phrasing, carrying how much of the weighted vote actually backs
+                # the label so the model can tell a split vote from a unanimous one.
+                _share = ("" if mv_strength is None
+                          else f" ({round(100 * mv_strength)}% of the weighted vote)")
                 prompt += (
-                    f"- The majority of independent reasoning traces reach {mv_label}. "
-                    f"Generate reasoning that rigorously leads to this conclusion.\n"
+                    f"- Prior: the independent reasoning traces mostly reach "
+                    f"{mv_label}{_share}. This is a prior, not the answer — the "
+                    f"traces come from one model and can agree on a mistake.\n"
+                    f"- Decide from the chain derived above: if it supports "
+                    f"{mv_label}, say so; if it supports the other label, state "
+                    f"the other label instead.\n"
                 )
     else:
         prompt += "- Do NOT conclude the entire problem here — more steps follow\n"
@@ -1038,6 +1054,7 @@ async def synthesize_trace_rkg(
     # NOTE: uses only the model's own predictions — no ground_truth access
     _mv_label:  Optional[str] = None   # logical domain
     _mv_answer: Optional[str] = None   # math domain
+    _mv_strength: Optional[float] = None  # share of the weighted vote behind _mv_label
     _all_traces = sample.get("cleaned_traces") or sample.get("traces", [])
     if no_mv:
         _all_traces = []  # skip MV computation entirely
@@ -1090,6 +1107,9 @@ async def synthesize_trace_rkg(
                     _label_counts[_lbl] = _label_counts.get(_lbl, 0) + _weight_of(_t)
             if _label_counts:
                 _mv_label = max(_label_counts, key=_label_counts.get)
+                _total = sum(_label_counts.values())
+                if _total > 0:
+                    _mv_strength = _label_counts[_mv_label] / _total
 
     topo_order = topological_sort_dag(consensus_rkg)
     plan       = build_synthesis_plan_from_dag(consensus_rkg, topo_order)
@@ -1317,6 +1337,7 @@ async def synthesize_trace_rkg(
                 problem_input, entry, generated_nodes,
                 domain=domain, total_steps=total_steps,
                 mv_label=_mv_label, mv_answer=_mv_answer,
+                mv_strength=_mv_strength,
                 gt_label=None,
                 step_terms_summary=_step_terms_summary,
                 previous_steps=generated_steps,
