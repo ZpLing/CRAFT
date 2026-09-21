@@ -30,11 +30,47 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Dict, List
 
 MODELS = ["gemini-3.1-flash-lite", "gpt-5.4-nano"]
 DATASETS = ["FLD", "ProofWriter", "OmniMATH", "OlympiadBench"]
+
+LABEL_RE = re.compile(r"__(?:PROVED|DISPROVED)__", re.IGNORECASE)
+BOXED_RE = re.compile(r"\\boxed\s*\{")
+
+
+def strip_answer(trace: str, domain: str) -> str:
+    """Cut the trace off before it states its answer.
+
+    With the answer in the training target the student can learn which endings
+    go with which problems instead of learning to reason to them, and the two
+    sides carry the SAME answer here — a pair is only kept where both were
+    right — so the answer is shared text that dilutes the one thing this
+    experiment varies. Removing it leaves the reasoning, which is the thing
+    being compared.
+
+    The cut is at the start of the line that states the answer, so the line is
+    removed whole rather than leaving "Therefore, the hypothesis is" dangling.
+    Lines after it, which are usually blank or a restatement, go too.
+    """
+    if not trace:
+        return ""
+    lines = trace.rstrip().split("\n")
+    pat = LABEL_RE if domain == "logical" else BOXED_RE
+    # The cut is at the FIRST line that states the answer, not the last. CRAFT's
+    # traces restate their conclusion as they go — the consensus graph gives the
+    # conclusion node's text to the steps that lead to it — so cutting at the
+    # last occurrence leaves the answer sitting in an earlier step. Measured on
+    # this data that left it in 332 of 1596 CRAFT traces against 11 raw ones,
+    # which is worse than not stripping at all: it would have leaked the answer
+    # to one student and not the other.
+    for i, line in enumerate(lines):
+        if pat.search(line):
+            return "\n".join(lines[:i]).rstrip()
+    return trace.rstrip()
+
 
 INSTRUCTION = {
     "logical": ("Decide whether the hypothesis follows from the facts and rules. "
@@ -64,6 +100,11 @@ def main() -> None:
     ap.add_argument("--out_dir", default="results/CRAFT_results/other_results/trace_utility/data")
     ap.add_argument("--test_frac", type=float, default=0.2)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--no_strip_answer", dest="strip_answer", action="store_false",
+                    default=True,
+                    help="Keep the answer in the training target. Off by default: "
+                         "both sides of a pair carry the same answer, so it is "
+                         "shared text that dilutes what the experiment varies")
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parents[3]
@@ -121,12 +162,21 @@ def main() -> None:
                 raw_ok = rr.get("predicted") == rr.get("ground_truth")
                 if not (craft_ok and raw_ok):
                     continue
-                raw_trace = (rr.get("traces") or [""])[0]
+                raw_trace = (rr.get("traces") or [""])[0] or ""
+                if not r.get("trace") or not raw_trace:
+                    continue
                 common = {"sample_id": sid, "dataset": ds, "source_model": model,
                           "domain": domain, "instruction": INSTRUCTION[domain],
                           "problem": problem, "answer": r["ground_truth"]}
-                train_craft.append({**common, "trace": r["trace"], "side": "craft"})
-                train_raw.append({**common, "trace": raw_trace, "side": "raw"})
+                c_body = strip_answer(r["trace"], domain) if args.strip_answer else r["trace"]
+                r_body = strip_answer(raw_trace, domain) if args.strip_answer else raw_trace
+                # A trace that is only its answer has no reasoning to learn from,
+                # and stripping leaves it empty on one side and not the other,
+                # which would make the two training sets different sizes.
+                if args.strip_answer and (len(c_body.split()) < 10 or len(r_body.split()) < 10):
+                    continue
+                train_craft.append({**common, "trace": c_body, "side": "craft"})
+                train_raw.append({**common, "trace": r_body, "side": "raw"})
                 n_tr += 1
             stats.append((model, ds, n_tr, n_te))
 
