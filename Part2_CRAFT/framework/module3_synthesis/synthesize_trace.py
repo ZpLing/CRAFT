@@ -836,6 +836,7 @@ def build_rkg_synthesis_prompt(
     mv_answer: Optional[str] = None,
     mv_strength: Optional[float] = None,
     prior_mode: str = "verify",
+    atomic_steps: bool = False,
     gt_label: Optional[str] = None,
     step_terms_summary: Optional[Dict[int, Dict]] = None,
     previous_steps: Optional[List[str]] = None,
@@ -940,14 +941,22 @@ suggestion, not a settled result):
             "- Compute the exact numerical result — no symbolic placeholders\n"
             "- Cite which given value, equation, or previous result you are using\n"
             "- Double-check every calculation; if uncertain, re-derive from the previous step\n"
-            "- If this step involves multiple operations, break them into labeled sub-steps: (a), (b), (c)...\n"
-            "- Write a DETAILED derivation — show ALL intermediate work, not just the final result of this step\n"
+            + ("- Keep this step to ONE inference: one equation solved, one "
+               "substitution made, one quantity computed. If the work needs "
+               "several, this step does the first and says what remains\n"
+               if atomic_steps else
+               "- If this step involves multiple operations, break them into labeled sub-steps: (a), (b), (c)...\n"
+               "- Write a DETAILED derivation — show ALL intermediate work, not just the final result of this step\n") +
             "- Only use values from the problem statement or the steps listed above\n"
         )
     else:
         prompt += (
             "- Build this step on the prerequisites named above\n"
-            "- Each logical inference must be explicit and atomic\n"
+            + ("- ONE inference only: apply exactly one rule to exactly one set "
+               "of premises and state what follows. Do not chain two rules in "
+               "this step, and do not restate what earlier steps established\n"
+               if atomic_steps else
+               "- Each logical inference must be explicit and atomic\n")
         )
 
     if is_last:
@@ -1068,6 +1077,7 @@ async def synthesize_trace_rkg(
     anchor_conclusion: bool = False,
     no_mv: bool = False,
     prior_mode: str = "verify",
+    atomic_steps: bool = False,
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
     min_tfidf: float = 0.01,
@@ -1411,6 +1421,7 @@ async def synthesize_trace_rkg(
                 domain=domain, total_steps=total_steps,
                 mv_label=_mv_label, mv_answer=_mv_answer,
                 mv_strength=_mv_strength, prior_mode=prior_mode,
+                atomic_steps=atomic_steps,
                 gt_label=None,
                 step_terms_summary=_step_terms_summary,
                 previous_steps=generated_steps,
@@ -1809,6 +1820,7 @@ async def synthesize_traces_for_dataset(
     anchor_conclusion: bool = False,
     no_mv: bool = False,
     prior_mode: str = "verify",
+    atomic_steps: bool = False,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     df_table_path: Optional[Path] = None,
@@ -1947,7 +1959,7 @@ async def synthesize_traces_for_dataset(
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
                 sample_rkg = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, prior_mode=prior_mode, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
+                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, prior_mode=prior_mode, atomic_steps=atomic_steps, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
             else:
                 tasks.append(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
@@ -2010,6 +2022,7 @@ async def retry_failed_synthesis(
     anchor_conclusion: bool = False,
     no_mv: bool = False,
     prior_mode: str = "verify",
+    atomic_steps: bool = False,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     df_table_path: Optional[Path] = None,
@@ -2067,7 +2080,7 @@ async def retry_failed_synthesis(
                     return sid, await synthesize_trace_rkg(
                         session, sample, rkg, model=model, domain=domain,
                         anchor_conclusion=anchor_conclusion, no_mv=no_mv,
-                        prior_mode=prior_mode,
+                        prior_mode=prior_mode, atomic_steps=atomic_steps,
                         df_table=df_table, idf_norm=(idf_norm == "log_n"),
                     )
                 except Exception as e:
@@ -2235,6 +2248,13 @@ def main():
     )
 
     parser.add_argument(
+        "--atomic_steps", action="store_true", default=False,
+        help="Ask each synthesized step for one inference rather than for all "
+             "the intermediate work. Raises FineLogic's atomicity and raises the "
+             "step count with it — the two cannot both be optimised, since a "
+             "problem needing thirty inferences cannot be nine atomic steps",
+    )
+    parser.add_argument(
         "--prior_mode", choices=["verify", "follow"], default="verify",
         help="How Module III is told to treat the consensus vote when it writes "
              "the conclusion. 'verify' (default) gives it as a prior the derived "
@@ -2314,6 +2334,7 @@ def main():
                 anchor_conclusion=args.anchor_conclusion,
                 no_mv=args.no_mv,
                 prior_mode=args.prior_mode,
+                atomic_steps=args.atomic_steps,
                 idf_scope=args.idf_scope,
                 idf_norm=args.idf_norm,
                 df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
@@ -2349,6 +2370,7 @@ def main():
             anchor_conclusion=args.anchor_conclusion,
             no_mv=args.no_mv,
             prior_mode=args.prior_mode,
+            atomic_steps=args.atomic_steps,
             idf_scope=args.idf_scope,
             idf_norm=args.idf_norm,
             df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
