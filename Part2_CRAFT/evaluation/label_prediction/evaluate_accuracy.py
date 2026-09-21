@@ -408,7 +408,18 @@ def load_cleaned(path: Path) -> List[Dict[str, Any]]:
         gt      = _get_gt(r, is_math)
         traces  = []
         for t in r.get("cleaned_traces", []):
-            text = t.get("reasoning_text") or ""
+            # The surviving steps and the trace's own closing statement, which is
+            # the other half of what survived filtering. Reading the steps alone
+            # left 78% of the maths traces with nothing to extract — a filter
+            # drops the concluding sentence from the step list, not from the
+            # trace — and "w/o Synthesis" then scored the extraction failure
+            # rather than the vote. The stored generation-time label is still
+            # not used: this is re-derived from surviving text, which is what
+            # separates this row from "w/o Filter & Synthesis".
+            text = "\n".join(
+                part for part in (t.get("reasoning_text"), t.get("final_statement"))
+                if part
+            )
             pred = extract_pred(text, "math" if is_math else "logical")
             traces.append({"predicted": pred, "text": text,
                            "n_steps":  count_steps(text, t.get("reasoning_steps")),
@@ -1598,7 +1609,7 @@ def main_ablation(argv) -> None:
 
     # Output
     parser.add_argument("--output",
-                        default="CRAFT_results/ablation_study/ablation_results.json",
+                        default="CRAFT_results/other_results/ablation_study/ablation_results.json",
                         help="the A-E ablation is its own experiment, so its results sit "
                              "under ablation_study/ rather than with the main table's")
 
