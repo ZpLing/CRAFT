@@ -1,0 +1,56 @@
+{
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gd",
+  "full_accuracy": 87.4,
+  "settings": {
+    "CRAFT (full)": {
+      "accuracy": 87.4,
+      "macro_f1": 0.8737,
+      "avg_steps": 8.88,
+      "n_samples": 500,
+      "delta": null
+    },
+    "w/o CRAFT": {
+      "accuracy": 61.0,
+      "macro_f1": 0.5541,
+      "avg_steps": 16.71,
+      "n_samples": 500,
+      "delta": -26.4
+    },
+    "w/o RKG": {
+      "accuracy": 83.6,
+      "macro_f1": 0.8377,
+      "avg_steps": 9.46,
+      "n_samples": 500,
+      "delta": -3.8
+    },
+    "w/o Synthesis": {
+      "accuracy": 59.2,
+      "macro_f1": 0.5894,
+      "avg_steps": 6.18,
+      "n_samples": 500,
+      "delta": -28.2
+    },
+    "w/o Filter & Synthesis": {
+      "accuracy": 59.2,
+      "macro_f1": 0.5894,
+      "avg_steps": 8.87,
+      "n_samples": 500,
+      "delta": -28.2
+    },
+    "w/o Weighted Edges Fusion": {
+      "accuracy": 84.2,
+      "macro_f1": 0.8418,
+      "avg_steps": 8.85,
+      "n_samples": 500,
+      "delta": -3.2
+    },
+    "Embedding Cosine Similarity": {
+      "accuracy": 83.6,
+      "macro_f1": 0.8359,
+      "avg_steps": 8.84,
+      "n_samples": 500,
+      "delta": -3.8
+    }
+  },
+  "not_run": []
+}

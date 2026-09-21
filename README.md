@@ -147,8 +147,11 @@ framework of §3.2.
 │       │                            one directory each: results.json and traces.jsonl
 │       └── CRAFT_results/  mirrors evaluation/ above, one directory per
 │           ├── label_prediction/     experiment, so a result sits where its
-│           ├── reasoning_traces_quality/  code does, other_results/ mirroring
-│           └── other_results/        other_evaluation/
+│           ├── reasoning_traces_quality/  code does
+│           ├── Ablation_Study/<model>/  one JSON per ablated cell: the six
+│           │                        settings, their accuracy, macro-F1, average
+│           │                        steps and the samples each rests on
+│           └── other_results/        the remaining appendix analyses
 └── config.py                        API credentials (local only, git-ignored)
 ```
 
