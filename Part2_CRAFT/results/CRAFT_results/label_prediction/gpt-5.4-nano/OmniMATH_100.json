@@ -1,0 +1,65 @@
+{
+  "file": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/OmniMATH_gpt-5.4-nano_100/synthesized.json",
+  "source": "synthesized",
+  "overall": {
+    "accuracy": 0.5051,
+    "macro_f1": null,
+    "precision_answered": 0.5051,
+    "avg_steps": 9.17,
+    "std_steps": 1.24,
+    "avg_tokens": 1973.9,
+    "std_tokens": 1074.2,
+    "mean_trace_acc": 0.5051,
+    "std_trace_acc": 0.5,
+    "n_total": 99,
+    "n_correct": 50,
+    "n_no_pred": 0,
+    "n_blocked": 0,
+    "no_pred_rate": 0.0,
+    "per_class_f1": {},
+    "confusion_matrix": {},
+    "domain": "math",
+    "per_dataset": {
+      "OmniMATH.json": {
+        "accuracy": 0.5051,
+        "macro_f1": null,
+        "precision_answered": 0.5051,
+        "avg_steps": 9.17,
+        "std_steps": 1.24,
+        "avg_tokens": 1973.9,
+        "std_tokens": 1074.2,
+        "mean_trace_acc": 0.5051,
+        "std_trace_acc": 0.5,
+        "n_total": 99,
+        "n_correct": 50,
+        "n_no_pred": 0,
+        "n_blocked": 0,
+        "no_pred_rate": 0.0,
+        "per_class_f1": {},
+        "confusion_matrix": {},
+        "domain": "math"
+      }
+    }
+  },
+  "per_dataset": {
+    "OmniMATH.json": {
+      "accuracy": 0.5051,
+      "macro_f1": null,
+      "precision_answered": 0.5051,
+      "avg_steps": 9.17,
+      "std_steps": 1.24,
+      "avg_tokens": 1973.9,
+      "std_tokens": 1074.2,
+      "mean_trace_acc": 0.5051,
+      "std_trace_acc": 0.5,
+      "n_total": 99,
+      "n_correct": 50,
+      "n_no_pred": 0,
+      "n_blocked": 0,
+      "no_pred_rate": 0.0,
+      "per_class_f1": {},
+      "confusion_matrix": {},
+      "domain": "math"
+    }
+  }
+}
