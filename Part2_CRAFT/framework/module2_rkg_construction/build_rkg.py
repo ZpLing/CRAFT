@@ -599,6 +599,63 @@ def _term_overlap_score(text_a: str, text_b: str) -> float:
     return inter / union if union > 0 else 0.0
 
 
+# ---------------------------------------------------------------------------
+# The ablation's "Embedding Cosine Similarity" row
+# ---------------------------------------------------------------------------
+# W(e) fuses the extractor's confidence with how much the two steps overlap, and
+# the paper measures that overlap as Jaccard over content terms. The alternative
+# the ablation reports is the cosine of two sentence embeddings, which scores two
+# steps as related when they say the same thing in different words — and scores
+# two steps as related when they merely talk about the same objects, which on a
+# deduction is most pairs of steps in the problem. Both are computed here so the
+# row is the same pipeline with one function swapped.
+_EMBEDDER = None
+_EMBED_CACHE: Dict[str, Any] = {}
+
+
+def _embedding_cosine_score(text_a: str, text_b: str) -> float:
+    """Cosine of two sentence embeddings, in place of the term-overlap score.
+
+    all-mpnet-base-v2 is the encoder, which is the one ROSCOE scores traces with,
+    so the ablation is not also introducing a second embedding space. Vectors are
+    cached by text: a trace's steps are compared repeatedly and the encoder is the
+    slow part.
+    """
+    global _EMBEDDER
+    if not text_a or not text_b:
+        return 0.0
+    if _EMBEDDER is None:
+        from sentence_transformers import SentenceTransformer
+        _EMBEDDER = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+    missing = [t for t in (text_a, text_b) if t not in _EMBED_CACHE]
+    if missing:
+        vecs = _EMBEDDER.encode(missing, normalize_embeddings=True,
+                                show_progress_bar=False)
+        for t, v in zip(missing, vecs):
+            _EMBED_CACHE[t] = v
+    import numpy as _np
+    return float(_np.clip(_np.dot(_EMBED_CACHE[text_a], _EMBED_CACHE[text_b]), 0.0, 1.0))
+
+
+# Which of the two the edge weight uses. build_rkg sets it from --similarity;
+# everything downstream calls _similarity_score and does not know the difference.
+_SIMILARITY = "jaccard"
+
+
+def set_similarity(kind: str) -> None:
+    """Choose the overlap measure for W(e): "jaccard" (paper) or "embedding"."""
+    global _SIMILARITY
+    if kind not in ("jaccard", "embedding"):
+        raise ValueError(f"unknown similarity {kind!r}")
+    _SIMILARITY = kind
+
+
+def _similarity_score(text_a: str, text_b: str) -> float:
+    if _SIMILARITY == "embedding":
+        return _embedding_cosine_score(text_a, text_b)
+    return _term_overlap_score(text_a, text_b)
+
+
 def build_consensus_rkg(
     trace_rkgs: List[Dict[str, Any]],
     consensus_threshold: float = 0.3,
@@ -738,7 +795,7 @@ def build_consensus_rkg(
 
             # P1-A: fuse LLM confidence + term overlap
             llm_conf     = e.get("confidence", 0.7)
-            overlap      = _term_overlap_score(
+            overlap      = _similarity_score(
                 all_node_texts.get(src, ""),
                 all_node_texts.get(dst, ""),
             )
@@ -1192,6 +1249,11 @@ def main() -> None:
     parser.add_argument("--node_threshold", type=float, default=None,
                         help="Node frequency threshold beta (default: same as --consensus_threshold)")
     parser.add_argument("--max_samples", type=int, default=None)
+    parser.add_argument("--similarity", choices=["jaccard", "embedding"],
+                        default="jaccard",
+                        help="The overlap measure fused into W(e): term Jaccard "
+                             "(the paper) or the cosine of all-mpnet-base-v2 "
+                             "embeddings (the ablation's row)")
     parser.add_argument("--edge_lambda", type=float, default=0.3,
                         help="Edge weight balance lambda: W(e) = (1-lambda)*LLM confidence "
                              "+ lambda*term overlap (paper: 0.3). 0 drops the fusion, which "
@@ -1214,6 +1276,7 @@ def main() -> None:
     parser.add_argument("--gt_file", default=None,
                         help="--rebuild_consensus: cleaned_with_problem.json, for conclusion-label diagnostics")
     args = parser.parse_args()
+    set_similarity(args.similarity)
 
     if args.rebuild_consensus:
         rebuild_consensus(
