@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Paired fine-tuning data for asking whether a CRAFT trace is better to learn from.
 
-A judge scoring steps can only report what a step looks like, and FineLogic's
-atomicity shows the cost of that: it penalises a step for being long, which is
-what CRAFT's steps are by construction, and says nothing about whether the
-reasoning in them is any good. Training says something a judge cannot. Fine-tune
+A judge scoring steps can only report what a step looks like. A per-step
+atomicity score is the clearest case: it penalises a step for being long, which
+is what CRAFT's steps are by construction — 178 words a step against raw CoT's
+12 on OlympiadBench — and says nothing about whether the reasoning in them is
+any good. Training says something a judge cannot. Fine-tune
 one student on CRAFT's traces and another on the raw chains over the same
 problems, change nothing else, and whichever student answers held-out problems
 better learned from the better traces.
@@ -39,6 +40,27 @@ DATASETS = ["FLD", "ProofWriter", "OmniMATH", "OlympiadBench"]
 
 LABEL_RE = re.compile(r"__(?:PROVED|DISPROVED)__", re.IGNORECASE)
 BOXED_RE = re.compile(r"\\boxed\s*\{")
+# PROVED / DISPROVED as a word, with or without the underscores the prompt asks
+# for, which is the form the baselines' own extractor accepts.
+BARE_LABEL_RE = re.compile(r"\b(?:PROVED|DISPROVED)\b")
+
+
+def has_conclusion(trace: str, domain: str) -> bool:
+    """Whether a trajectory states an answer at all, rather than being cut off.
+
+    A logical answer is written three ways across these runs. CRAFT's synthesis
+    is told to emit __PROVED__ and does; the baselines' zero-shot CoT was told
+    the same and often ends with a bare PROVED instead, which is what their own
+    extractor reads and scores. Matching only the underscored form called 276
+    of nano's 500 ProofWriter chains unfinished when every one of them ends in a
+    stated conclusion — the reading that would have dropped them from the pairs,
+    or had them regenerated against a baseline that is not in fact broken.
+    """
+    if not trace:
+        return False
+    if domain != "logical":
+        return bool(BOXED_RE.search(trace))
+    return bool(LABEL_RE.search(trace) or BARE_LABEL_RE.search(trace))
 
 
 def strip_answer(trace: str, domain: str) -> str:
@@ -54,6 +76,11 @@ def strip_answer(trace: str, domain: str) -> str:
     The cut is at the start of the line that states the answer, so the line is
     removed whole rather than leaving "Therefore, the hypothesis is" dangling.
     Lines after it, which are usually blank or a restatement, go too.
+
+    Not used by default. The default trains on the trajectory the pipeline
+    produced, reasoning and answer together, which is the artefact the paper
+    claims is better; a pair is only kept where both sides reach the same
+    answer, so that shared ending cannot favour either student.
     """
     if not trace:
         return ""
@@ -100,11 +127,12 @@ def main() -> None:
     ap.add_argument("--out_dir", default="results/CRAFT_results/other_results/trace_utility/data")
     ap.add_argument("--test_frac", type=float, default=0.2)
     ap.add_argument("--seed", type=int, default=42)
-    ap.add_argument("--no_strip_answer", dest="strip_answer", action="store_false",
-                    default=True,
-                    help="Keep the answer in the training target. Off by default: "
-                         "both sides of a pair carry the same answer, so it is "
-                         "shared text that dilutes what the experiment varies")
+    ap.add_argument("--strip_answer", action="store_true", default=False,
+                    help="Cut each training trace off before it states its "
+                         "answer. Off by default — a student is trained on the "
+                         "trajectory as the pipeline produced it, reasoning and "
+                         "answer together. Both sides of a pair reach the same "
+                         "answer, so including it cannot favour either student")
     args = ap.parse_args()
 
     root = Path(__file__).resolve().parents[3]
@@ -168,8 +196,22 @@ def main() -> None:
                 common = {"sample_id": sid, "dataset": ds, "source_model": model,
                           "domain": domain, "instruction": INSTRUCTION[domain],
                           "problem": problem, "answer": r["ground_truth"]}
+                # A pair enters only if both trajectories actually reach a
+                # stated conclusion. 295 of the raw chains — 18.5% of them, all
+                # logical — run out of tokens mid-sentence and never state one,
+                # while none of CRAFT's do; the baseline still recorded them as
+                # correct. Training a student on those teaches it to stop
+                # mid-sentence, and it would then lose for a reason that has
+                # nothing to do with how well the trace reasons. Dropping the
+                # pair keeps both trajectories exactly as the pipelines wrote
+                # them and keeps the two sides comparable.
+                if not (has_conclusion(r["trace"], domain)
+                        and has_conclusion(raw_trace, domain)):
+                    continue
                 c_body = strip_answer(r["trace"], domain) if args.strip_answer else r["trace"]
                 r_body = strip_answer(raw_trace, domain) if args.strip_answer else raw_trace
+                # Whole trajectories by default; the guard below only bites when
+                # --strip_answer has cut one down to nothing.
                 # A trace that is only its answer has no reasoning to learn from,
                 # and stripping leaves it empty on one side and not the other,
                 # which would make the two training sets different sizes.

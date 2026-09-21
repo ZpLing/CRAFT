@@ -5,7 +5,7 @@ The four datasets do not agree on how a problem is stored. FLD keeps its facts i
 one string and ProofWriter keeps them in a list; the logical two name the answer
 `proof_label` and the mathematical two name it `answer`; only the logical two
 record how long the gold proof is, and they record it two different ways. ROSCOE
-and FineLogic each need the same few fields out of whichever dataset a run was
+and the SFT evaluation each need the same few fields out of whichever dataset a run was
 generated from, so the per-dataset knowledge lives here once rather than as a
 fall-through guess repeated in each adapter — which is what let a ProofWriter run
 hand the scorer a list where it expected a string, and a maths run hand it an
@@ -67,9 +67,8 @@ def _int_or_none(value: Any) -> Optional[int]:
 def fld_proof_steps(proofs: Any) -> Optional[int]:
     """FLD's gold proof is one string: 'sent2 -> int1: …; int1 & sent4 -> hypothesis;'.
 
-    Its length is the number of derivations in it, which is what FineLogic's step
-    band is measured against. The published selection runs 1–7 steps, so the
-    band FineLogic's own table uses, [10, 20], is empty on it.
+    Its length is the number of derivations in it. The published selection runs
+    1–7 steps.
     """
     text = as_text(proofs)
     if not text:
