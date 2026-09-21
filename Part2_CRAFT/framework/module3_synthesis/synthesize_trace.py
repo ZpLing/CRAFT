@@ -1014,6 +1014,7 @@ async def synthesize_trace_rkg(
     no_mv: bool = False,
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
+    min_tfidf: float = 0.01,
 ) -> Dict[str, Any]:
     """RKG-guided high-quality trace generation (blind synthesis, no access to ground_truth).
 
@@ -1149,8 +1150,13 @@ async def synthesize_trace_rkg(
     # For math domain: also compute — helps RKG synthesis fill intermediate steps.
     _step_terms_summary: Dict[int, Dict] = {}
     if _all_traces:
+        # alpha, as the run was given it. This call had 0.01 written into it,
+        # so --min_tfidf never reached the graph-guided path at all: the term
+        # hints each step is shown were always cut at the default, whatever the
+        # run asked for. It is the one Module III hyperparameter the paper
+        # names, and the ablation that varies it was varying nothing.
         _step_terms_summary = collect_terms_by_step_position(
-            _all_traces, min_tfidf=0.01,
+            _all_traces, min_tfidf=min_tfidf,
             use_percentage_alignment=True, domain=domain,
             df_table=df_table, idf_norm=idf_norm,
         )
@@ -1856,7 +1862,7 @@ async def synthesize_traces_for_dataset(
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
                 sample_rkg = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, df_table=df_table, idf_norm=(idf_norm == "log_n")))
+                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
             else:
                 tasks.append(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
