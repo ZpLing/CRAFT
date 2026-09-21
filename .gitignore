@@ -75,12 +75,9 @@ Thumbs.db
 /baselines/
 
 # ── Side experiments — local checks, not part of the pipeline ───────
-# Excluded by their contents rather than as a directory, so the ablation can be
-# re-included: git cannot re-include a file whose parent directory is excluded.
-Part2_CRAFT/evaluation/other_evaluation/*
-# ...except the ablation, which produces a table in the paper and is tracked
-# together with its results under results/CRAFT_results/Ablation_Study/.
-!Part2_CRAFT/evaluation/other_evaluation/ablation_study/
+# The ablation used to live here and does not any more: it is a table in the
+# paper, so it sits at evaluation/Ablation_Study/ and is tracked.
+Part2_CRAFT/evaluation/other_evaluation/
 
 # ── Table and statistics generators — they render results/, they do not
 # produce them, and every number they print is recomputable from the
