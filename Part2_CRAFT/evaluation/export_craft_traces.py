@@ -16,6 +16,15 @@ Each line is one sample:
 `predicted` is re-derived from the trace text with the same extractor the
 scorer uses, so a line cannot disagree with the reported table.
 
+The trace is written out with its restatements removed. Walking the consensus
+graph carries each step's conclusion forward, so a late step repeats what the
+earlier ones established: across the eight cells that is 8% to 20% of the
+sentences, and the final answer itself is written out up to four times. The
+answer is read from the last commitment a trace makes, and dedup_trace leaves
+every sentence that states one alone and checks the rewrite against this
+cell's own reader, so `predicted` cannot move -- over the 3969 traces here it
+does not, on any of them.
+
     python export_craft_traces.py --out_dir CRAFT_results/Output
 """
 
@@ -23,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -31,6 +41,17 @@ import config as _cfg  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "label_prediction"))
 from evaluate_accuracy import LOADERS, compute_metrics  # noqa: E402
+from extract_label import extract_label, extract_math_answer  # noqa: E402
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]
+                       / "framework" / "module3_topology_guided_synthesis"))
+from dedup_trace import dedup_trace  # noqa: E402
+
+# Which reader names the answer, so the rewrite can be checked against it.
+_READER = {"FLD": extract_label, "ProofWriter": extract_label,
+           "OmniMATH": extract_math_answer, "OlympiadBench": extract_math_answer}
+
+_STEP_HEAD = re.compile(r"(?m)^\s*Step\s*\d+\s*[:.\-]\s*")
 
 # (dataset, model) -> (run directory, file, how it was run)
 CELLS = {
@@ -74,11 +95,18 @@ def main() -> None:
             continue
         rows = LOADERS["synthesized"](src)
         metrics = compute_metrics(rows)
+        shrunk = total = 0
         out = out_dir / model / f"{ds}_Output.jsonl"
         out.parent.mkdir(parents=True, exist_ok=True)
         with out.open("w", encoding="utf-8") as fh:
+            reader = _READER[ds]
             for r in rows:
                 t = r["traces"][0]
+                original = t["text"] or ""
+                text = dedup_trace(original, extractor=reader)
+                n_steps = len(_STEP_HEAD.findall(text)) or t["n_steps"]
+                shrunk += len(original) - len(text)
+                total += len(original)
                 fh.write(json.dumps({
                     "sample_id": r["sample_id"],
                     "source_dataset": r["source_dataset"],
@@ -87,11 +115,12 @@ def main() -> None:
                     "setting": setting,
                     "ground_truth": r["ground_truth"],
                     "predicted": r["predicted"],
-                    "n_steps": t["n_steps"],
-                    "trace": t["text"],
+                    "n_steps": n_steps,
+                    "trace": text,
                 }, ensure_ascii=False) + "\n")
         print(f"  {model:<22} {ds:<14} {len(rows):>4} samples  "
-              f"acc {100*metrics['accuracy']:5.1f}  steps {metrics['avg_steps']:4.1f}  -> {out}")
+              f"acc {100*metrics['accuracy']:5.1f}  steps {metrics['avg_steps']:4.1f}  "
+              f"trimmed {100*shrunk/max(total,1):4.1f}%  -> {out}")
 
     if missing:
         raise SystemExit("These cells have no reported trace file:\n  "
