@@ -648,11 +648,13 @@ def build_consensus_rkg(
         tidx = rkg_trace.get("trace_idx", 0)
         n_steps = sum(1 for n in rkg_trace.get("nodes", [])
                       if n.get("type") in ("step", "conclusion"))
+        # gold_depth compares the trace's own length, not the graph's
+        n_trace_steps = rkg_trace.get("n_trace_steps") or n_steps
         if weight_by == "step_count":
             # Use a small floor to avoid zero-weight on degenerate traces
             trace_weights[tidx] = float(max(n_steps, 1))
         elif weight_by == "gold_depth" and expected_depth:
-            trace_weights[tidx] = 1.0 / (1.0 + abs(n_steps - expected_depth)) ** 3
+            trace_weights[tidx] = 1.0 / (1.0 + abs(n_trace_steps - expected_depth)) ** 3
         else:
             trace_weights[tidx] = 1.0
 
@@ -925,6 +927,14 @@ async def build_rkgs_for_sample(
             })
         else:
             result["trace_idx"] = i
+            # The trace's own length, before the step filter shortened it, which
+            # is what a depth weighting has to compare against. The graph's node
+            # count is not it: extraction normalises the graphs to a similar size
+            # (mean 8.15, sd 1.30 on ProofWriter) while the traces vary (mean
+            # 5.99, sd 1.66), so weighting on nodes gave 2500 traces two distinct
+            # weights and the weighting did nothing.
+            result["n_trace_steps"] = (traces[i].get("original_num_steps")
+                                       or len(traces[i].get("reasoning_steps") or []))
             trace_rkgs.append(result)
 
     valid_rkgs = [d for d in trace_rkgs if d.get("extraction_method") != "error"]
