@@ -1,0 +1,65 @@
+{
+  "file": "results/craft_runs/full500/OlympiadBench_gemini-3.1-flash-lite/synthesized.json",
+  "source": "synthesized",
+  "overall": {
+    "accuracy": 0.7284,
+    "macro_f1": null,
+    "precision_answered": 0.7298,
+    "avg_steps": 9.63,
+    "std_steps": 0.73,
+    "avg_tokens": 1580.6,
+    "std_tokens": 575.9,
+    "mean_trace_acc": 0.7298,
+    "std_trace_acc": 0.444,
+    "n_total": 497,
+    "n_correct": 362,
+    "n_no_pred": 1,
+    "n_blocked": 0,
+    "no_pred_rate": 0.002,
+    "per_class_f1": {},
+    "confusion_matrix": {},
+    "domain": "math",
+    "per_dataset": {
+      "OlympiadBench.json": {
+        "accuracy": 0.7284,
+        "macro_f1": null,
+        "precision_answered": 0.7298,
+        "avg_steps": 9.63,
+        "std_steps": 0.73,
+        "avg_tokens": 1580.6,
+        "std_tokens": 575.9,
+        "mean_trace_acc": 0.7298,
+        "std_trace_acc": 0.444,
+        "n_total": 497,
+        "n_correct": 362,
+        "n_no_pred": 1,
+        "n_blocked": 0,
+        "no_pred_rate": 0.002,
+        "per_class_f1": {},
+        "confusion_matrix": {},
+        "domain": "math"
+      }
+    }
+  },
+  "per_dataset": {
+    "OlympiadBench.json": {
+      "accuracy": 0.7284,
+      "macro_f1": null,
+      "precision_answered": 0.7298,
+      "avg_steps": 9.63,
+      "std_steps": 0.73,
+      "avg_tokens": 1580.6,
+      "std_tokens": 575.9,
+      "mean_trace_acc": 0.7298,
+      "std_trace_acc": 0.444,
+      "n_total": 497,
+      "n_correct": 362,
+      "n_no_pred": 1,
+      "n_blocked": 0,
+      "no_pred_rate": 0.002,
+      "per_class_f1": {},
+      "confusion_matrix": {},
+      "domain": "math"
+    }
+  }
+}
