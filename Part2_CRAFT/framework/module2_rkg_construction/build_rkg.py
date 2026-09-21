@@ -654,7 +654,12 @@ def build_consensus_rkg(
             # Use a small floor to avoid zero-weight on degenerate traces
             trace_weights[tidx] = float(max(n_steps, 1))
         elif weight_by == "gold_depth" and expected_depth:
-            trace_weights[tidx] = 1.0 / (1.0 + abs(n_trace_steps - expected_depth)) ** 3
+            # Exponent chosen on the first 250 ProofWriter samples and checked on
+            # the other 250, where it is worth 5.2 points over an equal vote
+            # (0.584 -> 0.636). Sharper exponents score higher on that second
+            # half, but picking one by that number is choosing on the set the
+            # number is read from.
+            trace_weights[tidx] = 1.0 / (1.0 + abs(n_trace_steps - expected_depth)) ** 4
         else:
             trace_weights[tidx] = 1.0
 
