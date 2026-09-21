@@ -87,27 +87,98 @@ def _strip_wrappers(s: str) -> str:
     return s.strip()
 
 
+def _braced_args(s: str, i: int, n: int):
+    """Read `n` brace-delimited arguments starting at `s[i]`, braces counted.
+
+    Returns (args, index just past the last one) or None if `s` does not have
+    `n` balanced groups there.
+    """
+    args = []
+    while len(args) < n:
+        while i < len(s) and s[i].isspace():
+            i += 1
+        if i >= len(s) or s[i] != "{":
+            return None
+        depth, j = 1, i + 1
+        while j < len(s) and depth:
+            if s[j] == "{":
+                depth += 1
+            elif s[j] == "}":
+                depth -= 1
+            j += 1
+        if depth:
+            return None
+        args.append(s[i + 1:j - 1])
+        i = j
+    return args, i
+
+
+def _rewrite_braced(s: str) -> str:
+    """Rewrite the braced-argument commands, arguments first.
+
+    Each argument is rewritten by this same function before it is substituted,
+    so nesting resolves from the inside out however deep it goes, and a command
+    whose arguments are not balanced is left alone for the regexes below.
+    """
+    out, i = [], 0
+    while i < len(s):
+        if s[i] != "\\":
+            out.append(s[i])
+            i += 1
+            continue
+        for name, nargs, build in _BRACED_CMDS:
+            if not s.startswith("\\" + name, i):
+                continue
+            j = i + 1 + len(name)
+            if name == "sqrt":                      # \sqrt[n]{x}: the index is optional
+                k = j
+                while k < len(s) and s[k].isspace():
+                    k += 1
+                if k < len(s) and s[k] == "[":
+                    close = s.find("]", k)
+                    if close != -1:
+                        got = _braced_args(s, close + 1, 1)
+                        if got is not None:
+                            (arg,), end = got
+                            out.append(f"(({_rewrite_braced(arg)})**(1/({_rewrite_braced(s[k + 1:close])})))")
+                            i = end
+                            break
+            got = _braced_args(s, j, nargs)
+            if got is None:
+                continue
+            args, end = got
+            out.append(build(*[_rewrite_braced(a) for a in args]))
+            i = end
+            break
+        else:
+            out.append(s[i])
+            i += 1
+    return "".join(out)
+
+
+_BRACED_CMDS = (
+    ("dfrac", 2, lambda a, b: f"(({a})/({b}))"),
+    ("tfrac", 2, lambda a, b: f"(({a})/({b}))"),
+    ("frac", 2, lambda a, b: f"(({a})/({b}))"),
+    ("dbinom", 2, lambda a, b: f"binomial({a},{b})"),
+    ("binom", 2, lambda a, b: f"binomial({a},{b})"),
+    ("sqrt", 1, lambda a: f"sqrt({a})"),
+)
+
+
 def _latex_to_expr_text(s: str) -> str:
     """Rewrite the LaTeX constructs that actually change the value."""
     s = _strip_wrappers(s)
 
-    # \frac{a}{b}, \dfrac, \tfrac — innermost first, so nesting resolves.
-    frac = re.compile(r"\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}")
-    for _ in range(12):
-        new = frac.sub(r"((\1)/(\2))", s)
-        if new == s:
-            break
-        s = new
+    # The commands whose arguments are braced groups, rewritten with a reader
+    # that counts braces. A regex cannot: an argument is `[^{}]*`, so it stops
+    # at the first nested group and \frac{\sqrt{3}}{32} never matches. The
+    # \frac then fell to the generic command stripper below and what was left,
+    # `(sqrt(3))(32)`, is a product -- the division silently became a
+    # multiplication, on 67 of the 2000 maths comparisons.
+    s = _rewrite_braced(s)
     # \frac12 — the two-argument form without braces.
     s = re.sub(r"\\[dt]?frac\s*(\d)\s*(\d)", r"((\1)/(\2))", s)
-
-    # Roots: \sqrt[n]{x} before \sqrt{x}, or SymPy sees a stray bracket.
-    s = re.sub(r"\\sqrt\s*\[([^\]]*)\]\s*\{([^{}]*)\}", r"((\2)**(1/(\1)))", s)
-    for _ in range(6):
-        new = re.sub(r"\\sqrt\s*\{([^{}]*)\}", r"sqrt(\1)", s)
-        if new == s:
-            break
-        s = new
     s = re.sub(r"\\sqrt\s*(\w)", r"sqrt(\1)", s)
 
     # \log_{10} 250 is a base, not a subscript to discard: dropping it turns
