@@ -790,13 +790,22 @@ def build_synthesis_plan_from_rkg(
         edge_confs[e["dst"]].append(e.get("confidence", 0.7))
 
     plan = []
-    for pos, nid in enumerate(topo_order):
+    # Numbered over the steps that get written, not over the topological order.
+    # A fact node is given rather than derived, so it is skipped here -- but it
+    # used to consume a position anyway, and the trace came out numbered
+    # Step 0, Step 2, Step 4 with the later steps citing "from Step 1" for a
+    # step that was never written. 579 of 4000 exported traces carry such a
+    # citation, and the maths cells carry the most because their graphs hold
+    # the most facts.
+    written = 0
+    for nid in topo_order:
         node = nodes.get(nid, {})
         node_type = node.get("type", "step")
 
         # Fact nodes do not need to be generated — skip them (they are given)
         if node_type == "fact":
             continue
+        written += 1
 
         pred_ids = predecessors.get(nid, [])
         pred_texts = {
@@ -814,7 +823,7 @@ def build_synthesis_plan_from_rkg(
         plan.append({
             "node_id": nid,
             "node_type": node_type,
-            "step_position": pos + 1,
+            "step_position": written,
             "direct_predecessors": pred_ids,
             "predecessor_texts": pred_texts,
             "key_terms": key_terms,
