@@ -109,6 +109,7 @@ def run_roscoe_evaluation(
     coherence_batch: int = 16,
     model_cache_dir: str = None,
     datasets: list = None,
+    metrics: list = None,
 ) -> dict:
     """Run ROSCOE scoring on the exported traces.
 
@@ -122,6 +123,7 @@ def run_roscoe_evaluation(
         scores_output_dir:  Where to save TSV score files (default: export_dir/scores/)
         discourse_batch:    Batch size for discourse metrics
         coherence_batch:    Batch size for coherence metrics
+        metrics:            Score only these of ROSCOE's thirteen (default: all)
 
     Returns:
         dict: {setting: {dataset: {metric: mean_score}}}
@@ -279,6 +281,14 @@ def run_roscoe_evaluation(
                            dataset, setting,
                            sum(1 for r in refs if not getattr(r, "chain", None)), len(refs))
         score_types = REASONING_SCORES if has_refs else UNSUPERVISED_SCORES
+        if metrics:
+            keep = [m for m in score_types if m in metrics]
+            missing = [m for m in metrics if m not in score_types]
+            if missing:
+                logger.warning("not scored for this set, ignoring: %s", ", ".join(missing))
+            if not keep:
+                raise SystemExit(f"none of {metrics} is scored for {dataset}/{setting}")
+            score_types = keep
 
         # ── Feed into evaluator ────────────────────────────────────────────
         evaluator.set_hypos(hypotheses)
@@ -454,6 +464,13 @@ def main() -> None:
                              "A subset writes evaluation_results.<dataset>.json, so "
                              "jobs splitting one model across datasets cannot overwrite "
                              "each other's summary; merge them once all have run.")
+    parser.add_argument(
+        "--metrics", nargs="+", default=None,
+        help="Score only these, out of the thirteen. The chain-level "
+             "perplexities are where a run spends its time \u2014 a whole trace "
+             "against a 1024-token model \u2014 so asking for the three the paper's "
+             "table carries (grammar_step, repetition_step, repetition_word) is "
+             "what makes a run feasible without a GPU.")
     parser.add_argument("--roscoe_model", default="all-mpnet-base-v2")
     parser.add_argument("--discourse_batch", type=int, default=64)
     parser.add_argument("--coherence_batch", type=int, default=16)
@@ -487,6 +504,7 @@ def main() -> None:
             coherence_batch=args.coherence_batch,
             model_cache_dir=args.model_cache_dir,
             datasets=args.datasets,
+            metrics=args.metrics,
         )
         if not scores:
             continue
