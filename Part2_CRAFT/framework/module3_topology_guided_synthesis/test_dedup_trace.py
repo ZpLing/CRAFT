@@ -8,11 +8,15 @@ compares order removes a line that reuses its predecessor's shape.
 
     python test_dedup_trace.py
 """
+import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from dedup_trace import _repeats, _tokens, dedup_trace  # noqa: E402
+from dedup_trace import (_conclusion, _repeats, _tokens,  # noqa: E402
+                         dedup_steps, dedup_trace)
+
+_HEAD = re.compile(r"(?m)^\s*Step\s*(\d+)\s*:")
 
 # (later sentence, the earlier one it resembles, is it a restatement, why)
 CASES = [
@@ -54,6 +58,33 @@ Step 3: From Step 1 and Fact16, infer that the squirrel chases the dog.
 Step 4: From Step 3, conclude the hypothesis is __PROVED__."""
 
 
+# What a step derives, against what it merely quotes to get there. Reading the
+# premise as the conclusion made the step that builds on Step 4 look like a
+# repeat of it, and dropped the line that carried the proof forward.
+CONCLUSIONS = [
+    ("From **Step 4** we have **\u201cthe squirrel likes the tiger.\u201d** Using "
+     "**Fact18**, with the instantiation **someone = the squirrel**, infer "
+     "**\u201cthe tiger visits the dog.\u201d**",
+     "tiger visits dog", "the claim it lands on, not the premise it opens with"),
+    ("From Step 3 (\u201cthe bear sees the rabbit\u201d) and Fact12, infer that the "
+     "bear visits the bald eagle.",
+     "bear visits bald eagle", "infer that"),
+    ("Adding the two fractions over a common denominator, therefore the "
+     "probability is \\boxed{\\frac{2}{9}}.",
+     "probability \\boxed{\\frac{2}{9}}", "therefore, with the answer in it"),
+    ("We now compute the remaining sum explicitly.", None,
+     "no derivation announced, so nothing to compare"),
+]
+
+# The same conclusion reached twice, worded differently each time: too far apart
+# for the sentence rule, and the second one adds nothing to the proof.
+RESTATED = """Step 1: From Fact3 and Fact8, infer that the mouse needs the lion.
+Step 2: From Step 1 and Fact10, infer that the mouse needs the rabbit.
+Step 3: Applying Fact10 to Step 1 once more, it follows that the mouse needs \
+the rabbit.
+Step 4: From Step 3, conclude the hypothesis is __PROVED__."""
+
+
 def main() -> int:
     failures = 0
     for later, earlier, expected, why in CASES:
@@ -66,15 +97,52 @@ def main() -> int:
 
     # A step that goes must take its header with it, and what cited it must be
     # sent to the step whose line it repeated.
+    for step, expected, why in CONCLUSIONS:
+        got = _conclusion(step)
+        if (got or "") != (expected or ""):
+            failures += 1
+            print(f"FAIL  read {got!r}, wanted {expected!r}: {why}")
+        else:
+            print(f"ok    reads  {why}")
+
     out = dedup_trace(TRACE)
-    if "Step 3:" in out:
+    if out.count("infer that the squirrel chases the dog") != 1:
         failures += 1
         print("FAIL  the repeated step survived")
-    elif "From Step 2" not in out:
+    elif "From Step 2, conclude" not in out:
         failures += 1
         print("FAIL  the citation of the dropped step was not redirected")
+    elif [int(n) for n in _HEAD.findall(out)] != [1, 2, 3]:
+        failures += 1
+        print(f"FAIL  the surviving steps are numbered {_HEAD.findall(out)}")
     else:
-        print("ok    drops  a repeated step, and sends its citation to Step 2")
+        print("ok    drops  a repeated step, redirects its citation, renumbers")
+
+    out = dedup_trace(RESTATED)
+    if out.count("needs the rabbit") != 1:
+        failures += 1
+        print("FAIL  a conclusion reached twice was written twice")
+    elif "From Step 2, conclude" not in out:
+        failures += 1
+        print("FAIL  the citation was not sent to the step that first derived it")
+    else:
+        print("ok    drops  a step that re-derives an earlier conclusion")
+
+    # The export scores a list of steps whose "Step N:" headers are gone, but
+    # whose citations of them are not, so the list path has to renumber against
+    # the numbers the text uses -- which start at one.
+    listed = dedup_steps([line.split(": ", 1)[1] for line in RESTATED.splitlines()])
+    if len(listed) != 3:
+        failures += 1
+        print(f"FAIL  the list path kept {len(listed)} steps, wanted 3")
+    elif "From Step 1 and Fact10" not in listed[1]:
+        failures += 1
+        print(f"FAIL  a citation moved that should not have: {listed[1]!r}")
+    elif "From Step 2, conclude" not in listed[2]:
+        failures += 1
+        print(f"FAIL  the citation of the dropped step was not redirected: {listed[2]!r}")
+    else:
+        print("ok    drops  the same step through the list the export scores")
 
     braced = dedup_trace(BRACES)
     if braced.count("{") != braced.count("}"):
@@ -83,7 +151,8 @@ def main() -> int:
     else:
         print("ok    keeps  every brace it started with")
 
-    print(f"\n{len(CASES) + 2 - failures}/{len(CASES) + 2} passed")
+    total = len(CASES) + len(CONCLUSIONS) + 4
+    print(f"\n{total - failures}/{total} passed")
     return 1 if failures else 0
 
 

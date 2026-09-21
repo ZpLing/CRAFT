@@ -195,6 +195,72 @@ def _trim(bodies: List[str], owners: List[Optional[str]],
     return trimmed, alias
 
 
+# What a step derives, however it announces the derivation. A step that reaches
+# a conclusion an earlier one already reached has added nothing to the proof,
+# and the sentence rule above cannot see it: the two are worded differently, so
+# they never reach the verbatim ratio, and where the conclusion is the final
+# answer the sentence carrying it is protected outright. That is how a maths
+# trace comes to write \boxed{26} in step 5 and again in step 7.
+# Only words that announce a derivation. "we have" is not one of them: in these
+# traces it introduces the premise a step starts from -- "From Step 4 we have
+# X, so by Fact18 infer Y" -- and reading it as the conclusion made Y's step
+# look like a repeat of X's, which is the step it builds on. "that" is optional
+# after infer and conclude, because the traces write both "infer that X" and
+# "infer **X**".
+_DERIVES = re.compile(
+    r"(?is)\b(?:infer(?:\s+that)?|conclude(?:\s+that)?|it follows that|"
+    r"therefore|thus|hence|which gives|this gives|yields?)\b"
+    r"[,:\s]*(.+?)(?=[.;]|$)")
+# Wording that carries no claim, so two steps sharing it are not the same step.
+_FILLER = re.compile(r"\b(the|a|an|that|this|is|are|be|we|it|to|of|and|then|"
+                     r"so|now|next|finally|therefore|thus|hence)\b")
+
+
+def _conclusion(body: str) -> Optional[str]:
+    """The last thing a step asserts, normalised for comparison."""
+    found = _DERIVES.findall(body or "")
+    if not found:
+        return None
+    text = _STEP_CITE.sub(" ", found[-1].lower())
+    text = re.sub(r"[^a-z0-9\\{}^_]+", " ", text)
+    text = _FILLER.sub(" ", text)
+    text = " ".join(text.split())
+    # Too short to be distinctive: "it holds", "this is true". Steps sharing
+    # nothing but a turn of phrase would otherwise collapse into each other.
+    # A stated answer is exempt from the word count: "\\boxed{\\frac{2}{9}}"
+    # is two words and identifies the claim exactly, and a trace that derives
+    # the same boxed value twice is the repetition this is here to remove.
+    if "\\boxed" in text or "__proved__" in text or "__disproved__" in text:
+        return text if len(text) >= 8 else None
+    return text if len(text) >= 12 and len(text.split()) >= 3 else None
+
+
+def _repeat_conclusions(bodies: List[str],
+                        owners: List[Optional[str]]) -> Dict[str, str]:
+    """Map each step that re-derives an earlier conclusion to that earlier step.
+
+    The last step is never mapped. It is where extract_label reads the answer
+    from, and a trace whose final step restates the one before it is still a
+    trace that ends by stating its answer -- which is what the reader needs.
+    """
+    last = next((o for o, b in zip(reversed(owners), reversed(bodies))
+                 if o is not None and b.strip()), None)
+    first_seen: Dict[str, str] = {}
+    repeats: Dict[str, str] = {}
+    for body, owner in zip(bodies, owners):
+        if owner is None or not body.strip():
+            continue
+        claim = _conclusion(body)
+        if claim is None:
+            continue
+        if claim in first_seen:
+            if owner != last:
+                repeats[owner] = first_seen[claim]
+        else:
+            first_seen[claim] = owner
+    return repeats
+
+
 def _resolve(alias: Dict[str, str]) -> Dict[str, str]:
     """Follow a chain of dropped steps back to the one that still exists."""
     out: Dict[str, str] = {}
@@ -238,6 +304,15 @@ def dedup_trace(text: str,
     owners = [_STEP_NO.match(h).group(1) if h and _STEP_NO.match(h) else None
               for h in heads]
     trimmed, alias = _trim(bodies, owners, threshold)
+
+    # A step whose conclusion an earlier step already reached goes out whole,
+    # citations and all, rather than sentence by sentence: what makes it a
+    # repeat is the claim it lands on, not the words it gets there with.
+    for owner, source in _repeat_conclusions(trimmed, owners).items():
+        alias.setdefault(owner, source)
+        for i, o in enumerate(owners):
+            if o == owner:
+                trimmed[i] = ""
     alias = _resolve(alias)
 
     # A step that emptied out but has nowhere to send its citations keeps the
@@ -247,16 +322,34 @@ def dedup_trace(text: str,
         if owner is not None and not body.strip() and owner not in alias:
             trimmed[i] = bodies[i]
 
+    # What survives is renumbered from one. Leaving the original numbers behind
+    # would open a gap wherever a step went out -- "Step 1, Step 2, Step 4" --
+    # and every citation of a dropped step would point at a number the trace no
+    # longer has. Both are the same map: a surviving step takes its new
+    # position, and a dropped one takes the new position of the step whose
+    # conclusion it repeated.
+    renumber: Dict[str, str] = {}
+    position = 0
+    for owner, body in zip(owners, trimmed):
+        if owner is not None and body.strip():
+            position += 1
+            renumber[owner] = str(position)
+    for dropped, source in alias.items():
+        if source in renumber:
+            renumber[dropped] = renumber[source]
+
     parts: List[str] = []
-    for head, body in zip(heads, trimmed):
+    for head, owner, body in zip(heads, owners, trimmed):
         if not body.strip():
             continue
+        if head and owner in renumber:
+            head = f"Step {renumber[owner]}:"
         parts.append(f"{head} {body}" if head else body)
     rewritten = "\n".join(parts)
 
-    if alias:
+    if any(old_no != new_no for old_no, new_no in renumber.items()):
         def redirect(m: re.Match) -> str:
-            return m.group(1) + alias.get(m.group(2), m.group(2))
+            return m.group(1) + renumber.get(m.group(2), m.group(2))
         rebuilt = [piece if _STEP.fullmatch(piece or "")
                    else _STEP_REF.sub(redirect, piece or "")
                    for piece in _STEP.split(rewritten)]
@@ -279,15 +372,30 @@ def dedup_steps(steps: List[str], threshold: float = 0.75,
     leaves neither the "Step N:" line starts nor the blank lines dedup_trace
     reads, so the export deduplicates the list and joins what comes back.
     """
-    owners = [str(i) for i in range(len(steps))]
+    # Numbered from one, because a citation inside a step reads "From Step 1"
+    # and the redirect has to match it. Numbering these from zero sent every
+    # citation one step forward, so the first step came to cite the second.
+    owners = [str(i + 1) for i in range(len(steps))]
     trimmed, alias = _trim(list(steps), owners, threshold)
+    for owner, source in _repeat_conclusions(trimmed, owners).items():
+        alias.setdefault(owner, source)
+        trimmed[int(owner) - 1] = ""
     alias = _resolve(alias)
     out = [b for b in trimmed if b.strip()]
     if not out:
         return list(steps)
-    if alias:
+    renumber: Dict[str, str] = {}
+    position = 0
+    for owner, body in zip(owners, trimmed):
+        if body.strip():
+            position += 1
+            renumber[owner] = str(position)
+    for dropped, source in alias.items():
+        if source in renumber:
+            renumber[dropped] = renumber[source]
+    if any(old_no != new_no for old_no, new_no in renumber.items()):
         def redirect(m: re.Match) -> str:
-            return m.group(1) + alias.get(m.group(2), m.group(2))
+            return m.group(1) + renumber.get(m.group(2), m.group(2))
         out = [_STEP_REF.sub(redirect, b) for b in out]
     if extractor is not None and extractor(" ".join(out)) != extractor(" ".join(steps)):
         return list(steps)
