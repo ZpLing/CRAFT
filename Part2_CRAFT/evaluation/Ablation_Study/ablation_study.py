@@ -23,11 +23,22 @@ Three settings need their own run and are passed in with --variant NAME=PATH.
 Settings that were not run are printed as absent, so a partial table cannot be
 mistaken for a complete one.
 
+'w/o CRAFT' needs no run at all. Removing the whole pipeline leaves one call to
+the backbone, which is what the baselines' zero-shot CoT setting already is over
+the same samples and the same model, so --baseline_cot reads that run's
+traces.jsonl and writes the row from it rather than spending the calls again to
+get the same thing, then scores that file like every other row. Only the trace text crosses over: the label is re-derived
+with the extractor every other row is scored with, so a baseline and an ablation
+row that disagree are disagreeing about the run and not about how two scorers
+read a \\boxed{}. Samples the CRAFT run does not cover are dropped, and samples
+it covers that the baseline is missing are reported rather than silently
+shortening the row. --zero_shot takes a file already in that shape instead.
+
 Usage:
     python ablation_study.py --craft_dir craft_runs/olympiad_gemini \\
         --variant "w/o RKG=craft_runs/olympiad_gemini/synthesized_step_by_step.json" \\
         --variant "w/o Weighted Edges Fusion=craft_runs/olympiad_gemini_lam0/synthesized.json" \\
-        --zero_shot craft_runs/olympiad_gemini/zero_shot.json \\
+        --baseline_cot results/baseline_results/gemini-3.1-flash-lite/cot/traces.jsonl \\
         --output ablation/olympiad_gemini.json
 """
 
@@ -78,6 +89,45 @@ def rel(path: Path) -> str:
         return str(path)
 
 
+def build_zero_shot(baseline: Path, covered: Path, out: Path) -> List[str]:
+    """Write the 'w/o CRAFT' row from the baseline run that already exists.
+
+    It writes a file rather than scoring in memory so that row goes through
+    load_synthesized like every other one: the moment this scored its own rows,
+    the table would hold one number produced by a second reader of a trace, and
+    a disagreement with the baselines could no longer be pinned on the run.
+
+    Returns the sample ids the CRAFT run covers that the baseline does not, so a
+    row resting on fewer problems than the rows above it says so instead of
+    quietly averaging over a different set.
+    """
+    like = json.loads(Path(covered).read_text(encoding="utf-8"))
+    like = like.get("results", like) if isinstance(like, dict) else like
+    wanted = {r.get("sample_id") for r in like}
+
+    rows: List[Dict] = []
+    seen = set()
+    with Path(baseline).open(encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            rec = json.loads(line)
+            sid = rec.get("sample_id")
+            if sid not in wanted or sid in seen:
+                continue
+            seen.add(sid)
+            traces = rec.get("traces") or []
+            rows.append({"sample_id": sid,
+                         "source_dataset": rec.get("source_dataset"),
+                         "domain": rec.get("domain"),
+                         "ground_truth": rec.get("ground_truth"),
+                         "synthesized_trace": traces[0] if traces else ""})
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(rows, indent=1), encoding="utf-8")
+    return sorted(wanted - seen)
+
+
 def score(path: Path, source: str) -> Dict[str, Any]:
     """One row, scored exactly as evaluate_accuracy would score it.
 
@@ -101,9 +151,15 @@ def main() -> None:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--craft_dir", required=True,
                     help="The full CRAFT run: k_traces, cleaned traces, synthesized trace")
+    ap.add_argument("--baseline_cot", default=None,
+                    help="'w/o CRAFT': traces.jsonl from the baselines' zero-shot CoT "
+                         "setting for this model. The row is built from it, so the "
+                         "single call is not paid for twice")
     ap.add_argument("--zero_shot", default=None,
-                    help="'w/o CRAFT': a synthesized-schema file from a single-call run "
-                         "over the same samples. Without it that row is reported as absent")
+                    help="'w/o CRAFT' from a file already in the synthesized schema, "
+                         "instead of --baseline_cot. Given with --baseline_cot it is "
+                         "where that row is written; the default is zero_shot.json in "
+                         "--craft_dir. Without either, the row is absent")
     ap.add_argument("--variant", action="append", default=[], metavar="NAME=PATH",
                     help=f"Synthesis output for one of: {', '.join(VARIANT_ROWS)}. Repeatable")
     ap.add_argument("--synth_file", default=None,
@@ -131,7 +187,16 @@ def main() -> None:
     }
     if cleaned_path:
         rows["w/o Synthesis"] = score(cleaned_path, "cleaned")
-    if args.zero_shot:
+    if args.baseline_cot:
+        zs_path = Path(resolve_input(args.zero_shot)) if args.zero_shot \
+            else run_dir / "zero_shot.json"
+        missing = build_zero_shot(Path(resolve_input(args.baseline_cot)),
+                                  synth_path, zs_path)
+        rows["w/o CRAFT"] = score(zs_path, "synthesized")
+        if missing:
+            print(f"  w/o CRAFT: {len(missing)} of the run's samples are absent from "
+                  f"the baseline and are left out of that row: {missing[:5]}")
+    elif args.zero_shot:
         rows["w/o CRAFT"] = score(Path(resolve_input(args.zero_shot)), "synthesized")
     for spec in args.variant:
         if "=" not in spec:
@@ -161,7 +226,7 @@ def main() -> None:
         print("  Not run: " + ", ".join(absent))
         print("  w/o RKG: synthesize with --synthesis_strategy step_by_step.")
         print("  w/o Weighted Edges Fusion: build_rkg --edge_lambda 0, then synthesize.")
-        print("  w/o CRAFT: pass --zero_shot.")
+        print("  w/o CRAFT: pass --baseline_cot (or --zero_shot).")
 
     model = run_model(synth_path, k_path)
     out = Path(resolve_output(args.output
