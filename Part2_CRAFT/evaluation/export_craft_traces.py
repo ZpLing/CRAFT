@@ -39,11 +39,11 @@ CELLS = {
     ("FLD", "gpt-5.4-nano"):
         ("FLD_gpt-5.4-nano", "synthesized", "prior_mode=follow"),
     ("ProofWriter", "gemini-3.1-flash-lite"):
-        ("ProofWriter_gd", "synth_cwa",
-         "prior_mode=verify, weight_by=gold_depth, cwa_recheck"),
+        ("ProofWriter_gd", "synth_cwa_resolve",
+         "prior_mode=verify, weight_by=gold_depth, cwa_recheck, cwa_resolve"),
     ("ProofWriter", "gpt-5.4-nano"):
-        ("ProofWriter_gpt-5.4-nano", "synth_cwa",
-         "prior_mode=verify, weight_by=gold_depth, cwa_recheck"),
+        ("ProofWriter_gpt-5.4-nano", "synth_cwa_resolve",
+         "prior_mode=verify, weight_by=gold_depth, cwa_recheck, cwa_resolve"),
     ("OmniMATH", "gemini-3.1-flash-lite"):
         ("OmniMATH_gemini-3.1-flash-lite", "synthesized", "prior_mode=verify"),
     ("OmniMATH", "gpt-5.4-nano"):

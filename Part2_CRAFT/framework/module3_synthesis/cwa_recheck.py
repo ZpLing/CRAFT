@@ -21,8 +21,32 @@ earlier answer; no gold label is read, and samples already answered
 `__PROVED__` are not touched, so the pass can only move in the direction the
 closed-world asymmetry predicts.
 
+A third pass, `resolve`, is keyed to the reasoning rather than to the label.
+A trace that ends on the absence of a derivation reaches whichever label the
+hypothesis's polarity suggests -- a positive hypothesis nobody derived is
+called __DISPROVED__, a negative one __PROVED__ because "it does not happen"
+is said to be consistent with facts that never mention it -- so the side it
+lands on says nothing about the answer, and a pass keyed to the label sees
+only part of it. On gemini's ProofWriter run those samples are 230 of 500 and
+39.6% correct, against 94.8% for the traces that end on a chain they wrote;
+145 of the 230 are __DISPROVED__ and 85 __PROVED__.
+
+Asked to saturate forward instead of searching backward from the hypothesis,
+the model closed a chain on 151 of those 230 and changed 90 answers, and all
+90 were changed to the right one, with nothing correct broken: 69.4% to 87.4%.
+On nano the same pass is 9 of 65, also all correct, 95.4% to 97.2%. The gate
+is what makes that hold -- a flip is accepted only against a chain the reply
+writes out, and 79 samples where nothing closed were left as they were.
+
+FLD is not run through it. Its by-absence stratum is 93 samples of 500 and the
+pass changes 10 of them, 6 right and 4 wrong, which is +2 samples on a coin
+flip; nano's is 28, changing 5 for +1. The errors there are a different shape
+-- a hypothesis that does not follow, reported as proved -- and this pass does
+not address it.
+
     python cwa_recheck.py --synth <synthesized.json> --k_traces <k_traces.json> \
         --expected_depth 5 --model <m> --output <rechecked.json>
+    python cwa_recheck.py --synth <synth_cwa.json> ... --direction resolve
 """
 
 from __future__ import annotations
@@ -46,14 +70,43 @@ import config as _cfg  # noqa: E402
 LABEL_RE = re.compile(r"(__PROVED__|__DISPROVED__)", re.IGNORECASE)
 # A derivation names what it chained. Two or more references is the bar; the
 # replies that flip an answer without them are the ones that assert rather
-# than derive.
-CITE_RE = re.compile(r"\b(?:fact|rule|sent|premise|statement)\s*#?\d+", re.IGNORECASE)
+# than derive. Asked to saturate, a reply restates the premises in its own
+# shorthand first and then cites that -- `F8`, `R19` -- so the abbreviated
+# spellings count as references too, or a complete derivation reads as an
+# uncited assertion and is thrown away.
+CITE_RE = re.compile(
+    r"\b(?:fact|rule|sent|premise|statement)\s*#?\d+"
+    r"|\b[FR]#?\d+\b", re.IGNORECASE)
 MIN_CITATIONS = 2
 
 
 def last_label(text: str) -> Optional[str]:
     hits = LABEL_RE.findall(text or "")
     return f"__{hits[-1].upper().strip('_')}__" if hits else None
+
+
+# A trace that closes on the absence of a derivation rather than on one it
+# wrote. Both labels are reached this way and the polarity of the hypothesis
+# decides which: a positive hypothesis nobody could derive is called
+# __DISPROVED__, a negative one is called __PROVED__ because "it does not
+# happen" is said to be consistent with facts that never mention it. The
+# dataset is open-world, so neither reading is sound, and which of the two a
+# sample lands on carries no information about the answer.
+_BY_ABSENCE = re.compile(
+    r"(cannot be derived|can not be derived|cannot be concluded"
+    r"|no (?:premise|rule|mechanism|evidence|information|statement"
+    r"|logical (?:rule|chain|derivation))"
+    r"|do(?:es)? not (?:provide|contain)|not (?:provided|derivable|supported)"
+    r"|is consistent with|remains consistent|cannot be contradicted)",
+    re.IGNORECASE)
+
+_REACHED_RE = re.compile(r"REACHED:\s*(HYPOTHESIS|NEGATION|NEITHER)", re.IGNORECASE)
+
+
+def justified_by_absence(text: str) -> bool:
+    """Does the trace end by reporting a failed search instead of a derivation?"""
+    lines = [l for l in (text or "").splitlines() if l.strip()]
+    return bool(_BY_ABSENCE.search(" ".join(lines[-2:])))
 
 
 def build_audit_prompt(problem: str, claimed: str) -> str:
@@ -119,24 +172,104 @@ def build_prompt(problem: str, depth: Optional[int]) -> str:
     )
 
 
+def build_resolve_prompt(problem: str, depth: Optional[int]) -> str:
+    """Two directed searches on a sample that was answered by absence.
+
+    The single-direction passes above each start from a label and ask about
+    that label, which only works where the errors sit on one side. They do on
+    nano -- 63 of its 65 by-absence answers on ProofWriter are __DISPROVED__ --
+    and they do not on gemini, whose 230 are 145 against 85. A pass keyed to
+    the label therefore leaves a third of gemini's by-absence samples untouched,
+    and the ones it leaves are not the easier ones: the stratum as a whole is
+    39.6% correct, against 94.8% for the samples whose final step writes out a
+    chain.
+
+    So this pass is keyed to the reasoning instead of the label, and it asks
+    for both chains at once, because the thing the earlier attempt got wrong is
+    not which side it picked but that it picked from a failed search at all.
+    The slice guarantees exactly one of the two chains exists, which is what
+    makes a two-sided question answerable; the reply still has to write the
+    chain it claims, and "neither closes" changes nothing.
+    """
+    rounds = (f"The slice is generated at depth {depth}, so {depth} rounds "
+              f"saturate it.\n" if depth else "")
+    return (
+        "You are resolving one hypothesis that an earlier attempt left open.\n\n"
+        f"{problem}\n\n"
+        "That attempt searched backward from the hypothesis and stopped at the "
+        "first condition it could not immediately satisfy, then read its own "
+        "failure as an answer. Neither move is sound here: a condition unproven "
+        "in one round is often derived in the next, and the hypothesis is "
+        "either derivable from the facts or its negation is, with exactly one "
+        "of the two holding.\n\n"
+        "So do not search backward, and do not stop at an unproven condition. "
+        "Work forward in rounds instead:\n"
+        "  Round 1 -- apply every rule whose conditions are met by the facts as "
+        "given. Write each statement you derive and the rule that produced it.\n"
+        "  Round 2 -- do it again, using the facts together with everything "
+        "round 1 derived.\n"
+        "  Keep going until a round derives nothing new.\n"
+        f"{rounds}"
+        "Then look through everything you derived for the hypothesis as written, "
+        "and for its negation -- the same statement with its polarity reversed.\n\n"
+        "Finish in exactly one of these three ways:\n"
+        "  - the hypothesis is among them: name the rounds that produced it, "
+        "then REACHED: HYPOTHESIS and __PROVED__\n"
+        "  - its negation is among them: name the rounds that produced it, "
+        "then REACHED: NEGATION and __DISPROVED__\n"
+        "  - the rounds stopped deriving and neither appeared: REACHED: NEITHER\n\n"
+        "Only something a round actually derived counts. Do not write a label "
+        "for a statement you assumed, or for one you could not derive."
+    )
+
+
 async def recheck_one(session, sem, rec, problem, depth, model,
                       direction="prove") -> Dict[str, Any]:
     claimed = rec.get("synthesized_trace") or ""
-    prompt = (build_prompt(problem, depth) if direction == "prove"
-              else build_audit_prompt(problem, claimed))
+    prompt = {"prove": lambda: build_prompt(problem, depth),
+              "audit": lambda: build_audit_prompt(problem, claimed),
+              "resolve": lambda: build_resolve_prompt(problem, depth)}[direction]()
     async with sem:
         reply = await generate_reasoning_trace(session, prompt, model)
     label = last_label(reply or "")
     cites = len(CITE_RE.findall(reply or ""))
-    want = "__PROVED__" if direction == "prove" else "__DISPROVED__"
-    flipped = label == want and cites >= MIN_CITATIONS
-    out = dict(rec)
-    out["cwa_recheck"] = {"label": label, "citations": cites, "flipped": flipped,
-                          "direction": direction}
-    if flipped:
+    note = {"label": label, "citations": cites, "direction": direction}
+
+    if direction == "resolve":
+        # The reply says which of the two chains it closed, and the label has
+        # to agree with it: a label without its marker, or against it, is the
+        # same assertion-without-a-derivation this pass exists to remove.
+        m = _REACHED_RE.search(reply or "")
+        reached = m.group(1).upper() if m else None
+        want = {"HYPOTHESIS": "__PROVED__", "NEGATION": "__DISPROVED__"}.get(reached)
+        # The marker is the commitment and the label beside it is a restatement
+        # of it, which nano leaves off: 50 of its 51 resolved samples name the
+        # chain they closed and then stop. Requiring the token as well threw all
+        # 50 away. A reply that writes a token contradicting its own marker is
+        # incoherent rather than resolved, and is still refused.
+        accepted = (want is not None and label in (None, want)
+                    and cites >= MIN_CITATIONS)
+        before = last_label(claimed)
+        flipped = bool(accepted and want != before)
+        note.update({"reached": reached, "accepted": accepted,
+                     "before": before, "flipped": flipped})
+        header = "[Two-sided proof search]"
+    else:
+        want = "__PROVED__" if direction == "prove" else "__DISPROVED__"
+        flipped = label == want and cites >= MIN_CITATIONS
+        note["flipped"] = flipped
         header = ("[Directed proof search]" if direction == "prove"
                   else "[Derivation audit]")
-        out["synthesized_trace"] = claimed.rstrip() + f"\n\n{header}\n" + (reply or "").strip()
+
+    out = dict(rec)
+    out["cwa_recheck"] = note
+    if flipped:
+        body = (reply or "").strip()
+        if label != want:
+            # The answer is read back off the trace, so a reply that stated its
+            # result only as a marker has to leave the label behind in writing.
+            body += f"\n\n{want}"
+        out["synthesized_trace"] = claimed.rstrip() + f"\n\n{header}\n" + body
     return out
 
 
@@ -149,9 +282,15 @@ async def main_async(args) -> None:
     krows = kraw.get("results", kraw) if isinstance(kraw, dict) else kraw
     problems = {r["sample_id"]: r.get("problem_text") or "" for r in krows}
 
-    side = "__DISPROVED__" if args.direction == "prove" else "__PROVED__"
-    targets = [r for r in rows
-               if last_label(r.get("synthesized_trace") or "") == side]
+    if args.direction == "resolve":
+        # Keyed to how the trace ends, not to the label it ends on.
+        targets = [r for r in rows
+                   if justified_by_absence(r.get("synthesized_trace") or "")]
+        side = "by absence"
+    else:
+        side = "__DISPROVED__" if args.direction == "prove" else "__PROVED__"
+        targets = [r for r in rows
+                   if last_label(r.get("synthesized_trace") or "") == side]
     print(f"  {len(rows)} samples, {len(targets)} answered {side} — "
           f"rechecking those ({args.direction})")
 
@@ -166,9 +305,15 @@ async def main_async(args) -> None:
     by_id = {r["sample_id"]: r for r in done}
     merged = [by_id.get(r["sample_id"], r) for r in rows]
     n_flip = sum(1 for r in done if r["cwa_recheck"]["flipped"])
-    want = "__PROVED__" if args.direction == "prove" else "__DISPROVED__"
-    said = sum(1 for r in done if r["cwa_recheck"]["label"] == want)
-    print(f"  said {want}: {said}   of those naming what they used: {n_flip}")
+    if args.direction == "resolve":
+        acc = sum(1 for r in done if r["cwa_recheck"].get("accepted"))
+        nei = sum(1 for r in done if r["cwa_recheck"].get("reached") == "NEITHER")
+        print(f"  closed a chain: {acc}   left open: {nei}   "
+              f"answers changed: {n_flip}")
+    else:
+        want = "__PROVED__" if args.direction == "prove" else "__DISPROVED__"
+        said = sum(1 for r in done if r["cwa_recheck"]["label"] == want)
+        print(f"  said {want}: {said}   of those naming what they used: {n_flip}")
 
     out = Path(_cfg.resolve_output(args.output))
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -182,12 +327,15 @@ def main() -> None:
     ap.add_argument("--synth", required=True)
     ap.add_argument("--k_traces", required=True)
     ap.add_argument("--expected_depth", type=int, default=None)
-    ap.add_argument("--direction", choices=["prove", "audit"], default="prove",
+    ap.add_argument("--direction", choices=["prove", "audit", "resolve"], default="prove",
                     help="Which side the errors sit on. 'prove' searches again "
                          "for a derivation on the samples answered __DISPROVED__; "
                          "'audit' checks the claimed derivation on the samples "
-                         "answered __PROVED__. Chosen per configuration from where "
-                         "that configuration's errors actually are")
+                         "answered __PROVED__; 'resolve' takes the samples whose "
+                         "final step reasons from the absence of a derivation, "
+                         "whichever label that produced, and searches both "
+                         "directions. Chosen per configuration from where that "
+                         "configuration's errors actually are")
     ap.add_argument("--model", required=True)
     ap.add_argument("--api_key", default=None)
     ap.add_argument("--base_url", default=None)
