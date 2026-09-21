@@ -56,6 +56,46 @@ def last_label(text: str) -> Optional[str]:
     return f"__{hits[-1].upper().strip('_')}__" if hits else None
 
 
+def build_audit_prompt(problem: str, claimed: str) -> str:
+    """The mirror pass: check a claimed derivation instead of searching for one.
+
+    Where a model over-produces __DISPROVED__ it is failing to search; where it
+    over-produces __PROVED__ it is accepting a chain that does not hold, and on
+    FLD gemini does the second — 33 of its 52 errors are a hypothesis that does
+    not follow, reported as proved.
+
+    It does not work, and the measurement is the point of keeping it. On those
+    500 FLD samples it flips 60 of the 261 answered __PROVED__ and 47 of the 60
+    are wrong: 22% precision, against 92% for the search direction on
+    ProofWriter. Gating it on a split consensus does not rescue it — 38%
+    precision on the 26 non-unanimous flips, still net negative — and the
+    unanimous stratum is 9%. Asked to check a chain the model finds a fault
+    whether or not one is there.
+
+    So the two directions are not symmetric, and the pipeline only runs the one
+    that is safe. That asymmetry is also why the search direction can be trusted
+    at all: it accepts a flip only on positive evidence, a chain the reply
+    exhibits, and never on a claim that no chain exists.
+    """
+    return (
+        "Check one derivation, step by step. Do not write your own.\n\n"
+        f"{problem}\n\n"
+        "Claimed derivation:\n"
+        f"{claimed}\n\n"
+        "Go through it one step at a time. For each step, say which premises it "
+        "uses and whether the step follows from exactly those premises. Watch for "
+        "the three ways these derivations fail: a step that uses something never "
+        "stated, a step that reverses a conditional (concluding A from B and "
+        "'if A then B'), and a final step whose conclusion is not the hypothesis "
+        "as written.\n\n"
+        "Then finish in exactly one of these two ways:\n"
+        "  - If every step holds and the chain reaches the hypothesis: __PROVED__\n"
+        "  - If some step does not follow: name that step, say which premise it "
+        "misuses, then __DISPROVED__\n\n"
+        "Do not write __DISPROVED__ unless you can name the step that fails."
+    )
+
+
 def build_prompt(problem: str, depth: Optional[int]) -> str:
     budget = (f"The dataset's hypotheses are derivable in at most {depth} steps "
               f"when they are derivable at all, so a chain longer than that is a "
@@ -79,17 +119,24 @@ def build_prompt(problem: str, depth: Optional[int]) -> str:
     )
 
 
-async def recheck_one(session, sem, rec, problem, depth, model) -> Dict[str, Any]:
+async def recheck_one(session, sem, rec, problem, depth, model,
+                      direction="prove") -> Dict[str, Any]:
+    claimed = rec.get("synthesized_trace") or ""
+    prompt = (build_prompt(problem, depth) if direction == "prove"
+              else build_audit_prompt(problem, claimed))
     async with sem:
-        reply = await generate_reasoning_trace(session, build_prompt(problem, depth), model)
+        reply = await generate_reasoning_trace(session, prompt, model)
     label = last_label(reply or "")
     cites = len(CITE_RE.findall(reply or ""))
-    flipped = label == "__PROVED__" and cites >= MIN_CITATIONS
+    want = "__PROVED__" if direction == "prove" else "__DISPROVED__"
+    flipped = label == want and cites >= MIN_CITATIONS
     out = dict(rec)
-    out["cwa_recheck"] = {"label": label, "citations": cites, "flipped": flipped}
+    out["cwa_recheck"] = {"label": label, "citations": cites, "flipped": flipped,
+                          "direction": direction}
     if flipped:
-        out["synthesized_trace"] = (rec.get("synthesized_trace") or "").rstrip() + \
-            "\n\n[Directed proof search]\n" + (reply or "").strip()
+        header = ("[Directed proof search]" if direction == "prove"
+                  else "[Derivation audit]")
+        out["synthesized_trace"] = claimed.rstrip() + f"\n\n{header}\n" + (reply or "").strip()
     return out
 
 
@@ -102,23 +149,26 @@ async def main_async(args) -> None:
     krows = kraw.get("results", kraw) if isinstance(kraw, dict) else kraw
     problems = {r["sample_id"]: r.get("problem_text") or "" for r in krows}
 
+    side = "__DISPROVED__" if args.direction == "prove" else "__PROVED__"
     targets = [r for r in rows
-               if last_label(r.get("synthesized_trace") or "") == "__DISPROVED__"]
-    print(f"  {len(rows)} samples, {len(targets)} answered __DISPROVED__ — rechecking those")
+               if last_label(r.get("synthesized_trace") or "") == side]
+    print(f"  {len(rows)} samples, {len(targets)} answered {side} — "
+          f"rechecking those ({args.direction})")
 
     sem = asyncio.Semaphore(args.concurrency)
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         done = await asyncio.gather(*[
             recheck_one(session, sem, r, problems.get(r["sample_id"], ""),
-                        args.expected_depth, args.model)
+                        args.expected_depth, args.model, args.direction)
             for r in targets])
 
     by_id = {r["sample_id"]: r for r in done}
     merged = [by_id.get(r["sample_id"], r) for r in rows]
     n_flip = sum(1 for r in done if r["cwa_recheck"]["flipped"])
-    said_proved = sum(1 for r in done if r["cwa_recheck"]["label"] == "__PROVED__")
-    print(f"  said __PROVED__: {said_proved}   of those with a cited chain: {n_flip}")
+    want = "__PROVED__" if args.direction == "prove" else "__DISPROVED__"
+    said = sum(1 for r in done if r["cwa_recheck"]["label"] == want)
+    print(f"  said {want}: {said}   of those naming what they used: {n_flip}")
 
     out = Path(_cfg.resolve_output(args.output))
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -132,6 +182,12 @@ def main() -> None:
     ap.add_argument("--synth", required=True)
     ap.add_argument("--k_traces", required=True)
     ap.add_argument("--expected_depth", type=int, default=None)
+    ap.add_argument("--direction", choices=["prove", "audit"], default="prove",
+                    help="Which side the errors sit on. 'prove' searches again "
+                         "for a derivation on the samples answered __DISPROVED__; "
+                         "'audit' checks the claimed derivation on the samples "
+                         "answered __PROVED__. Chosen per configuration from where "
+                         "that configuration's errors actually are")
     ap.add_argument("--model", required=True)
     ap.add_argument("--api_key", default=None)
     ap.add_argument("--base_url", default=None)
