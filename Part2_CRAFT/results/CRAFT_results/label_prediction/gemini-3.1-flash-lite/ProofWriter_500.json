@@ -1,65 +1,65 @@
 {
-  "file": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/synth_p4.json",
+  "file": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/synth_prior.json",
   "source": "synthesized",
   "overall": {
-    "accuracy": 0.652,
-    "macro_f1": 0.6511,
-    "avg_steps": 8.64,
-    "std_steps": 1.06,
-    "avg_tokens": 463.5,
-    "std_tokens": 192.5,
-    "mean_trace_acc": 0.652,
-    "std_trace_acc": 0.4763,
-    "n_total": 250,
-    "n_correct": 163,
+    "accuracy": 0.674,
+    "macro_f1": 0.6735,
+    "avg_steps": 8.67,
+    "std_steps": 1.03,
+    "avg_tokens": 571.9,
+    "std_tokens": 203.1,
+    "mean_trace_acc": 0.674,
+    "std_trace_acc": 0.4687,
+    "n_total": 500,
+    "n_correct": 337,
     "n_no_pred": 0,
     "n_blocked": 0,
     "no_pred_rate": 0.0,
     "per_class_f1": {
-      "__PROVED__": 0.6329,
-      "__DISPROVED__": 0.6692
+      "__PROVED__": 0.6611,
+      "__DISPROVED__": 0.6859
     },
     "confusion_matrix": {
       "__PROVED__": {
-        "__PROVED__": 75,
-        "__DISPROVED__": 50,
+        "__PROVED__": 159,
+        "__DISPROVED__": 91,
         "none": 0
       },
       "__DISPROVED__": {
-        "__PROVED__": 37,
-        "__DISPROVED__": 88,
+        "__PROVED__": 72,
+        "__DISPROVED__": 178,
         "none": 0
       }
     },
     "domain": "logical",
     "per_dataset": {
       "ProofWriter.json": {
-        "accuracy": 0.652,
-        "macro_f1": 0.6511,
-        "avg_steps": 8.64,
-        "std_steps": 1.06,
-        "avg_tokens": 463.5,
-        "std_tokens": 192.5,
-        "mean_trace_acc": 0.652,
-        "std_trace_acc": 0.4763,
-        "n_total": 250,
-        "n_correct": 163,
+        "accuracy": 0.674,
+        "macro_f1": 0.6735,
+        "avg_steps": 8.67,
+        "std_steps": 1.03,
+        "avg_tokens": 571.9,
+        "std_tokens": 203.1,
+        "mean_trace_acc": 0.674,
+        "std_trace_acc": 0.4687,
+        "n_total": 500,
+        "n_correct": 337,
         "n_no_pred": 0,
         "n_blocked": 0,
         "no_pred_rate": 0.0,
         "per_class_f1": {
-          "__PROVED__": 0.6329,
-          "__DISPROVED__": 0.6692
+          "__PROVED__": 0.6611,
+          "__DISPROVED__": 0.6859
         },
         "confusion_matrix": {
           "__PROVED__": {
-            "__PROVED__": 75,
-            "__DISPROVED__": 50,
+            "__PROVED__": 159,
+            "__DISPROVED__": 91,
             "none": 0
           },
           "__DISPROVED__": {
-            "__PROVED__": 37,
-            "__DISPROVED__": 88,
+            "__PROVED__": 72,
+            "__DISPROVED__": 178,
             "none": 0
           }
         },
@@ -69,32 +69,32 @@
   },
   "per_dataset": {
     "ProofWriter.json": {
-      "accuracy": 0.652,
-      "macro_f1": 0.6511,
-      "avg_steps": 8.64,
-      "std_steps": 1.06,
-      "avg_tokens": 463.5,
-      "std_tokens": 192.5,
-      "mean_trace_acc": 0.652,
-      "std_trace_acc": 0.4763,
-      "n_total": 250,
-      "n_correct": 163,
+      "accuracy": 0.674,
+      "macro_f1": 0.6735,
+      "avg_steps": 8.67,
+      "std_steps": 1.03,
+      "avg_tokens": 571.9,
+      "std_tokens": 203.1,
+      "mean_trace_acc": 0.674,
+      "std_trace_acc": 0.4687,
+      "n_total": 500,
+      "n_correct": 337,
       "n_no_pred": 0,
       "n_blocked": 0,
       "no_pred_rate": 0.0,
       "per_class_f1": {
-        "__PROVED__": 0.6329,
-        "__DISPROVED__": 0.6692
+        "__PROVED__": 0.6611,
+        "__DISPROVED__": 0.6859
       },
       "confusion_matrix": {
         "__PROVED__": {
-          "__PROVED__": 75,
-          "__DISPROVED__": 50,
+          "__PROVED__": 159,
+          "__DISPROVED__": 91,
           "none": 0
         },
         "__DISPROVED__": {
-          "__PROVED__": 37,
-          "__DISPROVED__": 88,
+          "__PROVED__": 72,
+          "__DISPROVED__": 178,
           "none": 0
         }
       },
