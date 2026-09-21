@@ -934,7 +934,17 @@ suggestion, not a settled result):
                 "- This is the FINAL step — compute the exact final answer\n"
                 "- Must end with \\boxed{<answer>} where <answer> is a concrete number or simplified expression\n"
             )
-            if mv_answer:
+            if mv_answer and prior_mode == "follow":
+                # The same knob as the logical branch. nano's single
+                # re-derivation is weaker than its own vote on Omni-MATH too —
+                # the vote scores 54.5% and re-deriving scores 45.7%, losing in
+                # every agreement bucket including the unanimous one — so for
+                # that configuration the consensus answer is the one to reach.
+                prompt += (
+                    f"- The majority of the independent reasoning traces reach "
+                    f"{mv_answer}. Produce a derivation that arrives at it.\n"
+                )
+            elif mv_answer:
                 prompt += (
                     f"- Note: majority of reasoning traces suggest the answer may be {mv_answer} "
                     f"— verify this against your computation before committing\n"
