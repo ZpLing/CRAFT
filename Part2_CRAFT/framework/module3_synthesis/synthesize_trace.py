@@ -282,6 +282,7 @@ def build_synthesis_prompt(
     previous_steps: Optional[List[str]] = None,
     domain: str = "logical",
     mv_label: Optional[str] = None,
+    answer_is_prior: bool = False,
 ) -> str:
     """
     Build a prompt for generating a high-quality reasoning trace.
@@ -310,10 +311,19 @@ def build_synthesis_prompt(
 {problem_input}
 """
 
+    # What sits in this slot is the majority vote over the k traces in every
+    # blind setting — the pipeline never sees a gold answer — and heading it
+    # "Expected Answer" told the model the vote was the answer. That is the
+    # difference this path had against the RKG path, whose prior is phrased as
+    # something to check, so the ablation's w/o RKG row was measuring the graph
+    # against being handed the answer rather than against no graph. A real
+    # ground truth, which only a non-blind run supplies, still reads as one.
     if ground_truth:
-        if domain == "math":
+        if answer_is_prior:
             prompt += f"""
-**Expected Answer**:
+**Prior** (the majority of the independent traces reached this; they come from
+one model and can agree on a mistake — treat it as a prior, not as the answer,
+and follow your own derivation if it disagrees):
 {ground_truth}
 """
         else:
@@ -1249,6 +1259,7 @@ async def synthesize_trace_rkg(
                     problem_input,
                     _step_terms_summary,
                     ground_truth=_mv_answer,  # majority-vote answer (no GT leakage)
+                    answer_is_prior=True,
                     current_step=step_pos,
                     previous_steps=generated_steps,
                     domain=domain,
@@ -1539,6 +1550,7 @@ async def synthesize_trace_for_sample(
     # accuracy: on a 500-sample FLD run the row read 0.972 where it is 0.875,
     # and the whole ablation column was built on that.
     ground_truth = _mv_answer_sbs  # prompt hint only — majority vote, not GT
+    answer_is_prior = True         # …so it is presented as a prior, not an answer
 
     # Collect terms by step position (using percentage alignment)
     step_terms_summary = collect_terms_by_step_position(
@@ -1581,6 +1593,7 @@ async def synthesize_trace_for_sample(
                     current_step=step_pos,
                     previous_steps=generated_steps,
                     domain=domain,
+                    answer_is_prior=answer_is_prior,
                 )
 
                 response = await generate_reasoning_trace(
@@ -1646,7 +1659,8 @@ async def synthesize_trace_for_sample(
                         synthesized_text = fresh_resp.strip()
         else:
             prompt = build_synthesis_prompt(
-                problem_input, step_terms_summary, ground_truth, domain=domain
+                problem_input, step_terms_summary, ground_truth, domain=domain,
+                answer_is_prior=answer_is_prior,
             )
             synthesized_text = await generate_reasoning_trace(session, prompt, model)
 
