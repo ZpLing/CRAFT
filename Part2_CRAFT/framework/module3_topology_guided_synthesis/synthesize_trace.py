@@ -310,6 +310,7 @@ def build_synthesis_prompt(
     domain: str = "logical",
     mv_label: Optional[str] = None,
     answer_is_prior: bool = False,
+    atomic_steps: bool = False,
 ) -> str:
     """
     Build a prompt for generating a high-quality reasoning trace.
@@ -330,6 +331,38 @@ def build_synthesis_prompt(
     """
 
     label = step_label if step_label is not None else current_step
+
+    # The maths trace comes out five to seven times longer than the CoT it is
+    # built from, and two instructions here are why: every equals sign is to be
+    # written out on both sides with no algebra skipped, and every step is to
+    # open by reviewing the ones before it. The second is a restatement asked
+    # for in so many words -- 8% to 20% of the sentences in these traces repeat
+    # an earlier one. --atomic_steps asks for the inference instead.
+    if atomic_steps:
+        _equations_rule = (
+            "1. **Show the Work That Matters**: write the equation being solved "
+            "and its result. Arithmetic that a reader can do in their head need "
+            "not be spelled out."
+        )
+        _verify_block = (
+            "**Before Generating, Verify**:\n"
+            "- Does this step make exactly one inference?\n"
+            "- Does it state something the steps before it have not?\n"
+            "- If this is the final step, will you reach an explicit conclusion?\n"
+        )
+    else:
+        _equations_rule = (
+            "1. **Show Full Equations**: Write complete expressions on both sides "
+            "of every equals sign (e.g., '2x + 4 = 10 \u2192 2x = 6 \u2192 x = 3'). "
+            "Never skip algebraic steps."
+        )
+        _verify_block = (
+            "**Before Generating, Verify**:\n"
+            "- Have you reviewed all previous steps?\n"
+            "- Are you using conclusions from previous steps as premises?\n"
+            "- Is your reasoning logically consistent with previous steps?\n"
+            "- If this is the final step, will you reach an explicit conclusion?\n"
+        )
     sorted_steps = sorted(step_terms_summary.items())
 
     if domain == "math":
@@ -415,10 +448,10 @@ and follow your own derivation if it disagrees):
 
     # Add domain-specific quality guidelines to prevent common errors
     if domain == "math":
-        prompt += """
+        prompt += f"""
 **Critical Quality Guidelines** (MUST FOLLOW):
 
-1. **Show Full Equations**: Write complete expressions on both sides of every equals sign (e.g., '2x + 4 = 10 → 2x = 6 → x = 3'). Never skip algebraic steps.
+{_equations_rule}
 
 2. **Cite Premises**: Each step must state which given value, equation, or previous result it uses.
 
@@ -430,7 +463,7 @@ and follow your own derivation if it disagrees):
 
 6. **Reach a Numeric Answer** (CRITICAL):
    - You MUST continue until you obtain a concrete numeric or symbolic answer.
-   - The final step MUST include the answer in \\boxed{<answer>} notation.
+   - The final step MUST include the answer in \\boxed{{<answer>}} notation.
    - Do NOT stop before boxing the answer.
 
 **Instructions**:
@@ -539,12 +572,7 @@ and follow your own derivation if it disagrees):
 
         prompt += f"""
 
-**Before Generating, Verify**:
-- Have you reviewed all previous steps?
-- Are you using conclusions from previous steps as premises?
-- Is your reasoning logically consistent with previous steps?
-- If this is the final step, will you reach an explicit conclusion?
-
+{_verify_block}
 Please generate Step {label} now:"""
     else:
         if domain == "math":
@@ -1363,6 +1391,7 @@ async def synthesize_trace_rkg(
                     step_label=idx + 1,
                     previous_steps=generated_steps,
                     domain=domain,
+                    atomic_steps=atomic_steps,
                 )
                 # Note: RKG reference hints are NOT injected for math domain.
                 # Math intermediate results are problem-specific; consensus node
