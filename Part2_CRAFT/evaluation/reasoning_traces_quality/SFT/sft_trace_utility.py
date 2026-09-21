@@ -18,15 +18,41 @@ import argparse
 import json
 import os
 import random
+import re
 from pathlib import Path
 from typing import Dict, List
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-from transformers import (AutoModelForCausalLM, AutoTokenizer, Trainer,
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          StoppingCriteria, StoppingCriteriaList, Trainer,
                           TrainingArguments)
 from peft import LoraConfig, get_peft_model
+
+
+ANSWER_PAT = re.compile(r"__(?:PROVED|DISPROVED)__|\b(?:PROVED|DISPROVED)\b"
+                        r"|\\boxed\s*\{[^{}]*\}")
+
+
+class AnswerStated(StoppingCriteria):
+    """Stop once every sequence in the batch has stated an answer.
+
+    Generation is what makes this job long, and a student that has written its
+    conclusion has nothing left to say that is scored. Stopping on the whole
+    batch rather than per sequence keeps it simple and keeps both students under
+    the same rule; a sequence that finished early just pads.
+    """
+
+    def __init__(self, tok, prompt_len: int):
+        self.tok, self.prompt_len = tok, prompt_len
+
+    def __call__(self, input_ids, scores, **kwargs) -> bool:
+        for row in input_ids:
+            text = self.tok.decode(row[self.prompt_len:], skip_special_tokens=True)
+            if not ANSWER_PAT.search(text):
+                return False
+        return True
 
 
 def seed_everything(seed: int) -> None:
@@ -59,10 +85,17 @@ class TraceSFT(Dataset):
         p_ids = self.tok(build_prompt(rec), add_special_tokens=False)["input_ids"]
         t_ids = self.tok(rec["trace"] + self.tok.eos_token,
                          add_special_tokens=False)["input_ids"]
-        # A trace longer than the budget is truncated from its end; cutting the
-        # prompt instead would remove the problem the trace is about.
+        # A trace over budget keeps its opening and its ending and loses the
+        # middle. Cutting from the end instead removes the conclusion, and the
+        # two sides are not over budget equally often — at 3072 tokens that
+        # truncated 403 of CRAFT's 2008 traces and 0 of the raw ones, because
+        # CRAFT's run four times longer. A student would then be trained on a
+        # fifth of its examples with no answer on them while the other student
+        # had all of its, and would lose for that and not for its reasoning.
         room = max(self.max_len - len(p_ids), 8)
-        t_ids = t_ids[:room]
+        if len(t_ids) > room:
+            tail = max(room // 2, 1)
+            t_ids = t_ids[:room - tail] + t_ids[-tail:]
         ids = (p_ids + t_ids)[-self.max_len:]
         n_prompt = max(len(ids) - len(t_ids), 0)
         labels = [-100] * n_prompt + ids[n_prompt:]
@@ -91,8 +124,18 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--epochs", type=float, default=2.0)
     ap.add_argument("--lr", type=float, default=1e-4)
-    ap.add_argument("--max_len", type=int, default=3072)
-    ap.add_argument("--gen_max_new", type=int, default=1024)
+    ap.add_argument("--max_len", type=int, default=6144,
+                    help="Token budget per example. 6144 leaves 49 of 2008 "
+                         "CRAFT traces over budget and 0 raw ones; 3072 leaves "
+                         "403 and 0, which is an asymmetry in the training "
+                         "signal rather than in the traces")
+    ap.add_argument("--gen_batch", type=int, default=16,
+                    help="Problems generated together, sorted by length so a "
+                         "batch pads little")
+    ap.add_argument("--gen_max_new", type=int, default=2048,
+                    help="Both students get the same budget; it has to clear "
+                         "the longer style so neither is cut off before its "
+                         "answer")
     ap.add_argument("--lora_r", type=int, default=16)
     ap.add_argument("--grad_accum", type=int, default=8)
     args = ap.parse_args()
@@ -149,20 +192,35 @@ def main() -> None:
     test_rows = read_jsonl(Path(args.test_file))
     print(f"  generating on {len(test_rows)} held-out problems", flush=True)
 
+    # Batched, and stopped as soon as every sequence in the batch has stated an
+    # answer. One at a time with the full budget is 618 problems x 2048 tokens
+    # at roughly 30 tokens a second, which does not fit the job's walltime; the
+    # students also differ in how much they write, so a per-sequence budget that
+    # is never reached would have cost the two sides differently in wall-clock
+    # but not in what they were allowed to say. Both get the same budget and the
+    # same stopping rule.
+    tok.padding_side = "left"
     preds = []
+    order = sorted(range(len(test_rows)),
+                   key=lambda i: len(test_rows[i]["problem"]))
     with torch.no_grad():
-        for i, rec in enumerate(test_rows):
-            ids = tok(build_prompt(rec), return_tensors="pt",
-                      truncation=True, max_length=args.max_len).to("cuda")
-            gen = model.generate(**ids, max_new_tokens=args.gen_max_new,
-                                 do_sample=False, pad_token_id=tok.pad_token_id)
-            text = tok.decode(gen[0][ids["input_ids"].shape[1]:],
-                              skip_special_tokens=True)
-            preds.append({**{k: rec[k] for k in
-                             ("sample_id", "dataset", "domain", "answer")},
-                          "generated": text})
-            if (i + 1) % 25 == 0:
-                print(f"    {i + 1}/{len(test_rows)}", flush=True)
+        for start in range(0, len(order), args.gen_batch):
+            idxs = order[start:start + args.gen_batch]
+            batch = [test_rows[i] for i in idxs]
+            enc = tok([build_prompt(r) for r in batch], return_tensors="pt",
+                      padding=True, truncation=True,
+                      max_length=args.max_len).to("cuda")
+            gen = model.generate(**enc, max_new_tokens=args.gen_max_new,
+                                 do_sample=False, pad_token_id=tok.pad_token_id,
+                                 stopping_criteria=StoppingCriteriaList(
+                                     [AnswerStated(tok, enc["input_ids"].shape[1])]))
+            for r, row in zip(batch, gen):
+                text = tok.decode(row[enc["input_ids"].shape[1]:],
+                                  skip_special_tokens=True)
+                preds.append({**{k: r[k] for k in
+                                 ("sample_id", "dataset", "domain", "answer")},
+                              "generated": text})
+            print(f"    {len(preds)}/{len(test_rows)}", flush=True)
 
     with (out / "predictions.jsonl").open("w", encoding="utf-8") as fh:
         for r in preds:
