@@ -151,6 +151,7 @@ framework of §3.2.
 │       └── CRAFT_results/  mirrors evaluation/ above, one directory per
 │           ├── label_prediction/     experiment, so a result sits where its
 │           ├── reasoning_traces_quality/  code does
+│           │   └── ROSCOE/<model>/    ROSCOE_CRAFT.json, ROSCOE_Raw_CoT.json
 │           ├── Ablation_Study/<model>/  one JSON per ablated cell: the six
 │           │                        settings, their accuracy, macro-F1, average
 │           │                        steps and the samples each rests on
@@ -275,8 +276,14 @@ python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json 
     --output_dir $RUN/roscoe_export
 python $ROS/roscoe_score.py         --export_dir $RUN/roscoe_export
 python $ROS/roscoe_build_table.py   --summaries "Gemini-3.1-flash-lite:$RUN/roscoe_export/evaluation_results.json" \
+    --results_dir results/CRAFT_results/reasoning_traces_quality/ROSCOE \
     --latex_out $RUN/roscoe_craft_table.tex
 ```
+
+`--results_dir` files each model's run under a directory of its own, as the two
+sides it compares — `<model>/ROSCOE_CRAFT.json` and `<model>/ROSCOE_Raw_CoT.json`,
+all thirteen metrics per dataset. Passing that directory alone, with no
+`--summaries`, rebuilds the table from them.
 
 Hyperparameters fixed across all experiments (§4.6): Module I `K=5`, `T=0.7`,
 `β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. These are the
