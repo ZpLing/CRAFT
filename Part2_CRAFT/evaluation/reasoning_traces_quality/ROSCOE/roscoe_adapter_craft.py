@@ -52,10 +52,28 @@ _STEP_RE = re.compile(r"(?m)^\s*Step\s*\d+\s*[:.\-]\s*")
 
 
 def split_synthesized_text(text: str) -> List[str]:
-    """A synthesized trace is one string, 'Step 1: ... Step 2: ...' — split it."""
+    """Split a trace into its steps.
+
+    'Step 1: ... Step 2: ...' is what this pipeline's generator writes, but a
+    baseline passed through --raw_traces writes prose, and re.split hands back
+    the whole string when its pattern never matches. That one-element list is
+    truthy, so the caller's fallback never ran and such a trace reached ROSCOE
+    as a single step -- where the step-level metrics, all of them defined over
+    pairs of steps, award a one-step chain a free 1.0 and the comparison
+    against a nine-step trace stops meaning anything. So when no marker is
+    found the trace is split on its own line breaks, and failing those, on
+    sentence ends.
+    """
     if not text:
         return []
-    return [p.strip() for p in _STEP_RE.split(text) if p.strip()]
+    parts = [p.strip() for p in _STEP_RE.split(text) if p.strip()]
+    if len(parts) > 1:
+        return parts
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    if len(lines) > 1:
+        return lines
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+    return sentences if len(sentences) > 1 else parts
 
 
 def first_nonempty_trace(traces: List[Dict[str, Any]]) -> List[str]:
