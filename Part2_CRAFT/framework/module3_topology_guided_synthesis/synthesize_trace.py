@@ -36,8 +36,8 @@ import sys as _sys
 from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-# Reuse functions from Module I's extract_terms and Module II's anomaly_filter
-from framework.module1_generation_filtering.extract_terms import (
+# Reuse functions from Module I's tfirf_terms and Module II's steps_filter
+from framework.module1_generation_filtering.tfirf_terms import (
     tokenize_text,
     calculate_tf,
     calculate_idf,
@@ -48,7 +48,7 @@ from framework.module1_generation_filtering.extract_terms import (
     COMMON_LOGICAL_WORDS,
     MATH_COMMON_WORDS,
 )
-from framework.module1_generation_filtering.anomaly_filter import (
+from framework.module1_generation_filtering.steps_filter import (
     parse_steps_from_trace,
     build_global_df_table,
     STEP_PATTERN,
@@ -705,7 +705,7 @@ def extract_facts_from_traces(traces: List[Dict[str, Any]]) -> str:
 # RKG-Guided Synthesis
 #########################
 
-def topological_sort_dag(consensus_rkg: Dict[str, Any]) -> List[str]:
+def topological_sort_rkg(consensus_rkg: Dict[str, Any]) -> List[str]:
     """Kahn topological sort of consensus RKG nodes.
 
     If cycles exist (due to LLM misclassification), remove the lowest-confidence
@@ -758,7 +758,7 @@ def topological_sort_dag(consensus_rkg: Dict[str, Any]) -> List[str]:
     return topo_order
 
 
-def build_synthesis_plan_from_dag(
+def build_synthesis_plan_from_rkg(
     consensus_rkg: Dict[str, Any],
     topo_order: List[str],
 ) -> List[Dict[str, Any]]:
@@ -1188,8 +1188,8 @@ async def synthesize_trace_rkg(
                 if _total > 0:
                     _mv_strength = _label_counts[_mv_label] / _total
 
-    topo_order = topological_sort_dag(consensus_rkg)
-    plan       = build_synthesis_plan_from_dag(consensus_rkg, topo_order)
+    topo_order = topological_sort_rkg(consensus_rkg)
+    plan       = build_synthesis_plan_from_rkg(consensus_rkg, topo_order)
 
     if not plan:
         return {"sample_id": sample_id, "error": "empty_synthesis_plan", "synthesized_trace": None}
@@ -1554,7 +1554,7 @@ async def synthesize_trace_rkg(
             "topo_order":        topo_order,
             "synthesis_plan":    plan,
             "synthesized_trace": best_text,
-            "num_dag_nodes":     len(plan),
+            "num_rkg_nodes":     len(plan),
             "pred_label":        pred_label,
         }
 
@@ -1941,7 +1941,7 @@ async def synthesize_traces_for_dataset(
         if rkg_file is None or not rkg_file.exists():
             raise FileNotFoundError(
                 f"synthesis_strategy=rkg requires a valid --rkg_file path (current: {rkg_file}). "
-                "Build one with module2_rkg_construction/build_rkg.py, or pass "
+                "Build one with module2_consensus_rkg_construction/build_rkg.py, or pass "
                 "--synthesis_strategy step_by_step to synthesize without the graph — "
                 "which is the ablation's 'w/o RKG' setting, not CRAFT."
             )

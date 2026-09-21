@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-extract_terms.py  (Module I — TF-IRF Consensus Terms T_Con)
+tfirf_terms.py  (Module I — TF-IRF Consensus Terms T_Con)
 ---------------------------------------------------------------------------
 Extract important logical terms and domain-specific vocabulary from reasoning traces.
 
-Called internally by anomaly_filter.py (Module I) and synthesize_trace.py (Module III);
+Called internally by steps_filter.py (Module I) and synthesize_trace.py (Module III);
 run directly it just dumps the term table for inspection.
 It implements TF-IRF term extraction: terms that appear frequently within a single
 sample's traces but rarely across other samples' traces are considered important.

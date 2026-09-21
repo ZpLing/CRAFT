@@ -84,19 +84,19 @@ python $M1/generate_traces.py --datasets dataset/FLD.json \
     --k 5 --temperature 0.7 --output $K_TRACES
 
 # Module I — Steps Filtering: z-score cutoff over the TF-IRF consensus terms
-python $M1/anomaly_filter.py --input $K_TRACES \
+python $M1/steps_filter.py --input $K_TRACES \
     --method unsupervised --z_score_threshold -1.0 --consensus_threshold 0.3 --output $RUN/cleaned_z.json
 
 # Module II — Consensus RKG Construction: per-trace graphs, edge/node filtering, aggregation
-python framework/module2_rkg_construction/build_rkg.py --input $RUN/cleaned_z.json \
+python framework/module2_consensus_rkg_construction/build_rkg.py --input $RUN/cleaned_z.json \
     --consensus_threshold 0.3 --output $RUN/rkg.json
 
 # Module I again — the same step filter, now pruning against G*
-python $M1/anomaly_filter.py --input $RUN/cleaned_z.json \
+python $M1/steps_filter.py --input $RUN/cleaned_z.json \
     --method rkg --rkg_file $RUN/rkg.json --output $RUN/cleaned.json
 
 # Module III — Topology-guided Trace Synthesis: one step generated per node of G*
-python framework/module3_synthesis/synthesize_trace.py --input $RUN/cleaned.json \
+python framework/module3_topology_guided_synthesis/synthesize_trace.py --input $RUN/cleaned.json \
     --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
 ```
 
@@ -105,7 +105,7 @@ One run directory holds one dataset: every stage after generation takes a single
 on each. The file names above are the ones the evaluations glob for — a run
 directory is found by `k_traces_*_samples.json`, `cleaned_z*.json`, `cleaned.json`,
 `rkg*.json` and `synthesized.json` — so a stage renamed is a stage the evaluations
-cannot see. `extract_terms.py` is not a pipeline stage: it dumps the TF-IRF terms
+cannot see. `tfirf_terms.py` is not a pipeline stage: it dumps the TF-IRF terms
 for inspection, and the filters call its functions directly.
 
 ## Repository layout
@@ -129,10 +129,13 @@ framework of §3.2.
 │   │   ├── ProofWriter.json         (logical; FLD carries its published proofs)
 │   │   ├── OmniMATH.json            (mathematical)
 │   │   └── OlympiadBench.json
-│   ├── framework/                     one package per module of §3.2
-│   │   ├── module1_generation_filtering/  Module I   — K traces, TF-IRF terms, z-score filter
-│   │   ├── module2_rkg_construction/      Module II  — per-trace RKGs, consensus RKG G*
-│   │   └── module3_synthesis/             Module III — topology-guided synthesis over G*
+│   ├── framework/                     one package per module of §3.2, named as §3.2 names them
+│   │   ├── module1_generation_filtering/       Module I   — K traces, TF-IRF terms,
+│   │   │                                       z-score steps filtering
+│   │   ├── module2_consensus_rkg_construction/ Module II  — per-trace RKGs, consensus RKG G*
+│   │   ├── module3_topology_guided_synthesis/  Module III — one step per node of G*
+│   │   └── domain_optimization/                after Module III, per dataset — not part
+│   │                                           of the three-module framework
 │   ├── evaluation/
 │   │   ├── label_prediction/          main-table accuracy and its Wilson CIs
 │   │   │                              answer_match.py — one adapter per dataset

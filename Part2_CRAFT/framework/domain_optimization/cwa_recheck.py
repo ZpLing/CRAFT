@@ -61,7 +61,8 @@ from typing import Any, Dict, List, Optional
 
 import aiohttp
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Module III lives beside this package, not in it: these passes run after it.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "module3_topology_guided_synthesis"))
 from synthesize_trace import generate_reasoning_trace  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
