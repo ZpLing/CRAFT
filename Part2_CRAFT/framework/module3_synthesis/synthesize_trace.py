@@ -1493,6 +1493,20 @@ async def synthesize_trace_rkg(
                 synthesized_text = synthesized_text.rstrip() + "\n" + fixed.strip()
                 generated_steps.append(fixed.strip())
                 pred_label = _extract_answer(synthesized_text)
+            else:
+                # The re-ask did not get there, and under "follow" the consensus
+                # is what decides: Modules I and II pick the answer, Module III
+                # writes the reasoning. Letting the chain keep its own ending
+                # instead costs this configuration real accuracy — on nano's two
+                # maths sets the consensus is right on 61.0 and 53.6 of a hundred
+                # and the chains that wander off it land on 59.8 and 51.4 — and
+                # the wandering is not rare enough to ignore at 11% and 13% of
+                # samples. Of the ones this settles, 15 against 7 and 21 against
+                # 6 go to the consensus's answer over the chain's.
+                closing = _conclude_append(_mv_answer)
+                synthesized_text = synthesized_text.rstrip() + closing
+                generated_steps.append(closing.strip())
+                pred_label = _mv_answer
 
         if pred_label and not _has_conclusion(synthesized_text):
             synthesized_text += _conclude_append(pred_label)
