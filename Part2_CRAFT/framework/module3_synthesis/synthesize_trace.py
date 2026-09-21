@@ -1003,6 +1003,18 @@ suggestion, not a settled result):
 # second's reference to it raised NameError on every maths sample it reached,
 # which is the whole of the ablation's w/o RKG row — the step_by_step path
 # never returned a trace on Omni-MATH or OlympiadBench.
+def _norm_ans(text) -> str:
+    """Loose answer key, only for deciding whether two answers are the same one.
+
+    The scorer compares answers symbolically; this is the cheap check Module III
+    makes while it is still writing, where the cost of being wrong is one extra
+    call.
+    """
+    if not text:
+        return ""
+    return re.sub(r"[\s{}$\\,]+", "", str(text)).strip().lower().rstrip(".")
+
+
 def _extract_boxed_content(text: str) -> list:
     """Extract \\boxed{...} contents handling nested braces."""
     results = []
@@ -1421,6 +1433,34 @@ async def synthesize_trace_rkg(
         synthesized_text, generated_steps = await _generate_once()
 
         pred_label = _extract_answer(synthesized_text)
+
+        # prior_mode="follow" on a mathematical problem: the consensus decides
+        # the answer, so a chain that lands somewhere else gets one chance to
+        # re-derive its ending. Saying so in the final node's requirements is
+        # not enough — nano followed the consensus on 62% of Omni-MATH there,
+        # against 65% when it was merely asked to check it, because the answer
+        # comes from whatever \boxed{} the last node computed and the model
+        # recomputes. This re-asks for the closing step with the target named,
+        # so the trace still argues its way to the answer rather than having one
+        # pasted onto it; if the model will not get there, its own answer stands.
+        if (prior_mode == "follow" and domain == "math" and _mv_answer
+                and synthesized_text
+                and _norm_ans(pred_label) != _norm_ans(_mv_answer)):
+            retarget = (
+                f"Problem:\n{problem_input}\n\n"
+                f"Derivation so far:\n{synthesized_text}\n\n"
+                f"Independent reasoning traces agree the answer is {_mv_answer}, "
+                f"and the derivation above ends at {pred_label or 'no answer'}. "
+                f"Find where it goes wrong and write the corrected closing step, "
+                f"ending with \\boxed{{{_mv_answer}}}.\n"
+                "Output ONLY the corrected closing step."
+            )
+            fixed = await generate_reasoning_trace(session, retarget, model)
+            if fixed and _norm_ans(_extract_answer(fixed)) == _norm_ans(_mv_answer):
+                synthesized_text = synthesized_text.rstrip() + "\n" + fixed.strip()
+                generated_steps.append(fixed.strip())
+                pred_label = _extract_answer(synthesized_text)
+
         if pred_label and not _has_conclusion(synthesized_text):
             synthesized_text += _conclude_append(pred_label)
 
