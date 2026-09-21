@@ -2250,9 +2250,9 @@ def main():
     parser.add_argument(
         "--atomic_steps", action="store_true", default=False,
         help="Ask each synthesized step for one inference rather than for all "
-             "the intermediate work. Raises FineLogic's atomicity and raises the "
-             "step count with it — the two cannot both be optimised, since a "
-             "problem needing thirty inferences cannot be nine atomic steps",
+             "the intermediate work. Raises the step count with it — the two "
+             "cannot both be optimised, since a problem needing thirty "
+             "inferences cannot be nine atomic steps",
     )
     parser.add_argument(
         "--prior_mode", choices=["verify", "follow"], default="verify",
