@@ -1,0 +1,70 @@
+{
+  "craft_dir": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd",
+  "full_accuracy": 67.4,
+  "settings": {
+    "CRAFT (full)": {
+      "accuracy": 67.4,
+      "macro_f1": 0.6735,
+      "avg_steps": 8.67,
+      "n_samples": null,
+      "source": "synthesized",
+      "path": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/synth_prior.json",
+      "delta": null
+    },
+    "w/o CRAFT": {
+      "accuracy": 61.0,
+      "macro_f1": 0.5541,
+      "avg_steps": 16.71,
+      "n_samples": null,
+      "source": "synthesized",
+      "path": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/zero_shot.json",
+      "delta": -6.4
+    },
+    "w/o RKG": {
+      "accuracy": 63.2,
+      "macro_f1": 0.6331,
+      "avg_steps": 9.25,
+      "n_samples": null,
+      "source": "synthesized",
+      "path": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/abl_wo_rkg.json",
+      "delta": -4.2
+    },
+    "w/o Synthesis": {
+      "accuracy": 59.2,
+      "macro_f1": 0.5894,
+      "avg_steps": 6.18,
+      "n_samples": null,
+      "source": "cleaned",
+      "path": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/cleaned.json",
+      "delta": -8.2
+    },
+    "w/o Filter & Synthesis": {
+      "accuracy": 59.2,
+      "macro_f1": 0.5894,
+      "avg_steps": 8.87,
+      "n_samples": null,
+      "source": "k_traces",
+      "path": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/k_traces_500_samples.json",
+      "delta": -8.2
+    },
+    "w/o Weighted Edges Fusion": {
+      "accuracy": 67.6,
+      "macro_f1": 0.6755,
+      "avg_steps": 8.68,
+      "n_samples": null,
+      "source": "synthesized",
+      "path": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/abl_lam0.json",
+      "delta": 0.2
+    },
+    "Embedding Cosine Similarity": {
+      "accuracy": 67.4,
+      "macro_f1": 0.6735,
+      "avg_steps": 8.67,
+      "n_samples": null,
+      "source": "synthesized",
+      "path": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gd/abl_embed.json",
+      "delta": 0.0
+    }
+  },
+  "not_run": []
+}
