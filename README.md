@@ -14,48 +14,55 @@ traces, drops the steps they disagree on, aggregates the survivors into a consen
 
 **GPT-5.4-nano**
 
-| Method | FLD | ProofWriter | Omni-MATH | OlympiadBench | Avg |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Direct | 66.1 | 72.0 | 7.3 | 4.0 | 37.4 |
-| CoT | 77.0 | 84.6 | 34.3 | 44.1 | 60.0 |
-| Best-of-N | 78.0 | 87.2 | 42.1 | 51.1 | 64.6 |
-| Self-Consistency | 78.6 | 87.0 | <u>49.8</u> | <u>57.5</u> | <u>68.2</u> |
-| Univ. Self-Consistency | 69.3 | 70.8 | 20.9 | 20.1 | 45.3 |
-| Self-Refine | 62.4 | <u>94.0</u> | 48.2 | 55.1 | 64.9 |
-| Self-Eval Beam Search | 60.2 | 67.6 | 19.1 | 22.5 | 42.4 |
-| Faithful CoT | <u>78.8</u> | 85.8 | 40.0 | 46.9 | 62.9 |
-| Tree-of-Thought | 72.1 | 79.4 | 38.0 | 47.7 | 59.3 |
-| RAP | 72.9 | 89.6 | 37.4 | 49.1 | 62.2 |
-| PNS-Optimization | 75.4 | 76.4 | 37.2 | 47.7 | 59.2 |
-| Self-Aggregation | 76.8 | 86.6 | 33.1 | 43.7 | 60.0 |
-| **CRAFT** | **82.8** | **97.2** | **54.9** | **60.6** | **73.9** |
+| Method | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Direct | 66.1 | 0.659 | **1.0** | 72.0 | 0.710 | **1.0** | 7.3 | **1.0** | 4.0 | **1.0** |
+| CoT | 77.0 | 0.765 | 15.7 | 84.6 | 0.842 | 22.9 | 34.3 | 40.4 | 44.1 | 40.2 |
+| Best-of-N | 78.0 | 0.773 | 12.3 | 87.2 | 0.870 | 20.4 | 42.1 | 74.1 | 51.1 | 72.7 |
+| Self-Consistency | 78.6 | 0.777 | 12.3 | 87.0 | 0.868 | 19.7 | <ins>49.8</ins> | 78.4 | <ins>57.5</ins> | 74.1 |
+| Univ. Self-Consistency | 69.3 | 0.688 | 11.6 | 70.8 | 0.694 | 18.8 | 20.9 | 26.8 | 20.1 | 20.8 |
+| Self-Refine | 62.4 | 0.613 | 29.9 | <ins>94.0</ins> | <ins>0.940</ins> | 18.9 | 48.2 | 106.4 | 55.1 | 95.6 |
+| Self-Eval Beam Search | 60.2 | 0.580 | <ins>1.6</ins> | 67.6 | 0.650 | <ins>1.6</ins> | 19.1 | <ins>4.3</ins> | 22.5 | <ins>4.3</ins> |
+| Faithful CoT | <ins>78.8</ins> | <ins>0.785</ins> | 7.7 | 85.8 | 0.858 | 14.2 | 40.0 | 24.3 | 46.9 | 22.3 |
+| Tree-of-Thought | 72.1 | 0.709 | 16.4 | 79.4 | 0.785 | 20.6 | 38.0 | 75.0 | 47.7 | 70.2 |
+| RAP | 72.9 | 0.718 | 17.2 | 89.6 | 0.895 | 20.6 | 37.4 | 77.7 | 49.1 | 74.5 |
+| PNS-Optimization | 75.4 | 0.740 | 10.2 | 76.4 | 0.750 | 13.9 | 37.2 | 61.5 | 47.7 | 59.9 |
+| Self-Aggregation | 76.8 | 0.764 | 15.6 | 86.6 | 0.869 | 18.1 | 33.1 | 39.0 | 43.7 | 36.7 |
+| **CRAFT** | **82.8** | **0.828** | 9.0 | **97.2** | **0.972** | 9.6 | **54.9** | 9.4 | **60.6** | 9.3 |
 
 **Gemini-3.1-flash-lite**
 
-| Method | FLD | ProofWriter | Omni-MATH | OlympiadBench | Avg |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Direct | 74.8 | 62.4 | 18.9 | 18.9 | 43.8 |
-| CoT | 87.5 | 61.0 | 46.3 | 61.6 | 64.1 |
-| Best-of-N | 89.1 | 60.8 | 47.4 | 61.2 | 64.6 |
-| Self-Consistency | <u>89.9</u> | 61.0 | <u>56.3</u> | 63.8 | 67.8 |
-| Univ. Self-Consistency | 80.6 | 52.8 | 25.0 | 29.4 | 46.9 |
-| Self-Refine | <u>89.9</u> | <u>68.6</u> | 55.7 | <u>65.8</u> | <u>70.0</u> |
-| Self-Eval Beam Search | 80.0 | 65.8 | 38.0 | 48.7 | 58.1 |
-| Faithful CoT | 86.7 | 58.2 | 48.2 | 59.2 | 63.1 |
-| Tree-of-Thought | 86.7 | 60.6 | 46.3 | 59.4 | 63.3 |
-| RAP | 86.5 | 63.6 | 50.6 | 61.2 | 65.5 |
-| PNS-Optimization | **90.3** | 59.4 | 50.6 | 63.4 | 65.9 |
-| Self-Aggregation | 86.3 | 64.0 | 50.0 | 61.8 | 65.5 |
-| **CRAFT** | 89.5 | **87.4** | **62.6** | **75.7** | **78.8** |
+| Method | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Direct | 74.8 | 0.747 | **1.0** | 62.4 | 0.589 | **1.0** | 18.9 | **1.0** | 18.9 | **1.0** |
+| CoT | 87.5 | 0.875 | 13.0 | 61.0 | 0.554 | 16.7 | 46.3 | 27.5 | 61.6 | 26.7 |
+| Best-of-N | 89.1 | 0.893 | 13.3 | 60.8 | 0.558 | 17.2 | 47.4 | 24.9 | 61.2 | 27.1 |
+| Self-Consistency | <ins>89.9</ins> | <ins>0.899</ins> | 13.3 | 61.0 | 0.548 | 17.4 | <ins>56.3</ins> | 24.9 | 63.8 | 26.8 |
+| Univ. Self-Consistency | 80.6 | 0.806 | 12.5 | 52.8 | 0.417 | 17.2 | 25.0 | 11.6 | 29.4 | 12.3 |
+| Self-Refine | <ins>89.9</ins> | **0.903** | 12.9 | <ins>68.6</ins> | <ins>0.678</ins> | 14.8 | 55.7 | 21.0 | <ins>65.8</ins> | 25.0 |
+| Self-Eval Beam Search | 80.0 | 0.801 | <ins>2.4</ins> | 65.8 | 0.646 | <ins>3.8</ins> | 38.0 | <ins>6.8</ins> | 48.7 | 12.2 |
+| Faithful CoT | 86.7 | 0.867 | 6.7 | 58.2 | 0.563 | 7.2 | 48.2 | 10.7 | 59.2 | 12.9 |
+| Tree-of-Thought | 86.7 | 0.867 | 11.2 | 60.6 | 0.544 | 14.7 | 46.3 | 23.9 | 59.4 | 27.1 |
+| RAP | 86.5 | 0.868 | 11.7 | 63.6 | 0.593 | 15.7 | 50.6 | 25.3 | 61.2 | 28.4 |
+| PNS-Optimization | **90.3** | **0.903** | 11.1 | 59.4 | 0.525 | 13.4 | 50.6 | 23.1 | 63.4 | 24.0 |
+| Self-Aggregation | 86.3 | 0.866 | 11.5 | 64.0 | 0.600 | 13.9 | 50.0 | 18.2 | 61.8 | 20.8 |
+| **CRAFT** | 89.5 | 0.895 | 9.2 | **87.4** | **0.874** | 8.9 | **62.6** | 9.5 | **75.7** | <ins>9.6</ins> |
 
-Label-prediction accuracy (%), regenerated by `evaluation/label_prediction/sota_table.py`;
-**best** per column in bold, <u>second best</u> underlined.
+Label-prediction accuracy, macro-F1 and average reasoning steps, all scored by
+`evaluation/label_prediction/evaluate_accuracy.py` and its answer readers; **best** per
+column in bold, <ins>second best</ins> underlined. Macro-F1 is averaged over PROVED and
+DISPROVED, so the two maths datasets have no classes to average and leave it out rather
+than printing their accuracy twice.
 Every cell scores CRAFT and all 12 baselines on the sample ids they share, so neither side
 is charged for a question the other was never asked; that leaves 492 to 500 of the 500 per
-cell. The strongest baseline is a different method in almost every column, which is why no
-single one of them makes a fair point of comparison. CRAFT is ahead on 7 of the 8 cells,
-6 of them at p<0.05 under an exact two-sided McNemar; the eighth, Gemini on FLD, is 0.8
-behind PNS-Optimization at p=0.65.
+cell, and the three metrics are read off that same set. The strongest baseline is a
+different method in almost every column, which is why no single one of them makes a fair
+point of comparison. CRAFT is ahead on 7 of the 8 accuracy cells, 6 of them at p<0.05 under
+an exact two-sided McNemar; the eighth, Gemini on FLD, is 0.8 behind PNS-Optimization at
+p=0.65. The steps columns are won by Direct, which answers in one line and gets a third of
+FLD right, and then by Self-Eval Beam Search, whose beam is pruned to almost nothing — short
+is only worth reading next to the accuracy beside it, and among the methods that are
+actually competitive CRAFT is the shortest on seven of the eight cells.
 CRAFT also wins on average steps, and its post-processed traces score higher under ROSCOE
 and FineLogic.
 
