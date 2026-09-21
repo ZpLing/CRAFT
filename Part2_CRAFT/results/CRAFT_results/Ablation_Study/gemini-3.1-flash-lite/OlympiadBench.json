@@ -1,0 +1,45 @@
+{
+  "craft_dir": "results/craft_runs/full500/OlympiadBench_gemini-3.1-flash-lite",
+  "full_accuracy": 75.6,
+  "settings": {
+    "CRAFT (full)": {
+      "accuracy": 75.6,
+      "macro_f1": null,
+      "avg_steps": 9.63,
+      "n_samples": 497,
+      "delta": null
+    },
+    "w/o CRAFT": {
+      "accuracy": 72.4,
+      "macro_f1": null,
+      "avg_steps": 26.53,
+      "n_samples": 500,
+      "delta": -3.2
+    },
+    "w/o RKG": {
+      "accuracy": 72.4,
+      "macro_f1": null,
+      "avg_steps": 9.75,
+      "n_samples": 497,
+      "delta": -3.2
+    },
+    "w/o Synthesis": {
+      "accuracy": 72.2,
+      "macro_f1": null,
+      "avg_steps": 6.79,
+      "n_samples": 497,
+      "delta": -3.4
+    },
+    "w/o Filter & Synthesis": {
+      "accuracy": 71.8,
+      "macro_f1": null,
+      "avg_steps": 8.08,
+      "n_samples": 500,
+      "delta": -3.8
+    }
+  },
+  "not_run": [
+    "w/o Weighted Edges Fusion",
+    "Embedding Cosine Similarity"
+  ]
+}

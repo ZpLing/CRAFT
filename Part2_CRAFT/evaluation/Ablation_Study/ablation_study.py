@@ -158,8 +158,9 @@ def main() -> None:
     ap.add_argument("--zero_shot", default=None,
                     help="'w/o CRAFT' from a file already in the synthesized schema, "
                          "instead of --baseline_cot. Given with --baseline_cot it is "
-                         "where that row is written; the default is zero_shot.json in "
-                         "--craft_dir. Without either, the row is absent")
+                         "where that row is written; the default is "
+                         "zero_shot_from_cot.json in --craft_dir. Without either, the "
+                         "row is absent")
     ap.add_argument("--variant", action="append", default=[], metavar="NAME=PATH",
                     help=f"Synthesis output for one of: {', '.join(VARIANT_ROWS)}. Repeatable")
     ap.add_argument("--synth_file", default=None,
@@ -188,8 +189,11 @@ def main() -> None:
     if cleaned_path:
         rows["w/o Synthesis"] = score(cleaned_path, "cleaned")
     if args.baseline_cot:
+        # Not zero_shot.json: several runs already carry a file by that name,
+        # and a default that silently overwrites one of a run's own inputs is a
+        # default that loses data the first time it is used.
         zs_path = Path(resolve_input(args.zero_shot)) if args.zero_shot \
-            else run_dir / "zero_shot.json"
+            else run_dir / "zero_shot_from_cot.json"
         missing = build_zero_shot(Path(resolve_input(args.baseline_cot)),
                                   synth_path, zs_path)
         rows["w/o CRAFT"] = score(zs_path, "synthesized")

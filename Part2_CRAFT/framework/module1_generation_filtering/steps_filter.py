@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-anomaly_filter.py  (Module I — Z-score Steps Filtering)
+steps_filter.py  (Module I — Z-score Steps Filtering)
 ---------------------------------------------------------------------------
 Scores each step by its Jaccard overlap with T_Con, z-normalizes within the K
 traces, and drops the steps below gamma. The --method rkg pass belongs to the
@@ -19,7 +19,7 @@ Method 2: unsupervised (cross-position comparison, GRPO-style)
 - Uses group relative policy optimization (GRPO) style relative comparison
 
 Core functionality:
-1. Extract important terms per step (via extract_terms.py)
+1. Extract important terms per step (via tfirf_terms.py)
 2. Compare steps across traces within the same sample to detect anomalies
 3. Flag steps whose term composition deviates significantly (z-score < threshold)
 4. Remove anomalous steps; report before/after step counts
@@ -48,8 +48,8 @@ _cfg_path = _Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_part_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
 
-# Reuse functions from extract_terms.py (Step 2: TF-IRF Term Extraction)
-from framework.module1_generation_filtering.extract_terms import (
+# Reuse functions from tfirf_terms.py (Step 2: TF-IRF Term Extraction)
+from framework.module1_generation_filtering.tfirf_terms import (
     tokenize_text,
     calculate_tf,
     calculate_idf,

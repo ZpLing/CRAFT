@@ -1,0 +1,45 @@
+{
+  "craft_dir": "results/craft_runs/full500/OlympiadBench_gpt-5.4-nano",
+  "full_accuracy": 60.6,
+  "settings": {
+    "CRAFT (full)": {
+      "accuracy": 60.6,
+      "macro_f1": null,
+      "avg_steps": 9.34,
+      "n_samples": 497,
+      "delta": null
+    },
+    "w/o CRAFT": {
+      "accuracy": 49.0,
+      "macro_f1": null,
+      "avg_steps": 39.94,
+      "n_samples": 500,
+      "delta": -11.6
+    },
+    "w/o RKG": {
+      "accuracy": 55.3,
+      "macro_f1": null,
+      "avg_steps": 9.34,
+      "n_samples": 497,
+      "delta": -5.3
+    },
+    "w/o Synthesis": {
+      "accuracy": 60.8,
+      "macro_f1": null,
+      "avg_steps": 6.36,
+      "n_samples": 500,
+      "delta": 0.2
+    },
+    "w/o Filter & Synthesis": {
+      "accuracy": 61.2,
+      "macro_f1": null,
+      "avg_steps": 7.4,
+      "n_samples": 500,
+      "delta": 0.6
+    }
+  },
+  "not_run": [
+    "w/o Weighted Edges Fusion",
+    "Embedding Cosine Similarity"
+  ]
+}

@@ -68,7 +68,7 @@ import sys as _sys
 from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from framework.module1_generation_filtering.anomaly_filter import parse_steps_from_trace, STEP_PATTERN
+from framework.module1_generation_filtering.steps_filter import parse_steps_from_trace, STEP_PATTERN
 
 #########################
 # Configuration — loaded from root config.py; change models there
