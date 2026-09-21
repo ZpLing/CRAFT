@@ -132,20 +132,46 @@ def baseline_predictions(model: str, dataset: str) -> Dict[str, Dict[str, Option
     return out
 
 
-def score(preds: Dict[str, Optional[str]], gold: Dict[str, Tuple[str, Optional[str]]],
-          ids: List[str], dataset: str) -> float:
+def _hits(preds: Dict[str, Optional[str]], gold: Dict[str, Tuple[str, Optional[str]]],
+          ids: List[str], dataset: str) -> List[bool]:
     match = ADAPTERS[dataset]
-    ok = 0
+    out = []
     for sid in ids:
         p = preds.get(sid)
         g, at = gold[sid]
         if not p:
-            continue                      # no answer counts against the method
+            out.append(False)             # no answer counts against the method
+            continue
         try:
-            ok += bool(match(p, g, at))
+            out.append(bool(match(p, g, at)))
         except Exception:
-            pass
-    return ok / len(ids) if ids else float("nan")
+            out.append(False)
+    return out
+
+
+def score(preds: Dict[str, Optional[str]], gold: Dict[str, Tuple[str, Optional[str]]],
+          ids: List[str], dataset: str) -> float:
+    h = _hits(preds, gold, ids, dataset)
+    return sum(h) / len(h) if h else float("nan")
+
+
+def mcnemar(a: List[bool], b: List[bool]) -> Tuple[int, int, float]:
+    """Exact two-sided McNemar on the samples the two methods disagree about.
+
+    A gap of a few samples on 496 is inside the standard error of either
+    method, so a table that ranks cells by the gap alone will rank noise. This
+    reports the discordant pairs it rests on and the p-value, which is the only
+    honest way to write "ahead" next to a difference of four samples.
+    """
+    from math import comb
+    b_only = sum(1 for x, y in zip(a, b) if x and not y)
+    c_only = sum(1 for x, y in zip(a, b) if y and not x)
+    n = b_only + c_only
+    if n == 0:
+        return b_only, c_only, 1.0
+    k = min(b_only, c_only)
+    p = 2 * sum(comb(n, i) for i in range(k + 1)) / (2 ** n)
+    return b_only, c_only, min(p, 1.0)
 
 
 def main() -> None:
@@ -185,32 +211,47 @@ def main() -> None:
             ids = sorted(asked - (set() if a.keep_refused else set(refused)))
             if not ids:
                 continue
-            craft = score(cp, gold, ids, dataset)
-            scored = {s: score(p, gold, ids, dataset) for s, p in bl.items()}
+            craft_hits = _hits(cp, gold, ids, dataset)
+            craft = sum(craft_hits) / len(craft_hits)
+            hits = {s: _hits(p, gold, ids, dataset) for s, p in bl.items()}
+            scored = {s: sum(h) / len(h) for s, h in hits.items()}
             if a.baseline:
                 best_name, best = a.baseline, scored.get(a.baseline, float("nan"))
             else:
                 best_name, best = max(scored.items(), key=lambda kv: kv[1]) \
                     if scored else ("—", float("nan"))
+            won, lost, pval = (mcnemar(craft_hits, hits[best_name])
+                               if best_name in hits else (0, 0, 1.0))
             table.append({
                 "model": model, "dataset": dataset, "n": len(ids),
                 "refused": len(refused),
                 "craft": craft, "best_baseline": best_name, "baseline": best,
                 "delta": craft - best, "craft_file": cfile.name,
+                "only_craft": won, "only_baseline": lost, "p": pval,
                 "all_baselines": scored,
             })
 
     w = max((len(f"{r['model']}/{r['dataset']}") for r in table), default=20)
     print(f"\n{'cell':<{w}} {'n':>5} {'CRAFT':>7} {'baseline':>9} "
-          f"{'Δ':>7}  {'strongest baseline':<24} {'file'}")
-    print("-" * (w + 70))
-    wins = 0
+          f"{'Δ':>7} {'only/only':>10} {'p':>7}  {'strongest baseline':<22}")
+    print("-" * (w + 66))
+    wins = sig = ties = 0
     for r in table:
-        wins += r["delta"] > 0
+        ahead = r["delta"] > 0
+        wins += ahead
+        strong = r["p"] < 0.05
+        sig += ahead and strong
+        ties += not strong
+        mark = "*" if strong else " "
         print(f"{r['model']+'/'+r['dataset']:<{w}} {r['n']:>5} "
               f"{r['craft']*100:>7.1f} {r['baseline']*100:>9.1f} "
-              f"{r['delta']*100:>+7.1f}  {r['best_baseline']:<24} {r['craft_file']}")
-    print(f"\n  CRAFT ahead on {wins}/{len(table)} cells")
+              f"{r['delta']*100:>+7.1f} {str(r['only_craft'])+'/'+str(r['only_baseline']):>10} "
+              f"{r['p']:>7.3f}{mark} {r['best_baseline']:<22}")
+    print(f"\n  CRAFT ahead on {wins}/{len(table)} cells; "
+          f"{sig} of those significant at p<0.05 (*), "
+          f"{ties} cells statistically tied")
+    print("  only/only = samples only CRAFT got right / only the baseline did; "
+          "p is exact two-sided McNemar on those")
 
     if a.json:
         a.json.write_text(json.dumps(table, indent=2), encoding="utf-8")
