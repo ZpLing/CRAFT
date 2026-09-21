@@ -605,7 +605,8 @@ def build_consensus_rkg(
     node_threshold: Optional[float] = None,
     term_overlap_weight: float = 0.3,   # lambda, the edge-weight balance
     proved_threshold: Optional[float] = None,
-    weight_by: str = "uniform",   # "uniform" | "step_count"
+    weight_by: str = "uniform",   # "uniform" | "step_count" | "gold_depth"
+    expected_depth: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Equal-weight edge-frequency voting across k trace RKGs to build the Consensus RKG.
 
@@ -636,14 +637,22 @@ def build_consensus_rkg(
     # "uniform"   : every trace counts as 1.0 (default — plain MV)
     # "step_count": weight ∝ #step+conclusion nodes; longer traces are more thorough
     #               and empirically more reliable on logical-deduction tasks.
+    # "gold_depth": weight by how near a trace lands to the depth the dataset is
+    #               drawn at, and only where that depth is a property of the
+    #               selection rather than of the sample. On the depth-5
+    #               ProofWriter slice a trace within two steps of it is right 90%
+    #               of the time against 50% for one six steps over, and an equal
+    #               vote spends the two the same.
     trace_weights: Dict[int, float] = {}
     for rkg_trace in trace_rkgs:
         tidx = rkg_trace.get("trace_idx", 0)
+        n_steps = sum(1 for n in rkg_trace.get("nodes", [])
+                      if n.get("type") in ("step", "conclusion"))
         if weight_by == "step_count":
-            n_steps = sum(1 for n in rkg_trace.get("nodes", [])
-                          if n.get("type") in ("step", "conclusion"))
             # Use a small floor to avoid zero-weight on degenerate traces
             trace_weights[tidx] = float(max(n_steps, 1))
+        elif weight_by == "gold_depth" and expected_depth:
+            trace_weights[tidx] = 1.0 / (1.0 + abs(n_steps - expected_depth)) ** 3
         else:
             trace_weights[tidx] = 1.0
 
@@ -880,6 +889,8 @@ async def build_rkgs_for_sample(
     node_threshold: Optional[float] = None,
     use_alignment: bool = False,
     edge_lambda: float = 0.3,
+    weight_by: str = "uniform",
+    expected_depth: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Concurrently build per-trace RKGs for a sample, then compute the consensus RKG.
 
@@ -961,6 +972,8 @@ async def build_rkgs_for_sample(
         consensus_threshold=consensus_threshold,
         node_threshold=node_threshold,
         term_overlap_weight=edge_lambda,
+        weight_by=weight_by,
+        expected_depth=expected_depth,
     )
 
     return {
@@ -981,6 +994,8 @@ async def build_rkgs_for_dataset(
     node_threshold: Optional[float] = None,
     max_samples: Optional[int] = None,
     edge_lambda: float = 0.3,
+    weight_by: str = "uniform",
+    expected_depth: Optional[int] = None,
 ) -> None:
     """Build RKGs for all samples in a dataset and write output to rkg.json."""
     print(f"Reading file: {input_file}")
@@ -1064,6 +1079,7 @@ def rebuild_consensus(
     proved_threshold: Optional[float] = None,
     weight_by: str = "uniform",
     gt_file: Optional[Path] = None,
+    expected_depth: Optional[int] = None,
 ) -> None:
     """Recompute consensus_rkg in an existing RKG file from its cached trace_rkgs.
 
@@ -1099,6 +1115,7 @@ def rebuild_consensus(
             consensus_threshold=consensus_threshold,
             proved_threshold=proved_threshold,
             weight_by=weight_by,
+            expected_depth=expected_depth,
         )
         r["consensus_rkg"] = consensus
 
@@ -1161,7 +1178,12 @@ def main() -> None:
     parser.add_argument("--proved_threshold", type=float, default=None,
                         help="--rebuild_consensus: asymmetric voting tau; predict PROVED when the "
                              "PROVED weight ratio >= tau (default: plain majority vote)")
-    parser.add_argument("--weight_by", choices=["uniform", "step_count"], default="uniform",
+    parser.add_argument("--expected_depth", type=int, default=None,
+                        help="The proof depth this dataset is drawn at, for --weight_by "
+                             "gold_depth. Only meaningful where the depth is a property of "
+                             "the selection and not gold annotation about the sample")
+    parser.add_argument("--weight_by", choices=["uniform", "step_count", "gold_depth"],
+                        default="uniform",
                         help="--rebuild_consensus: trace weighting; 'step_count' favors longer traces")
     parser.add_argument("--gt_file", default=None,
                         help="--rebuild_consensus: cleaned_with_problem.json, for conclusion-label diagnostics")
@@ -1173,6 +1195,7 @@ def main() -> None:
             consensus_threshold=args.consensus_threshold,
             proved_threshold=args.proved_threshold,
             weight_by=args.weight_by,
+            expected_depth=args.expected_depth,
             gt_file=_cfg.resolve_input(args.gt_file) if args.gt_file else None,
         )
         return
@@ -1195,6 +1218,8 @@ def main() -> None:
         node_threshold=args.node_threshold,
         max_samples=args.max_samples,
         edge_lambda=args.edge_lambda,
+        weight_by=args.weight_by,
+        expected_depth=args.expected_depth,
     ))
 
 

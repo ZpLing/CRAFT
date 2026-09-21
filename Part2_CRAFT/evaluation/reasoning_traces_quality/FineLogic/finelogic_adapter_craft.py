@@ -118,6 +118,10 @@ def main() -> None:
                     help="Which of the K traces is the raw baseline (default: the first)")
     ap.add_argument("--max_samples", type=int, default=None,
                     help="Cap the pairs written — these evaluations run on a sample")
+    ap.add_argument("--raw_traces", default=None,
+                    help="traces.jsonl of the baseline the CRAFT trace is compared against "
+                         "(matched by sample_id). Without it the raw side is the run's own "
+                         "first candidate trace")
     args = ap.parse_args()
 
     craft_dir = Path(resolve_input(args.craft_dir))
@@ -143,6 +147,14 @@ def main() -> None:
         if isinstance(k_blob, dict) else "unknown"
     synth_by_id = {r["sample_id"]: r for r in load_records(synth_path) if "sample_id" in r}
 
+    baseline_raw: Dict[str, str] = {}
+    if args.raw_traces:
+        for row in load_records(Path(resolve_input(args.raw_traces))):
+            sid, tr = row.get("sample_id"), (row.get("traces") or [])
+            if sid and tr:
+                baseline_raw[sid] = str(tr[0])
+        print(f"[adapter] raw side from baseline: {len(baseline_raw)} traces")
+
     raw_out: List[Dict[str, Any]] = []
     craft_out: List[Dict[str, Any]] = []
     n_no_raw = n_no_craft = 0
@@ -153,7 +165,10 @@ def main() -> None:
         source = by_input.get(problem_input)
 
         traces = rec.get("traces") or []
-        raw_text = raw_response(traces[min(args.trace_idx, len(traces) - 1)]) if traces else ""
+        if baseline_raw:
+            raw_text = baseline_raw.get(sid, "")
+        else:
+            raw_text = raw_response(traces[min(args.trace_idx, len(traces) - 1)]) if traces else ""
         synth = synth_by_id.get(sid) or {}
         craft_text = synth.get("synthesized_trace") or ""
 

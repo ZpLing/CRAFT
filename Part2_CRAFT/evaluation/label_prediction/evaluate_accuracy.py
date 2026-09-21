@@ -307,9 +307,20 @@ def balance_samples(samples: List[Dict], n_per_class: int = 125, seed: int = 42)
             continue
         groups[s.get("source_dataset", "unknown")][gt].append(s)
 
-    for ds, label_map in groups.items():
-        for gt, items in label_map.items():
-            rng.shuffle(items)
+    # Sort before shuffling, and shuffle each group from its own seed. Synthesis
+    # writes its results in completion order, which asyncio does not fix, so two
+    # runs over the same samples produce files whose record order differs. The
+    # shuffle then drew a different 125 from each, and two settings scored on
+    # different subsets were reported side by side as if they were comparable —
+    # on one FLD pair that read as 0.960 against 0.896 where scoring every
+    # sample puts both at 0.887. Ordering by sample_id makes the subset a
+    # function of the samples alone, so any two settings over the same run are
+    # scored on the same rows.
+    for ds in sorted(groups):
+        label_map = groups[ds]
+        for gt in sorted(label_map):
+            items = sorted(label_map[gt], key=lambda s: str(s.get("sample_id", "")))
+            random.Random(f"{seed}:{ds}:{gt}").shuffle(items)
             result.extend(items[:n_per_class])
 
     return result

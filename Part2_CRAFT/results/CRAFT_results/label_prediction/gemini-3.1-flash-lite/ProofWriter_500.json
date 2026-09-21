@@ -1,0 +1,104 @@
+{
+  "file": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/ProofWriter_gemini-3.1-flash-lite/synthesized.json",
+  "source": "synthesized",
+  "overall": {
+    "accuracy": 0.584,
+    "macro_f1": 0.5834,
+    "avg_steps": 9.1,
+    "std_steps": 1.08,
+    "avg_tokens": 471.7,
+    "std_tokens": 180.0,
+    "mean_trace_acc": 0.584,
+    "std_trace_acc": 0.4929,
+    "n_total": 250,
+    "n_correct": 146,
+    "n_no_pred": 0,
+    "n_blocked": 0,
+    "no_pred_rate": 0.0,
+    "per_class_f1": {
+      "__PROVED__": 0.5667,
+      "__DISPROVED__": 0.6
+    },
+    "confusion_matrix": {
+      "__PROVED__": {
+        "__PROVED__": 68,
+        "__DISPROVED__": 57,
+        "none": 0
+      },
+      "__DISPROVED__": {
+        "__PROVED__": 47,
+        "__DISPROVED__": 78,
+        "none": 0
+      }
+    },
+    "domain": "logical",
+    "per_dataset": {
+      "ProofWriter.json": {
+        "accuracy": 0.584,
+        "macro_f1": 0.5834,
+        "avg_steps": 9.1,
+        "std_steps": 1.08,
+        "avg_tokens": 471.7,
+        "std_tokens": 180.0,
+        "mean_trace_acc": 0.584,
+        "std_trace_acc": 0.4929,
+        "n_total": 250,
+        "n_correct": 146,
+        "n_no_pred": 0,
+        "n_blocked": 0,
+        "no_pred_rate": 0.0,
+        "per_class_f1": {
+          "__PROVED__": 0.5667,
+          "__DISPROVED__": 0.6
+        },
+        "confusion_matrix": {
+          "__PROVED__": {
+            "__PROVED__": 68,
+            "__DISPROVED__": 57,
+            "none": 0
+          },
+          "__DISPROVED__": {
+            "__PROVED__": 47,
+            "__DISPROVED__": 78,
+            "none": 0
+          }
+        },
+        "domain": "logical"
+      }
+    }
+  },
+  "per_dataset": {
+    "ProofWriter.json": {
+      "accuracy": 0.584,
+      "macro_f1": 0.5834,
+      "avg_steps": 9.1,
+      "std_steps": 1.08,
+      "avg_tokens": 471.7,
+      "std_tokens": 180.0,
+      "mean_trace_acc": 0.584,
+      "std_trace_acc": 0.4929,
+      "n_total": 250,
+      "n_correct": 146,
+      "n_no_pred": 0,
+      "n_blocked": 0,
+      "no_pred_rate": 0.0,
+      "per_class_f1": {
+        "__PROVED__": 0.5667,
+        "__DISPROVED__": 0.6
+      },
+      "confusion_matrix": {
+        "__PROVED__": {
+          "__PROVED__": 68,
+          "__DISPROVED__": 57,
+          "none": 0
+        },
+        "__DISPROVED__": {
+          "__PROVED__": 47,
+          "__DISPROVED__": 78,
+          "none": 0
+        }
+      },
+      "domain": "logical"
+    }
+  }
+}

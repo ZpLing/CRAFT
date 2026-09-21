@@ -155,6 +155,11 @@ def main() -> None:
                     help="Synthesis output to read (default: the one synthesized*.json in --craft_dir)")
     ap.add_argument("--max_samples", type=int, default=None,
                     help="Cap the pairs written per dataset")
+    ap.add_argument("--raw_traces", default=None,
+                    help="traces.jsonl of the baseline the CRAFT trace is compared against "
+                         "(matched by sample_id). Without it the raw side is the run's own "
+                         "first candidate trace, which compares CRAFT to the traces it was "
+                         "built from rather than to a baseline anyone else would run")
     args = ap.parse_args()
 
     craft_dir = Path(resolve_input(args.craft_dir))
@@ -171,6 +176,17 @@ def main() -> None:
 
     source = load_source(Path(resolve_input(args.dataset)))
     k_records = load_records(k_files[0])
+
+    # The raw side, when it is a baseline's own generations rather than ours.
+    baseline_raw: Dict[str, List[str]] = {}
+    if args.raw_traces:
+        for row in load_records(Path(resolve_input(args.raw_traces))):
+            sid = row.get("sample_id")
+            traces = row.get("traces") or []
+            if sid and traces:
+                baseline_raw[sid] = split_synthesized_text(traces[0]) or [
+                    s.strip() for s in str(traces[0]).split("\n") if s.strip()]
+        print(f"[adapter] raw side from baseline: {len(baseline_raw)} traces")
     synth_by_id = {r["sample_id"]: r for r in load_records(synth_path) if "sample_id" in r}
 
     export_dir = Path(resolve_output(args.output_dir))
@@ -200,7 +216,9 @@ def main() -> None:
             src_row = rows[idx]
             n_by_position += 1
 
-        raw_steps = first_nonempty_trace(rec.get("traces"))
+        raw_steps = (baseline_raw.get(rec.get("sample_id"))
+                     if baseline_raw else first_nonempty_trace(rec.get("traces")))
+        raw_steps = raw_steps or []
         if not raw_steps:
             n_raw_empty += 1
         synth = synth_by_id.get(rec.get("sample_id"))

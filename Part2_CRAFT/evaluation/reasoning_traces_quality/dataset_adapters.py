@@ -134,6 +134,29 @@ def adapt_omnimath(sample: Dict[str, Any]) -> Problem:
     )
 
 
+# The proof depth a dataset is drawn at, where that is a property of the
+# selection rather than of the sample. ProofWriter here is the depth-5 slice, so
+# every one of its 500 problems needs a five-step deduction and the number is
+# public — the paper states it. Knowing it is knowing the configuration, not the
+# answer, so a consensus may weight by how close a trace comes to it.
+#
+# FLD is deliberately absent. Its proof length varies per sample, so a depth
+# would be gold annotation about that problem, and a run has no business seeing
+# it. The mathematical sets annotate no depth at all.
+#
+# Measured on the 500-sample ProofWriter run: a trace landing within two steps
+# of the depth is right 90% of the time, one running six steps over is right 50%
+# — the accuracy of a coin on a two-way label.
+EXPECTED_DEPTH: Dict[str, Optional[int]] = {
+    "ProofWriter": 5,
+}
+
+
+def expected_depth(dataset: Any) -> Optional[int]:
+    """The depth this dataset is drawn at, or None when it is not a constant."""
+    return EXPECTED_DEPTH.get(dataset_name(dataset))
+
+
 # What a step looks like in each set, which the downstream scorers need before
 # they can read one: the logical sets state their premises as "Fact1: ..." and
 # close with a __PROVED__/__DISPROVED__ marker, the mathematical ones state a
