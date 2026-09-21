@@ -1,0 +1,65 @@
+{
+  "file": "/Users/timchef/EMNLP2026_CRAFT/Part2_CRAFT/results/craft_runs/full500/OlympiadBench_gpt-5.4-nano/synth_follow2.json",
+  "source": "synthesized",
+  "overall": {
+    "accuracy": 0.5976,
+    "macro_f1": null,
+    "precision_answered": 0.5976,
+    "avg_steps": 9.34,
+    "std_steps": 1.06,
+    "avg_tokens": 2014.2,
+    "std_tokens": 1266.6,
+    "mean_trace_acc": 0.5976,
+    "std_trace_acc": 0.4904,
+    "n_total": 497,
+    "n_correct": 297,
+    "n_no_pred": 0,
+    "n_blocked": 0,
+    "no_pred_rate": 0.0,
+    "per_class_f1": {},
+    "confusion_matrix": {},
+    "domain": "math",
+    "per_dataset": {
+      "OlympiadBench.json": {
+        "accuracy": 0.5976,
+        "macro_f1": null,
+        "precision_answered": 0.5976,
+        "avg_steps": 9.34,
+        "std_steps": 1.06,
+        "avg_tokens": 2014.2,
+        "std_tokens": 1266.6,
+        "mean_trace_acc": 0.5976,
+        "std_trace_acc": 0.4904,
+        "n_total": 497,
+        "n_correct": 297,
+        "n_no_pred": 0,
+        "n_blocked": 0,
+        "no_pred_rate": 0.0,
+        "per_class_f1": {},
+        "confusion_matrix": {},
+        "domain": "math"
+      }
+    }
+  },
+  "per_dataset": {
+    "OlympiadBench.json": {
+      "accuracy": 0.5976,
+      "macro_f1": null,
+      "precision_answered": 0.5976,
+      "avg_steps": 9.34,
+      "std_steps": 1.06,
+      "avg_tokens": 2014.2,
+      "std_tokens": 1266.6,
+      "mean_trace_acc": 0.5976,
+      "std_trace_acc": 0.4904,
+      "n_total": 497,
+      "n_correct": 297,
+      "n_no_pred": 0,
+      "n_blocked": 0,
+      "no_pred_rate": 0.0,
+      "per_class_f1": {},
+      "confusion_matrix": {},
+      "domain": "math"
+    }
+  }
+}
