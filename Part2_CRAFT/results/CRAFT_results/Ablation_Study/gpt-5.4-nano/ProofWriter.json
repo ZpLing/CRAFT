@@ -1,0 +1,45 @@
+{
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano",
+  "full_accuracy": 97.2,
+  "settings": {
+    "CRAFT (full)": {
+      "accuracy": 97.2,
+      "macro_f1": 0.972,
+      "avg_steps": 9.62,
+      "n_samples": 500,
+      "delta": null
+    },
+    "w/o CRAFT": {
+      "accuracy": 84.6,
+      "macro_f1": 0.8424,
+      "avg_steps": 22.9,
+      "n_samples": 500,
+      "delta": -12.6
+    },
+    "w/o RKG": {
+      "accuracy": 91.0,
+      "macro_f1": 0.9099,
+      "avg_steps": 9.28,
+      "n_samples": 500,
+      "delta": -6.2
+    },
+    "w/o Synthesis": {
+      "accuracy": 94.8,
+      "macro_f1": 0.9479,
+      "avg_steps": 6.39,
+      "n_samples": 500,
+      "delta": -2.4
+    },
+    "w/o Filter & Synthesis": {
+      "accuracy": 94.8,
+      "macro_f1": 0.9479,
+      "avg_steps": 8.87,
+      "n_samples": 500,
+      "delta": -2.4
+    }
+  },
+  "not_run": [
+    "w/o Weighted Edges Fusion",
+    "Embedding Cosine Similarity"
+  ]
+}
