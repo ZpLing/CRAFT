@@ -12,59 +12,28 @@ that guidance. So **CRAFT** repairs the *structure* instead: it rolls out `K` ca
 traces, drops the steps they disagree on, aggregates the survivors into a consensus
 **Reasoning Knowledge Graph (RKG)**, and synthesizes one trace by walking that graph.
 
-**GPT-5.4-nano**
-
-| Method | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Direct | 66.1 | 0.659 | **1.0** | 72.0 | 0.710 | **1.0** | 7.3 | **1.0** | 4.0 | **1.0** |
-| CoT | 77.0 | 0.765 | 15.7 | 84.6 | 0.842 | 22.9 | 34.3 | 40.4 | 44.1 | 40.2 |
-| Best-of-N | 78.0 | 0.773 | 12.3 | 87.2 | 0.870 | 20.4 | 42.1 | 74.1 | 51.1 | 72.7 |
-| Self-Consistency | 78.6 | 0.777 | 12.3 | 87.0 | 0.868 | 19.7 | <ins>49.8</ins> | 78.4 | <ins>57.5</ins> | 74.1 |
-| Univ. Self-Consistency | 69.3 | 0.688 | 11.6 | 70.8 | 0.694 | 18.8 | 20.9 | 26.8 | 20.1 | 20.8 |
-| Self-Refine | 62.4 | 0.613 | 29.9 | <ins>94.0</ins> | <ins>0.940</ins> | 18.9 | 48.2 | 106.4 | 55.1 | 95.6 |
-| Self-Eval Beam Search | 60.2 | 0.580 | <ins>1.6</ins> | 67.6 | 0.650 | <ins>1.6</ins> | 19.1 | <ins>4.3</ins> | 22.5 | <ins>4.3</ins> |
-| Faithful CoT | <ins>78.8</ins> | <ins>0.785</ins> | 7.7 | 85.8 | 0.858 | 14.2 | 40.0 | 24.3 | 46.9 | 22.3 |
-| Tree-of-Thought | 72.1 | 0.709 | 16.4 | 79.4 | 0.785 | 20.6 | 38.0 | 75.0 | 47.7 | 70.2 |
-| RAP | 72.9 | 0.718 | 17.2 | 89.6 | 0.895 | 20.6 | 37.4 | 77.7 | 49.1 | 74.5 |
-| PNS-Optimization | 75.4 | 0.740 | 10.2 | 76.4 | 0.750 | 13.9 | 37.2 | 61.5 | 47.7 | 59.9 |
-| Self-Aggregation | 76.8 | 0.764 | 15.6 | 86.6 | 0.869 | 18.1 | 33.1 | 39.0 | 43.7 | 36.7 |
-| **CRAFT** | **82.8** | **0.828** | 9.0 | **97.2** | **0.972** | 9.6 | **54.9** | 9.4 | **60.6** | 9.3 |
-
-**Gemini-3.1-flash-lite**
-
-| Method | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Direct | 74.8 | 0.747 | **1.0** | 62.4 | 0.589 | **1.0** | 18.9 | **1.0** | 18.9 | **1.0** |
-| CoT | 87.5 | 0.875 | 13.0 | 61.0 | 0.554 | 16.7 | 46.3 | 27.5 | 61.6 | 26.7 |
-| Best-of-N | 89.1 | 0.893 | 13.3 | 60.8 | 0.558 | 17.2 | 47.4 | 24.9 | 61.2 | 27.1 |
-| Self-Consistency | <ins>89.9</ins> | <ins>0.899</ins> | 13.3 | 61.0 | 0.548 | 17.4 | <ins>56.3</ins> | 24.9 | 63.8 | 26.8 |
-| Univ. Self-Consistency | 80.6 | 0.806 | 12.5 | 52.8 | 0.417 | 17.2 | 25.0 | 11.6 | 29.4 | 12.3 |
-| Self-Refine | <ins>89.9</ins> | **0.903** | 12.9 | <ins>68.6</ins> | <ins>0.678</ins> | 14.8 | 55.7 | 21.0 | <ins>65.8</ins> | 25.0 |
-| Self-Eval Beam Search | 80.0 | 0.801 | <ins>2.4</ins> | 65.8 | 0.646 | <ins>3.8</ins> | 38.0 | <ins>6.8</ins> | 48.7 | 12.2 |
-| Faithful CoT | 86.7 | 0.867 | 6.7 | 58.2 | 0.563 | 7.2 | 48.2 | 10.7 | 59.2 | 12.9 |
-| Tree-of-Thought | 86.7 | 0.867 | 11.2 | 60.6 | 0.544 | 14.7 | 46.3 | 23.9 | 59.4 | 27.1 |
-| RAP | 86.5 | 0.868 | 11.7 | 63.6 | 0.593 | 15.7 | 50.6 | 25.3 | 61.2 | 28.4 |
-| PNS-Optimization | **90.3** | **0.903** | 11.1 | 59.4 | 0.525 | 13.4 | 50.6 | 23.1 | 63.4 | 24.0 |
-| Self-Aggregation | 86.3 | 0.866 | 11.5 | 64.0 | 0.600 | 13.9 | 50.0 | 18.2 | 61.8 | 20.8 |
-| **CRAFT** | 89.5 | 0.895 | 9.2 | **87.4** | **0.874** | 8.9 | **62.6** | 9.5 | **75.7** | <ins>9.6</ins> |
+| Backbone | Setting | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GPT-5.4-nano | Best of 12 baselines | 78.8 | 0.785 | **7.7** | 94.0 | 0.940 | 18.9 | 49.8 | 78.4 | 57.5 | 74.1 |
+| GPT-5.4-nano | **CRAFT** | **82.8** | **0.828** | 9.0 | **97.2** | **0.972** | **9.6** | **54.9** | **9.4** | **60.6** | **9.3** |
+| Gemini-3.1-flash-lite | Best of 12 baselines | **90.3** | **0.903** | 11.1 | 68.6 | 0.678 | 14.8 | 56.3 | 24.9 | 65.8 | 25.0 |
+| Gemini-3.1-flash-lite | **CRAFT** | 89.5 | 0.895 | **9.2** | **87.4** | **0.874** | **8.9** | **62.6** | **9.5** | **75.7** | **9.6** |
 
 Label-prediction accuracy, macro-F1 and average reasoning steps, all scored by
-`evaluation/label_prediction/evaluate_accuracy.py` and its answer readers; **best** per
-column in bold, <ins>second best</ins> underlined. Macro-F1 is averaged over PROVED and
-DISPROVED, so the two maths datasets have no classes to average and leave it out rather
-than printing their accuracy twice.
+`evaluation/label_prediction/evaluate_accuracy.py` and its answer readers; **bold** is the
+better of the two rows. Macro-F1 is averaged over PROVED and DISPROVED, so the two maths
+datasets have no classes to average and leave it out rather than printing their accuracy
+twice.
 Every cell scores CRAFT and all 12 baselines on the sample ids they share, so neither side
 is charged for a question the other was never asked; that leaves 492 to 500 of the 500 per
-cell, and the three metrics are read off that same set. The strongest baseline is a
-different method in almost every column, which is why no single one of them makes a fair
-point of comparison. CRAFT is ahead on 7 of the 8 accuracy cells, 6 of them at p<0.05 under
-an exact two-sided McNemar; the eighth, Gemini on FLD, is 0.8 behind PNS-Optimization at
-p=0.65. The steps columns are won by Direct, which answers in one line and gets a third of
-FLD right, and then by Self-Eval Beam Search, whose beam is pruned to almost nothing — short
-is only worth reading next to the accuracy beside it, and among the methods that are
-actually competitive CRAFT is the shortest on seven of the eight cells.
-CRAFT also wins on average steps, and its post-processed traces score higher under ROSCOE
-and FineLogic.
+cell, and the three metrics are read off that same set. The baseline row is the best of the
+12 *on that cell*, chosen by accuracy, so it is a different method in almost every column
+and its F1 and steps are that method's rather than the best any baseline reached.
+CRAFT is ahead on 7 of the 8 accuracy cells, 6 of them at p<0.05 under an exact two-sided
+McNemar; the eighth, Gemini on FLD, is 0.8 behind PNS-Optimization at p=0.65. It is also
+the shorter trace on 7 of the 8, and not by a little — 9.4 steps against Self-Consistency's
+78.4 on nano's Omni-MATH, at 5.1 points higher accuracy. The exception is nano's FLD, where
+Faithful CoT answers in 7.7 steps to CRAFT's 9.0 and 4.0 points less accurately.
 
 > FOLIO and GSM8K were dropped after the pilot — both backbones had run out of room on
 > them, a median 49/50 on GSM8K and 46/50 on FOLIO, where no method can show a difference
@@ -167,7 +136,7 @@ framework of §3.2.
 │   ├── evaluation/
 │   │   ├── label_prediction/          main-table accuracy and its Wilson CIs
 │   │   │                              answer_match.py — one adapter per dataset
-│   │   ├── reasoning_traces_quality/  ROSCOE/, FineLogic/ (§4)
+│   │   ├── reasoning_traces_quality/  ROSCOE/ (§4)
 │   │   │                              dataset_adapters.py — the same four, for traces
 │   │   └── other_evaluation/          the analyses behind the appendix
 │   │       ├── ablation_study/        the six settings of the ablation table
@@ -247,25 +216,21 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 
 ## Part 2 — CRAFT (§3.2)
 
-The stages of the Quick start above run in order. Trace quality is then scored two
-ways (§4), each directory holding the same three roles — adapt a CRAFT run into the
-scorer's schema, score raw CoT against the synthesized trace, tabulate the result:
+The stages of the Quick start above run in order. Trace quality is then scored by
+ROSCOE (§4), whose directory holds three roles — adapt a CRAFT run into the
+scorer's schema, score raw CoT against the synthesized trace, tabulate the result
+— and reports Grammar, Rep-Step and Rep-Word.
 
-| | scores | metrics |
-|---|---|---|
-| `FineLogic/` | each step, by LLM judge | All Valid, All Relevant, All Atomic |
-| `ROSCOE/` | trace quality | Grammar, Rep-Step, Rep-Word |
-
-Both are metrics rather than benchmarks — they score whatever traces they are
-given — so both score the same traces, on the same four datasets, and this part
+ROSCOE is a metric rather than a benchmark — it scores whatever traces it is given
+— so it scores the same traces, on the same four datasets, and this part
 introduces no data beyond them. The rollout that gives the main table its accuracy
-is the one they read: its first candidate trace is the raw CoT and its synthesized
+is the one it reads: its first candidate trace is the raw CoT and its synthesized
 trace is CRAFT's, so `--dataset` is simply the `dataset/` file that run was
 generated from. ROSCOE's own annotated sets are not used here; its reference-based
 metrics need a reference chain none of these four carries, and the scorer drops
 them on its own, leaving the three reference-free ones we report.
 
-ReCEval was the third and is not used. Its Entail and Contradict are computed over
+ReCEval was the other candidate and is not used. Its Entail and Contradict are computed over
 reasoning units an SRL parser extracts from each step, and that parser is a BERT
 whose 512 positions a competition-maths step overruns: a third of the steps CRAFT
 synthesizes on Omni-MATH and OlympiadBench are longer than it can encode, against
@@ -279,19 +244,12 @@ facts are a list where FLD's are one string, and the mathematical two name their
 answer `answer` where the logical two name it `proof_label` — so each has an
 adapter, the way `label_prediction/answer_match.py` already gives each one a way
 to compare an answer. `reasoning_traces_quality/dataset_adapters.py` is that layer
-for traces: it hands every scorer the same four fields (premises, hypothesis,
-answer, the gold step count), and both adapters beside it dispatch on the
-dataset a run recorded rather than guessing from the fields present. Only the two
-logical sets annotate a step count — FLD in its proof string, ProofWriter in
-`QDep` — so FineLogic's step-band rows cover those two and its overall row covers
-all four. FLD's own proofs run 1–7 steps, so the [10, 20] band FineLogic's paper
-reports on is empty on this selection and [1–9] is the one that covers it. ROSCOE
-fetches upstream's two scoring files on first use; FineLogic's step evaluator is
-our natural-language adaptation of upstream's. It judges with Qwen3-32B rather
-than upstream's GPT-4.1-mini: the backbones being compared are a GPT and a
-Gemini, so a judge from either family would be scoring its own relatives, and
-Qwen3-32B's weights are Apache 2.0, so a reported number's judgements can be
-reproduced rather than taken on trust in an API.
+for traces: it hands the scorer the same four fields (premises, hypothesis,
+answer, the gold step count), and the adapter beside it dispatches on the dataset
+a run recorded rather than guessing from the fields present. Only the two logical
+sets annotate a step count — FLD in its proof string, ProofWriter in `QDep` — so
+that field is None on the mathematical two. ROSCOE fetches upstream's two scoring
+files on first use.
 
 ```bash
 RTQ=evaluation/reasoning_traces_quality
@@ -312,22 +270,6 @@ python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json 
 python $ROS/roscoe_score.py         --export_dir $RUN/roscoe_export
 python $ROS/roscoe_build_table.py   --summaries "Gemini-3.1-flash-lite:$RUN/roscoe_export/evaluation_results.json" \
     --latex_out $RUN/roscoe_craft_table.tex
-```
-
-FineLogic follows the same three steps over a CRAFT run on any of the four:
-
-```bash
-FL=$RTQ/FineLogic
-python $FL/finelogic_adapter_craft.py --craft_dir $RUN \
-    --dataset dataset/FLD.json \
-    --output_dir finelogic/<run> --max_samples 50
-for side in raw craft; do
-  python $FL/finelogic_eval_steps.py --input finelogic/<run>/FLD_$side.json \
-      --output_detail finelogic/<run>/detail_$side.json \
-      --output_summary finelogic/<run>/summary_$side.json
-done
-python $FL/finelogic_build_table.py --raw finelogic/<run>/detail_raw.json \
-    --craft finelogic/<run>/detail_craft.json --label FLD
 ```
 
 Hyperparameters fixed across all experiments (§4.6): Module I `K=5`, `T=0.7`,
