@@ -9,11 +9,25 @@ percentage-point change from raw CoT to CRAFT.
 
 Output: a markdown table on stdout, and a LaTeX body with --latex_out.
 
+A scoring run's evaluation_results.json is where the numbers arrive, not where
+they are kept: --results_dir files them under one directory per model, as the
+run's two sides,
+
+    <results_dir>/<model>/ROSCOE_CRAFT.json
+    <results_dir>/<model>/ROSCOE_Raw_CoT.json
+
+which is also what this reads when --summaries is absent, so a table can be
+rebuilt from the kept results without the scoring run's directories.
+
 Example:
     python roscoe_build_table.py \\
         --summaries "GPT-5.4-nano:roscoe_craft/nano/evaluation_results.json" \\
                     "Gemini-3.1-flash-lite:roscoe_craft/gemini/evaluation_results.json" \\
+        --results_dir CRAFT_results/reasoning_traces_quality/ROSCOE \\
         --latex_out roscoe_craft/roscoe_craft_table.tex
+
+    python roscoe_build_table.py \\
+        --results_dir CRAFT_results/reasoning_traces_quality/ROSCOE
 """
 
 from __future__ import annotations
@@ -41,6 +55,85 @@ METRICS: List[Tuple[str, str, bool]] = [
 DATASET_LABEL = {"FLD": "FLD", "ProofWriter": "ProofWriter",
                  "OmniMATH": "Omni-MATH", "OlympiadBench": "OlympiadBench"}
 DATASET_ORDER = ["FLD", "ProofWriter", "OmniMATH", "OlympiadBench"]
+
+# The kept results: one file per side, under a directory named for the model.
+SIDE_FILE = {"raw": "ROSCOE_Raw_CoT.json", "craft": "ROSCOE_CRAFT.json"}
+SIDE_TRACE = {
+    "raw": "the first of the K candidate traces",
+    "craft": ("the trace Module III synthesizes from the consensus RKG, "
+              "after deduplication"),
+}
+SCORES_NOTE = "ROSCOE's own, all thirteen higher-is-better"
+
+
+def model_dir(label: str) -> str:
+    """The directory a model's results live in.
+
+    The rest of results/ names a model's directory by its API id in lower case
+    (gpt-5.4-nano, gemini-3.1-flash-lite), so a table label of any casing has to
+    land in the same place as the traces it scored.
+    """
+    return "-".join(label.strip().lower().split())
+
+
+def write_results(results_dir: Path, label: str, summary: Dict[str, Any]) -> List[Path]:
+    """File one model's scoring run as the two kept per-side results."""
+    out_dir = results_dir / model_dir(label)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    scored = summary.get("datasets", {})
+    order = DATASET_ORDER + sorted(set(scored) - set(DATASET_ORDER))
+
+    written = []
+    for side, filename in SIDE_FILE.items():
+        datasets = {}
+        for ds in order:
+            block = scored.get(ds)
+            if not block:
+                continue
+            metrics = (block.get("metrics", {}) or {}).get(side) or {}
+            if not metrics:
+                continue
+            datasets[ds] = {
+                "n_traces": (block.get("n_traces", {}) or {}).get(side),
+                "metrics": {k: metrics[k] for k in sorted(metrics)},
+            }
+        if not datasets:
+            continue
+        path = out_dir / filename
+        path.write_text(json.dumps({
+            "model": model_dir(label),
+            "side": side if side == "craft" else "raw_cot",
+            "trace": SIDE_TRACE[side],
+            "scores": SCORES_NOTE,
+            "datasets": datasets,
+        }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        written.append(path)
+    return written
+
+
+def read_results(results_dir: Path) -> List[Tuple[str, Dict[str, Any]]]:
+    """Rebuild the scoring-run shape from the kept results, one entry per model.
+
+    Reading gives back what --summaries would have loaded, so everything below
+    stays written against the one shape.
+    """
+    loaded: List[Tuple[str, Dict[str, Any]]] = []
+    for model_path in sorted(p for p in results_dir.iterdir() if p.is_dir()):
+        per_dataset: Dict[str, Any] = {}
+        for side, filename in SIDE_FILE.items():
+            path = model_path / filename
+            if not path.exists():
+                continue
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            for ds, block in doc.get("datasets", {}).items():
+                cell = per_dataset.setdefault(ds, {"n_traces": {}, "metrics": {}})
+                cell["metrics"][side] = block.get("metrics", {})
+                cell["n_traces"][side] = block.get("n_traces")
+        if per_dataset:
+            loaded.append((model_path.name, {"datasets": per_dataset}))
+    if not loaded:
+        raise SystemExit(f"No <model>/{SIDE_FILE['craft']} under {results_dir}")
+    return loaded
 
 
 def load_summary(path: Path) -> Dict[str, Any]:
@@ -84,15 +177,31 @@ def parse_spec(spec: str) -> Tuple[str, Path]:
 def main() -> None:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--summaries", nargs="+", required=True,
+    ap.add_argument("--summaries", nargs="+", default=None,
                     help="One 'Model label:evaluation_results.json' per model, in table order")
+    ap.add_argument("--results_dir", default=None,
+                    help="Where the kept per-model results live. With --summaries, "
+                         "the scoring runs are filed here first; without it, the "
+                         "table is built from what is already here")
     ap.add_argument("--datasets", nargs="+", default=None,
                     help="Datasets to include (default: the benchmark's four, those present)")
     ap.add_argument("--latex_out", default=None,
                     help="Also write the LaTeX table body here")
     args = ap.parse_args()
 
-    loaded = [(label, load_summary(path)) for label, path in map(parse_spec, args.summaries)]
+    if not args.summaries and not args.results_dir:
+        raise SystemExit("Give --summaries, or --results_dir to read kept results")
+
+    if args.summaries:
+        loaded = [(label, load_summary(path))
+                  for label, path in map(parse_spec, args.summaries)]
+        if args.results_dir:
+            kept = Path(resolve_output(args.results_dir))
+            for label, summary in loaded:
+                for path in write_results(kept, label, summary):
+                    print(f"kept → {path}")
+    else:
+        loaded = read_results(Path(resolve_input(args.results_dir)))
 
     # Datasets the summaries hold that DATASET_ORDER does not name still belong in
     # the table: a dataset added later should show up rather than disappear into a
