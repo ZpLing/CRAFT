@@ -813,6 +813,7 @@ def build_rkg_synthesis_prompt(
     mv_label: Optional[str] = None,
     mv_answer: Optional[str] = None,
     mv_strength: Optional[float] = None,
+    prior_mode: str = "verify",
     gt_label: Optional[str] = None,
     step_terms_summary: Optional[Dict[int, Dict]] = None,
     previous_steps: Optional[List[str]] = None,
@@ -950,6 +951,16 @@ suggestion, not a settled result):
                     f"- The correct answer is {gt_label}. "
                     f"Generate reasoning that rigorously leads to this conclusion.\n"
                 )
+            elif mv_label and not gt_label and domain == "logical" and prior_mode == "follow":
+                # The consensus is taken as settled. Worth having as the other
+                # setting of the knob: where a model's single re-derivation is
+                # weaker than its own vote — nano on FLD, whose traces score
+                # 77-81% each and 82.7% pooled — inviting it to overrule the
+                # vote loses in every agreement bucket.
+                prompt += (
+                    f"- The majority of independent reasoning traces reach {mv_label}. "
+                    f"Generate reasoning that rigorously leads to this conclusion.\n"
+                )
             elif mv_label and not gt_label and domain == "logical":
                 # The vote is a prior, not the answer. Telling the model to
                 # "generate reasoning that leads to" the majority label makes the
@@ -1012,6 +1023,7 @@ async def synthesize_trace_rkg(
     domain: str = "logical",
     anchor_conclusion: bool = False,
     no_mv: bool = False,
+    prior_mode: str = "verify",
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
     min_tfidf: float = 0.01,
@@ -1354,7 +1366,7 @@ async def synthesize_trace_rkg(
                 problem_input, entry, generated_nodes,
                 domain=domain, total_steps=total_steps,
                 mv_label=_mv_label, mv_answer=_mv_answer,
-                mv_strength=_mv_strength,
+                mv_strength=_mv_strength, prior_mode=prior_mode,
                 gt_label=None,
                 step_terms_summary=_step_terms_summary,
                 previous_steps=generated_steps,
@@ -1724,6 +1736,7 @@ async def synthesize_traces_for_dataset(
     rkg_file: Optional[Path] = None,
     anchor_conclusion: bool = False,
     no_mv: bool = False,
+    prior_mode: str = "verify",
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     df_table_path: Optional[Path] = None,
@@ -1862,7 +1875,7 @@ async def synthesize_traces_for_dataset(
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
                 sample_rkg = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
+                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, prior_mode=prior_mode, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
             else:
                 tasks.append(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
@@ -1924,6 +1937,7 @@ async def retry_failed_synthesis(
     domain: str = "logical",
     anchor_conclusion: bool = False,
     no_mv: bool = False,
+    prior_mode: str = "verify",
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     df_table_path: Optional[Path] = None,
@@ -1981,6 +1995,7 @@ async def retry_failed_synthesis(
                     return sid, await synthesize_trace_rkg(
                         session, sample, rkg, model=model, domain=domain,
                         anchor_conclusion=anchor_conclusion, no_mv=no_mv,
+                        prior_mode=prior_mode,
                         df_table=df_table, idf_norm=(idf_norm == "log_n"),
                     )
                 except Exception as e:
@@ -2148,6 +2163,15 @@ def main():
     )
 
     parser.add_argument(
+        "--prior_mode", choices=["verify", "follow"], default="verify",
+        help="How Module III is told to treat the consensus vote when it writes "
+             "the conclusion. 'verify' (default) gives it as a prior the derived "
+             "chain may overrule; 'follow' asks for reasoning that leads to it. "
+             "Selected per configuration on a validation split: a model whose "
+             "single re-derivation is weaker than its own vote does better with "
+             "'follow'.",
+    )
+    parser.add_argument(
         "--no_mv",
         action="store_true",
         default=False,
@@ -2217,6 +2241,7 @@ def main():
                 domain=args.domain,
                 anchor_conclusion=args.anchor_conclusion,
                 no_mv=args.no_mv,
+                prior_mode=args.prior_mode,
                 idf_scope=args.idf_scope,
                 idf_norm=args.idf_norm,
                 df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
@@ -2251,6 +2276,7 @@ def main():
             rkg_file=_cfg.resolve_input(args.rkg_file) if args.rkg_file else None,
             anchor_conclusion=args.anchor_conclusion,
             no_mv=args.no_mv,
+            prior_mode=args.prior_mode,
             idf_scope=args.idf_scope,
             idf_norm=args.idf_norm,
             df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
