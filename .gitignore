@@ -78,3 +78,10 @@ Part2_CRAFT/results/CRAFT_results/other_results/filtering_stats/
 
 # ── Dropped baselines and pre-swap backups — kept locally, never pushed ──
 Part2_CRAFT/results/baseline_results/_archive/
+
+# ── SFT training sets — the input to trace_utility, not its result ───
+# train_craft.jsonl and train_raw.jsonl are 19 MB of traces the utility
+# experiment fine-tunes on. What the appendix quotes is the score, so the
+# score's json is tracked and the two training sets stay local. test.jsonl
+# is kept: it is 584 KB and the score cannot be re-checked without it.
+Part2_CRAFT/results/CRAFT_results/other_results/trace_utility/data/train_*.jsonl
