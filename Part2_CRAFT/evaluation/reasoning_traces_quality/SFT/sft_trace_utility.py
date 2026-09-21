@@ -19,6 +19,7 @@ import json
 import os
 import random
 import re
+import sys
 from pathlib import Path
 from typing import Dict, List
 
@@ -29,6 +30,45 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer,
                           StoppingCriteria, StoppingCriteriaList, Trainer,
                           TrainingArguments)
 from peft import LoraConfig, get_peft_model
+
+def _add_scorer_path() -> None:
+    """Put label_prediction on the path from wherever this file was copied to.
+
+    The runs happen on a cluster, where this script sits beside its data rather
+    than in the tree, so a path built from __file__'s parents finds nothing and
+    the import kills the job after the backbone has loaded. Each candidate is
+    tried and the first that holds the modules wins.
+    """
+    here = Path(__file__).resolve()
+    candidates = [
+        here.parents[2] / "label_prediction",   # in the repo
+        here.parent / "label_prediction",       # copied with its scorers beside it
+        here.parent,                            # copied flat
+    ]
+    for c in candidates:
+        if all((c / m).exists() for m in
+               ("answer_match.py", "extract_label.py", "step_count.py")):
+            sys.path.insert(0, str(c))
+            return
+    raise SystemExit(
+        "answer_match.py, extract_label.py and step_count.py were not found "
+        f"next to this script or at {candidates[0]}; copy them beside it.")
+
+
+_add_scorer_path()
+
+from answer_match import answers_match  # noqa: E402
+from step_count import count_steps, count_tokens  # noqa: E402
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from score_sft_run import _metrics  # noqa: E402
+from extract_label import extract_label, extract_math_answer  # noqa: E402
+
+# The reader and the comparison a held-out problem is marked with are the ones
+# the main table uses, so a student's accuracy here means what accuracy means
+# everywhere else in this project.
+_READER = {"FLD": extract_label, "ProofWriter": extract_label,
+           "OmniMATH": extract_math_answer, "OlympiadBench": extract_math_answer}
 
 
 ANSWER_PAT = re.compile(r"__(?:PROVED|DISPROVED)__|\b(?:PROVED|DISPROVED)\b"
@@ -228,10 +268,46 @@ def main() -> None:
                               "generated": text})
             print(f"    {len(preds)}/{len(test_rows)}", flush=True)
 
-    with (out / "predictions.jsonl").open("w", encoding="utf-8") as fh:
-        for r in preds:
-            fh.write(json.dumps(r, ensure_ascii=False) + "\n")
-    print(f"  wrote {out / 'predictions.jsonl'}", flush=True)
+    # ── mark them, and write the one file this run is read from ─────────────
+    by_ds: Dict[str, List[Dict]] = {}
+    for r in preds:
+        reader = _READER.get(r["dataset"], extract_label)
+        got = reader(r["generated"] or "")
+        r["predicted"] = got
+        r["correct"] = bool(got is not None
+                            and answers_match(got, r["answer"], r["dataset"]))
+        r["n_steps"] = count_steps(r["generated"] or "")
+        r["n_tokens"] = count_tokens(r["generated"] or "")
+        by_ds.setdefault(r["dataset"], []).append(r)
+
+    side = "CRAFT" if "craft" in Path(args.train_file).stem else "Raw_CoT"
+    # Qwen/Qwen3.5-9B -> Qwen-3.5-9B, so a file says which backbone it is.
+    slug = re.sub(r"^([A-Za-z]+)(?=\d)", r"\1-", args.model.rsplit("/", 1)[-1])
+    name = f"{slug}_SFT_{side}_Seed{args.seed}"
+    summary = {
+        "run": name,
+        "side": "craft" if side == "CRAFT" else "raw",
+        "seed": args.seed,
+        "model": args.model,
+        "train_file": Path(args.train_file).name,
+        "n_train": len(train_rows),
+        "n_test": len(preds),
+        "epochs": args.epochs,
+        "lr": args.lr,
+        "lora_r": args.lora_r,
+        "accuracy": round(sum(r["correct"] for r in preds) / max(len(preds), 1), 4),
+        "avg_steps": round(sum(r["n_steps"] for r in preds) / max(len(preds), 1), 2),
+        "by_dataset": {d: _metrics(rs) for d, rs in sorted(by_ds.items())},
+        "predictions": preds,
+    }
+    with (out / f"{name}.json").open("w", encoding="utf-8") as fh:
+        json.dump(summary, fh, ensure_ascii=False, indent=1)
+    print(f"  {name}: accuracy {100*summary['accuracy']:.1f}  "
+          f"steps {summary['avg_steps']:.1f}  over {len(preds)} problems", flush=True)
+    for d, m in summary["by_dataset"].items():
+        f1 = "  —  " if m["macro_f1"] is None else f"{m['macro_f1']:.3f}"
+        print(f"      {d:<16} acc {100*m['accuracy']:5.1f}   F1 {f1}   "
+              f"steps {m['avg_steps']:5.1f}   n {m['n']}", flush=True)
 
 
 if __name__ == "__main__":
