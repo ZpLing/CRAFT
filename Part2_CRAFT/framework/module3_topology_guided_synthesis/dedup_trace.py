@@ -6,28 +6,57 @@ step restates what earlier ones established before adding anything of its own:
 across the eight cells 8% to 20% of sentences repeat an earlier one, a maths
 trace names "Step N" seven to twelve times, and the final \\boxed{} answer is
 written out up to four times. None of that is reasoning, and all of it counts
-against the trace under the ROSCOE metrics defined over pairs of sentences.
+against the trace under the ROSCOE metrics defined over pairs of sentences,
+every one of which takes a maximum over those pairs.
 
-What must not move is the answer. extract_label reads it from the *last*
-commitment a trace makes -- [-1] on every path it has, for __PROVED__, for
-\\boxed{}, for "the answer is" and for the natural-language fallback -- so a
-trace is only rewritten when re-reading it returns what it returned before,
-and is otherwise kept as it was. `dedup_trace` applies that check itself.
+Three things are preserved.
 
-Paragraphs, not sentences, are the unit: a sentence split lands inside
-\\begin{cases} ... \\end{cases}, and dropping one fragment of a display leaves
-the braces unbalanced, which made the boxed reader run past the end of the
-answer and swallow the rest of the trace.
+The answer. extract_label reads it from the *last* commitment a trace makes --
+[-1] on every path it has, for __PROVED__, for \\boxed{}, for "the answer is"
+and for the natural-language fallback -- so a paragraph that states one is
+never dropped, and `dedup_trace` checks the rewrite against the reader it will
+be scored with before keeping it.
+
+The maths. Paragraphs, not sentences, are the unit wherever a display appears:
+a sentence split lands inside \\begin{cases} ... \\end{cases}, and dropping one
+fragment leaves the braces unbalanced, which makes the boxed reader run past
+the answer and swallow the rest of the trace. Prose, which carries most of the
+repetition, still splits a sentence at a time.
+
+The references. A step that says nothing new drops out with its header, since
+"Step 3: Step 4:" with nothing between them is worse than the repetition it
+removes. Half the traces that lose a step cite it by number from a later one,
+so those citations are redirected to the step whose content was repeated --
+"From Step 5 (the squirrel chases the dog)" becomes "From Step 2", which is
+where that line was first derived.
 """
 
 from __future__ import annotations
 
+import difflib
 import re
-from typing import Callable, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
 _STEP = re.compile(r"(?m)^(\s*Step\s*\d+\s*[:.\-]\s*)")
+_STEP_NO = re.compile(r"(?m)^\s*Step\s*(\d+)\s*[:.\-]")
+_STEP_REF = re.compile(r"(?i)(\bSteps?\s*)(\d+)")
 _PARA = re.compile(r"\n\s*\n")
-_WORD = re.compile(r"[A-Za-z\\]+|\d+")
+_SENT = re.compile(r"(?<=[.!?])\s+")
+# A subscripted symbol is one name: split c_a into "c" and "a" and it stops
+# being distinguishable from d_a whenever the sentence also mentions c on
+# its own, which is how "Thus, $c_a = c$" was read as a repeat of
+# "Thus, $d_a = c$".
+_WORD = re.compile(r"[A-Za-z\\]+(?:_\{?[A-Za-z0-9]+\}?)?|\d+")
+_MATHY = re.compile(r"\\\[|\\\]|\\begin\{|\\end\{|\$\$|\\boxed\{")
+
+# A display is balanced by construction, so one can be lifted out of a
+# paragraph the paragraph rule has to keep whole. That is where most of what
+# survives sentence deduplication sits: a trace that derives a_n once quotes
+# the formula again in every step that uses it -- four copies of the same two
+# lines, each wrapped in different prose, so no two paragraphs match. The
+# prose already says which step it came from, so the second copy onwards is
+# dropped and the citation left standing.
+_DISPLAY = re.compile(r"\\\[.*?\\\]", re.DOTALL)
 
 # A paragraph that states an answer is never dropped, wherever it sits.
 _ANSWER = re.compile(
@@ -41,8 +70,62 @@ def _tokens(text: str) -> frozenset:
     return frozenset(_WORD.findall(text.lower()))
 
 
-_MATHY = re.compile(r"\\\[|\\\]|\\begin\{|\\end\{|\$\$|\\boxed\{")
-_SENT = re.compile(r"(?<=[.!?])\s+")
+# Token overlap alone cannot tell "the dog chases the dog" from "the squirrel
+# chases the dog": the second holds every word of the first, so the two score
+# 0.85 and the later one looks like a restatement when it states something new.
+# A near-verbatim repeat also matches in order, which a sequence ratio sees and
+# a bag of words does not, so both have to agree before anything is dropped.
+_VERBATIM = 0.95
+
+# Neither test survives work that reuses a sentence's shape. A maths trace
+# checking n = 2, then n = 5, then n = 7 writes "Since $5$ is a prime number,
+# the condition is satisfied" against "Since $2$ ..."; one placing a
+# parallelogram writes "$B = (c, 0)$" against "$B = (a, 0)$". Both score 0.93
+# or better by sequence and share every word but one, and both are doing
+# something their source did not.
+#
+# What separates them is that a restatement says nothing new: every word of it
+# was already in the sentence it repeats. A line that carries a value or a
+# symbol its source lacks -- 5 against 2, c against a -- is new work, whatever
+# the two score. Step citations are renumbering, not content, so they come out
+# before the comparison.
+_STEP_CITE = re.compile(r"(?i)\bSteps?\s*\d+")
+
+
+def _content(text: str) -> frozenset:
+    return frozenset(_WORD.findall(_STEP_CITE.sub(" ", text).lower()))
+
+
+def _drop_repeated_displays(paragraph: str, seen: set) -> str:
+    """Remove a display this trace has already written out once."""
+    def maybe(m: re.Match) -> str:
+        body = m.group(0)
+        if _ANSWER.search(body):
+            return body
+        key = " ".join(body.split())
+        if key in seen:
+            return ""
+        seen.add(key)
+        return body
+    out = _DISPLAY.sub(maybe, paragraph)
+    return re.sub(r"\n{3,}", "\n\n", out)
+
+
+def _repeats(candidate: str, source: str, toks: frozenset,
+             prev: frozenset, threshold: float) -> bool:
+    if len(toks & prev) / max(1, len(toks | prev)) <= threshold:
+        return False
+    if _content(candidate) - _content(source):
+        return False
+    return difflib.SequenceMatcher(None, candidate, source).ratio() > _VERBATIM
+
+
+def _balanced(text: str) -> bool:
+    """Does this paragraph close every delimiter it opens?"""
+    return (text.count("{") == text.count("}")
+            and text.count(r"\[") == text.count(r"\]")
+            and text.count(r"\begin{") == text.count(r"\end{")
+            and text.count("$") % 2 == 0)
 
 
 def _is_prose(text: str) -> bool:
@@ -50,15 +133,80 @@ def _is_prose(text: str) -> bool:
     return not _MATHY.search(text)
 
 
-def _balanced(text: str) -> bool:
-    """Does this paragraph close every delimiter it opens?"""
-    if text.count("{") != text.count("}"):
-        return False
-    if text.count(r"\[") != text.count(r"\]"):
-        return False
-    if text.count(r"\begin{") != text.count(r"\end{"):
-        return False
-    return text.count("$") % 2 == 0
+def _trim(bodies: List[str], owners: List[Optional[str]],
+          threshold: float) -> Tuple[List[str], Dict[str, str]]:
+    """Trim each body against what the earlier ones already said.
+
+    `owners[i]` is the step number body i belongs to, or None for text before
+    the first step. Returns the trimmed bodies and, for each step that ends up
+    empty, the step its content repeated.
+    """
+    seen: List[Tuple[frozenset, Optional[str], str]] = []
+    displays: set = set()
+    trimmed: List[str] = []
+    sources: Dict[str, List[str]] = {}
+    for body, owner in zip(bodies, owners):
+        kept: List[str] = []
+        for para in _PARA.split(body or ""):
+            text = para.strip()
+            if not text:
+                continue
+            if _ANSWER.search(text) or not _balanced(para):
+                kept.append(para)
+                continue
+            if not _is_prose(text):
+                text = _drop_repeated_displays(text, displays)
+                if not text.strip():
+                    continue
+                kept.append(text)
+                continue
+            units = _SENT.split(text)
+            survivors: List[str] = []
+            for unit in units:
+                piece = unit.strip()
+                toks = _tokens(piece)
+                # The paragraph balances, but a sentence inside it need not:
+                # "the set $\\{a, b\\}$" splits after a full stop that falls
+                # between the braces, and dropping that half leaves the rest
+                # of the trace one brace short.
+                if (len(piece) < 40 or len(toks) < 6 or _ANSWER.search(piece)
+                        or not _balanced(unit)):
+                    survivors.append(unit)
+                    continue
+                match = next((src for prev, src, prev_text in seen
+                              if _repeats(piece, prev_text, toks, prev, threshold)),
+                             "")
+                if match != "":
+                    if owner is not None and match is not None:
+                        sources.setdefault(owner, []).append(match)
+                    continue
+                seen.append((toks, owner, piece))
+                survivors.append(unit)
+            joined = " ".join(x for x in survivors if x.strip())
+            if joined.strip():
+                kept.append(joined)
+        trimmed.append("\n\n".join(k for k in kept if k.strip()))
+
+    alias: Dict[str, str] = {}
+    for body, owner in zip(trimmed, owners):
+        if owner is not None and not body.strip() and sources.get(owner):
+            picks = sources[owner]
+            alias[owner] = max(set(picks), key=picks.count)
+    return trimmed, alias
+
+
+def _resolve(alias: Dict[str, str]) -> Dict[str, str]:
+    """Follow a chain of dropped steps back to the one that still exists."""
+    out: Dict[str, str] = {}
+    for key in alias:
+        seen = {key}
+        target = alias[key]
+        while target in alias and target not in seen:
+            seen.add(target)
+            target = alias[target]
+        if target not in alias:
+            out[key] = target
+    return out
 
 
 def dedup_trace(text: str,
@@ -74,19 +222,50 @@ def dedup_trace(text: str,
         return text
 
     pieces = _STEP.split(text)
-    heads = [p for p in pieces if _STEP.fullmatch(p or "")]
-    bodies = [p for p in pieces if not _STEP.fullmatch(p or "")]
-    kept = dedup_steps(bodies, threshold)
-    if len(kept) != len(bodies):
-        return text
-    rebuilt = []
-    bi = 0
+    heads: List[Optional[str]] = []
+    bodies: List[str] = []
+    pending: Optional[str] = None
+    seen_head = False
     for piece in pieces:
         if _STEP.fullmatch(piece or ""):
-            rebuilt.append(piece)
-        else:
-            rebuilt.append(kept[bi]); bi += 1
-    rewritten = "".join(rebuilt)
+            pending = piece.strip()
+            seen_head = True
+            continue
+        heads.append(pending if seen_head else None)
+        bodies.append((piece or "").strip())
+        pending = None
+
+    owners = [_STEP_NO.match(h).group(1) if h and _STEP_NO.match(h) else None
+              for h in heads]
+    trimmed, alias = _trim(bodies, owners, threshold)
+    alias = _resolve(alias)
+
+    # A step that emptied out but has nowhere to send its citations keeps the
+    # body it had: dropping it would leave a later "from Step N" pointing at
+    # nothing, which is worse than the repetition.
+    for i, (owner, body) in enumerate(zip(owners, trimmed)):
+        if owner is not None and not body.strip() and owner not in alias:
+            trimmed[i] = bodies[i]
+
+    parts: List[str] = []
+    for head, body in zip(heads, trimmed):
+        if not body.strip():
+            continue
+        parts.append(f"{head} {body}" if head else body)
+    rewritten = "\n".join(parts)
+
+    if alias:
+        def redirect(m: re.Match) -> str:
+            return m.group(1) + alias.get(m.group(2), m.group(2))
+        rebuilt = [piece if _STEP.fullmatch(piece or "")
+                   else _STEP_REF.sub(redirect, piece or "")
+                   for piece in _STEP.split(rewritten)]
+        rewritten = "".join(rebuilt)
+        # Two citations that now point at the same step read as "Step 2 and
+        # Step 2"; say it once.
+        rewritten = re.sub(r"(?i)\b(Steps?\s*(\d+))(\s*(?:and|,)\s*Steps?\s*\2\b)+",
+                           r"\1", rewritten)
+
     if extractor is not None and extractor(rewritten) != extractor(text):
         return text
     return rewritten
@@ -97,47 +276,19 @@ def dedup_steps(steps: List[str], threshold: float = 0.75,
     """The same pass over a trace already split into steps.
 
     The ROSCOE export joins a trace's steps with a space before scoring, which
-    leaves neither the "Step N:" line starts nor the blank lines `dedup_trace`
+    leaves neither the "Step N:" line starts nor the blank lines dedup_trace
     reads, so the export deduplicates the list and joins what comes back.
-    A step whose every paragraph repeats an earlier one drops out entirely.
     """
-    seen: List[frozenset] = []
-    out: List[str] = []
-    for step in steps:
-        kept: List[str] = []
-        for para in _PARA.split(step or ""):
-            body = para.strip()
-            if not body:
-                kept.append(para)
-                continue
-            if _ANSWER.search(body) or not _balanced(para):
-                kept.append(para)
-                continue
-            # Prose splits a sentence at a time, which is what reaches the
-            # metric; a paragraph carrying a display is kept whole, because a
-            # split inside one leaves its braces unbalanced.
-            units = _SENT.split(body) if _is_prose(body) else [body]
-            survivors = []
-            for unit in units:
-                u = unit.strip()
-                toks = _tokens(u)
-                if len(u) < 40 or len(toks) < 6:
-                    survivors.append(unit)
-                    continue
-                if _ANSWER.search(u):
-                    survivors.append(unit)
-                    continue
-                if any(len(toks & prev) / max(1, len(toks | prev)) > threshold
-                       for prev in seen):
-                    continue
-                seen.append(toks)
-                survivors.append(unit)
-            joined_para = " ".join(x for x in survivors if x.strip())
-            if joined_para.strip():
-                kept.append(joined_para)
-        out.append("\n\n".join(k for k in kept if k.strip()))
-    if not any(o.strip() for o in out):
+    owners = [str(i) for i in range(len(steps))]
+    trimmed, alias = _trim(list(steps), owners, threshold)
+    alias = _resolve(alias)
+    out = [b for b in trimmed if b.strip()]
+    if not out:
         return list(steps)
+    if alias:
+        def redirect(m: re.Match) -> str:
+            return m.group(1) + alias.get(m.group(2), m.group(2))
+        out = [_STEP_REF.sub(redirect, b) for b in out]
     if extractor is not None and extractor(" ".join(out)) != extractor(" ".join(steps)):
         return list(steps)
     return out
