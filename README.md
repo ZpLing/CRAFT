@@ -276,6 +276,38 @@ Hyperparameters fixed across all experiments (§4.6): Module I `K=5`, `T=0.7`,
 `β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. These are the
 CLI defaults, so a stage run without flags uses them.
 
+### Ablation (§4.5)
+
+| Ablation Setting | FLD<br>Acc(%) | FLD<br>&Delta; | ProofWriter<br>Acc(%) | ProofWriter<br>&Delta; |
+| --- | ---: | ---: | ---: | ---: |
+| **CRAFT (full)** | **82.8** | — | **87.4** | — |
+| w/o CRAFT | 76.0 | −6.8 | 61.0 | −26.4 |
+| w/o RKG | 79.4 | −3.4 | 83.6 | −3.8 |
+| w/o Synthesis | 82.7 | −0.1 | 59.2 | −28.2 |
+| w/o Filter & Synthesis | 82.0 | −0.8 | 59.2 | −28.2 |
+| w/o Weighted Edges Fusion | 81.0 | −1.8 | 84.2 | −3.2 |
+| Embedding Cosine (replacing Jaccard) | 81.4 | −1.4 | 83.6 | −3.8 |
+
+FLD under GPT-5.4-nano, ProofWriter under Gemini-3.1-flash-lite, both the same
+runs the main table reports. Every row is scored by the same metric as that
+table, so an ablation row and a main-table cell cannot disagree about what a run
+achieved. `w/o Synthesis` and `w/o Filter & Synthesis` vote over the filtered and
+the raw K traces respectively, re-deriving each trace's prediction from the text
+that survived filtering rather than reusing the label it was generated with,
+which is the only reason those two rows differ at all.
+
+The two datasets put the weight on different components. On FLD nothing costs
+more than 6.8 points: voting over the filtered traces already recovers the full
+system, so what CRAFT buys there is mostly Module I's filter. On ProofWriter the
+order reverses and the margins are an order of magnitude larger — its traces end
+on a search that failed rather than on a refutation, and only a trace written
+over the consensus RKG resolves them. The graph's own construction choices are
+worth a few points each and agree closely across the two columns, which is the
+part of the table that generalises: −3.4 / −3.8 for the RKG, −1.8 / −3.2 for
+weighted edge fusion, −1.4 / −3.8 for Jaccard over embedding cosine — the last
+confirming Jaccard is the better choice, since it holds higher accuracy without
+an extra API call.
+
 ## Configuration
 
 Credentials live only in the repo-root `config.py` (git-ignored); every module reads them through
