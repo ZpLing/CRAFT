@@ -138,8 +138,8 @@ framework of §3.2.
 │   │   │                              answer_match.py — one adapter per dataset
 │   │   ├── reasoning_traces_quality/  ROSCOE/ (§4)
 │   │   │                              dataset_adapters.py — the same four, for traces
+│   │   ├── Ablation_Study/            the six settings of the ablation table (§4.5)
 │   │   └── other_evaluation/          the analyses behind the appendix
-│   │       ├── ablation_study/        the six settings of the ablation table
 │   │       ├── hyperparameter_sensitivity/  accuracy and RKG size against K
 │   │       └── rkg_construct_robustness/  does the backbone change the graph
 │   └── results/

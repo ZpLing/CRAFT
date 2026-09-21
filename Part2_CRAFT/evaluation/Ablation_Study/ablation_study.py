@@ -39,17 +39,17 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
     from config import PART_ROOT, resolve_input, resolve_output, run_model
 except ImportError:
     resolve_input = resolve_output = Path
-    PART_ROOT = Path(__file__).resolve().parents[3]
+    PART_ROOT = Path(__file__).resolve().parents[2]
 
     def run_model(*paths):  # noqa: D103
         return "unknown-model"
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]
                        / "evaluation" / "label_prediction"))
 from evaluate_accuracy import LOADERS, compute_metrics
 
