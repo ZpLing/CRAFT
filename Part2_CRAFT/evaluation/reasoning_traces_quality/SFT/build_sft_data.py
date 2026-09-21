@@ -125,7 +125,11 @@ def main() -> None:
     ap.add_argument("--baselines", default="results/baseline_results")
     ap.add_argument("--k_runs", default="results/craft_runs/full500")
     ap.add_argument("--out_dir", default="results/CRAFT_results/other_results/trace_utility/data")
-    ap.add_argument("--test_frac", type=float, default=0.2)
+    ap.add_argument("--test_frac", type=float, default=0.0,
+                    help="Hold out this share of the run's own problems. 0 by "
+                         "default: the test set is built from problems the "
+                         "pipeline never touched, by build_test_set.py, so the "
+                         "run's 500 per cell can all be trained on")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--strip_answer", action="store_true", default=False,
                     help="Cut each training trace off before it states its "
@@ -172,7 +176,7 @@ def main() -> None:
                 if rr is None:
                     continue
 
-                if in_test_split(sid, args.test_frac, args.seed):
+                if args.test_frac > 0 and in_test_split(sid, args.test_frac, args.seed):
                     # A problem is one problem. It appears once per backbone in
                     # the traces, because both were run over the same 500, and a
                     # student answers it once — counting it twice would weight
