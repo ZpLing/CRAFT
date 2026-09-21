@@ -14,7 +14,9 @@ Each line is one sample:
     trace (the post-processed text), setting (how the cell was run)
 
 `predicted` is re-derived from the trace text with the same extractor the
-scorer uses, so a line cannot disagree with the reported table.
+scorer uses, so a line cannot disagree with the reported table. A sample
+Module III produced no trace for is left out, as the scorer leaves it out, so
+this file's line count is the n its cell reports.
 
 The trace is written out with its restatements removed. Walking the consensus
 graph carries each step's conclusion forward, so a late step repeats what the
@@ -95,7 +97,7 @@ def main() -> None:
             continue
         rows = LOADERS["synthesized"](src)
         metrics = compute_metrics(rows)
-        shrunk = total = 0
+        shrunk = total = dropped = 0
         out = out_dir / model / f"{ds}_Output.jsonl"
         out.parent.mkdir(parents=True, exist_ok=True)
         with out.open("w", encoding="utf-8") as fh:
@@ -103,6 +105,14 @@ def main() -> None:
             for r in rows:
                 t = r["traces"][0]
                 original = t["text"] or ""
+                # Module III produced nothing for this sample. The scorer
+                # already leaves those out -- a cell's n is 492 to 500, not 500
+                # -- so writing them here as an empty trace put a row in this
+                # file that no reported number counts, and handed anything
+                # reading it an empty string to score.
+                if not original.strip():
+                    dropped += 1
+                    continue
                 text = dedup_trace(original, extractor=reader)
                 n_steps = len(_STEP_HEAD.findall(text)) or t["n_steps"]
                 shrunk += len(original) - len(text)
@@ -118,9 +128,10 @@ def main() -> None:
                     "n_steps": n_steps,
                     "trace": text,
                 }, ensure_ascii=False) + "\n")
-        print(f"  {model:<22} {ds:<14} {len(rows):>4} samples  "
+        print(f"  {model:<22} {ds:<14} {len(rows) - dropped:>4} traces  "
               f"acc {100*metrics['accuracy']:5.1f}  steps {metrics['avg_steps']:4.1f}  "
-              f"trimmed {100*shrunk/max(total,1):4.1f}%  -> {out}")
+              f"trimmed {100*shrunk/max(total,1):4.1f}%"
+              + (f"  dropped {dropped}" if dropped else "") + f"  -> {out}")
 
     if missing:
         raise SystemExit("These cells have no reported trace file:\n  "
