@@ -756,12 +756,36 @@ def load_label_pool(path: Optional[Path], source: str) -> Dict[str, Dict]:
     if not results:
         return {}
 
-    # Domain detection: scan first 20 records (first may be an error item with no fields)
+    # Domain detection: scan the first 20 records, since the first may be an
+    # error item with no fields.
+    #
+    # A record's own "domain" decides it. The fallbacks below only run when no
+    # record carries one, because "target_answer" does not mean what it looks
+    # like: a k_traces record has it on every dataset, holding "__PROVED__" on
+    # the logical ones. Reading it as a sign of maths sent FLD and ProofWriter
+    # through normalise_math_answer, which returns None for "__PROVED__", so
+    # every vote came back empty and Settings B and C reported 0.0000 --- not a
+    # component contributing nothing, but a domain read the wrong way.
     def _detect_math(records):
+        # The record's own domain decides it, wherever it is written. A
+        # k_traces record carries it at the top; a cleaned record does not, and
+        # carries it on each trace instead.
         for rec in records[:20]:
-            if rec.get("domain") == "math":
-                return True
-            if "target_answer" in rec:
+            d = rec.get("domain")
+            if d:
+                return d == "math"
+            for key in ("traces", "cleaned_traces", "original_traces"):
+                for t in (rec.get(key) or [])[:3]:
+                    if t.get("domain"):
+                        return t["domain"] == "math"
+        # No domain anywhere: read what the target answer looks like. Its
+        # presence says nothing --- every dataset's k_traces has one --- but a
+        # logical dataset's is __PROVED__ or __DISPROVED__.
+        for rec in records[:20]:
+            ta = rec.get("target_answer")
+            if isinstance(ta, str) and normalise_label(ta) in VALID_LABELS:
+                return False
+            if ta is not None:
                 return True
             if "answer" in rec and "proof_label" not in rec and "Label" not in rec:
                 return True

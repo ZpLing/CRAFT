@@ -1,0 +1,152 @@
+{
+  "settings": [
+    {
+      "key": "B",
+      "name": "B: Majority vote on raw k traces (Step 1)",
+      "accuracy": 0.6099,
+      "macro_f1": null,
+      "per_class_f1": {},
+      "avg_steps": 0.0,
+      "std_steps": 0.0,
+      "avg_tokens": 0.0,
+      "std_tokens": 0.0,
+      "n_total": 405,
+      "n_correct": 247,
+      "n_no_pred": 9,
+      "no_pred_rate": 0.0222,
+      "per_dataset": {
+        "OlympiadBench": {
+          "accuracy": 0.6099,
+          "macro_f1": null,
+          "precision_answered": 0.6237,
+          "avg_steps": 0.0,
+          "std_steps": 0.0,
+          "avg_tokens": 0.0,
+          "std_tokens": 0.0,
+          "mean_trace_acc": 0.6099,
+          "std_trace_acc": 0.0,
+          "n_total": 405,
+          "n_correct": 247,
+          "n_no_pred": 9,
+          "n_blocked": 0,
+          "no_pred_rate": 0.0222,
+          "per_class_f1": {},
+          "confusion_matrix": {},
+          "domain": "math"
+        }
+      }
+    },
+    {
+      "key": "C",
+      "name": "C: Majority vote on filtered traces (Step 3/3.6)",
+      "accuracy": 0.6099,
+      "macro_f1": null,
+      "per_class_f1": {},
+      "avg_steps": 0.0,
+      "std_steps": 0.0,
+      "avg_tokens": 0.0,
+      "std_tokens": 0.0,
+      "n_total": 405,
+      "n_correct": 247,
+      "n_no_pred": 9,
+      "no_pred_rate": 0.0222,
+      "per_dataset": {
+        "OlympiadBench": {
+          "accuracy": 0.6099,
+          "macro_f1": null,
+          "precision_answered": 0.6237,
+          "avg_steps": 0.0,
+          "std_steps": 0.0,
+          "avg_tokens": 0.0,
+          "std_tokens": 0.0,
+          "mean_trace_acc": 0.6099,
+          "std_trace_acc": 0.0,
+          "n_total": 405,
+          "n_correct": 247,
+          "n_no_pred": 9,
+          "n_blocked": 0,
+          "no_pred_rate": 0.0222,
+          "per_class_f1": {},
+          "confusion_matrix": {},
+          "domain": "math"
+        }
+      }
+    },
+    {
+      "key": "D",
+      "name": "D: Direct pred_label \u2014 step-by-step synthesis (Step 5)",
+      "accuracy": 0.5358,
+      "macro_f1": null,
+      "per_class_f1": {},
+      "avg_steps": 0.0,
+      "std_steps": 0.0,
+      "avg_tokens": 0.0,
+      "std_tokens": 0.0,
+      "n_total": 405,
+      "n_correct": 217,
+      "n_no_pred": 30,
+      "no_pred_rate": 0.0741,
+      "per_dataset": {
+        "OlympiadBench": {
+          "accuracy": 0.5358,
+          "macro_f1": null,
+          "precision_answered": 0.5787,
+          "avg_steps": 0.0,
+          "std_steps": 0.0,
+          "avg_tokens": 0.0,
+          "std_tokens": 0.0,
+          "mean_trace_acc": 0.5358,
+          "std_trace_acc": 0.0,
+          "n_total": 405,
+          "n_correct": 217,
+          "n_no_pred": 30,
+          "n_blocked": 0,
+          "no_pred_rate": 0.0741,
+          "per_class_f1": {},
+          "confusion_matrix": {},
+          "domain": "math"
+        }
+      }
+    },
+    {
+      "key": "E",
+      "name": "E: Direct pred_label \u2014 RKG synthesis (Step 5)",
+      "accuracy": 0.5877,
+      "macro_f1": null,
+      "per_class_f1": {},
+      "avg_steps": 0.0,
+      "std_steps": 0.0,
+      "avg_tokens": 0.0,
+      "std_tokens": 0.0,
+      "n_total": 405,
+      "n_correct": 238,
+      "n_no_pred": 29,
+      "no_pred_rate": 0.0716,
+      "per_dataset": {
+        "OlympiadBench": {
+          "accuracy": 0.5877,
+          "macro_f1": null,
+          "precision_answered": 0.633,
+          "avg_steps": 0.0,
+          "std_steps": 0.0,
+          "avg_tokens": 0.0,
+          "std_tokens": 0.0,
+          "mean_trace_acc": 0.5877,
+          "std_trace_acc": 0.0,
+          "n_total": 405,
+          "n_correct": 238,
+          "n_no_pred": 29,
+          "n_blocked": 0,
+          "no_pred_rate": 0.0716,
+          "per_class_f1": {},
+          "confusion_matrix": {},
+          "domain": "math"
+        }
+      }
+    }
+  ],
+  "model": "o4-mini",
+  "seed": 42,
+  "per_dataset": 500,
+  "test_ratio": 1.0
+}

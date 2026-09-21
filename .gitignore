@@ -85,3 +85,10 @@ Part2_CRAFT/results/baseline_results/_archive/
 # score's json is tracked and the two training sets stay local. test.jsonl
 # is kept: it is 584 KB and the score cannot be re-checked without it.
 Part2_CRAFT/results/CRAFT_results/other_results/trace_utility/data/train_*.jsonl
+
+# ── Ablation per-sample dumps — the numbers are in the summary ───────
+# Each setting's json carries every sample's trace text, 74 MB across the
+# eight cells. <cell>.summary.json is 48 KB and holds every number the
+# appendix reads: accuracy, macro-F1, per-class F1, per-dataset breakdown.
+Part2_CRAFT/results/CRAFT_results/other_results/ablation_study/*/[A-Za-z]*.json
+!Part2_CRAFT/results/CRAFT_results/other_results/ablation_study/*/*.summary.json
