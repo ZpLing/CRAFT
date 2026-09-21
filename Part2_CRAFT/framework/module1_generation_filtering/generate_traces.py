@@ -326,6 +326,16 @@ LABEL_TOKEN_PATTERN = re.compile(r"__PROVED__|__DISPROVED__", re.IGNORECASE)
 
 # Math domain: extract boxed answer or plain numeric/expression answer
 BOXED_PATTERN = re.compile(r"\\boxed\{([^}]+)\}", re.IGNORECASE)
+
+# Nested braces are read by the evaluation side's reader, so a trace's stored
+# answer and the answer it is later scored on come from the same rules.
+try:
+    import sys as _sys
+    _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[2]
+                            / "evaluation" / "label_prediction"))
+    from extract_label import _extract_boxed_content as _shared_boxed
+except Exception:
+    _shared_boxed = None
 MATH_ANSWER_PATTERN = re.compile(
     r"(?:the\s+answer\s+is|final\s+answer\s*[:\=]|answer\s*[:\=])\s*([^\n\.]+)", re.IGNORECASE
 )
@@ -394,10 +404,23 @@ def extract_label_from_text(text: str) -> Optional[str]:
 
 
 def extract_math_answer_from_text(text: str) -> Optional[str]:
-    """Extract the final answer from math reasoning text (\\boxed{} or 'the answer is ...')."""
+    """Extract the final answer from math reasoning text (\\boxed{} or 'the answer is ...').
+
+    The shared reader in evaluation/label_prediction/extract_label.py is used for
+    the \\boxed{} case. The local pattern here was \\boxed\\{([^}]+)\\}, which stops
+    at the first closing brace and so cut every nested answer short: \\boxed{\\sqrt{2}}
+    was recorded as "\\sqrt{2", \\boxed{\\frac{1}{2}} as "\\frac{1". On Omni-MATH that
+    truncated 22% of the traces' stored labels, and those labels are what the
+    k-trace vote is counted over and what Module III is handed as its
+    majority-vote prior — so a cut answer was both scored wrong and fed forward.
+    """
     if not text:
         return None
     # Prefer \boxed{...}
+    if _shared_boxed is not None:
+        boxed = _shared_boxed(text)
+        if boxed:
+            return boxed[-1].strip()
     boxed_matches = BOXED_PATTERN.findall(text)
     if boxed_matches:
         return boxed_matches[-1].strip()

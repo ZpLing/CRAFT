@@ -924,6 +924,33 @@ def build_rkg_synthesis_prompt(
     return prompt
 
 
+# Module level: synthesize_trace_rkg and synthesize_trace_for_sample both read
+# a boxed answer, and this used to be nested inside the first of them. The
+# second's reference to it raised NameError on every maths sample it reached,
+# which is the whole of the ablation's w/o RKG row — the step_by_step path
+# never returned a trace on Omni-MATH or OlympiadBench.
+def _extract_boxed_content(text: str) -> list:
+    """Extract \\boxed{...} contents handling nested braces."""
+    results = []
+    i = 0
+    while i < len(text):
+        idx = text.find('\\boxed{', i)
+        if idx == -1:
+            break
+        start = idx + 7  # len('\\boxed{')
+        depth, j = 1, start
+        while j < len(text) and depth > 0:
+            if text[j] == '{':
+                depth += 1
+            elif text[j] == '}':
+                depth -= 1
+            j += 1
+        if depth == 0:
+            results.append(text[start:j - 1].strip())
+        i = j
+    return results
+
+
 async def synthesize_trace_rkg(
     session: aiohttp.ClientSession,
     sample: Dict[str, Any],
@@ -948,27 +975,6 @@ async def synthesize_trace_rkg(
         r"(?:the\s+answer\s+is|final\s+answer\s*[:\=]|answer\s*[:\=])\s*([^\n\.]+)",
         re.IGNORECASE,
     )
-
-    def _extract_boxed_content(text: str) -> list:
-        """Extract \\boxed{...} contents handling nested braces."""
-        results = []
-        i = 0
-        while i < len(text):
-            idx = text.find('\\boxed{', i)
-            if idx == -1:
-                break
-            start = idx + 7  # len('\\boxed{')
-            depth, j = 1, start
-            while j < len(text) and depth > 0:
-                if text[j] == '{':
-                    depth += 1
-                elif text[j] == '}':
-                    depth -= 1
-                j += 1
-            if depth == 0:
-                results.append(text[start:j - 1].strip())
-            i = j
-        return results
 
     sample_id      = sample.get("sample_id", "unknown")
     consensus_rkg  = sample_rkg.get("consensus_rkg") or sample_rkg.get("consensus_dag") or {}
