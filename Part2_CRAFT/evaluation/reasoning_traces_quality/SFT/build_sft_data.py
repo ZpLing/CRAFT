@@ -121,7 +121,7 @@ def in_test_split(sample_id: str, frac: float, seed: int) -> bool:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--traces", default="results/CRAFT_results/traces")
+    ap.add_argument("--traces", default="results/CRAFT_results/Output")
     ap.add_argument("--baselines", default="results/baseline_results")
     ap.add_argument("--k_runs", default="results/craft_runs/full500")
     ap.add_argument("--out_dir", default="results/CRAFT_results/other_results/trace_utility/data")
@@ -157,7 +157,7 @@ def main() -> None:
 
         for ds in DATASETS:
             rows = [json.loads(l) for l in
-                    (root / args.traces / model / f"{ds}_Traces.jsonl").open(encoding="utf-8")]
+                    (root / args.traces / model / f"{ds}_Output.jsonl").open(encoding="utf-8")]
             kpath = root / args.k_runs / f"{ds}_{model}" / "k_traces_500_samples.json"
             if not kpath.exists() and ds == "ProofWriter" and model.startswith("gemini"):
                 kpath = root / args.k_runs / "ProofWriter_gd" / "k_traces_500_samples.json"

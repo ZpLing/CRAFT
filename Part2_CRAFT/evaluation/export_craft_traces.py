@@ -16,7 +16,7 @@ Each line is one sample:
 `predicted` is re-derived from the trace text with the same extractor the
 scorer uses, so a line cannot disagree with the reported table.
 
-    python export_craft_traces.py --out_dir CRAFT_results/traces
+    python export_craft_traces.py --out_dir CRAFT_results/Output
 """
 
 from __future__ import annotations
@@ -59,7 +59,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--runs", default="craft_runs/full500")
-    ap.add_argument("--out_dir", default="CRAFT_results/traces")
+    ap.add_argument("--out_dir", default="CRAFT_results/Output")
     args = ap.parse_args()
 
     runs = Path(_cfg.resolve_input(args.runs))
@@ -74,7 +74,7 @@ def main() -> None:
             continue
         rows = LOADERS["synthesized"](src)
         metrics = compute_metrics(rows)
-        out = out_dir / model / f"{ds}_Traces.jsonl"
+        out = out_dir / model / f"{ds}_Output.jsonl"
         out.parent.mkdir(parents=True, exist_ok=True)
         with out.open("w", encoding="utf-8") as fh:
             for r in rows:
