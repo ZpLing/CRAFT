@@ -172,7 +172,13 @@ def main() -> None:
             gradient_accumulation_steps=args.grad_accum,
             learning_rate=args.lr,
             lr_scheduler_type="cosine",
-            warmup_ratio=0.03,
+            # transformers 5 dropped warmup_ratio. The step count is the same
+            # on both sides of the pair -- the two training sets hold the same
+            # 2008 problems -- so naming the steps outright gives the two
+            # students an identical schedule rather than one recomputed from a
+            # ratio each run.
+            warmup_steps=max(1, round(0.03 * (len(train_rows) / args.grad_accum)
+                                      * args.epochs)),
             logging_steps=20,
             save_strategy="no",
             bf16=True,
