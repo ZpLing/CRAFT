@@ -338,6 +338,13 @@ def build_synthesis_prompt(
     # open by reviewing the ones before it. The second is a restatement asked
     # for in so many words -- 8% to 20% of the sentences in these traces repeat
     # an earlier one. --atomic_steps asks for the inference instead.
+    # The two were measured apart, on 49 paired OlympiadBench samples: keeping
+    # the algebra written out and dropping only the review of earlier steps
+    # trimmed 8.0% against this flag's 33.7%, took 5.0 points off the repeated
+    # sentences against 9.2, and answered 4.1 points worse against 2.0. The
+    # reading that the algebra is what catches a slip -- the one sample this
+    # flag lost computed 504 and carried 503 into the next line -- did not
+    # survive: the half measure lost three. They go together.
     if atomic_steps:
         _equations_rule = (
             "1. **Show the Work That Matters**: write the equation being solved "
