@@ -61,7 +61,29 @@ import importlib.util as _ilu, pathlib as _pl
 
 # normalise_math_answer comes from extract_label, the one copy of it.
 def _normalise_math_pred(s: Optional[str]) -> Optional[str]:
-    """Normalize a math pred_label before storing — delegates to extract_label."""
+    """The answer as the trace wrote it.
+
+    This used to rewrite the answer before storing it, and the rewriting lost
+    the answer: \\tfrac{1}{2}, \\frac{41}{2} and \\frac{5}{2},\\ 3,\\ \\sqrt{10} all
+    came back None, and only a bare integer survived. Fractions, roots and
+    multi-part answers are most of what a competition problem asks for, so the
+    stored pred_label was empty for 28% of an Omni-MATH run and 22% of an
+    OlympiadBench one — every one of them scored wrong although the trace had
+    written the answer out in \\boxed{}.
+
+    extract_label.py's own notes record the same function being dropped from the
+    evaluation side for the same reason: it stripped every LaTeX command, so
+    \\lceil n/2 \\rceil + 1 became n/2 + 1. Equivalence is answers_match's job, and
+    it compares symbolically; nothing is gained by rewriting the answer first.
+    """
+    if s is None:
+        return None
+    s = s.strip()
+    return s or None
+
+
+def _normalise_math_pred_legacy(s: Optional[str]) -> Optional[str]:
+    """The previous rewriting behaviour, kept for reference. Not called."""
     try:
         import sys as _sys
         _eval_dir = str(_pl.Path(__file__).resolve().parents[2] / "evaluation" / "label_prediction")
