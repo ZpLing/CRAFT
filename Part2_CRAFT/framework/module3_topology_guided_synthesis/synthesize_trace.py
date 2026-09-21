@@ -296,11 +296,16 @@ def collect_terms_by_step_position(
     return step_terms_summary
 
 
+# A step's own "Step 7:" prefix, stripped before the trace is numbered.
+_STEP_PREFIX = re.compile(r"^\s*\*{0,2}Step\s*\d+\*{0,2}\s*[:.\-]\s*", re.IGNORECASE)
+
+
 def build_synthesis_prompt(
     problem_input: str,
     step_terms_summary: Dict[int, Dict[str, Any]],
     ground_truth: Optional[str] = None,
     current_step: Optional[int] = None,
+    step_label: Optional[int] = None,
     previous_steps: Optional[List[str]] = None,
     domain: str = "logical",
     mv_label: Optional[str] = None,
@@ -313,11 +318,18 @@ def build_synthesis_prompt(
         problem_input: Problem context
         step_terms_summary: Summary of terms at each step position
         ground_truth: Expected answer (optional)
-        current_step: Step number to generate (if None, generate all steps at once)
+        current_step: Which bucket of terms to draw on (if None, generate all at once)
+        step_label: What to call this step in the prompt. The buckets are
+            percentage positions over the K traces, so their keys skip a number
+            whenever no trace put a step in that tenth -- and the step then went
+            out labelled "Step 4" in a trace whose steps run 0,1,2,4. Numbering
+            by how many have been written keeps the label contiguous, and the
+            model's own citations with it. Defaults to current_step.
         previous_steps: List of previously generated steps (used for autoregressive generation)
         domain: "logical" or "math"
     """
 
+    label = step_label if step_label is not None else current_step
     sorted_steps = sorted(step_terms_summary.items())
 
     if domain == "math":
@@ -376,7 +388,7 @@ and follow your own derivation if it disagrees):
             ]
 
             prompt += f"""
-**Current Step ({current_step}) - Important Terms** (extracted from {num_traces} traces):
+**Current Step ({label}) - Important Terms** (extracted from {num_traces} traces):
   Key terms: {', '.join(high_freq_terms[:20])}
   Term frequencies: {dict((t, frequencies[t]) for t in high_freq_terms[:10])}
 """
@@ -471,7 +483,7 @@ and follow your own derivation if it disagrees):
         is_last_step = (current_step == sorted_steps[-1][0])
 
         prompt += f"""
-**Current Task**: Generate Step {current_step} of {total_steps} total steps"""
+**Current Task**: Generate Step {label} of {total_steps} total steps"""
 
         if is_last_step:
             prompt += f""" (THIS IS THE FINAL STEP - MUST REACH A CLEAR CONCLUSION)"""
@@ -489,18 +501,18 @@ and follow your own derivation if it disagrees):
    - DO NOT contradict or ignore conclusions from previous steps
 
 2. **Step Generation**:
-   - Generate ONLY Step {current_step} based on the important terms provided
+   - Generate ONLY Step {label} based on the important terms provided
    - Build logically on the previously generated steps (use their conclusions as premises)
    - Use the key terms naturally in your reasoning
    - Follow all quality guidelines above
-   - Output format: "Step {current_step}: [your reasoning here]"
+   - Output format: "Step {label}: [your reasoning here]"
    - Do NOT generate any other steps"""
 
         if is_last_step:
             if domain == "math":
                 prompt += f"""
 
-3. **Final Step Requirements** (CRITICAL - This is Step {current_step}, the LAST step):
+3. **Final Step Requirements** (CRITICAL - This is Step {label}, the LAST step):
    - You MUST arrive at a clear, numeric or symbolic answer
    - Express the final answer using \\boxed{{<answer>}} notation
    - Do NOT stop before boxing the answer
@@ -509,7 +521,7 @@ and follow your own derivation if it disagrees):
             else:
                 prompt += f"""
 
-3. **Final Step Requirements** (CRITICAL - This is Step {current_step}, the LAST step):
+3. **Final Step Requirements** (CRITICAL - This is Step {label}, the LAST step):
    - You MUST reach a clear, explicit conclusion about the hypothesis
    - The conclusion should be one of: __PROVED__ or __DISPROVED__ (exactly two choices)
    - Do NOT stop before reaching this conclusion
@@ -520,7 +532,7 @@ and follow your own derivation if it disagrees):
             prompt += f"""
 
 3. **Continuation Requirements**:
-   - This is Step {current_step} of {total_steps} - you are NOT done yet
+   - This is Step {label} of {total_steps} - you are NOT done yet
    - Continue building the reasoning chain
    - Do NOT conclude or stop here
    - Prepare for the next step"""
@@ -533,7 +545,7 @@ and follow your own derivation if it disagrees):
 - Is your reasoning logically consistent with previous steps?
 - If this is the final step, will you reach an explicit conclusion?
 
-Please generate Step {current_step} now:"""
+Please generate Step {label} now:"""
     else:
         if domain == "math":
             prompt += """
@@ -849,6 +861,7 @@ def build_rkg_synthesis_prompt(
     gt_label: Optional[str] = None,
     step_terms_summary: Optional[Dict[int, Dict]] = None,
     previous_steps: Optional[List[str]] = None,
+    prev_context: str = "all",
 ) -> str:
     """Build generation prompt for a single RKG node.
 
@@ -887,7 +900,11 @@ def build_rkg_synthesis_prompt(
     # the same 49 samples, that cost 4.1 points on FLD and 3.6 extra steps, while
     # maths — which saw everything — came out level. The topology still fixes the
     # order and the dependencies; it no longer hides what has been derived.
-    if previous_steps:
+    # --prev_context direct narrows this to the graph's own dependencies, which
+    # is what the logical branch used to do on its own and what the comment
+    # above records the cost of. It is here so the choice can be measured
+    # rather than assumed, not because the default is in doubt.
+    if previous_steps and prev_context == "all":
         prompt += "\n**Previously Generated Steps**:\n"
         for prev_step in previous_steps:
             prompt += f"{prev_step}\n"
@@ -1087,6 +1104,7 @@ async def synthesize_trace_rkg(
     no_mv: bool = False,
     prior_mode: str = "verify",
     atomic_steps: bool = False,
+    prev_context: str = "all",
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
     min_tfidf: float = 0.01,
@@ -1342,6 +1360,7 @@ async def synthesize_trace_rkg(
                     ground_truth=_mv_answer,  # majority-vote answer (no GT leakage)
                     answer_is_prior=True,
                     current_step=step_pos,
+                    step_label=idx + 1,
                     previous_steps=generated_steps,
                     domain=domain,
                 )
@@ -1382,8 +1401,11 @@ async def synthesize_trace_rkg(
                         if retry_resp and retry_resp.strip():
                             generated_steps.append(retry_resp.strip())
 
+            # The label the model was given is contiguous, so its own prefix
+            # agrees with the position; strip it anyway and number here, so a
+            # model that writes its own number cannot reintroduce a gap.
             text = "\n".join([
-                f"Step {i+1}: {s}" if not s.startswith("Step ") else s
+                f"Step {i+1}: {_STEP_PREFIX.sub('', s).strip()}"
                 for i, s in enumerate(generated_steps)
             ])
 
@@ -1434,6 +1456,7 @@ async def synthesize_trace_rkg(
                 gt_label=None,
                 step_terms_summary=_step_terms_summary,
                 previous_steps=generated_steps,
+                prev_context=prev_context,
             )
             response = await generate_reasoning_trace(session, prompt, model)
             nid      = entry["node_id"]
@@ -1844,6 +1867,7 @@ async def synthesize_traces_for_dataset(
     no_mv: bool = False,
     prior_mode: str = "verify",
     atomic_steps: bool = False,
+    prev_context: str = "all",
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     df_table_path: Optional[Path] = None,
@@ -1982,7 +2006,7 @@ async def synthesize_traces_for_dataset(
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
                 sample_rkg = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, prior_mode=prior_mode, atomic_steps=atomic_steps, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
+                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, prior_mode=prior_mode, atomic_steps=atomic_steps, prev_context=prev_context, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
             else:
                 tasks.append(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
@@ -2046,6 +2070,7 @@ async def retry_failed_synthesis(
     no_mv: bool = False,
     prior_mode: str = "verify",
     atomic_steps: bool = False,
+    prev_context: str = "all",
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     df_table_path: Optional[Path] = None,
@@ -2104,6 +2129,7 @@ async def retry_failed_synthesis(
                         session, sample, rkg, model=model, domain=domain,
                         anchor_conclusion=anchor_conclusion, no_mv=no_mv,
                         prior_mode=prior_mode, atomic_steps=atomic_steps,
+                        prev_context=prev_context,
                         df_table=df_table, idf_norm=(idf_norm == "log_n"),
                     )
                 except Exception as e:
@@ -2271,6 +2297,14 @@ def main():
     )
 
     parser.add_argument(
+        "--prev_context", choices=["all", "direct"], default="all",
+        help="What a step is shown of the trace so far: 'all' every step "
+             "written before it, 'direct' only the ones the graph makes it "
+             "depend on. 'all' is the default because withholding the rest "
+             "cost 4.1 points on FLD and 3.6 extra steps when it was measured; "
+             "the switch is here to measure it again, not because that is in "
+             "doubt.")
+    parser.add_argument(
         "--atomic_steps", action="store_true", default=False,
         help="Ask each synthesized step for one inference rather than for all "
              "the intermediate work. Raises the step count with it — the two "
@@ -2358,6 +2392,7 @@ def main():
                 no_mv=args.no_mv,
                 prior_mode=args.prior_mode,
                 atomic_steps=args.atomic_steps,
+                prev_context=args.prev_context,
                 idf_scope=args.idf_scope,
                 idf_norm=args.idf_norm,
                 df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
@@ -2394,6 +2429,7 @@ def main():
             no_mv=args.no_mv,
             prior_mode=args.prior_mode,
             atomic_steps=args.atomic_steps,
+            prev_context=args.prev_context,
             idf_scope=args.idf_scope,
             idf_norm=args.idf_norm,
             df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
