@@ -1,37 +1,34 @@
 #!/usr/bin/env python3
-"""Label-prediction accuracy for CRAFT, both ways of asking for it.
+"""Label-prediction accuracy for CRAFT.
 
-Two scripts asked the same question of the same files and answered it
+Two scripts once asked the same question of the same files and answered it
 differently. evaluate_direct_accuracy scored one pipeline output;
-evaluate_label_accuracy ran the ablation, Settings A through E, of which B
-through E are that same scoring applied to four files and arranged in a table.
-Each carried its own compute_metrics, compute_per_dataset, print_metrics and
-answer reader, and the copies had drifted apart — so the ablation table and the
-direct score of the very same file could disagree.
+evaluate_label_accuracy ran a Settings A-E ablation whose B through E are that
+same scoring applied to four files. Each carried its own compute_metrics,
+compute_per_dataset, print_metrics and answer reader, and the copies had
+drifted, so the two could disagree about one file.
 
 They disagreed in ways that mattered. The ablation compared maths answers by
 normalising both sides to a string and testing equality, which loses whatever
-the normaliser strips: an answer of 3\\pi/4 became 0.75 and no longer matched.
-It reported macro-F1 for maths as equal to accuracy, where there are no classes
-to average over. It read the domain from the first prediction and applied it to
-the whole batch, the same read that once sent a hundred maths samples through
-the logical parser. And it counted a sample the gateway refused as a sample the
-model got wrong.
+the normaliser strips: 3\\pi/4 became 0.75 and no longer matched. It reported
+macro-F1 for maths as equal to accuracy, where there are no classes to average
+over. It read the domain from the first prediction and applied it to the whole
+batch, the same read that once sent a hundred maths samples through the
+logical parser. And it counted a sample the gateway refused as one the model
+got wrong.
 
-This file keeps one of each, the version that does not have those faults:
-answers_match decides maths equivalence symbolically, macro-F1 is None for
-maths and real over PROVED/DISPROVED for logic, the domain is the majority of
-the batch, and a refused sample leaves the denominator instead of counting as a
-failure.
+This file keeps one of each, the version without those faults: answers_match
+decides maths equivalence symbolically, macro-F1 is None for maths and real
+over PROVED/DISPROVED for logic, the domain is the majority of the batch, and
+a refused sample leaves the denominator rather than counting as a failure.
 
-Two entry points remain, because they are two questions:
+The A-E ablation is gone with it. The paper's ablation is six named rows, and
+other_evaluation/ablation_study builds them from the loaders and the metric
+here, so there is one scorer and one definition of the ablation rather than a
+second table that can drift from the first.
 
     python evaluate_accuracy.py score \\
         --input craft_runs/<run>/synthesized.json --source synthesized
-
-    python evaluate_accuracy.py ablation \\
-        --datasets dataset/FLD.json \\
-        --k_traces_file $RUN/k_traces.json --synthesized_rkg $RUN/synthesized.json
 """
 
 
@@ -1401,273 +1398,16 @@ async def run_setting_icl(
             "domain":              domain,
         })
     return predictions
-
-
-# ---------------------------------------------------------------------------
-# Metrics
-# ---------------------------------------------------------------------------
-
-
-SETTING_NAMES = {
-    "A": "A: Zero-shot (no pipeline)",
-    "B": "B: Majority vote on raw k traces (Step 1)",
-    "C": "C: Majority vote on filtered traces (Step 3/3.6)",
-    "D": "D: Direct pred_label — step-by-step synthesis (Step 5)",
-    "E": "E: Direct pred_label — RKG synthesis (Step 5)",
-    "L": "L: Best-of-N (N={n}, LLM verifier)",
-}
-
-# The settings this script can run, in the order the ablation reports them.
-# --settings validated against this list; it had never been defined, so the
-# ablation raised NameError before argparse finished building its parser.
-ALL_SETTINGS = list(SETTING_NAMES)
-
-
-async def run(args: argparse.Namespace) -> None:
-    # Resolve L setting name with actual N
-    SETTING_NAMES["L"] = f"L: Best-of-N (N={args.bon_n}, LLM verifier)"
-
-    # 1. Load & split data
-    all_samples = load_raw_dataset([Path(p) for p in args.datasets], seed=args.seed,
-                                   per_dataset=args.per_dataset)
-    logger.info("Loaded %d balanced samples", len(all_samples))
-
-    if args.test_file and Path(args.test_file).exists():
-        with open(args.test_file) as f:
-            test_ids_set = set(json.load(f))
-        test_samples = [s for s in all_samples if s["sample_id"] in test_ids_set]
-        logger.info("Using provided split: %d test samples", len(test_samples))
-    else:
-        _, test_samples = stratified_split(all_samples, args.test_ratio, args.seed)
-        logger.info("Auto-split: %d test samples", len(test_samples))
-        split_path = Path(args.output).parent / "test_ids.json" if args.output else Path("test_ids.json")
-        split_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(split_path, "w") as f:
-            json.dump([s["sample_id"] for s in test_samples], f, indent=2)
-        logger.info("Test IDs saved → %s", split_path)
-
-    # 2. Load label pools for Settings B–E (offline, no LLM)
-    label_pools: Dict[str, Dict[str, Dict]] = {
-        "B": load_label_pool(Path(args.k_traces_file)    if args.k_traces_file    else None, "k_traces"),
-        "C": load_label_pool(Path(args.cleaned_file)     if args.cleaned_file     else None, "cleaned"),
-        "D": load_label_pool(Path(args.synthesized_step) if args.synthesized_step else None, "synthesized"),
-        "E": load_label_pool(Path(args.synthesized_rkg)  if args.synthesized_rkg  else None, "synthesized"),
-    }
-    for key, pool in label_pools.items():
-        logger.info("Setting %s label pool: %d samples", key, len(pool))
-
-    # 2b. For math datasets: bypass the answer-based stratified split (which collapses
-    #     the test set when many problems share the same answer) and instead build test
-    #     samples directly from all_samples restricted to pipeline pool IDs, capped at
-    #     per_dataset per dataset. Non-math samples keep the stratified split.
-    #     When only online settings (A, L) are requested, use all math samples directly.
-    has_math = any(s.get("domain") == "math" for s in all_samples)
-    settings_to_run_preview = list(args.settings or ALL_SETTINGS)
-    offline_settings_requested = [k for k in settings_to_run_preview if k in ("B", "C", "D", "E")]
-    if has_math:
-        all_pool_ids = set().union(*(p.keys() for p in label_pools.values() if p))
-        by_ds: Dict[str, List] = defaultdict(list)
-        for s in all_samples:
-            if s.get("domain") == "math":
-                # If offline settings requested, restrict to pool IDs; otherwise use all
-                if offline_settings_requested and s["sample_id"] not in all_pool_ids:
-                    continue
-                by_ds[s["source_dataset"]].append(s)
-        rng_test = random.Random(args.seed)
-        math_test: List[Dict] = []
-        for ds_name, ds_samples in by_ds.items():
-            rng_test.shuffle(ds_samples)
-            math_test.extend(ds_samples[:args.per_dataset])
-        # Replace math test samples; keep non-math from stratified split
-        non_math_test = [s for s in test_samples if s.get("domain") != "math"]
-        test_samples = non_math_test + math_test
-        logger.info("Math pool restriction: %d math test samples (+ %d non-math)",
-                    len(math_test), len(non_math_test))
-
-    # 3. Determine which settings to run
-    settings_to_run = list(args.settings or ALL_SETTINGS)
-    for key in list(settings_to_run):
-        if key in ("B", "C", "D", "E") and not label_pools.get(key):
-            logger.warning("Setting %s skipped — no pipeline output file provided", key)
-            settings_to_run = [s for s in settings_to_run if s != key]
-    logger.info("Settings to run: %s", settings_to_run)
-
-    semaphore = asyncio.Semaphore(args.concurrency)
-    all_results: List[Tuple[str, Dict]] = []
-    full_output: Dict[str, Any] = {}
-
-    async with aiohttp.ClientSession() as session:
-        for key in settings_to_run:
-            name = SETTING_NAMES[key]
-            logger.info("=== Running Setting %s: %s ===", key, name)
-
-            if key == "A":
-                # Zero-shot: one LLM call per sample
-                preds = await run_setting_zeroshot(
-                    test_samples, args.model, args.api_key, args.base_url,
-                    semaphore, session)
-            elif key == "L":
-                # Best-of-N: N generations + N verifier calls per sample
-                preds = await run_setting_best_of_n(
-                    test_samples, args.model, args.api_key, args.base_url,
-                    semaphore, session, n=args.bon_n)
-            else:
-                # B/C/D/E: offline, read label directly from pipeline output
-                preds = run_setting_offline(test_samples, label_pools[key])
-
-            overall = compute_metrics(preds)
-            per_ds  = compute_per_dataset(preds)
-
-            print_metrics(overall, label=f"Setting {key}: {name}")
-
-
-            all_results.append((name, overall))
-            full_output[key] = {
-                "setting":     name,
-                "overall":     overall,
-                "per_dataset": per_ds,
-                "predictions": preds,
-            }
-
-    print_comparison_table(all_results)
-
-    if args.output:
-        out = Path(args.output)
-        out.parent.mkdir(parents=True, exist_ok=True)
-        with open(out, "w", encoding="utf-8") as f:
-            json.dump(full_output, f, indent=2, ensure_ascii=False)
-        logger.info("Results saved → %s", out)
-
-        summary = {
-            "settings": [
-                {
-                    "key":          k,
-                    "name":         v["setting"],
-                    "accuracy":     v["overall"]["accuracy"],
-                    "macro_f1":     v["overall"]["macro_f1"],
-                    "per_class_f1": v["overall"].get("per_class_f1", {}),
-                    "avg_steps":    v["overall"]["avg_steps"],
-                    "std_steps":    v["overall"]["std_steps"],
-                    "avg_tokens":   v["overall"]["avg_tokens"],
-                    "std_tokens":   v["overall"]["std_tokens"],
-                    "n_total":      v["overall"]["n_total"],
-                    "n_correct":    v["overall"]["n_correct"],
-                    "n_no_pred":    v["overall"]["n_no_pred"],
-                    "no_pred_rate": v["overall"]["no_pred_rate"],
-                    "per_dataset":  v.get("per_dataset", {}),
-                }
-                for k, v in full_output.items()
-            ],
-            "model":       args.model,
-            "seed":        args.seed,
-            "per_dataset": args.per_dataset,
-            "test_ratio":  args.test_ratio,
-        }
-        summary_path = out.with_suffix(".summary.json")
-        with open(summary_path, "w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
-        logger.info("Summary saved → %s", summary_path)
-
-
-def print_ablation_table(results: List[Tuple[str, Dict]]) -> None:
-    W = 116
-    print("\n" + "═" * W)
-    print("  ABLATION STUDY — SETTINGS A through E")
-    print("═" * W)
-    hdr = (f"  {'Setting':<46}  {'Accuracy':>9}  {'Macro-F1':>9}"
-           f"  {'F1-PRV':>7}  {'F1-DIS':>7}"
-           f"  {'Avg Steps':>11}  {'Avg Tokens':>12}"
-           f"  {'NoPred%':>7}  N")
-    print(hdr)
-    print("  " + "─" * (W - 2))
-    short = {"__PROVED__": "PRV", "__DISPROVED__": "DIS"}
-    for label, m in results:
-        steps_str  = f"{m['avg_steps']:.2f}±{m['std_steps']:.2f}"
-        tokens_str = f"{m['avg_tokens']:.1f}±{m['std_tokens']:.1f}"
-        pcf = m.get("per_class_f1", {})
-        f1_prv = pcf.get("__PROVED__",   pcf.get("PRV", 0.0))
-        f1_dis = pcf.get("__DISPROVED__", pcf.get("DIS", 0.0))
-        no_pred_pct = f"{m['no_pred_rate']*100:.1f}%"
-        print(f"  {label:<46}  {m['accuracy']:>9.4f}  {m['macro_f1']:>9.4f}"
-              f"  {f1_prv:>7.4f}  {f1_dis:>7.4f}"
-              f"  {steps_str:>11}  {tokens_str:>12}"
-              f"  {no_pred_pct:>7}  {m['n_total']}")
-    print("═" * W)
-
-
-# ===========================================================================
-# MAIN
-# ===========================================================================
-
-
-def main_ablation(argv) -> None:
-    parser = argparse.ArgumentParser(
-        description="Ablation Study — Settings A through E (B–E are offline, no LLM calls)",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    # Datasets
-    parser.add_argument("--datasets",    nargs="+", required=True,
-                        help="the dataset JSONs the run was generated from")
-    parser.add_argument("--test_file",   default=None,
-                        help="JSON file with test sample_ids (auto-split if absent)")
-    parser.add_argument("--test_ratio",  type=float, default=0.2)
-    parser.add_argument("--per_dataset", type=int,   default=250,
-                        help="Max samples per dataset file (half PROVED + half DISPROVED). Default 250.")
-    parser.add_argument("--seed",        type=int,   default=42)
-
-    # Pipeline output files (Settings B–E)
-    parser.add_argument("--k_traces_file",   default=None,
-                        help="k_traces*.json — Setting B (Step 1 output)")
-    parser.add_argument("--cleaned_file",    default=None,
-                        help="cleaned_traces*.json — Setting C (Step 3/3.6 output)")
-    parser.add_argument("--synthesized_step", default=None,
-                        help="synthesized_traces.json (step_by_step) — Setting D (Step 5)")
-    parser.add_argument("--synthesized_rkg",  default=None,
-                        help="synthesized_traces.json (RKG) — Setting E (Step 5)")
-    parser.add_argument("--e_direct_extract", action="store_true",
-                        help="Setting E: extract label directly from synthesized trace (no LLM call)")
-
-    # Which settings to run
-    parser.add_argument("--settings",   nargs="+", choices=ALL_SETTINGS, default=None,
-                        help="Settings to run (default: all available)")
-
-    # Best-of-N
-    parser.add_argument("--bon_n", type=int, default=8,
-                        help="N for Best-of-N (Setting L). Default: 8")
-
-    # API — only needed for Setting A (zero-shot)
-    parser.add_argument("--model",       default=DEFAULT_MODEL,
-                        help="LLM for Setting A zero-shot (default: %(default)s)")
-    parser.add_argument("--api_key",     default=OPENAI_API_KEY)
-    parser.add_argument("--base_url",    default=OPENAI_BASE_URL)
-    parser.add_argument("--concurrency", type=int, default=50)
-
-    # Output
-    parser.add_argument("--output",
-                        default="CRAFT_results/other_results/ablation_study/ablation_results.json",
-                        help="the A-E ablation is its own experiment, so its results sit "
-                             "under ablation_study/ rather than with the main table's")
-
-    args = parser.parse_args(argv)
-
-    # Relative paths resolve against the part's results root, so a run reads the
-    # previous stage's output by bare name and writes beside the existing runs.
-    args.datasets = [str(resolve_input(d)) for d in args.datasets]
-    for _arg in ("test_file", "k_traces_file", "cleaned_file",
-                 "synthesized_step", "synthesized_rkg"):
-        if getattr(args, _arg):
-            setattr(args, _arg, str(resolve_input(getattr(args, _arg))))
-    args.output = str(resolve_output(args.output))
-
-    asyncio.run(run(args))
-
-
-
-
 def main() -> None:
-    """score one pipeline output, or run the Settings A-E ablation."""
+    """Score one pipeline output.
+
+    The Settings A-E ablation that used to live here is gone. The paper's
+    ablation is the six named rows, which other_evaluation/ablation_study
+    builds from this module's loaders and metric, so there is one scorer and
+    one place the ablation is defined.
+    """
     import sys as _sys
-    modes = {"score": main_score, "ablation": main_ablation}
+    modes = {"score": main_score}
     if len(_sys.argv) < 2 or _sys.argv[1] not in modes:
         print(__doc__)
         raise SystemExit(2)
