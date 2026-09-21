@@ -1076,6 +1076,8 @@ async def build_rkgs_for_dataset(
 def rebuild_consensus(
     input_file: Path,
     consensus_threshold: float = 0.3,
+    node_threshold: Optional[float] = None,
+    term_overlap_weight: float = 0.3,
     proved_threshold: Optional[float] = None,
     weight_by: str = "uniform",
     gt_file: Optional[Path] = None,
@@ -1110,9 +1112,18 @@ def rebuild_consensus(
         if not valid:
             r["consensus_rkg"] = {"nodes": [], "edges": []}
             continue
+        # lambda and the node threshold travel with the rest. They used not to:
+        # a rebuild always used build_consensus_rkg's defaults for both, so
+        # --edge_lambda 0 rebuilt a graph byte-identical to --edge_lambda 0.3 —
+        # node sets, edge sets and edge confidences all unchanged on 100 of 100
+        # graphs. The ablation's "w/o Weighted Edges Fusion" row was therefore
+        # scoring the full model against itself and reporting no difference,
+        # which is exactly what a component with no effect would look like.
         consensus = build_consensus_rkg(
             valid,
             consensus_threshold=consensus_threshold,
+            node_threshold=node_threshold,
+            term_overlap_weight=term_overlap_weight,
             proved_threshold=proved_threshold,
             weight_by=weight_by,
             expected_depth=expected_depth,
@@ -1193,6 +1204,8 @@ def main() -> None:
         rebuild_consensus(
             input_file=_cfg.resolve_input(args.input),
             consensus_threshold=args.consensus_threshold,
+            node_threshold=args.node_threshold,
+            term_overlap_weight=args.edge_lambda,
             proved_threshold=args.proved_threshold,
             weight_by=args.weight_by,
             expected_depth=args.expected_depth,

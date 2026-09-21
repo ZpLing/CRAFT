@@ -1041,6 +1041,21 @@ async def synthesize_trace_rkg(
     _all_traces = sample.get("cleaned_traces") or sample.get("traces", [])
     if no_mv:
         _all_traces = []  # skip MV computation entirely
+
+    # The weight Module II gave each trace when it built the consensus. This
+    # vote used to count every trace as one, which meant Module II's weighting
+    # never reached the answer: whatever the graph decided, the label came from
+    # a plain count of the same traces. It is why the synthesized label agreed
+    # with an unweighted vote on 98-100% of samples, why weighting the vote by
+    # proof depth gained 2.8 points and lost all but 1.2 of them by the end of
+    # the pipeline, and why Module II could not show a contribution in the
+    # ablation — its output was not on the path to the prediction.
+    _tw = (sample_rkg.get("consensus_rkg") or {}).get("trace_weights") or {}
+    def _weight_of(_t) -> float:
+        if not _tw:
+            return 1.0
+        idx = _t.get("trace_idx")
+        return float(_tw.get(str(idx), _tw.get(idx, 1.0)))
     if _all_traces:
         if domain == "math":
             _ans_counts: Dict[str, int] = {}
@@ -1049,7 +1064,7 @@ async def synthesize_trace_rkg(
                 _boxed = _extract_boxed_content(_txt)
                 if _boxed:
                     _a = _boxed[-1].strip()
-                    _ans_counts[_a] = _ans_counts.get(_a, 0) + 1
+                    _ans_counts[_a] = _ans_counts.get(_a, 0) + _weight_of(_t)
                 else:
                     # fallback: "the answer is X"
                     _m2 = re.findall(
@@ -1058,7 +1073,7 @@ async def synthesize_trace_rkg(
                     )
                     if _m2:
                         _a = _m2[-1].strip()
-                        _ans_counts[_a] = _ans_counts.get(_a, 0) + 1
+                        _ans_counts[_a] = _ans_counts.get(_a, 0) + _weight_of(_t)
             if _ans_counts:
                 _mv_answer = max(_ans_counts, key=_ans_counts.get)
         else:
@@ -1066,13 +1081,13 @@ async def synthesize_trace_rkg(
             for _t in _all_traces:
                 _lbl = _t.get("label")
                 if _lbl and _lbl in ("__PROVED__", "__DISPROVED__"):
-                    _label_counts[_lbl] = _label_counts.get(_lbl, 0) + 1
+                    _label_counts[_lbl] = _label_counts.get(_lbl, 0) + _weight_of(_t)
                     continue
                 _txt = (_t.get("reasoning_text") or "") + " " + (_t.get("raw_response") or "")
                 _ms = re.findall(r"__(PROVED|DISPROVED)__", _txt, re.IGNORECASE)
                 if _ms:
                     _lbl = f"__{_ms[-1].upper()}__"
-                    _label_counts[_lbl] = _label_counts.get(_lbl, 0) + 1
+                    _label_counts[_lbl] = _label_counts.get(_lbl, 0) + _weight_of(_t)
             if _label_counts:
                 _mv_label = max(_label_counts, key=_label_counts.get)
 
