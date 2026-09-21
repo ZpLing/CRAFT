@@ -77,5 +77,12 @@ Thumbs.db
 # ── Side experiments — local checks, not part of the pipeline ───────
 Part2_CRAFT/evaluation/other_evaluation/
 
+# ── Table and statistics generators — they render results/, they do not
+# produce them, and every number they print is recomputable from the
+# scorers that stay: evaluate_accuracy.py and its answer readers.
+Part2_CRAFT/evaluation/label_prediction/sota_table.py
+Part2_CRAFT/evaluation/label_prediction/confidence_intervals.py
+Part2_CRAFT/evaluation/token_accounting.py
+
 # ── Dropped baselines and pre-swap backups — kept locally, never pushed ──
 Part2_CRAFT/results/baseline_results/_archive/
