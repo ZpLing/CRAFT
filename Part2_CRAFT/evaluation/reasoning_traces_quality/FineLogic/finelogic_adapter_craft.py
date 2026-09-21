@@ -43,7 +43,16 @@ from dataset_adapters import adapt, domain_of
 
 
 def load_records(path: Path) -> List[Dict[str, Any]]:
+    """A .json list or object, or a .jsonl stream — both appear in this pipeline.
+
+    A baseline's traces.jsonl is one record per line, and reading it with
+    json.load raised "Extra data" on line 2. The ROSCOE adapter beside this one
+    already reads both.
+    """
+    path = Path(path)
     with open(path, encoding="utf-8") as f:
+        if path.suffix == ".jsonl":
+            return [json.loads(line) for line in f if line.strip()]
         raw = json.load(f)
     return raw.get("results", raw) if isinstance(raw, dict) else raw
 

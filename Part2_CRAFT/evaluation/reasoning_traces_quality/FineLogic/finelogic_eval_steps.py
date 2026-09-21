@@ -68,7 +68,15 @@ MODELS = ([m.strip() for m in _models_env.split(",")] if _models_env
           else ["qwen3-32b"])
 
 # ---- Step header ----
-STEP_RE = re.compile(r"^\s*Step\s*(\d+)\s*[:\.]", re.I | re.M)
+STEP_RE = re.compile(r"^\s*\**\s*Step\s*(\d+)\s*\**\s*[:\.]", re.I | re.M)
+# A trace that numbers its steps "1." / "2." instead of "Step 1:". Baselines
+# write this way, and with only the header above they parsed as a single step:
+# every baseline CoT came back as one step against seven to nine for a
+# synthesized trace, which makes a step-level comparison meaningless — All
+# Relevant is 100% for free when the only step is also the last one. This is a
+# fallback, tried only when no Step header is present, so a trace that does use
+# the headers is split exactly as before.
+NUM_STEP_RE = re.compile(r"^\s*\**\s*(\d+)\s*[\.\)]\s+", re.M)
 
 # ---- Fact definition line from problem input ----
 # matches "Fact1: ...", "Fact 1: ..."; splits on ;  \n  .
@@ -209,6 +217,11 @@ def split_steps_nl(text: str):
 
     matches = list(STEP_RE.finditer(text))
     if not matches:
+        numbered = list(NUM_STEP_RE.finditer(text))
+        # Two or more, and running 1,2,3… — a lone "1." is a sentence, not a chain.
+        if len(numbered) >= 2 and [int(m.group(1)) for m in numbered][:2] == [1, 2]:
+            matches = numbered
+    if not matches:
         # Fallback: treat entire text as one "step" so caller can still evaluate
         ante = {normalise_ref(m.group(1)) for m in REF_RE_NL.finditer(text)}
         return [{
@@ -225,7 +238,8 @@ def split_steps_nl(text: str):
         n = int(m.group(1))
         block = text[starts[i]:starts[i + 1]].strip()
         # body minus the "Step N:" header (first line)
-        body = re.sub(r"^\s*Step\s*\d+\s*[:\.]\s*", "", block, count=1, flags=re.I).strip()
+        body = re.sub(r"^\s*\**\s*(?:Step\s*)?\d+\s*\**\s*[:\.\)]\s*", "", block,
+                      count=1, flags=re.I).strip()
         # Find references inside the body, excluding self-reference
         ante = set()
         for rm in REF_RE_NL.finditer(body):
