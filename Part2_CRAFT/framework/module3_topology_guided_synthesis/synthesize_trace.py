@@ -1032,6 +1032,11 @@ suggestion, not a settled result):
                 )
 
     prompt += "\n**Requirements**:\n"
+    # Opening the first step on what the problem asks and supplies was tried
+    # for informativeness_chain, which embeds the whole trace against the whole
+    # problem. It moved that score 0.002 to 0.005 -- against a gap to raw CoT
+    # of 0.017 -- and cost 2.0, 6.0 and 6.2 points of accuracy on three of the
+    # four logical cells. The chain score is not short of one restatement.
     if domain == "math":
         prompt += (
             "- Show FULL equations: write complete expressions on both sides of every = sign "
