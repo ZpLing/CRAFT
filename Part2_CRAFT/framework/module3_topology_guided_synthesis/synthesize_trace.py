@@ -1069,8 +1069,16 @@ suggestion, not a settled result):
                # reward, and since each step applies a different rule, quoting
                # one adds no repetition. Dropping both cost ProofWriter 1.8
                # points of informativeness_step to buy 0.6 of repetition_step.
-               "- Quote the rule or fact you apply in the problem's own words, "
-               "so the step reads on its own rather than as a pointer\n"
+               # Stating the rule and applying it in one sentence dilutes the
+               # quotation: ROSCOE embeds whole sentences, and a sentence that
+               # is only the rule as the problem words it aligns with the
+               # problem at 0.93 where one that also carries the application
+               # sits at 0.86. The faithfulness and informativeness scores are
+               # means over sentences, so the two said separately score above
+               # the two said together.
+               "- Say the rule and its application in TWO sentences: first the "
+               "rule or fact exactly as the problem words it, then what "
+               "follows when it is applied to the premises named\n"
                # These facts are formal logic written out in English, and the
                # negations nest: "that it does not detonate kiln and it is not
                # juridical does not hold" is a negated conjunction of two
