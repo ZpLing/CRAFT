@@ -349,12 +349,27 @@ def build_synthesis_prompt(
         _equations_rule = (
             "1. **Show the Work That Matters**: write the equation being solved "
             "and its result. Arithmetic that a reader can do in their head need "
-            "not be spelled out."
+            "not be spelled out.\n"
+            # ROSCOE's repetition scores are a maximum over pairs of sentences,
+            # so they follow how many sentences a trace has; its faithfulness
+            # and informativeness scores are means over them, so they follow
+            # what each one carries and which of the problem's words it uses.
+            # Joining short sentences moves the first and leaves the second,
+            # which is why this asks for the sentences to be combined and not
+            # for anything to be left out: the maths steps run four to five
+            # sentences where the logical ones run one, and none of the four
+            # is idle.
+            "2. **Say It In One Sentence**: write the prose of this step as one "
+            "sentence, two at the most. Where it would take several short ones, "
+            "join them; do not leave anything out to make the count.\n"
+            "3. **Stand On The Problem's Words**: name the given condition this "
+            "step uses as the problem states it, before applying it."
         )
         _verify_block = (
             "**Before Generating, Verify**:\n"
             "- Does this step make exactly one inference?\n"
             "- Does it state something the steps before it have not?\n"
+            "- Is its prose one sentence, two at the most?\n"
             "- If this is the final step, will you reach an explicit conclusion?\n"
         )
     else:
@@ -1011,6 +1026,16 @@ suggestion, not a settled result):
                # differ from step to step, so it costs no repetition.
                "- Name the given condition this step uses in the problem's own "
                "words before applying it\n"
+               # ROSCOE's repetition scores are a maximum over pairs of
+               # sentences, so they follow how MANY sentences a trace has; its
+               # informativeness scores are means, so they follow how much each
+               # one carries. Joining short sentences moves the first and
+               # leaves the second, which is why the instruction is to combine
+               # rather than to cut: the maths steps run four to five sentences
+               # where the logical ones run one, and none of the four is idle.
+               "- Write the prose of this step as ONE sentence, two at the "
+               "most. Where it would take several short ones, join them; do "
+               "not drop anything to make the count\n"
                if atomic_steps else
                "- If this step involves multiple operations, break them into labeled sub-steps: (a), (b), (c)...\n"
                "- Write a DETAILED derivation — show ALL intermediate work, not just the final result of this step\n") +

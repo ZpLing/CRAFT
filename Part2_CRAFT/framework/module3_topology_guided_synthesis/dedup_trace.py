@@ -347,12 +347,18 @@ def _conclusion(body: str) -> Optional[str]:
     text = " ".join(text.split())
     # Too short to be distinctive: "it holds", "this is true". Steps sharing
     # nothing but a turn of phrase would otherwise collapse into each other.
+    # Two words is the floor, not three: the connectives are already gone, so
+    # what is left is substance, and a logical conclusion is routinely two
+    # words of it -- "infer that the woof is scarred" reduces to "woof
+    # scarred". At three, conclusions went unread on half the steps of an FLD
+    # trace, and two steps applying the same rule to the same premise could
+    # not be seen to agree.
     # A stated answer is exempt from the word count: "\\boxed{\\frac{2}{9}}"
     # is two words and identifies the claim exactly, and a trace that derives
     # the same boxed value twice is the repetition this is here to remove.
     if "\\boxed" in text or "__proved__" in text or "__disproved__" in text:
         return text if len(text) >= 8 else None
-    return text if len(text) >= 12 and len(text.split()) >= 3 else None
+    return text if len(text) >= 10 and len(text.split()) >= 2 else None
 
 
 def _repeat_conclusions(bodies: List[str],
