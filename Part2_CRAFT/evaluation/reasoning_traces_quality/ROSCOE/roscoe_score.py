@@ -300,7 +300,9 @@ def run_roscoe_evaluation(
         # ── Save TSV ───────────────────────────────────────────────────────
         tsv_path = _os.path.join(scores_output_dir, f"scores_{stem}.tsv")
         score_list = list(scores.keys())
-        with open(tsv_path, "w") as tf:
+        # Traces carry curly quotes and the like, and a cluster node's locale is
+        # often ASCII, where writing one raises rather than mangling it.
+        with open(tsv_path, "w", encoding="utf-8") as tf:
             header = "{:<8} ".format("ID") + " ".join("{:<15}".format(s) for s in score_list)
             tf.write(header + "\n")
             n = len(scores[score_list[0]])
