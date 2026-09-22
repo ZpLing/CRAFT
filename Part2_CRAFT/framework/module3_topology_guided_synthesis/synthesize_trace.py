@@ -1089,6 +1089,18 @@ suggestion, not a settled result):
                 "__PROVED__ or __DISPROVED__ as the last part of your response\n"
                 "- Example final sentence: \"Therefore, the hypothesis is __PROVED__.\"\n"
                 "- Do NOT omit this marker — it is mandatory\n"
+                # The label is about the hypothesis, not about the polarity of
+                # the last thing derived, and the two come apart whenever the
+                # hypothesis is itself a negation. Deriving "the woof is not a
+                # scarred" against the hypothesis "the woof is not a scarred"
+                # was being written up as __DISPROVED__ because the derivation
+                # ended on a "not".
+                "- __PROVED__ means the hypothesis AS WRITTEN follows from the "
+                "facts; __DISPROVED__ means its negation follows. Before "
+                "choosing, restate the hypothesis with whatever negation it "
+                "carries and check it against what you derived: deriving "
+                "\"X does not hold\" PROVES a hypothesis that says X does not "
+                "hold, and DISPROVES one that says X holds\n"
             )
             if gt_label and domain == "logical":
                 prompt += (

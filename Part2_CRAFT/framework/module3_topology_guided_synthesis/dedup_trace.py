@@ -332,6 +332,8 @@ def _is_recap(piece: str, earlier: List[str]) -> bool:
         return False
     return any(not (body - _substance(prev)) for prev in earlier)
 # Wording that carries no claim, so two steps sharing it are not the same step.
+# The value a maths step boxes, taken apart from the words around it.
+_BOXED = re.compile(r"\\boxed\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}")
 _FILLER = re.compile(r"\b(the|a|an|that|this|is|are|be|we|it|to|of|and|then|"
                      r"so|now|next|finally|therefore|thus|hence)\b")
 
@@ -384,10 +386,21 @@ def _repeat_conclusions(bodies: List[str],
         claim = _conclusion(body)
         if claim is None:
             continue
-        if claim in first_seen:
-            repeats[owner] = first_seen[claim]
+        # Two steps landing on the same boxed value have reached the same
+        # place, whatever wording they took to say so: "the final value of the
+        # expression is \\boxed{46}" and "the value is \\boxed{46}" normalise
+        # to different strings and were both kept. A boxed answer is the most
+        # exact statement a maths step makes, so it is compared on its own.
+        keys = [claim]
+        boxed = _BOXED.findall(claim)
+        if boxed:
+            keys.append("\\boxed{" + boxed[-1].strip() + "}")
+        hit = next((first_seen[k] for k in keys if k in first_seen), None)
+        if hit is not None:
+            repeats[owner] = hit
         else:
-            first_seen[claim] = owner
+            for k in keys:
+                first_seen.setdefault(k, owner)
     return repeats
 
 
