@@ -1067,17 +1067,13 @@ suggestion, not a settled result):
                "- If the rule carries nested negation (\"... does not hold\", "
                "\"it is not ...\"), first restate it in the affirmative and say "
                "what it reduces to, then apply the restated form\n"
-               # ROSCOE's repetition scores take a maximum over every pair of
-               # sentences, so what they measure is the closest pair, and steps
-               # cast from one mould -- "From Step X and Fact Y, infer Z" for
-               # every step -- put that pair near 1 however different the
-               # content is. Varying the sentence shape costs no content; it
-               # is the same claim, said another way.
-               "- Do not cast every step in the same sentence shape. Vary how "
-               "the step opens and how the premises are ordered -- lead with "
-               "the rule, or with the established fact, or with what is being "
-               "shown -- while keeping every premise, citation and conclusion "
-               "the step needs\n"
+               # Asking for varied sentence shapes was tried here and
+               # measured worse on both counts: on 50 paired samples it moved
+               # repetition_step by -0.4, +0.1 and -0.1 points across the three
+               # logical cells while the answers fell 4.1, 4.0 and 4.0. The
+               # shape the steps share is not what the repetition score is
+               # reading, and varying it costs the model the form it reasons in.
+
                if atomic_steps else
                "- Each logical inference must be explicit and atomic\n")
         )
