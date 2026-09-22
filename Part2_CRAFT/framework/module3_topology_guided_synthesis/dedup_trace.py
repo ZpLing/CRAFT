@@ -48,15 +48,19 @@ _STEP_REF = re.compile(
     r"(?i)(?:"
     # a reference word before it: "from Step 3", "established in Step 4"
     r"(?P<pre>\b(?:from|in|into|at|by|per|see|using|used|use|with|of|to|and|or|"
-    r"than|versus|vs\.?|,|;|\()\s*(?:the\s+)?"
+    r"than|versus|vs\.?|since|because|,|;|\()\s*(?:the\s+)?"
     r"(?:result|results|conclusion|premise|premises|prerequisite|prerequisites)?"
     r"\s*(?:established|derived|shown|obtained|stated)?\s*(?:in|at|by)?\s*"
     r"\bSteps?\s*)(?P<n1>\d+)"
     r"|"
-    # a reference verb after it: "Step 3 establishes that ..."
-    r"(?P<pre2>\bSteps?\s*)(?P<n2>\d+)(?=\s*(?:establishes|established|shows|"
-    r"showed|gives|gave|derives|derived|states|stated|tells|told|yields|yielded|"
-    r"provides|provided|and\s+Steps?\s*\d)\b)"
+    # a reference verb after it: "Step 3 establishes that ...", or the start
+    # of a run that ends in one: "Step 5, Step 2, and Step 4 establish that".
+    # The first step of such a run has only a comma after it, and a citation
+    # left unmatched keeps its old number -- which, once the steps around it
+    # are renumbered, can be the number of the step citing it.
+    r"(?P<pre2>\bSteps?\s*)(?P<n2>\d+)(?=\s*(?:establish(?:es|ed)?|show(?:s|ed)?|"
+    r"give(?:s)?|gave|derive(?:s|d)?|state(?:s|d)?|tell(?:s)?|told|yield(?:s|ed)?|"
+    r"provide(?:s|d)?|and\s+Steps?\s*\d|,\s*(?:and\s+)?Steps?\s*\d)\b)"
     r")")
 
 
@@ -74,7 +78,6 @@ _SENT = re.compile(r"(?<=[.!?])\s+")
 # its own, which is how "Thus, $c_a = c$" was read as a repeat of
 # "Thus, $d_a = c$".
 _WORD = re.compile(r"[A-Za-z\\]+(?:_\{?[A-Za-z0-9]+\}?)?|\d+")
-_MATHY = re.compile(r"\\\[|\\\]|\\begin\{|\\end\{|\$\$|\\boxed\{")
 
 # A display is balanced by construction, so one can be lifted out of a
 # paragraph the paragraph rule has to keep whole. That is where most of what
@@ -82,8 +85,13 @@ _MATHY = re.compile(r"\\\[|\\\]|\\begin\{|\\end\{|\$\$|\\boxed\{")
 # the formula again in every step that uses it -- four copies of the same two
 # lines, each wrapped in different prose, so no two paragraphs match. The
 # prose already says which step it came from, so the second copy onwards is
-# dropped and the citation left standing.
-_DISPLAY = re.compile(r"\\\[.*?\\\]", re.DOTALL)
+# dropped and the citation left standing. What counts as a display, in either
+# convention a model writes, is math_text's to say.
+import sys as _sys_mt
+import pathlib as _pl_mt
+_sys_mt.path.insert(0, str(_pl_mt.Path(__file__).resolve().parents[2]))
+from framework.domain_optimization.math_text import (  # noqa: E402
+    DISPLAY_RE as _DISPLAY, balanced as _balanced, has_display as _has_display)
 
 # A paragraph that states an answer is never dropped, wherever it sits.
 _ANSWER = re.compile(
@@ -142,26 +150,42 @@ def _drop_repeated_displays(paragraph: str, seen: set) -> str:
     return re.sub(r"\n{3,}", "\n\n", out)
 
 
+# Markdown emphasis is not part of a sentence: "**if someone is blue then they
+# eat the cow**" and "if someone is blue then they eat the cow" are the same
+# line, and the asterisks kept them apart under both the verbatim and the
+# sequence tests.
+def _plain(text: str) -> str:
+    return text.replace("*", "")
+
+
+# A rule stated twice under the same name. The traces restate a fact where
+# they apply it -- "According to Fact 3, the nitrobacteria is quadrupedal, and
+# the nitrobacteria does not vary hackee ..." in one step and "... and it does
+# not vary hackee ..." in a later one -- and the pronoun keeps the pair under
+# the sequence ratio while adding nothing. The same fact number and no new
+# content word is what makes the second a restatement, whatever the ratio.
+_RULE_OPEN = re.compile(r"(?i)^\s*(?:according to|by|per|from|using)\s+(Fact\s*\d+)\b")
+
+
+def _same_rule(candidate: str, source: str) -> bool:
+    a, b = _RULE_OPEN.match(candidate), _RULE_OPEN.match(source)
+    if not a or not b or a.group(1).replace(" ", "").lower() != b.group(1).replace(" ", "").lower():
+        return False
+    return not (_content(candidate) - _content(source) - _RECAP_WORDS)
+
+
 def _repeats(candidate: str, source: str, toks: frozenset,
              prev: frozenset, threshold: float) -> bool:
     if len(toks & prev) / max(1, len(toks | prev)) <= threshold:
         return False
     if _content(candidate) - _content(source):
         return False
-    return difflib.SequenceMatcher(None, candidate, source).ratio() > _VERBATIM
-
-
-def _balanced(text: str) -> bool:
-    """Does this paragraph close every delimiter it opens?"""
-    return (text.count("{") == text.count("}")
-            and text.count(r"\[") == text.count(r"\]")
-            and text.count(r"\begin{") == text.count(r"\end{")
-            and text.count("$") % 2 == 0)
+    return difflib.SequenceMatcher(None, _plain(candidate), _plain(source)).ratio() > _VERBATIM
 
 
 def _is_prose(text: str) -> bool:
     """A paragraph with no display maths in it can be split a sentence at a time."""
-    return not _MATHY.search(text)
+    return not (_has_display(text) or "\\boxed{" in text)
 
 
 def _drop_verbatim(bodies: List[str], owners: List[Optional[str]]
@@ -190,7 +214,7 @@ def _drop_verbatim(bodies: List[str], owners: List[Optional[str]]
     counts: Dict[str, int] = {}
     for body in bodies:
         for piece in _SENT.split(body or ""):
-            key = " ".join(piece.split())
+            key = " ".join(_plain(piece).split())
             if len(key) >= _VERBATIM_MIN and _balanced(piece):
                 counts[key] = counts.get(key, 0) + 1
     repeated = {k for k, n in counts.items() if n > 1}
@@ -205,7 +229,7 @@ def _drop_verbatim(bodies: List[str], owners: List[Optional[str]]
         pieces = _SENT.split(body or "")
         survivors: List[str] = []
         for piece in pieces:
-            key = " ".join(piece.split())
+            key = " ".join(_plain(piece).split())
             if key not in repeated:
                 survivors.append(piece)
                 continue
@@ -227,6 +251,119 @@ def _drop_verbatim(bodies: List[str], owners: List[Optional[str]]
     alias = {o: src for o, src in alias.items()
              if not out[owners.index(o)].strip()}
     return out, alias
+
+
+# A condition the trace has already quoted, quoted again in a parenthetical:
+# "By the problem's condition (“draw a convex n-gon whose vertices ...”)". The
+# synthesis prompt asks each step to name the condition it uses in the
+# problem's words, and a step that uses the same condition as the one before
+# it writes the same words again -- one OmniMATH trace carries the same
+# forty-word quotation in six of its eight steps. The first quotation is
+# where the condition enters the proof and stays; a later one in a
+# parenthetical is an aside by construction, so the sentence reads without
+# it, and the noun it hangs on ("Fact 18", "the problem's condition") still
+# says which condition is meant. Only the parenthetical form is touched: a
+# quotation that is the object of its sentence -- "the hypothesis “X” is
+# __DISPROVED__" -- is the claim, not a reminder of it.
+_QUOTE = re.compile(r'[“"]([^”"]{20,}?)[”"]')
+_PAREN_QUOTE = re.compile(r'\s*\(\s*[“"]([^”"]{20,}?)[”"]\s*\)')
+# The same quotation in apposition to the noun that names it: "Using the
+# given condition “the sum of the squares ...” from the setup", "by Fact 17
+# (“If someone is big ...”)". The noun stays and the quotation goes, and only
+# where the sentence carries on after it -- a quotation that ends its sentence
+# would leave "According to Fact 12." standing on its own. A quotation that is
+# what the sentence is about ("the hypothesis “X” is equivalent to “Y”") or
+# is predicated of the noun ("the condition is “X”") is left alone: there the
+# words are the claim. So is one that the sentence goes on to predicate
+# something of -- "According to Fact 12, “X” reduces to ..." -- where the
+# quotation is the subject of the verb that follows it; what may follow is a
+# preposition carrying on the same phrase ("... “X” from the setup"), and
+# nothing else.
+_APPOS_QUOTE = re.compile(
+    r'(?P<head>\b(?:Fact\s*\d+|(?:the\s+)?(?:problem[\'’]s\s+)?(?:given\s+|stated\s+)?'
+    r'(?:winning\s+)?(?:condition|premise|rule|principle|constraint|definition)))'
+    r'\s*[“"](?P<q>[^”"]{20,}?)[”"]'
+    r'(?=\s+(?:from|together|with|for|to|in|on|at|by|of|under|over|across)\b)')
+
+
+def _drop_requoted(bodies: List[str]) -> List[str]:
+    """Remove a repeat quotation of a span an earlier step quoted."""
+    quoted: set = set()
+    out: List[str] = []
+    for body in bodies:
+        def paren(m: re.Match) -> str:
+            key = " ".join(m.group(1).split())
+            return "" if key in quoted else m.group(0)
+
+        def appos(m: re.Match) -> str:
+            key = " ".join(m.group("q").split())
+            return m.group("head") if key in quoted else m.group(0)
+        # Only a quotation that entered before this body counts as earlier:
+        # collected after the substitution so a body's own first quotation
+        # is not taken for a repeat of itself.
+        new = _PAREN_QUOTE.sub(paren, body or "")
+        new = _APPOS_QUOTE.sub(appos, new)
+        quoted |= {" ".join(q.split()) for q in _QUOTE.findall(body or "")}
+        out.append(new)
+    return out
+
+
+# Two steps in a row that open with the same clause: "Using the results
+# $S_1 = 52$ from Step 3 and $S_2 = 12$ from Step 4, we substitute ..." and
+# then "Using the results $S_1 = 52$ from Step 3 and $S_2 = 12$ from Step 4,
+# we perform the subtraction ...". The second names its premises in the words
+# the first just used, and the two sentences are the most alike pair in the
+# trace. The opening comes off the second step, which then begins with what
+# it does; the step before it still says where the values came from.
+_LEAD = re.compile(r"^\s*([^,\n]{20,}?),\s+(?=[a-z])")
+
+# The same condition named in full at the head of step after step: "Using the
+# given condition that $n$ is a positive integer and $n^3+2n^2+9n+8$ is the
+# cube of an integer, ..." opens six of an OmniMATH trace's eight steps. The
+# first naming is where the condition enters; a later one is replaced by a
+# back-reference, which says the same thing in the words the trace already
+# used once. Only a clause that names a condition is touched, and only when
+# the same words opened an earlier step.
+_CONDITION_OPEN = re.compile(
+    r"^\s*(?P<lead>(?:Using|By|From|Applying|Given|Under|With)\s+"
+    r"(?:the\s+)?(?:problem[\'’]s\s+)?(?:given\s+|stated\s+)?condition(?:s)?\s+"
+    r"(?:that\s+|[“\"]))(?P<cond>[^,\n]{15,}?)(?P<close>[”\"]?)\s*,\s+(?=[a-z])",
+    re.IGNORECASE)
+
+
+def _drop_repeated_condition(bodies: List[str], owners: List[Optional[str]]) -> List[str]:
+    out: List[str] = []
+    first_named: Dict[str, Optional[str]] = {}
+    for body, owner in zip(bodies, owners):
+        text = body or ""
+        m = _CONDITION_OPEN.match(text)
+        if m:
+            key = " ".join(m.group("cond").split()).lower().rstrip(".,;")
+            source = first_named.get(key)
+            if source is not None:
+                verb = m.group("lead").split()[0]
+                text = f"{verb} the condition stated in Step {source}, " + text[m.end():]
+            elif key not in first_named and owner is not None:
+                first_named[key] = owner
+        out.append(text)
+    return out
+
+
+def _drop_repeated_lead(bodies: List[str]) -> List[str]:
+    out: List[str] = []
+    prev_lead: Optional[str] = None
+    for body in bodies:
+        text = body or ""
+        m = _LEAD.match(text)
+        lead = " ".join(m.group(1).split()) if m else None
+        if (lead is not None and lead == prev_lead
+                and len(lead.split()) >= 6 and _balanced(m.group(1))):
+            rest = text[m.end():]
+            if len(rest.split()) >= 5:
+                text = rest[0].upper() + rest[1:]
+        prev_lead = lead
+        out.append(text)
+    return out
 
 
 def _trim(bodies: List[str], owners: List[Optional[str]],
@@ -272,7 +409,8 @@ def _trim(bodies: List[str], owners: List[Optional[str]],
                 if _is_recap(piece, [text for _, _, text in seen]):
                     continue
                 match = next((src for prev, src, prev_text in seen
-                              if _repeats(piece, prev_text, toks, prev, threshold)),
+                              if _repeats(piece, prev_text, toks, prev, threshold)
+                              or _same_rule(piece, prev_text)),
                              "")
                 if match != "":
                     if owner is not None and match is not None:
@@ -305,8 +443,15 @@ def _trim(bodies: List[str], owners: List[Optional[str]],
 # look like a repeat of X's, which is the step it builds on. "that" is optional
 # after infer and conclude, because the traces write both "infer that X" and
 # "infer **X**".
+# "derive", "deduce", "establish" and "show" announce a derivation as plainly
+# as "infer" does, and the traces use them interchangeably: "we derive that
+# the cow sees the squirrel" in one step and "we infer that the cow sees the
+# squirrel" in the next were two derivations of one line until the first
+# verb was read.
 _DERIVES = re.compile(
     r"(?is)\b(?:infer(?:\s+that)?|conclude(?:\s+that)?|it follows that|"
+    r"we (?:can\s+)?(?:derive|deduce|establish|show)(?:\s+that)?|"
+    r"(?:this|which|that)\s+(?:implies|means|shows|establishes)(?:\s+that)?|"
     r"therefore|thus|hence|which gives(?:\s+us)?|this gives|yields?|"
     r"we (?:get|obtain|find)|to get|resulting in|so that)\b"
     r"[,:\s]*(.+?)(?=[.;]|$)")
@@ -361,8 +506,14 @@ def _is_recap(piece: str, earlier: List[str]) -> bool:
 # Wording that carries no claim, so two steps sharing it are not the same step.
 # The value a maths step boxes, taken apart from the words around it.
 _BOXED = re.compile(r"\\boxed\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}")
+# A modal or an intensifier changes how firmly a conclusion is put, not what
+# it says: "the diffuser must be antipollution" and "the diffuser is
+# antipollution" are one conclusion, and were two until "must" was filler.
 _FILLER = re.compile(r"\b(the|a|an|that|this|is|are|be|we|it|to|of|and|then|"
-                     r"so|now|next|finally|therefore|thus|hence)\b")
+                     r"so|now|next|finally|therefore|thus|hence|"
+                     r"must|should|will|would|can|could|may|might|shall|"
+                     r"indeed|necessarily|clearly|certainly|also|still|already|"
+                     r"in fact|as well)\b")
 
 
 def _conclusion(body: str) -> Optional[str]:
@@ -445,8 +596,8 @@ def _repeat_conclusions(bodies: List[str],
 # step before the one that actually derived the line, and reads as rigorous
 # while resting on nothing.
 _CITE_CLAIM = re.compile(
-    r"(?i)\b(Steps?\s*)(\d+)(\s*(?:establishes|established|shows|showed|gives|"
-    r"gave|derives|derived|states|stated|as the premise that|"
+    r"(?i)\b(Steps?\s*)(\d+)(\s*(?:establish(?:es|ed)?|show(?:s|ed)?|"
+    r"give(?:s)?|gave|derive(?:s|d)?|state(?:s|d)?|as the premise that|"
     r"we (?:have|know|established) that)\s*(?:that\s+)?)([^,.;]{10,140})")
 
 
@@ -583,6 +734,11 @@ def dedup_trace(text: str,
     bodies = [_fix_citations(b, source_bodies, owners, o)
               for b, o in zip(bodies, owners)]
 
+    # Before the sentence rules, so that two sentences differing only in a
+    # re-quoted parenthetical meet them as the repeat they are.
+    bodies = _drop_requoted(bodies)
+    bodies = _drop_repeated_condition(bodies, owners)
+    bodies = _drop_repeated_lead(bodies)
     bodies, verbatim_alias = _drop_verbatim(bodies, owners)
     trimmed, alias = _trim(bodies, owners, threshold)
     for owner, source in verbatim_alias.items():
