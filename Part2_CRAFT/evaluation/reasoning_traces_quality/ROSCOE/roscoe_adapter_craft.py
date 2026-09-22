@@ -81,8 +81,9 @@ def split_synthesized_text(text: str) -> List[str]:
     if not text:
         return []
     # The pipeline's own cut, so a display block on the lines after a "Step
-    # N:" header is scored with its step here exactly as Module I stored it.
-    parts = split_steps(text, keep_conclusion_lines=True)
+    # N:" header is scored with its step. Every trailer stays: a scorer sees
+    # the text as written, "Final Answer: \\boxed{7}" included.
+    parts = split_steps(text, keep_conclusion_lines=True, keep_trailers=True)
     if len(parts) > 1:
         return parts
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]

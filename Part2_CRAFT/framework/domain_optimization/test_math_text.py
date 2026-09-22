@@ -53,6 +53,18 @@ PROSE = """We want the largest n.
 Try n = 7: it works.
 \\boxed{7}"""
 
+# A $$ opened and never closed before the next step, whose own $$ would pair
+# with it and hide the header inside a "display".
+UNCLOSED = """Step 1: We have
+$$
+a = b
+and stop here.
+Step 2: Then
+$$
+c = d
+$$
+follows."""
+
 
 def main() -> int:
     failures = 0
@@ -104,6 +116,20 @@ def main() -> int:
     else:
         print("ok    keeps  every line of a trace with no step headers")
 
+    steps = split_steps(GPT_MATH, keep_trailers=True)
+    if steps[-1] != "Final Answer: \\boxed{7}" or len(steps) != 3:
+        failures += 1
+        print("FAIL  a scorer asking for the whole text did not get the answer trailer")
+    else:
+        print("ok    keeps  the answer trailer for a scorer, as its own step")
+
+    steps = split_steps(UNCLOSED)
+    if len(steps) != 2 or not steps[1].startswith("Step 2"):
+        failures += 1
+        print(f"FAIL  an unclosed $$ swallowed the next step header: {len(steps)} steps")
+    else:
+        print("ok    reads  an unclosed $$ line by line instead of hiding the next header in it")
+
     kinds = [k for _, _, k in find_math("Set \\[ a \\] and $$ b $$ with \\(x\\), $y$, \\begin{cases} c \\end{cases}.")]
     if kinds != ["display", "display", "inline", "inline", "display"]:
         failures += 1
@@ -129,7 +155,7 @@ def main() -> int:
     else:
         print("ok    tells  an unclosed $$, \\[ or brace from a closed one")
 
-    total = 12
+    total = 14
     print(f"\n{total - failures}/{total} passed")
     return 1 if failures else 0
 

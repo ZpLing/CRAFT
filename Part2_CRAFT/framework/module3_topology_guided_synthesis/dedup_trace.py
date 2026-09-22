@@ -57,10 +57,13 @@ _STEP_REF = re.compile(
     # of a run that ends in one: "Step 5, Step 2, and Step 4 establish that".
     # The first step of such a run has only a comma after it, and a citation
     # left unmatched keeps its old number -- which, once the steps around it
-    # are renumbered, can be the number of the step citing it.
-    r"(?P<pre2>\bSteps?\s*)(?P<n2>\d+)(?=\s*(?:establish(?:es|ed)?|show(?:s|ed)?|"
+    # are renumbered, can be the number of the step citing it. The run has to
+    # end in the verb: "Ada performs Step 1, Step 2, and Step 3" is the
+    # problem's own text and names no step of the trace.
+    r"(?P<pre2>\bSteps?\s*)(?P<n2>\d+)"
+    r"(?=(?:\s*,?\s*(?:and\s+)?Steps?\s*\d+)*\s*(?:establish(?:es|ed)?|show(?:s|ed)?|"
     r"give(?:s)?|gave|derive(?:s|d)?|state(?:s|d)?|tell(?:s)?|told|yield(?:s|ed)?|"
-    r"provide(?:s|d)?|and\s+Steps?\s*\d|,\s*(?:and\s+)?Steps?\s*\d)\b)"
+    r"provide(?:s|d)?)\b)"
     r")")
 
 

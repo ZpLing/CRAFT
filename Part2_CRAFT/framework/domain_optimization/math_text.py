@@ -118,23 +118,40 @@ LABEL_RE = re.compile(r"__(?:PROVED|DISPROVED|UNKNOWN)__", re.IGNORECASE)
 _NL = "\x00"  # stands in for a newline inside a display block while lines are read
 
 
-def split_steps(text: str, keep_conclusion_lines: bool = True) -> List[str]:
+_HEADER_INSIDE = re.compile(r"\n\s*\**\s*Step\s*\d+\s*\**\s*[:.\-]", re.IGNORECASE)
+
+
+def split_steps(text: str, keep_conclusion_lines: bool = True,
+                keep_trailers: bool = False) -> List[str]:
     """Cut a generation into steps, each with every line that belongs to it.
 
     A step is its "Step N:" line and the lines after it up to the next step
     or a trailer. A display block that spans lines is never cut: its line
     breaks are hidden before the text is read line by line and restored in
-    the step that holds it. Lines before the first step are not a step and
-    are left out. With `keep_conclusion_lines`, a "Final Conclusion" line or
-    one carrying a __PROVED__/__DISPROVED__ token is kept as a step of its
-    own after the last one, which is where the RKG reads the conclusion.
+    the step that holds it -- unless a "Step N:" line falls inside what the
+    delimiters enclose, which is an unclosed block, not a display, and is read
+    line by line like the rest. Lines before the first step are not a step
+    and are left out.
+
+    A trailer is a line that closes the reasoning rather than continuing a
+    step: "Summary: ...", "Final Answer: ...". Module I leaves trailers out,
+    keeping only a "Final Conclusion" line or one carrying a
+    __PROVED__/__DISPROVED__ token as a step of its own (`keep_conclusion_lines`),
+    which is where the RKG reads the conclusion. A scorer that must see the
+    whole text as written passes `keep_trailers`, and every trailer stays, as
+    its own step, in order.
 
     A text with no "Step N:" line at all is returned as its non-empty lines,
     display blocks kept whole.
     """
     if not text:
         return []
-    shielded = DISPLAY_RE.sub(lambda m: m.group(0).replace("\n", _NL), text)
+
+    def shield(m: "re.Match") -> str:
+        block = m.group(0)
+        return block if _HEADER_INSIDE.search(block) else block.replace("\n", _NL)
+
+    shielded = DISPLAY_RE.sub(shield, text)
     lines = [ln.strip() for ln in shielded.splitlines() if ln.strip()]
     restore = lambda s: s.replace(_NL, "\n")  # noqa: E731
 
@@ -143,7 +160,7 @@ def split_steps(text: str, keep_conclusion_lines: bool = True) -> List[str]:
 
     steps: List[str] = []
     current: List[str] = []
-    conclusions: List[str] = []
+    trailers: List[str] = []
     for ln in lines:
         if STEP_HEAD_RE.match(ln):
             if current:
@@ -153,13 +170,14 @@ def split_steps(text: str, keep_conclusion_lines: bool = True) -> List[str]:
             if current:
                 steps.append("\n".join(current))
                 current = []
-            if keep_conclusion_lines and (FINAL_CONCLUSION_RE.search(ln) or LABEL_RE.search(ln)):
-                conclusions.append(ln)
+            if keep_trailers or (keep_conclusion_lines
+                                 and (FINAL_CONCLUSION_RE.search(ln) or LABEL_RE.search(ln))):
+                trailers.append(ln)
         elif current:
             current.append(ln)
     if current:
         steps.append("\n".join(current))
-    for ln in conclusions:
+    for ln in trailers:
         if ln not in steps:
             steps.append(ln)
     return [restore(s) for s in steps]
