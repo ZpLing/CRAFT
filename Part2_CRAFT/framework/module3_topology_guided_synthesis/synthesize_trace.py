@@ -363,13 +363,15 @@ def build_synthesis_prompt(
             "two sentences, three at the most. Where it would take several "
             "short ones, join them; never leave out a calculation to meet the "
             "count -- if the step needs an intermediate value, write it.\n"
-            # Same split as the logical branch: ROSCOE embeds whole sentences
-            # and averages them, so the condition stated on its own scores as
-            # the problem's own wording, while the same words folded into the
-            # calculation score as the calculation.
-            "3. **Stand On The Problem's Words**: give the condition this step "
-            "uses its own sentence, in the problem's wording, and do the "
-            "calculation in the next one."
+            # The logical branch gains from stating the rule in a sentence of
+            # its own; this one does not. Split the same way, OmniMATH/gemini
+            # -- deterministic on these samples -- answered 42.0% against
+            # 40.0%, and its alignment with the problem moved 0.001 where the
+            # logical cells moved 0.02 to 0.04. A maths condition is an
+            # equation, and an equation on its own line is not the problem's
+            # prose; there is nothing to recover by separating it.
+            "3. **Stand On The Problem's Words**: name the given condition this "
+            "step uses as the problem states it, before applying it."
         )
         _verify_block = (
             "**Before Generating, Verify**:\n"
