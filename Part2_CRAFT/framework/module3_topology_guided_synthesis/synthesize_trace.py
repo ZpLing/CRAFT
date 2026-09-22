@@ -363,8 +363,13 @@ def build_synthesis_prompt(
             "two sentences, three at the most. Where it would take several "
             "short ones, join them; never leave out a calculation to meet the "
             "count -- if the step needs an intermediate value, write it.\n"
-            "3. **Stand On The Problem's Words**: name the given condition this "
-            "step uses as the problem states it, before applying it."
+            # Same split as the logical branch: ROSCOE embeds whole sentences
+            # and averages them, so the condition stated on its own scores as
+            # the problem's own wording, while the same words folded into the
+            # calculation score as the calculation.
+            "3. **Stand On The Problem's Words**: give the condition this step "
+            "uses its own sentence, in the problem's wording, and do the "
+            "calculation in the next one."
         )
         _verify_block = (
             "**Before Generating, Verify**:\n"
@@ -1076,9 +1081,18 @@ suggestion, not a settled result):
                # sits at 0.86. The faithfulness and informativeness scores are
                # means over sentences, so the two said separately score above
                # the two said together.
-               "- Say the rule and its application in TWO sentences: first the "
-               "rule or fact exactly as the problem words it, then what "
-               "follows when it is applied to the premises named\n"
+               + ("- Say the rule and its application in TWO sentences: first "
+                  "the rule or fact exactly as the problem words it, then what "
+                  "follows when it is applied to the premises named\n"
+                  if not is_last else
+                  # The final step's two sentences are the hypothesis and the
+                  # verdict on it. Asked for a rule and its application
+                  # instead, it opens "Fact 5 states ..." and reaches a
+                  # verdict on the rule rather than on the hypothesis: four
+                  # FLD/gemini answers turned over that way.
+                  "- Your two sentences here are the hypothesis in the "
+                  "problem's own wording, and the verdict on it\n")
+               +
                # These facts are formal logic written out in English, and the
                # negations nest: "that it does not detonate kiln and it is not
                # juridical does not hold" is a negated conjunction of two
