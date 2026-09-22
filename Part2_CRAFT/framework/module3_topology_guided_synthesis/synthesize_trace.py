@@ -1085,13 +1085,17 @@ suggestion, not a settled result):
                   "the rule or fact exactly as the problem words it, then what "
                   "follows when it is applied to the premises named\n"
                   if not is_last else
-                  # The final step's two sentences are the hypothesis and the
-                  # verdict on it. Asked for a rule and its application
-                  # instead, it opens "Fact 5 states ..." and reaches a
-                  # verdict on the rule rather than on the hypothesis: four
-                  # FLD/gemini answers turned over that way.
-                  "- Your two sentences here are the hypothesis in the "
-                  "problem's own wording, and the verdict on it\n")
+                  # The final step has to land on the hypothesis, not on
+                  # another rule: asked for a rule and its application it
+                  # opens "Fact 5 states ..." and reaches a verdict on the
+                  # rule, which turned over four FLD/gemini answers. But
+                  # capping it at those two sentences costs the step the
+                  # reasoning it still needs -- ProofWriter/gemini, which is
+                  # deterministic here, went 94.0% to 88.0% under the cap.
+                  # So the ending is fixed and the length is not.
+                  "- End this step with the hypothesis in the problem's own "
+                  "wording and the verdict on it. Say whatever this step "
+                  "still needs to establish first\n")
                +
                # These facts are formal logic written out in English, and the
                # negations nest: "that it does not detonate kiln and it is not
