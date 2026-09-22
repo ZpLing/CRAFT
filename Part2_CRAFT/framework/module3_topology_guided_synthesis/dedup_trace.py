@@ -379,6 +379,7 @@ def _repeat_conclusions(bodies: List[str],
     guard checks exactly that before keeping the rewrite.
     """
     first_seen: Dict[str, str] = {}
+    boxed_seen: Dict[str, Tuple[str, str]] = {}
     repeats: Dict[str, str] = {}
     for body, owner in zip(bodies, owners):
         if owner is None or not body.strip():
@@ -386,21 +387,28 @@ def _repeat_conclusions(bodies: List[str],
         claim = _conclusion(body)
         if claim is None:
             continue
-        # Two steps landing on the same boxed value have reached the same
-        # place, whatever wording they took to say so: "the final value of the
-        # expression is \\boxed{46}" and "the value is \\boxed{46}" normalise
-        # to different strings and were both kept. A boxed answer is the most
-        # exact statement a maths step makes, so it is compared on its own.
-        keys = [claim]
+        hit = first_seen.get(claim)
+        # Two steps can word the same landing differently -- "the final value of
+        # the expression is \\boxed{46}" against "the value is \\boxed{46}" --
+        # and the strings then miss each other. Matching on the boxed value
+        # alone catches those, but it also catches a step that merely mentions
+        # the same value while doing something else: deriving tan from an
+        # equation the step before rearranged, or checking the result against
+        # the problem's constraints. So the value has to agree AND the later
+        # step has to say nothing the earlier one did not.
         boxed = _BOXED.findall(claim)
-        if boxed:
-            keys.append("\\boxed{" + boxed[-1].strip() + "}")
-        hit = next((first_seen[k] for k in keys if k in first_seen), None)
+        if hit is None and boxed:
+            key = "\\boxed{" + boxed[-1].strip() + "}"
+            cand = boxed_seen.get(key)
+            if cand is not None and not (_substance(claim) - _substance(cand[1])):
+                hit = cand[0]
         if hit is not None:
             repeats[owner] = hit
         else:
-            for k in keys:
-                first_seen.setdefault(k, owner)
+            first_seen.setdefault(claim, owner)
+            if boxed:
+                boxed_seen.setdefault(
+                    "\\boxed{" + boxed[-1].strip() + "}", (owner, claim))
     return repeats
 
 

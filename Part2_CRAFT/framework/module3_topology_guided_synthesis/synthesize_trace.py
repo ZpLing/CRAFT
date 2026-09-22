@@ -1058,6 +1058,15 @@ suggestion, not a settled result):
                # points of informativeness_step to buy 0.6 of repetition_step.
                "- Quote the rule or fact you apply in the problem's own words, "
                "so the step reads on its own rather than as a pointer\n"
+               # These facts are formal logic written out in English, and the
+               # negations nest: "that it does not detonate kiln and it is not
+               # juridical does not hold" is a negated conjunction of two
+               # negatives. Read left to right it says the opposite of what it
+               # means, and the step then reaches a conclusion whose polarity
+               # is inverted -- which the final verdict inherits.
+               "- If the rule carries nested negation (\"... does not hold\", "
+               "\"it is not ...\"), first restate it in the affirmative and say "
+               "what it reduces to, then apply the restated form\n"
                if atomic_steps else
                "- Each logical inference must be explicit and atomic\n")
         )
