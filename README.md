@@ -135,7 +135,11 @@ framework of §3.2.
 │   │   ├── module2_consensus_rkg_construction/ Module II  — per-trace RKGs, consensus RKG G*
 │   │   ├── module3_topology_guided_synthesis/  Module III — one step per node of G*
 │   │   └── domain_optimization/                after Module III, per dataset — not part
-│   │                                           of the three-module framework
+│   │                                           of the three-module framework; also
+│   │                                           math_text.py, the one definition of the
+│   │                                           mathematics in a trace (how it is found,
+│   │                                           written and cut into steps) that every
+│   │                                           module and the ROSCOE adapter read through
 │   ├── evaluation/
 │   │   ├── label_prediction/          main-table accuracy and its Wilson CIs
 │   │   │                              answer_match.py — one adapter per dataset
@@ -273,7 +277,7 @@ models, so it is the half that usually runs elsewhere:
 ROS=$RTQ/ROSCOE
 
 python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json \
-    --output_dir $RUN/roscoe_export
+    --raw_model gemini-3.1-flash-lite --output_dir $RUN/roscoe_export
 python $ROS/roscoe_score.py         --export_dir $RUN/roscoe_export
 python $ROS/roscoe_build_table.py   --summaries "Gemini-3.1-flash-lite:$RUN/roscoe_export/evaluation_results.json" \
     --results_dir results/CRAFT_results/reasoning_traces_quality/ROSCOE \

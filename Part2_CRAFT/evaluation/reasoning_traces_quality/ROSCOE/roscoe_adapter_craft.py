@@ -2,8 +2,11 @@
 """
 Adapter: CRAFT pipeline outputs -> ROSCOE export schema.
 
-Pairs the raw CoT baseline (the first of the K candidate traces) with CRAFT's
-synthesized trace and writes one file per dataset per setting:
+Pairs the raw CoT baseline -- the model's own full response from the CoT run
+the main table reports (baseline_results/<model>/cot/results.json,
+`raw_response`), never one of CRAFT's K sampled traces -- with CRAFT's
+synthesized trace, deduplicated the way the reported traces are, and writes
+one file per dataset per setting:
 
     <output_dir>/{dataset}_raw.jsonl      raw CoT
     <output_dir>/{dataset}_craft.jsonl    CRAFT post-processed
@@ -25,6 +28,7 @@ Usage:
     python roscoe_adapter_craft.py \\
         --craft_dir  results/craft_runs/fld_nano \\
         --dataset    dataset/FLD.json \\
+        --raw_model  gpt-5.4-nano \\
         --output_dir roscoe_craft/fld_nano
 """
 
@@ -48,7 +52,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from dataset_adapters import adapt
 
 
-_STEP_RE = re.compile(r"(?m)^\s*Step\s*\d+\s*[:.\-]\s*")
+from framework.domain_optimization.math_text import split_steps, normalize_math  # noqa: E402
+# The CRAFT side is scored as it is reported: deduplicated by dedup_trace,
+# checked against the answer reader the cell is scored with.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]
+                       / "framework" / "module3_topology_guided_synthesis"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "label_prediction"))
+from dedup_trace import dedup_trace  # noqa: E402
+from extract_label import extract_label, extract_math_answer  # noqa: E402
+
+_READER = {"FLD": extract_label, "ProofWriter": extract_label,
+           "OmniMATH": extract_math_answer, "OlympiadBench": extract_math_answer}
 
 
 def split_synthesized_text(text: str) -> List[str]:
@@ -66,7 +80,9 @@ def split_synthesized_text(text: str) -> List[str]:
     """
     if not text:
         return []
-    parts = [p.strip() for p in _STEP_RE.split(text) if p.strip()]
+    # The pipeline's own cut, so a display block on the lines after a "Step
+    # N:" header is scored with its step here exactly as Module I stored it.
+    parts = split_steps(text, keep_conclusion_lines=True)
     if len(parts) > 1:
         return parts
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
@@ -76,22 +92,19 @@ def split_synthesized_text(text: str) -> List[str]:
     return sentences if len(sentences) > 1 else parts
 
 
-def first_nonempty_trace(traces: List[Dict[str, Any]]) -> List[str]:
-    """Steps of the first candidate trace that has any — the raw CoT baseline."""
-    for t in traces or []:
-        steps = list(t.get("reasoning_steps") or [])
-        if steps:
-            return steps
-    return []
-
-
 def load_records(path: Path) -> List[Dict[str, Any]]:
-    """Read a .json list or a .jsonl stream, both of which appear in this pipeline."""
+    """Read a .json list or a .jsonl stream, both of which appear in this pipeline.
+
+    A run file keeps its rows under `results`; a baseline's results.json keeps
+    them under `predictions`.
+    """
     with open(path, encoding="utf-8") as f:
         if path.suffix == ".jsonl":
             return [json.loads(line) for line in f if line.strip()]
         raw = json.load(f)
-    return raw.get("results", raw) if isinstance(raw, dict) else raw
+    if isinstance(raw, dict):
+        return raw.get("results") or raw.get("predictions") or raw
+    return raw
 
 
 def index_by_text(rows: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
@@ -125,6 +138,23 @@ def load_source(source: Path) -> Dict[str, List[Dict[str, Any]]]:
     return out
 
 
+# The problem's own notation. Every OmniMATH and OlympiadBench statement writes
+# its mathematics between dollar signs and none uses markdown, while a trace
+# from gpt-5.4-nano writes \( ... \) -- 136 of them in a typical OmniMATH trace
+# against 11 in its raw CoT -- and both models bold a rule or a result with
+# asterisks. ROSCOE scores the text as written: its word alignment measures
+# each token of the trace against the problem's tokens, and its grammar model
+# reads "**if someone is blue then they eat the cow**" as a sentence. Neither
+# the delimiter nor the asterisks is part of the reasoning, so both sides of a
+# comparison are rendered in the notation the problem uses before scoring.
+_BOLD = re.compile(r"\*\*(.+?)\*\*", re.DOTALL)
+
+
+def normalize_markup(text: str) -> str:
+    """Render a step in the problem's notation: no markdown, $-delimited maths."""
+    return normalize_math(_BOLD.sub(r"\1", text))
+
+
 def build_entry(src: Dict[str, Any], dataset: str, steps: List[str],
                 setting: str, sample_id: str) -> Dict[str, Any]:
     """One ROSCOE line. `gpt-3` is the field the scorer reads the trace from.
@@ -140,6 +170,7 @@ def build_entry(src: Dict[str, Any], dataset: str, steps: List[str],
         problem = adapt(src, dataset)
         premise, hypothesis, answer = (problem.premises, problem.hypothesis,
                                        problem.answer)
+    steps = [normalize_markup(s) for s in steps]
     entry: Dict[str, Any] = {
         "key":        src.get("key", sample_id),
         "premise":    premise,
@@ -173,12 +204,23 @@ def main() -> None:
                     help="Synthesis output to read (default: the one synthesized*.json in --craft_dir)")
     ap.add_argument("--max_samples", type=int, default=None,
                     help="Cap the pairs written per dataset")
+    ap.add_argument("--raw_model", default=None,
+                    help="Model whose CoT run is the raw side: reads "
+                         "baseline_results/<model>/cot/results.json (predictions[].raw_response, "
+                         "matched by sample_id)")
     ap.add_argument("--raw_traces", default=None,
-                    help="traces.jsonl of the baseline the CRAFT trace is compared against "
-                         "(matched by sample_id). Without it the raw side is the run's own "
-                         "first candidate trace, which compares CRAFT to the traces it was "
-                         "built from rather than to a baseline anyone else would run")
+                    help="Instead of --raw_model, a baseline file to read the raw side from: "
+                         "a cot results.json (predictions[].raw_response) or a traces.jsonl "
+                         "(traces[0]), matched by sample_id")
     args = ap.parse_args()
+    if not args.raw_model and not args.raw_traces:
+        # The raw side used to default to the run's own first sampled trace,
+        # cut to its "Step N:" lines. That compared CRAFT to an outline of the
+        # traces it was built from -- for gpt-5.4-nano on mathematics, 19% of
+        # the characters -- and not to the CoT anyone reports. There is no
+        # sensible default to fall back to, so the choice is made explicit.
+        ap.error("one of --raw_model or --raw_traces is required: the raw side is the "
+                 "model's own CoT response, not a trace of this run")
 
     craft_dir = Path(resolve_input(args.craft_dir))
     k_files = sorted(craft_dir.glob("k_traces_*_samples.json"))
@@ -195,16 +237,22 @@ def main() -> None:
     source = load_source(Path(resolve_input(args.dataset)))
     k_records = load_records(k_files[0])
 
-    # The raw side, when it is a baseline's own generations rather than ours.
+    # The raw side: the baseline's own generations, matched by sample_id. A cot
+    # results.json keeps them under predictions[].raw_response; a traces.jsonl
+    # under traces[0]. The full response is cut with the pipeline's own splitter
+    # (prose falls back to lines, then sentences), so a display block is never
+    # dropped from the raw side either.
+    raw_path = Path(resolve_input(args.raw_traces)) if args.raw_traces else Path(
+        resolve_input(f"baseline_results/{args.raw_model}/cot/results.json"))
     baseline_raw: Dict[str, List[str]] = {}
-    if args.raw_traces:
-        for row in load_records(Path(resolve_input(args.raw_traces))):
-            sid = row.get("sample_id")
-            traces = row.get("traces") or []
-            if sid and traces:
-                baseline_raw[sid] = split_synthesized_text(traces[0]) or [
-                    s.strip() for s in str(traces[0]).split("\n") if s.strip()]
-        print(f"[adapter] raw side from baseline: {len(baseline_raw)} traces")
+    for row in load_records(raw_path):
+        sid = row.get("sample_id")
+        text = row.get("raw_response") or ((row.get("traces") or [""])[0])
+        if isinstance(text, dict):
+            text = text.get("raw_response") or text.get("text") or ""
+        if sid and str(text).strip():
+            baseline_raw[sid] = split_synthesized_text(str(text))
+    print(f"[adapter] raw side from {raw_path}: {len(baseline_raw)} traces")
     synth_by_id = {r["sample_id"]: r for r in load_records(synth_path) if "sample_id" in r}
 
     export_dir = Path(resolve_output(args.output_dir))
@@ -234,13 +282,14 @@ def main() -> None:
             src_row = rows[idx]
             n_by_position += 1
 
-        raw_steps = (baseline_raw.get(rec.get("sample_id"))
-                     if baseline_raw else first_nonempty_trace(rec.get("traces")))
-        raw_steps = raw_steps or []
+        raw_steps = baseline_raw.get(rec.get("sample_id")) or []
         if not raw_steps:
             n_raw_empty += 1
         synth = synth_by_id.get(rec.get("sample_id"))
-        craft_steps = split_synthesized_text((synth or {}).get("synthesized_trace") or "")
+        craft_text = (synth or {}).get("synthesized_trace") or ""
+        if craft_text.strip() and dataset in _READER:
+            craft_text = dedup_trace(craft_text, extractor=_READER[dataset])
+        craft_steps = split_synthesized_text(craft_text)
         if not craft_steps:
             n_craft_empty += 1
         # Both sides have to exist, or the delta for this sample compares a trace
