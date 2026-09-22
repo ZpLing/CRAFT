@@ -39,7 +39,34 @@ from typing import Callable, Dict, List, Optional, Tuple
 
 _STEP = re.compile(r"(?m)^(\s*Step\s*\d+\s*[:.\-]\s*)")
 _STEP_NO = re.compile(r"(?m)^\s*Step\s*(\d+)\s*[:.\-]")
-_STEP_REF = re.compile(r"(?i)(\bSteps?\s*)(\d+)")
+# A reference to one of this trace's own steps, which renumbering may rewrite.
+# Requiring the wording that makes it a reference keeps renumbering off the
+# problem's own text: an OlympiadBench question describes an algorithm whose
+# "Step 1" is Ada adding x and y, and a trace that quotes it would otherwise
+# have that step silently renumbered along with the citations.
+_STEP_REF = re.compile(
+    r"(?i)(?:"
+    # a reference word before it: "from Step 3", "established in Step 4"
+    r"(?P<pre>\b(?:from|in|into|at|by|per|see|using|used|use|with|of|to|and|or|"
+    r"than|versus|vs\.?|,|;|\()\s*(?:the\s+)?"
+    r"(?:result|results|conclusion|premise|premises|prerequisite|prerequisites)?"
+    r"\s*(?:established|derived|shown|obtained|stated)?\s*(?:in|at|by)?\s*"
+    r"\bSteps?\s*)(?P<n1>\d+)"
+    r"|"
+    # a reference verb after it: "Step 3 establishes that ..."
+    r"(?P<pre2>\bSteps?\s*)(?P<n2>\d+)(?=\s*(?:establishes|established|shows|"
+    r"showed|gives|gave|derives|derived|states|stated|tells|told|yields|yielded|"
+    r"provides|provided|and\s+Steps?\s*\d)\b)"
+    r")")
+
+
+def _ref_parts(m: "re.Match"):
+    """(prefix, number) for whichever alternative matched."""
+    if m.group("n1") is not None:
+        return m.group("pre"), m.group("n1")
+    return m.group("pre2"), m.group("n2")
+# The looser form, for counting and for the "Step 2 and Step 2" cleanup.
+_STEP_REF_ANY = re.compile(r"(?i)(\bSteps?\s*)(\d+)")
 _PARA = re.compile(r"\n\s*\n")
 _SENT = re.compile(r"(?<=[.!?])\s+")
 # A subscripted symbol is one name: split c_a into "c" and "a" and it stops
@@ -419,11 +446,13 @@ def _repeat_conclusions(bodies: List[str],
 # while resting on nothing.
 _CITE_CLAIM = re.compile(
     r"(?i)\b(Steps?\s*)(\d+)(\s*(?:establishes|established|shows|showed|gives|"
-    r"gave|derives|derived|states|stated)\s+(?:that\s+)?)([^,.;]{10,140})")
+    r"gave|derives|derived|states|stated|as the premise that|"
+    r"we (?:have|know|established) that)\s*(?:that\s+)?)([^,.;]{10,140})")
 
 
 def _fix_citations(text: str, bodies: List[str],
-                   owners: List[Optional[str]]) -> str:
+                   owners: List[Optional[str]],
+                   here: Optional[str] = None) -> str:
     """Point a citation at the step that actually carries what it claims.
 
     Only the number is touched, and only when the step named does not contain
@@ -442,7 +471,15 @@ def _fix_citations(text: str, bodies: List[str],
             return m.group(0)
         holds = [o for o, b in by_owner.items()
                  if not (want - _substance(b))]
-        if named in holds or len(holds) != 1:
+        # A step cannot stand on itself, so a self-citation is repaired even
+        # when the step does contain the claim -- it is citing the line it is
+        # about to write. Otherwise the named step has to be wrong about the
+        # claim before anything moves.
+        if here is not None and named == here:
+            holds = [o for o in holds if o != here]
+        elif named in holds:
+            return m.group(0)
+        if len(holds) != 1:
             return m.group(0)
         return m.group(1) + holds[0] + m.group(3) + m.group(4)
 
@@ -495,7 +532,8 @@ def dedup_trace(text: str,
     # is dropped or renumbered, so the numbers it is checked against are the
     # ones it was written with.
     source_bodies = list(bodies)
-    bodies = [_fix_citations(b, source_bodies, owners) for b in bodies]
+    bodies = [_fix_citations(b, source_bodies, owners, o)
+              for b, o in zip(bodies, owners)]
 
     bodies, verbatim_alias = _drop_verbatim(bodies, owners)
     trimmed, alias = _trim(bodies, owners, threshold)
@@ -545,11 +583,39 @@ def dedup_trace(text: str,
     rewritten = "\n".join(parts)
 
     if any(old_no != new_no for old_no, new_no in renumber.items()):
-        def redirect(m: re.Match) -> str:
-            return m.group(1) + renumber.get(m.group(2), m.group(2))
-        rebuilt = [piece if _STEP.fullmatch(piece or "")
-                   else _STEP_REF.sub(redirect, piece or "")
-                   for piece in _STEP.split(rewritten)]
+        # Renumbering can land a citation on the step that carries it: a step
+        # citing one that was dropped is sent to the step it repeated, and that
+        # step may be this one under its new number. A step cannot stand on
+        # itself, so such a citation keeps the number it had.
+        live = {n for n in renumber.values()}
+
+        def redirect_for(current: Optional[str]):
+            def redirect(m: re.Match) -> str:
+                pre, old_no = _ref_parts(m)
+                new_no = renumber.get(old_no, old_no)
+                if current is None or new_no != current:
+                    return pre + new_no
+                # The citation would name the step carrying it. Keeping the
+                # number it had only works if that number still exists; where
+                # it does not, the nearest surviving earlier step is the one
+                # this step was built on.
+                if old_no in live:
+                    return m.group(0)
+                earlier = [n for n in live if n.isdigit() and int(n) < int(current)]
+                if not earlier:
+                    return m.group(0)
+                return pre + max(earlier, key=int)
+            return redirect
+
+        rebuilt = []
+        current: Optional[str] = None
+        for piece in _STEP.split(rewritten):
+            if _STEP.fullmatch(piece or ""):
+                found = _STEP_NO.match(piece or "")
+                current = found.group(1) if found else None
+                rebuilt.append(piece)
+            else:
+                rebuilt.append(_STEP_REF.sub(redirect_for(current), piece or ""))
         rewritten = "".join(rebuilt)
         # Two citations that now point at the same step read as "Step 2 and
         # Step 2"; say it once.
@@ -595,7 +661,8 @@ def dedup_steps(steps: List[str], threshold: float = 0.75,
             renumber[dropped] = renumber[source]
     if any(old_no != new_no for old_no, new_no in renumber.items()):
         def redirect(m: re.Match) -> str:
-            return m.group(1) + renumber.get(m.group(2), m.group(2))
+            pre, old_no = _ref_parts(m)
+            return pre + renumber.get(old_no, old_no)
         out = [_STEP_REF.sub(redirect, b) for b in out]
     if extractor is not None and extractor(" ".join(out)) != extractor(" ".join(steps)):
         return list(steps)
