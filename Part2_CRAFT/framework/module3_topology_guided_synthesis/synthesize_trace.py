@@ -1095,6 +1095,10 @@ suggestion, not a settled result):
                   # reasoning it still needs -- ProofWriter/gemini, which is
                   # deterministic here, went 94.0% to 88.0% under the cap.
                   # So the ending is fixed and the length is not.
+                  # Opening with the hypothesis instead was tried: it wins
+                  # FLD/gemini's one remaining sample and costs FLD/gpt two,
+                  # and drops ProofWriter/gemini and /gpt from above the full
+                  # run to level with it. Ending on it is the better trade.
                   "- End this step with the hypothesis in the problem's own "
                   "wording and the verdict on it. Say whatever this step "
                   "still needs to establish first\n")
