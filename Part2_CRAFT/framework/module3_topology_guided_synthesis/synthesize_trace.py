@@ -359,9 +359,10 @@ def build_synthesis_prompt(
             # for anything to be left out: the maths steps run four to five
             # sentences where the logical ones run one, and none of the four
             # is idle.
-            "2. **Say It In One Sentence**: write the prose of this step as one "
-            "sentence, two at the most. Where it would take several short ones, "
-            "join them; do not leave anything out to make the count.\n"
+            "2. **Say It In Two Sentences**: write the prose of this step as "
+            "two sentences, three at the most. Where it would take several "
+            "short ones, join them; never leave out a calculation to meet the "
+            "count -- if the step needs an intermediate value, write it.\n"
             "3. **Stand On The Problem's Words**: name the given condition this "
             "step uses as the problem states it, before applying it."
         )
@@ -369,7 +370,8 @@ def build_synthesis_prompt(
             "**Before Generating, Verify**:\n"
             "- Does this step make exactly one inference?\n"
             "- Does it state something the steps before it have not?\n"
-            "- Is its prose one sentence, two at the most?\n"
+            "- Is its prose two sentences, three at the most?\n"
+            "- Is every intermediate value this step relies on written down?\n"
             "- If this is the final step, will you reach an explicit conclusion?\n"
         )
     else:
@@ -1405,45 +1407,47 @@ async def synthesize_trace_rkg(
         generated_nodes: Dict[str, str] = {}
         generated_steps: List[str]      = []
 
-        # ── Math domain: hybrid RKG + step_by_step autoregressive ──────────
-        # Uses RKG topo order for step count & reference hints, but generates
-        # each step autoregressively (seeing full prior context) like
-        # synthesize_trace_for_sample — this produces detailed arithmetic
-        # chains that per-node independent generation cannot.
+        # ── Maths domain: topological traversal of G* ──────────────────────
+        # Module III walks G* in topological order and puts the node it is
+        # standing on into that step's prompt; `plan` is that order. Each step
+        # additionally sees the steps before it and the term hints for its
+        # position, which the arithmetic needs and the topology does not
+        # preclude.
         if domain == "math":
             _math_max_tok = RESPONSE_TOKENS_MATH
 
-            # Build RKG reference hint lookup: map bucket position → hint text
-            _dag_hints: Dict[int, str] = {}
-            for entry in plan:
-                pos = entry.get("step_position", 1)
-                hint = entry.get("node_text_hint", "")
-                if hint:
-                    # Map RKG step position to percentage bucket (0-9)
-                    bucket = round((pos - 1) / max(total_steps - 1, 1) * 9)
-                    _dag_hints[bucket] = hint
-
-            # Iterate over step_terms_summary buckets (same as step_by_step)
-            sorted_step_positions = sorted(_step_terms_summary.keys()) if _step_terms_summary else list(range(total_steps))
-
-            for idx, step_pos in enumerate(sorted_step_positions):
-                is_last = (idx == len(sorted_step_positions) - 1)
+            for idx, entry in enumerate(plan):
+                is_last = (idx == len(plan) - 1)
+                step_pos = entry.get("step_position", idx + 1)
+                # Term hints are bucketed by relative position; keep that lookup
+                # keyed the way build_synthesis_prompt expects.
+                bucket = round((step_pos - 1) / max(total_steps - 1, 1) * 9)
 
                 prompt = build_synthesis_prompt(
                     problem_input,
                     _step_terms_summary,
                     ground_truth=_mv_answer,  # majority-vote answer (no GT leakage)
                     answer_is_prior=True,
-                    current_step=step_pos,
+                    current_step=bucket,
                     step_label=idx + 1,
                     previous_steps=generated_steps,
                     domain=domain,
                     atomic_steps=atomic_steps,
                 )
-                # Note: RKG reference hints are NOT injected for math domain.
-                # Math intermediate results are problem-specific; consensus node
-                # texts from different traces can mislead the solver.
-                # RKG value for math is in filtering (Steps 3.2/3.3), not generation.
+                _node_hint = (entry.get("node_text_hint") or "").strip()
+                if _node_hint:
+                    prompt += (
+                        f"\n**Consensus node for this step** (what the surviving "
+                        f"traces agreed this step establishes):\n"
+                        f"  \"{_node_hint[:300]}\"\n"
+                        "  Reach that result in this step. Treat the wording as "
+                        "the target, not as a source to copy: re-derive every "
+                        "number yourself, and where your own arithmetic "
+                        "disagrees with it, follow your arithmetic and say so.\n"
+                        # A consensus node carries what other traces agreed on,
+                        # and a number right in general can be wrong for this
+                        # problem; hence the target-not-source wording.
+                    )
                 if is_last:
                     if _mv_answer:
                         prompt += (
@@ -1501,7 +1505,7 @@ async def synthesize_trace_rkg(
 
             return text, generated_steps
 
-        # ── Logical domain: per-node RKG synthesis (original path) ─────────
+        # ── Logical domain: topological traversal of G* ────────────────────
         for entry in plan:
             step_pos   = entry.get("step_position", len(generated_steps) + 1)
             is_last_e  = (step_pos == total_steps)
@@ -1625,30 +1629,6 @@ async def synthesize_trace_rkg(
             pred_label = _extract_answer(synthesized_text) or pred_label
 
         best_text = synthesized_text
-
-        # ── Math: expand compressed RKG skeleton into full arithmetic chain ───
-        # Only needed when math domain uses per-node RKG synthesis (not hybrid).
-        # The hybrid path already produces detailed autoregressive traces.
-        if False and domain == "math" and best_text:
-            expand_prompt = (
-                f"Problem:\n{problem_input}\n\n"
-                f"High-level reasoning outline:\n{best_text}\n\n"
-                "Task: Using the outline above as a guide, write a COMPLETE and DETAILED "
-                "step-by-step solution to the problem from scratch.\n"
-                "- The outline shows the key ideas — you must fill in ALL intermediate "
-                "algebraic manipulations, substitutions, and arithmetic\n"
-                "- Show EVERY equation transformation and compute EVERY numerical result explicitly\n"
-                "- Break complex steps into multiple sub-steps — do NOT skip any calculation\n"
-                "- Each step must produce a concrete number or simplified expression\n"
-                "- Label each step: Step 1:, Step 2:, Step 3:, ... (use as many steps as needed)\n"
-                "- End with \\boxed{<final answer>}\n"
-                "Output ONLY the complete solution."
-            )
-            expanded = await generate_reasoning_trace(
-                session, expand_prompt, model, max_tokens=RESPONSE_TOKENS_MATH)
-            if expanded and _has_conclusion(expanded):
-                best_text  = expanded.strip()
-                pred_label = _extract_answer(best_text) or pred_label
 
         if domain == "math" and pred_label:
             pred_label = _normalise_math_pred(pred_label)
