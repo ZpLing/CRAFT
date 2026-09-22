@@ -350,20 +350,25 @@ def sanitize_label(label: Optional[str]) -> Optional[str]:
         return "__PROVED__"
     return None
 
+import sys as _sys_mt
+import pathlib as _pl_mt
+_sys_mt.path.insert(0, str(_pl_mt.Path(__file__).resolve().parents[2]))
+from framework.domain_optimization.math_text import split_steps  # noqa: E402
+
+
 def extract_reasoning_steps(text: str) -> List[str]:
-    if not text:
-        return []
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
-    steps = [line for line in lines if STEP_PATTERN.match(line)]
-    if steps:
-        # Retain Final Conclusion lines so the RKG can detect the conclusion node
-        conclusion_lines = [l for l in lines if FINAL_CONCLUSION_PATTERN.search(l) or LABEL_TOKEN_PATTERN.search(l)]
-        # Avoid duplicating lines already in steps
-        for cl in conclusion_lines:
-            if cl not in steps:
-                steps.append(cl)
-        return steps
-    return lines  # Retain all lines as-is, including conclusion lines
+    """Split a generation into its steps, each with the lines that belong to it.
+
+    Keeping only the "Step N:" lines, as this once did, dropped whatever a
+    model writes on the lines after the header: gpt-5.4-nano puts each step's
+    mathematics in a display block on its own lines, so its OmniMATH and
+    OlympiadBench traces kept 16% to 19% of their characters and every
+    equation was lost before the TF-IRF terms, the z-score filter and the RKG
+    ever saw the trace. The one splitter that keeps a block with its step is
+    math_text.split_steps; a Final Conclusion line stays as a step of its own
+    so the RKG can find the conclusion node.
+    """
+    return split_steps(text)
 
 def extract_final_statement(text: str) -> str:
     if not text:
