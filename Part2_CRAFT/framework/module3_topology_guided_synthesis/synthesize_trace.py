@@ -819,6 +819,19 @@ def topological_sort_rkg(consensus_rkg: Dict[str, Any]) -> List[str]:
     remaining = [nid for nid in nodes if nid not in topo_order]
     topo_order.extend(sorted(remaining, key=node_priority))
 
+    # A conclusion nothing depends on belongs at the end, whatever its in-degree
+    # says. Kahn's algorithm emits such a node as soon as it is the only thing
+    # left in the queue, which happens while other branches are still waiting on
+    # their premises -- the trace then decides the verdict in step 8 and applies
+    # three more facts after it, and extract_label reads the marker that came
+    # last. Moving a node with no outgoing edge to the end is still a
+    # topological order: by definition nothing follows it.
+    tail = [nid for nid in topo_order
+            if nodes[nid].get("type") == "conclusion" and not adj[nid]]
+    if tail and topo_order[-len(tail):] != tail:
+        moved = set(tail)
+        topo_order = [nid for nid in topo_order if nid not in moved] + tail
+
     return topo_order
 
 
