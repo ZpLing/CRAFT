@@ -1101,6 +1101,14 @@ suggestion, not a settled result):
                   "- Write that first sentence as your own sentence carrying "
                   "the rule -- \"According to Fact 12, ...\" -- not as a "
                   "quotation dropped in after a colon\n"
+                  # Banning numbered sub-points was tried, against a 5%
+                  # rate of sentences under twelve characters -- list markers
+                  # and lone symbols, which a grammar model scores at the
+                  # floor. That rate was measured on the traces as they were
+                  # before any of this, and the instructions above had already
+                  # taken it to 0.0-2.3%. Banning them anyway cost 4.1, 2.0
+                  # and 8.0 points of accuracy on three of the four cells.
+
                   # Quoting the same rule in two steps does put a
                   # near-identical pair of sentences in the trace, which is
                   # what the repetition scores read -- Fact16 quoted twice
