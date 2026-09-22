@@ -486,6 +486,30 @@ def _fix_citations(text: str, bodies: List[str],
     return _CITE_CLAIM.sub(repair, text)
 
 
+# A run of citations, as a step writes them: "From Step 6, Step 1, and Step 1".
+# Redirecting can send two of them to the same step, and a list that names one
+# step twice is both wrong and ungrammatical -- the CoLA model that scores these
+# traces puts "From Step6, Step1, and Step1, we have ..." at 0.15 where the
+# trace averages 0.77.
+_CITE_RUN = re.compile(
+    r"(?i)\bSteps?\s*\d+(?:\s*(?:,|and|,\s*and)\s*Steps?\s*\d+)+")
+_CITE_ONE = re.compile(r"(?i)Steps?\s*(\d+)")
+
+
+def _tidy_citation_lists(text: str) -> str:
+    """Drop repeats from a run of step citations and space them properly."""
+    def fix(m: re.Match) -> str:
+        seen: List[str] = []
+        for n in _CITE_ONE.findall(m.group(0)):
+            if n not in seen:
+                seen.append(n)
+        parts = [f"Step {n}" for n in seen]
+        if len(parts) == 1:
+            return parts[0]
+        return ", ".join(parts[:-1]) + (" and " if len(parts) == 2 else ", and ") + parts[-1]
+    return _CITE_RUN.sub(fix, text)
+
+
 def _resolve(alias: Dict[str, str]) -> Dict[str, str]:
     """Follow a chain of dropped steps back to the one that still exists."""
     out: Dict[str, str] = {}
@@ -617,10 +641,7 @@ def dedup_trace(text: str,
             else:
                 rebuilt.append(_STEP_REF.sub(redirect_for(current), piece or ""))
         rewritten = "".join(rebuilt)
-        # Two citations that now point at the same step read as "Step 2 and
-        # Step 2"; say it once.
-        rewritten = re.sub(r"(?i)\b(Steps?\s*(\d+))(\s*(?:and|,)\s*Steps?\s*\2\b)+",
-                           r"\1", rewritten)
+        rewritten = _tidy_citation_lists(rewritten)
 
     if extractor is not None and extractor(rewritten) != extractor(text):
         return text
