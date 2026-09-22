@@ -412,6 +412,43 @@ def _repeat_conclusions(bodies: List[str],
     return repeats
 
 
+# A citation that says what the step it names established: "Step 4 establishes
+# that the tiger sees the tiger". The claim is checkable against that step, and
+# in these traces it is wrong about one time in twenty -- the trace cites the
+# step before the one that actually derived the line, and reads as rigorous
+# while resting on nothing.
+_CITE_CLAIM = re.compile(
+    r"(?i)\b(Steps?\s*)(\d+)(\s*(?:establishes|established|shows|showed|gives|"
+    r"gave|derives|derived|states|stated)\s+(?:that\s+)?)([^,.;]{10,140})")
+
+
+def _fix_citations(text: str, bodies: List[str],
+                   owners: List[Optional[str]]) -> str:
+    """Point a citation at the step that actually carries what it claims.
+
+    Only the number is touched, and only when the step named does not contain
+    the claim and exactly one earlier step does -- an ambiguous case is left
+    alone, since guessing between two candidates would be inventing a
+    derivation rather than repairing a reference.
+    """
+    by_owner = {o: b for o, b in zip(owners, bodies) if o is not None}
+    if not by_owner:
+        return text
+
+    def repair(m: re.Match) -> str:
+        named, claim = m.group(2), m.group(4)
+        want = _substance(claim)
+        if len(want) < 2:
+            return m.group(0)
+        holds = [o for o, b in by_owner.items()
+                 if not (want - _substance(b))]
+        if named in holds or len(holds) != 1:
+            return m.group(0)
+        return m.group(1) + holds[0] + m.group(3) + m.group(4)
+
+    return _CITE_CLAIM.sub(repair, text)
+
+
 def _resolve(alias: Dict[str, str]) -> Dict[str, str]:
     """Follow a chain of dropped steps back to the one that still exists."""
     out: Dict[str, str] = {}
@@ -454,6 +491,12 @@ def dedup_trace(text: str,
 
     owners = [_STEP_NO.match(h).group(1) if h and _STEP_NO.match(h) else None
               for h in heads]
+    # A citation is repaired against the trace as it came in, before anything
+    # is dropped or renumbered, so the numbers it is checked against are the
+    # ones it was written with.
+    source_bodies = list(bodies)
+    bodies = [_fix_citations(b, source_bodies, owners) for b in bodies]
+
     bodies, verbatim_alias = _drop_verbatim(bodies, owners)
     trimmed, alias = _trim(bodies, owners, threshold)
     for owner, source in verbatim_alias.items():
