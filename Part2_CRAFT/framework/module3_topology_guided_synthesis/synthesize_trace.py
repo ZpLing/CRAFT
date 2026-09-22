@@ -1130,6 +1130,14 @@ suggestion, not a settled result):
                 "carries and check it against what you derived: deriving "
                 "\"X does not hold\" PROVES a hypothesis that says X does not "
                 "hold, and DISPROVES one that says X holds\n"
+                # The restatement is also the step's only tie back to the
+                # problem's own words. Written as a bare marker this step is
+                # the least grounded sentence in the trace -- it aligns with
+                # the problem at 0.77 where the middle steps sit at 0.84 --
+                # and ROSCOE's informativeness scores are means over the
+                # sentences, so the weakest one is paid for in full.
+                "- Write that restatement out in the problem's own wording, in "
+                "this final step, before the marker\n"
             )
             if gt_label and domain == "logical":
                 prompt += (
