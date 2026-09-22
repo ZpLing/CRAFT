@@ -242,6 +242,8 @@ def _trim(bodies: List[str], owners: List[Optional[str]],
                         or not _balanced(unit)):
                     survivors.append(unit)
                     continue
+                if _is_recap(piece, [text for _, _, text in seen]):
+                    continue
                 match = next((src for prev, src, prev_text in seen
                               if _repeats(piece, prev_text, toks, prev, threshold)),
                              "")
@@ -278,8 +280,57 @@ def _trim(bodies: List[str], owners: List[Optional[str]],
 # "infer **X**".
 _DERIVES = re.compile(
     r"(?is)\b(?:infer(?:\s+that)?|conclude(?:\s+that)?|it follows that|"
-    r"therefore|thus|hence|which gives|this gives|yields?)\b"
+    r"therefore|thus|hence|which gives(?:\s+us)?|this gives|yields?|"
+    r"we (?:get|obtain|find)|to get|resulting in|so that)\b"
     r"[,:\s]*(.+?)(?=[.;]|$)")
+
+# A sentence that only says again what an earlier step established. The
+# synthesis prompt forbids it in so many words and the traces write it anyway,
+# in the shape "We established in Step 1 that X" or "As shown in Step 3, X".
+# It repeats a step rather than the problem, so it earns nothing under the
+# faithfulness scores and costs under the repetition ones.
+_RECAP_OPEN = re.compile(
+    r"(?i)^\s*(?:as\s+)?(?:we\s+)?(?:have\s+)?"
+    r"(?:established|shown|derived|determined|found|noted|recalled|seen)\s+"
+    r"(?:above\s+|earlier\s+|previously\s+)?"
+    r"(?:in|from|at)\s+Steps?\s*\d+|"
+    r"(?i)^\s*(?:as|from|per)\s+(?:established\s+in\s+|shown\s+in\s+|"
+    r"derived\s+in\s+)?Steps?\s*\d+\s*,?\s*we\s+"
+    r"(?:have|know|established|derived|obtained)\b")
+
+
+# The wording a recap is made of. Left in, "established" and "in" count as
+# content the earlier step lacked, and every recap looks like new work.
+_RECAP_WORDS = frozenset("""
+as we have has had been being in from at of to that this it its and or but so
+then now here there also again both each all any some no not is are was were
+be by with which what where when who whom whose for on onto into over under
+established shown derived determined found noted recalled seen show give gives
+given know known step steps fact facts rule rules above earlier previously
+therefore thus hence since because recall note
+""".split())
+
+
+def _substance(text: str) -> frozenset:
+    """The content words of a sentence, with the connective wording removed."""
+    return frozenset(w for w in _content(text) if w not in _RECAP_WORDS)
+
+
+def _is_recap(piece: str, earlier: List[str]) -> bool:
+    """Does this sentence only repeat what an earlier step already said?
+
+    A sentence opening "as established in Step 3" and then going on to do
+    something is not a recap; one that opens that way and adds nothing is. The
+    difference is whether any of its substance is new, so that is what is
+    checked -- against each earlier sentence on its own, since a recap names
+    one step.
+    """
+    if not _RECAP_OPEN.search(piece) or _ANSWER.search(piece):
+        return False
+    body = _substance(piece)
+    if len(body) < 2:
+        return False
+    return any(not (body - _substance(prev)) for prev in earlier)
 # Wording that carries no claim, so two steps sharing it are not the same step.
 _FILLER = re.compile(r"\b(the|a|an|that|this|is|are|be|we|it|to|of|and|then|"
                      r"so|now|next|finally|therefore|thus|hence)\b")

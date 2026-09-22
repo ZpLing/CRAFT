@@ -1005,6 +1005,12 @@ suggestion, not a settled result):
             + ("- Keep this step to ONE inference: one equation solved, one "
                "substitution made, one quantity computed. If the work needs "
                "several, this step does the first and says what remains\n"
+               # As in the logical branch: name the condition being used in the
+               # problem's own words. A step that says which given it is
+               # standing on aligns with the problem text, and the conditions
+               # differ from step to step, so it costs no repetition.
+               "- Name the given condition this step uses in the problem's own "
+               "words before applying it\n"
                if atomic_steps else
                "- If this step involves multiple operations, break them into labeled sub-steps: (a), (b), (c)...\n"
                "- Write a DETAILED derivation — show ALL intermediate work, not just the final result of this step\n") +
@@ -1016,6 +1022,15 @@ suggestion, not a settled result):
             + ("- ONE inference only: apply exactly one rule to exactly one set "
                "of premises and state what follows. Do not chain two rules in "
                "this step, and do not restate what earlier steps established\n"
+               # Not restating an earlier step and not quoting the premise are
+               # different economies, and asking for the first got both. The
+               # restatement is what the repetition scores punish; the quoted
+               # premise is what the faithfulness and informativeness scores
+               # reward, and since each step applies a different rule, quoting
+               # one adds no repetition. Dropping both cost ProofWriter 1.8
+               # points of informativeness_step to buy 0.6 of repetition_step.
+               "- Quote the rule or fact you apply in the problem's own words, "
+               "so the step reads on its own rather than as a pointer\n"
                if atomic_steps else
                "- Each logical inference must be explicit and atomic\n")
         )
