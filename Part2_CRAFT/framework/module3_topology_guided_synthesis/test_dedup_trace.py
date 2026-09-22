@@ -85,6 +85,22 @@ the rabbit.
 Step 4: From Step 3, conclude the hypothesis is __PROVED__."""
 
 
+# A line written out twice, character for character, inside paragraphs that
+# carry displays -- which the sentence rule has to leave whole. One pair like
+# this puts ROSCOE's repetition score at its worst value on its own.
+VERBATIM = """Step 1: Compute the fifth term for each case.
+\\[ a_5 = 5 + 4d \\]
+Therefore, the possible values of the fifth term are \\(\\boxed{7,\\,-5}\\).
+Step 2: Collect the two cases and state the result.
+\\[ a_5 = 5 + 4d \\]
+Therefore, the possible values of the fifth term are \\(\\boxed{7,\\,-5}\\)."""
+
+# The same line twice, but the halves a split makes are not balanced on their
+# own: removing one leaves the trace short a brace.
+UNBALANCED = """Step 1: Consider \\begin{cases} x = 1. \\\\ y = 2. \\end{cases} and note it is finite.
+Step 2: Consider \\begin{cases} x = 1. \\\\ y = 2. \\end{cases} and note it is finite."""
+
+
 def main() -> int:
     failures = 0
     for later, earlier, expected, why in CASES:
@@ -144,6 +160,24 @@ def main() -> int:
     else:
         print("ok    drops  the same step through the list the export scores")
 
+    out = dedup_trace(VERBATIM)
+    n_answer = out.count("the possible values of the fifth term")
+    if n_answer != 1:
+        failures += 1
+        print(f"FAIL  the answer line is still written {n_answer} times")
+    elif "\\boxed{7,\\,-5}" not in out:
+        failures += 1
+        print("FAIL  removing the earlier copy took the answer with it")
+    else:
+        print("ok    drops  a line written twice inside a display paragraph")
+
+    out = dedup_trace(UNBALANCED)
+    if out.count("\\begin{cases}") != out.count("\\end{cases}"):
+        failures += 1
+        print("FAIL  a verbatim drop unbalanced an environment")
+    else:
+        print("ok    keeps  a repeat whose own delimiters do not balance")
+
     braced = dedup_trace(BRACES)
     if braced.count("{") != braced.count("}"):
         failures += 1
@@ -151,7 +185,7 @@ def main() -> int:
     else:
         print("ok    keeps  every brace it started with")
 
-    total = len(CASES) + len(CONCLUSIONS) + 4
+    total = len(CASES) + len(CONCLUSIONS) + 6
     print(f"\n{total - failures}/{total} passed")
     return 1 if failures else 0
 

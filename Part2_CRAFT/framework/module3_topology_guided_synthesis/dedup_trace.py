@@ -77,6 +77,10 @@ def _tokens(text: str) -> frozenset:
 # a bag of words does not, so both have to agree before anything is dropped.
 _VERBATIM = 0.95
 
+# Below this a repeated line is a connective -- "Therefore:", "So we have" --
+# that two steps may legitimately share.
+_VERBATIM_MIN = 25
+
 # Neither test survives work that reuses a sentence's shape. A maths trace
 # checking n = 2, then n = 5, then n = 7 writes "Since $5$ is a prime number,
 # the condition is satisfied" against "Since $2$ ..."; one placing a
@@ -131,6 +135,71 @@ def _balanced(text: str) -> bool:
 def _is_prose(text: str) -> bool:
     """A paragraph with no display maths in it can be split a sentence at a time."""
     return not _MATHY.search(text)
+
+
+def _drop_verbatim(bodies: List[str], owners: List[Optional[str]]
+                   ) -> Tuple[List[str], Dict[str, str]]:
+    """Remove sentences the trace writes twice, character for character.
+
+    ROSCOE's repetition scores are (1 - max over every pair of sentences), so a
+    single pair of identical sentences puts the trace at the worst score the
+    metric has and no amount of other deduplication moves it. One trace in five
+    has such a pair, and among the maths cells it is one in three.
+
+    Nothing about this pass is lossy -- what it removes is a character-for-
+    character copy of a line the trace still has -- so it runs over every
+    paragraph, including the ones carrying displays that _trim has to leave
+    whole. What keeps it safe there is that a sentence whose own delimiters do
+    not balance is never removed: those are the fragments a split lands inside
+    \\begin{cases}, and dropping one leaves the rest of the trace short a brace.
+
+    The first copy stays, since that is where the line was derived. A copy
+    stating the answer is the exception: the last one stays, so the trace still
+    ends on its answer and extract_label reads what it always read.
+
+    A step left empty by this is reported with the step its line came from, so
+    that what cited it can be sent there instead of being restored.
+    """
+    counts: Dict[str, int] = {}
+    for body in bodies:
+        for piece in _SENT.split(body or ""):
+            key = " ".join(piece.split())
+            if len(key) >= _VERBATIM_MIN and _balanced(piece):
+                counts[key] = counts.get(key, 0) + 1
+    repeated = {k for k, n in counts.items() if n > 1}
+    if not repeated:
+        return list(bodies), {}
+
+    kept_once: Dict[str, Optional[str]] = {}
+    seen_so_far: Dict[str, int] = {}
+    alias: Dict[str, str] = {}
+    out: List[str] = []
+    for body, owner in zip(bodies, owners):
+        pieces = _SENT.split(body or "")
+        survivors: List[str] = []
+        for piece in pieces:
+            key = " ".join(piece.split())
+            if key not in repeated:
+                survivors.append(piece)
+                continue
+            seen_so_far[key] = seen_so_far.get(key, 0) + 1
+            if _ANSWER.search(piece):
+                # keep the last
+                if seen_so_far[key] == counts[key]:
+                    survivors.append(piece)
+            else:
+                # keep the first
+                if key not in kept_once:
+                    kept_once[key] = owner
+                    survivors.append(piece)
+                elif owner is not None and kept_once[key] is not None:
+                    alias.setdefault(owner, kept_once[key])
+        out.append(" ".join(x for x in survivors if x.strip()))
+    # Only a step this emptied needs redirecting; one that kept a line of its
+    # own is still there to be cited.
+    alias = {o: src for o, src in alias.items()
+             if not out[owners.index(o)].strip()}
+    return out, alias
 
 
 def _trim(bodies: List[str], owners: List[Optional[str]],
@@ -239,12 +308,17 @@ def _repeat_conclusions(bodies: List[str],
                         owners: List[Optional[str]]) -> Dict[str, str]:
     """Map each step that re-derives an earlier conclusion to that earlier step.
 
-    The last step is never mapped. It is where extract_label reads the answer
-    from, and a trace whose final step restates the one before it is still a
-    trace that ends by stating its answer -- which is what the reader needs.
+    The final step is mapped like any other. Sparing it looked like the careful
+    choice -- it is where extract_label reads the answer -- but the traces put
+    their repeats at the end: a step reaching the same conclusion off a
+    different premise, "From Step 2 ... infer the woof is scarred" against
+    "From Step 3 ... infer the woof is scarred". Sparing the last one left
+    every one of those standing, and they are what ROSCOE's repetition score,
+    a maximum over sentence pairs, ends up measuring. Since the two conclusions
+    are the same string, dropping the later one leaves the step before it
+    saying what it said, and the reader reads the same answer; dedup_trace's
+    guard checks exactly that before keeping the rewrite.
     """
-    last = next((o for o, b in zip(reversed(owners), reversed(bodies))
-                 if o is not None and b.strip()), None)
     first_seen: Dict[str, str] = {}
     repeats: Dict[str, str] = {}
     for body, owner in zip(bodies, owners):
@@ -254,8 +328,7 @@ def _repeat_conclusions(bodies: List[str],
         if claim is None:
             continue
         if claim in first_seen:
-            if owner != last:
-                repeats[owner] = first_seen[claim]
+            repeats[owner] = first_seen[claim]
         else:
             first_seen[claim] = owner
     return repeats
@@ -303,7 +376,10 @@ def dedup_trace(text: str,
 
     owners = [_STEP_NO.match(h).group(1) if h and _STEP_NO.match(h) else None
               for h in heads]
+    bodies, verbatim_alias = _drop_verbatim(bodies, owners)
     trimmed, alias = _trim(bodies, owners, threshold)
+    for owner, source in verbatim_alias.items():
+        alias.setdefault(owner, source)
 
     # A step whose conclusion an earlier step already reached goes out whole,
     # citations and all, rather than sentence by sentence: what makes it a
@@ -376,7 +452,10 @@ def dedup_steps(steps: List[str], threshold: float = 0.75,
     # and the redirect has to match it. Numbering these from zero sent every
     # citation one step forward, so the first step came to cite the second.
     owners = [str(i + 1) for i in range(len(steps))]
-    trimmed, alias = _trim(list(steps), owners, threshold)
+    stripped, verbatim_alias = _drop_verbatim(list(steps), owners)
+    trimmed, alias = _trim(stripped, owners, threshold)
+    for owner, source in verbatim_alias.items():
+        alias.setdefault(owner, source)
     for owner, source in _repeat_conclusions(trimmed, owners).items():
         alias.setdefault(owner, source)
         trimmed[int(owner) - 1] = ""
