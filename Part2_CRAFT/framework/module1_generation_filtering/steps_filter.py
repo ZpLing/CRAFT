@@ -72,7 +72,7 @@ try:
 except ImportError:
     _SYMPY_AVAILABLE = False
 
-STEP_PATTERN = re.compile(r"^Step\s*\d+\s*:", re.IGNORECASE | re.MULTILINE)
+from framework.domain_optimization.math_text import split_steps, STEP_HEAD_RE  # noqa: E402
 
 
 def parse_steps_from_trace(trace: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -91,43 +91,13 @@ def parse_steps_from_trace(trace: Dict[str, Any]) -> List[Dict[str, Any]]:
                     "step_text": step_text.strip(),
                 })
     elif reasoning_text:
-        # Parse steps from text
-        lines = reasoning_text.split('\n')
-        current_step = None
-        current_text = []
-
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-
-            # Check if this is the start of a step
-            match = STEP_PATTERN.match(line)
-            if match:
-                # Save the previous step
-                if current_step is not None:
-                    parsed_steps.append({
-                        "step_number": current_step,
-                        "step_text": '\n'.join(current_text).strip(),
-                    })
-
-                # Start a new step
-                step_num_match = re.search(r'\d+', line)
-                if step_num_match:
-                    current_step = int(step_num_match.group())
-                    current_text = [line]
-                else:
-                    current_step = len(parsed_steps) + 1
-                    current_text = [line]
-            else:
-                if current_step is not None:
-                    current_text.append(line)
-
-        # Save the last step
-        if current_step is not None:
+        # The same cut Module I makes when it stores the trace, so a display
+        # block stays with its step here too.
+        for idx, step_text in enumerate(split_steps(reasoning_text, keep_conclusion_lines=False)):
+            head = STEP_HEAD_RE.match(step_text)
             parsed_steps.append({
-                "step_number": current_step,
-                "step_text": '\n'.join(current_text).strip(),
+                "step_number": int(head.group(1)) if head else idx + 1,
+                "step_text": step_text.strip(),
             })
 
     return parsed_steps
