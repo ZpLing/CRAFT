@@ -1086,6 +1086,14 @@ suggestion, not a settled result):
                + ("- Say the rule and its application in TWO sentences: first "
                   "the rule or fact exactly as the problem words it, then what "
                   "follows when it is applied to the premises named\n"
+                  # Quoting the same rule in two steps does put a
+                  # near-identical pair of sentences in the trace, which is
+                  # what the repetition scores read -- Fact16 quoted twice
+                  # comes out 0.97 similar. Quoting it once and naming it
+                  # afterwards was tried and made repetition worse everywhere:
+                  # 0.0406 to 0.0323, 0.0382 to 0.0240, 0.0207 to 0.0169. The
+                  # quotation is what makes two steps differ; without it they
+                  # are the same skeleton, and the skeleton is identical.
                   if not is_last else
                   # The final step has to land on the hypothesis, not on
                   # another rule: asked for a rule and its application it
