@@ -492,17 +492,41 @@ def _fix_citations(text: str, bodies: List[str],
 # traces puts "From Step6, Step1, and Step1, we have ..." at 0.15 where the
 # trace averages 0.77.
 _CITE_RUN = re.compile(
-    r"(?i)\bSteps?\s*\d+(?:\s*(?:,|and|,\s*and)\s*Steps?\s*\d+)+")
-_CITE_ONE = re.compile(r"(?i)Steps?\s*(\d+)")
+    # "Step 6, Step 1, and Step 1" and the plural form that names the word
+    # once, "Steps 5 and 7" -- both come out of redirecting, and both can end
+    # up naming one step twice.
+    r"(?i)\bSteps?\s*\d+(?:\s*(?:,|and|,\s*and)\s*(?:Steps?\s*)?\d+)+")
+# Every number in such a run, whether or not "Step" precedes it: the plural
+# form writes the word once and then bare numbers, "Steps 5 and 7".
+_CITE_ONE = re.compile(r"\d+")
+
+
+# A step whose body opens by naming itself again: "Step 8: Step 8 (final): From
+# Steps 5 and 7 ...". The header is already there, so the repeat is noise, and
+# the CoLA model that scores these traces puts such a sentence at 0.04 where the
+# trace averages 0.79.
+_ECHOED_HEAD = re.compile(r"(?i)^\s*\**\s*Steps?\s*\d+\s*(?:\([^)]{0,20}\))?\s*\**\s*[:.\-]\s*")
+
+
+def _drop_echoed_header(body: str) -> str:
+    """Remove a step number the body repeats after its own header."""
+    return _ECHOED_HEAD.sub("", body, count=1)
 
 
 def _tidy_citation_lists(text: str) -> str:
-    """Drop repeats from a run of step citations and space them properly."""
+    """Drop repeats from a run of step citations and space them properly.
+
+    A run naming distinct steps is returned exactly as written. Rewriting one
+    risks dropping a citation, and there is nothing there to fix.
+    """
     def fix(m: re.Match) -> str:
+        found = _CITE_ONE.findall(m.group(0))
         seen: List[str] = []
-        for n in _CITE_ONE.findall(m.group(0)):
+        for n in found:
             if n not in seen:
                 seen.append(n)
+        if len(seen) == len(found):
+            return m.group(0)
         parts = [f"Step {n}" for n in seen]
         if len(parts) == 1:
             return parts[0]
@@ -601,8 +625,10 @@ def dedup_trace(text: str,
     for head, owner, body in zip(heads, owners, trimmed):
         if not body.strip():
             continue
-        if head and owner in renumber:
-            head = f"Step {renumber[owner]}:"
+        if head:
+            if owner in renumber:
+                head = f"Step {renumber[owner]}:"
+            body = _drop_echoed_header(body)
         parts.append(f"{head} {body}" if head else body)
     rewritten = "\n".join(parts)
 
@@ -641,7 +667,11 @@ def dedup_trace(text: str,
             else:
                 rebuilt.append(_STEP_REF.sub(redirect_for(current), piece or ""))
         rewritten = "".join(rebuilt)
-        rewritten = _tidy_citation_lists(rewritten)
+        pass
+
+    # A run of citations can name one step twice whether or not anything was
+    # renumbered, so this runs on every trace.
+    rewritten = _tidy_citation_lists(rewritten)
 
     if extractor is not None and extractor(rewritten) != extractor(text):
         return text
