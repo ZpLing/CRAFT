@@ -1089,8 +1089,18 @@ suggestion, not a settled result):
                # means over sentences, so the two said separately score above
                # the two said together.
                + ("- Say the rule and its application in TWO sentences: first "
-                  "the rule or fact exactly as the problem words it, then what "
+                  "the rule or fact in the problem's own words, then what "
                   "follows when it is applied to the premises named\n"
+                  # The rule sentence has to read as a sentence. Written as a
+                  # quotation dropped in -- Fact6 says: \"...\" -- the CoLA
+                  # model that scores these traces puts it at 0.36 where raw
+                  # CoTs "According to Fact 21, if something sees the dog then
+                  # it visits the bear" sits near 0.89. Same words, same
+                  # citation, carried by the sentence instead of pasted into
+                  # it.
+                  "- Write that first sentence as your own sentence carrying "
+                  "the rule -- \"According to Fact 12, ...\" -- not as a "
+                  "quotation dropped in after a colon\n"
                   # Quoting the same rule in two steps does put a
                   # near-identical pair of sentences in the trace, which is
                   # what the repetition scores read -- Fact16 quoted twice
