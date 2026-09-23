@@ -753,12 +753,31 @@ _ANY_BOXED = re.compile(r"\\boxed\{((?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)\}")
 _BARE_BOX_LINE = re.compile(r"^[ \t]*\$?\$?[ \t]*\\boxed\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}[ \t]*\$?\$?[ \t]*\.?[ \t]*$")
 
 
-def _math_key(s: str) -> str:
-    """One spelling for a piece of mathematics, so \\frac{1}{2} and 1/2 compare equal."""
+def _math_key(s: str, whole: bool = True) -> str:
+    """One spelling for a piece of mathematics, so \\frac{1}{2} and 1/2 compare equal.
+
+    With `whole`, every space goes (the key of a boxed value). Without it, only
+    the spaces around operators and punctuation go, so words stay separate and
+    a value can be looked for as a whole token: "3" is not found inside
+    "\\frac{30}{10}" or "13".
+    """
     s = s.lower()
     s = re.sub(r"\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}", r"\1/\2", s)
     s = re.sub(r"\\(?:left|right|,|;|!|text|mathrm|displaystyle)\b", "", s)
-    return re.sub(r"[\s${}()]", "", s)
+    s = re.sub(r"[${}()]", "", s)
+    if whole:
+        return re.sub(r"\s+", "", s)
+    s = re.sub(r"\s*([^\w\s])\s*", r"\1", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+
+def _stated_in(content: str, prose: str) -> bool:
+    """Whether the prose already writes this value out, as a whole token."""
+    key = _math_key(content)
+    if not key:
+        return True
+    return re.search(r"(?<![0-9a-z])" + re.escape(key) + r"(?![0-9a-z])",
+                     _math_key(prose, whole=False)) is not None
 
 
 def _unbox_intermediate(text: str) -> str:
@@ -794,7 +813,7 @@ def _unbox_intermediate(text: str) -> str:
             prose = text[(heads[-1] if heads else 0):line_start]
             content = m.group(1).strip()
             out.append(text[last:line_start])
-            if content and content.lower() != "none" and _math_key(content) not in _math_key(prose):
+            if content and content.lower() != "none" and not _stated_in(content, prose):
                 out.append(f"This gives ${content}$.")
                 out.append(text[line_end:line_end + 1])   # keep the newline
             last = min(line_end + 1, len(text))
