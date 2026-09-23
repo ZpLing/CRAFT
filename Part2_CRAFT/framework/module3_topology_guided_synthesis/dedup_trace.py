@@ -787,7 +787,20 @@ def _stated_in(content: str, prose: str) -> bool:
                for k in keys)
 
 
-_PLACEHOLDERS = {"", "none", "n/a", "na", "null", "?"}
+_PLACEHOLDERS = {"", "none", "n/a", "null"}
+
+
+def _trim_box(content: str) -> str:
+    """The boxed value without a trailing spacing command or end mark.
+
+    A stray period inside the box would double the sentence's own, so it
+    goes -- but only when it is punctuation. `\\,` and `\\;` end with the same
+    characters and are LaTeX thin spaces; stripping their comma or semicolon
+    leaves a bare backslash that swallows the closing dollar sign.
+    """
+    content = content.strip()
+    content = re.sub(r"(?:\\[,;:!]|\\\s|\s)+$", "", content)      # trailing thin spaces
+    return re.sub(r"(?<!\\)[.,;]+$", "", content).rstrip()
 
 
 def _unbox_intermediate(text: str) -> str:
@@ -829,7 +842,7 @@ def _unbox_intermediate(text: str) -> str:
             # \\boxed{None} and \\boxed{\\text{None}} are placeholders for a step
             # that reached no value; they go with their line either way.
             if content and _math_key(content) not in _PLACEHOLDERS and not _stated_in(content, prose):
-                out.append(f"This gives ${content.rstrip('.,; ')}$.")
+                out.append(f"This gives ${_trim_box(content)}$.")
                 out.append(text[line_end:line_end + 1])   # keep the newline
             last = min(line_end + 1, len(text))
             continue
