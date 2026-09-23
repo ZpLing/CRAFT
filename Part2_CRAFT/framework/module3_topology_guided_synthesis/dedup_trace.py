@@ -753,18 +753,31 @@ _ANY_BOXED = re.compile(r"\\boxed\{((?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)\}")
 _BARE_BOX_LINE = re.compile(r"^[ \t]*\$?\$?[ \t]*\\boxed\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}[ \t]*\$?\$?[ \t]*\.?[ \t]*$")
 
 
-def _unbox_intermediate(text: str) -> str:
-    """Every box but the last loses its box; one that stands alone on its line goes.
+def _math_key(s: str) -> str:
+    """One spelling for a piece of mathematics, so \\frac{1}{2} and 1/2 compare equal."""
+    s = s.lower()
+    s = re.sub(r"\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}", r"\1/\2", s)
+    s = re.sub(r"\\(?:left|right|,|;|!|text|mathrm|displaystyle)\b", "", s)
+    return re.sub(r"[\s${}()]", "", s)
 
-    gemini ends an intermediate step by writing its result once more as a
-    bare `\\boxed{3}` on a line of its own (149 such lines across 86 of
-    OlympiadBench's 500 traces, some of them `\\boxed{None}`). Unboxing that
+
+def _unbox_intermediate(text: str) -> str:
+    """Every box but the last loses its box; a bare box line is dropped or made a sentence.
+
+    gemini ends an intermediate mathematics step by writing its result once
+    more as a bare `\\boxed{3}` on a line of its own (149 such lines across 86
+    of OlympiadBench's 500 traces, some of them `\\boxed{None}`). Unboxing that
     line used to leave a lone "3" between two steps, which the sentence
     splitter glued onto the next header -- "3 Step 3: ..." -- and which the
     scorers then read as a sentence: two of those in one trace were the pair
-    the coherence score called a contradiction. The prose of the step already
-    states the value, so the line is a restatement and is dropped whole; a box
-    inside a sentence keeps its content and loses only the box.
+    the coherence score called a contradiction.
+
+    When the step's own prose already states the value, the line is a
+    restatement and goes whole. When it does not -- 146 of 502 such lines
+    carry a value the prose only implies, "y = 14 - 5, which simplifies to
+    the final value" boxing 9 -- the value is kept, as the sentence "This
+    gives $9$." that closes the step, so nothing the step derived is lost. A
+    box inside a sentence keeps its content and loses only the box.
     """
     boxes = list(_ANY_BOXED.finditer(text))
     if len(boxes) < 2:
@@ -776,8 +789,15 @@ def _unbox_intermediate(text: str) -> str:
         line_end = text.find("\n", m.end())
         line_end = len(text) if line_end == -1 else line_end
         if _BARE_BOX_LINE.match(text[line_start:line_end]):
+            # The step this line closes: from its header (or the trace start).
+            heads = [h.start() for h in _STEP.finditer(text) if h.start() < line_start]
+            prose = text[(heads[-1] if heads else 0):line_start]
+            content = m.group(1).strip()
             out.append(text[last:line_start])
-            last = min(line_end + 1, len(text))   # the line and its newline
+            if content and content.lower() != "none" and _math_key(content) not in _math_key(prose):
+                out.append(f"This gives ${content}$.")
+                out.append(text[line_end:line_end + 1])   # keep the newline
+            last = min(line_end + 1, len(text))
             continue
         out.append(text[last:m.start()])
         out.append(m.group(1))
