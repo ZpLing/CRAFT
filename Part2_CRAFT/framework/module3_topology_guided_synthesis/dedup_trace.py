@@ -748,13 +748,37 @@ def _join_label_fragments(text: str) -> str:
 _ANY_BOXED = re.compile(r"\\boxed\{((?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)\}")
 
 
+# A line that is nothing but a box: optional $ or $$ around it, an optional
+# closing period, nothing else.
+_BARE_BOX_LINE = re.compile(r"^[ \t]*\$?\$?[ \t]*\\boxed\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\}[ \t]*\$?\$?[ \t]*\.?[ \t]*$")
+
+
 def _unbox_intermediate(text: str) -> str:
+    """Every box but the last loses its box; one that stands alone on its line goes.
+
+    gemini ends an intermediate step by writing its result once more as a
+    bare `\\boxed{3}` on a line of its own (149 such lines across 86 of
+    OlympiadBench's 500 traces, some of them `\\boxed{None}`). Unboxing that
+    line used to leave a lone "3" between two steps, which the sentence
+    splitter glued onto the next header -- "3 Step 3: ..." -- and which the
+    scorers then read as a sentence: two of those in one trace were the pair
+    the coherence score called a contradiction. The prose of the step already
+    states the value, so the line is a restatement and is dropped whole; a box
+    inside a sentence keeps its content and loses only the box.
+    """
     boxes = list(_ANY_BOXED.finditer(text))
     if len(boxes) < 2:
         return text
     out = []
     last = 0
     for m in boxes[:-1]:
+        line_start = text.rfind("\n", 0, m.start()) + 1
+        line_end = text.find("\n", m.end())
+        line_end = len(text) if line_end == -1 else line_end
+        if _BARE_BOX_LINE.match(text[line_start:line_end]):
+            out.append(text[last:line_start])
+            last = min(line_end + 1, len(text))   # the line and its newline
+            continue
         out.append(text[last:m.start()])
         out.append(m.group(1))
         last = m.end()
