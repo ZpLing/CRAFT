@@ -52,7 +52,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from dataset_adapters import adapt
 
 
-from framework.domain_optimization.math_text import split_steps, normalize_math  # noqa: E402
+from framework.domain_optimization.math_text import (  # noqa: E402
+    normalize_math, protect_factorials, split_steps)
 # The CRAFT side is scored as it is reported: deduplicated by dedup_trace,
 # checked against the answer reader the cell is scored with.
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]
@@ -148,12 +149,40 @@ def load_source(source: Path) -> Dict[str, List[Dict[str, Any]]]:
 # reads "**if someone is blue then they eat the cow**" as a sentence. Neither
 # the delimiter nor the asterisks is part of the reasoning, so both sides of a
 # comparison are rendered in the notation the problem uses before scoring.
-_BOLD = re.compile(r"\*\*(.+?)\*\*", re.DOTALL)
+# Markdown bold: the opening marker is not glued to a letter or digit on its
+# left and the closing one not on its right, so "x**2 + 2**n" -- two powers
+# written the Python way -- is not read as bold "2 + 2".
+_BOLD = re.compile(r"(?<![A-Za-z0-9])\*\*(?=\S)(.+?)(?<=\S)\*\*(?![A-Za-z0-9])", re.DOTALL)
+# Spacing tells a power from a marker: x**2 has none on either side, 2 ** 3
+# has it on both; "every** box" and ": ** Using" have it on one side only.
+_POWER = re.compile(r"(?<=[A-Za-z0-9)\]}])\*\*(?=[A-Za-z0-9(\[{\\-])|(?<=[A-Za-z0-9)\]}]) \*\* (?=[A-Za-z0-9(\[{\\-])")
 
 
 def normalize_markup(text: str) -> str:
-    """Render a step in the problem's notation: no markdown, $-delimited maths."""
-    return normalize_math(_BOLD.sub(r"\1", text))
+    """Render a step in the problem's notation: no markdown, $-delimited maths.
+
+    A factorial's "!" is also marked as not ending a sentence, because the
+    scorer splits sentences with punkt, which ends one at every "!": a trace
+    about $n!!\\mid 2012!!$ otherwise scores as dozens of one-word sentences.
+    The same is done to the problem text, so both sides are read alike.
+    """
+    # A "**" between two operands -- x**2, 2 ** 3, a**-1 -- is a power written
+    # the Python way and is arithmetic, not markup; it is set aside before
+    # the bold rules run and put back after (the spacing rule is on _POWER).
+    powers: list = []
+
+    def _keep(m: re.Match) -> str:
+        powers.append(m.group(0))
+        return f"\x00{len(powers) - 1}\x00"
+    text = _POWER.sub(_keep, text)
+    text = _BOLD.sub(r"\1", text)
+    # A bold marker that lost its partner -- "Step 2: ** Using the ..." -- is
+    # markup with nothing to mark; it goes too.
+    text = re.sub(r"\*\*(?=\s)|(?<=\s)\*\*", "", text)   # beside a space: the space stays
+    text = re.sub(r"\*\*", " ", text)                    # glued on both sides: becomes a space
+    text = re.sub(r"(?<=\S) {2,}(?=\S)", " ", text)
+    text = re.sub(r"\x00(\d+)\x00", lambda m: powers[int(m.group(1))], text)
+    return protect_factorials(normalize_math(text))
 
 
 def build_entry(src: Dict[str, Any], dataset: str, steps: List[str],
@@ -174,8 +203,8 @@ def build_entry(src: Dict[str, Any], dataset: str, steps: List[str],
     steps = [normalize_markup(s) for s in steps]
     entry: Dict[str, Any] = {
         "key":        src.get("key", sample_id),
-        "premise":    premise,
-        "hypothesis": hypothesis,
+        "premise":    protect_factorials(premise),
+        "hypothesis": protect_factorials(hypothesis),
         "answer":     answer,
         "gpt-3":      " ".join(steps),
         "steps":      steps,

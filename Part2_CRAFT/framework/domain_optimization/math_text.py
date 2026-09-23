@@ -86,6 +86,32 @@ def normalize_math(text: str) -> str:
 
 
 # ── Whether a piece of text closes what it opens ──────────────────────────
+# A factorial's "!" is a sentence end to every sentence splitter, so "$n!!
+# \\mid 2012!!$" comes apart into four "sentences", each a fragment that
+# aligns with nothing and repeats the next. The joiner is invisible and
+# breaks nothing in LaTeX; it only tells the splitter there is no boundary.
+# The "!" is read as a factorial from its neighbours rather than from being
+# inside a math span, because the traces that suffer most are the ones whose
+# dollars do not pair up: a "!" glued to a letter, digit or closing bracket
+# and followed by more mathematics -- another "!", a delimiter, an operator,
+# a comma -- or by lower-case text; an exclamation is followed by a capital.
+# LaTeX's own "\\!" (a negative thin space, as in "\\sin\\!\\left(") and the
+# "62,\\!250" thousands separator split sentences the same way and are caught
+# by the backslash before them.
+FACTORIAL_JOINER = "\u2060"
+_FACTORIAL = re.compile(
+    r"(?<=\\)!(?!\u2060)"
+    r"|(?<=[A-Za-z0-9)}\]!$\u2060])!(?!\u2060)"
+    r"(?=[!$\\()}\],;:=<>+\-*/.|^_]|\s+[a-z\\$(0-9=<>+\-|])")
+
+
+def protect_factorials(text: str) -> str:
+    """Mark every factorial's "!" as not ending a sentence."""
+    if "!" not in (text or ""):
+        return text
+    return _FACTORIAL.sub("!" + FACTORIAL_JOINER, text)
+
+
 def balanced(text: str) -> bool:
     """Does this text close every delimiter it opens, in either convention?
 
