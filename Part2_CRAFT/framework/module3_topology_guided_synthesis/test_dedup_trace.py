@@ -14,7 +14,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dedup_trace import (_conclusion, _join_label_fragments,  # noqa: E402
-                         _repeats, _tokens, dedup_steps, dedup_trace)
+                         _repeats, _tokens, _unbox_intermediate, dedup_steps,
+                         dedup_trace)
 
 _HEAD = re.compile(r"(?m)^\s*Step\s*(\d+)\s*:")
 
@@ -126,8 +127,83 @@ FRAGMENTS = [
 ]
 
 
+# (trace, what it must become, why): nano boxes intermediate results.
+UNBOX = [
+    ("Step 3: Hence $\\boxed{0<c\\le \\sqrt5}$.\nStep 5: So the answer is $\\boxed{(0,1]}$.",
+     "Step 3: Hence $0<c\\le \\sqrt5$.\nStep 5: So the answer is $\\boxed{(0,1]}$.",
+     "an intermediate box loses the box, the last one keeps it"),
+    ("Step 2: We get $\\boxed{\\frac{3}{1009^2}}$.\nStep 4: Thus $\\boxed{773}$.",
+     "Step 2: We get $\\frac{3}{1009^2}$.\nStep 4: Thus $\\boxed{773}$.",
+     "nested braces inside the intermediate box are kept whole"),
+    ("Step 1: Therefore $\\boxed{5}$.", "Step 1: Therefore $\\boxed{5}$.", "a single box is left alone"),
+]
+
+
+# A citation may rest only on an earlier step. The repair used to pick the
+# citing step itself (it always contains the claim it is about to make) or a
+# later one that repeats the claim.
+CITATIONS = """Step 1: According to Fact 17, if someone eats the lion then they like the dog. Since Fact 6 states that the dog eats the lion, it follows that the dog likes the dog.
+Step 2: According to Fact 14, if someone is young then they visit the dog. Since Fact 9 states that the dog is young, it follows that the dog visits the dog.
+Step 3: According to Fact 12, if someone likes the dog and visits the dog then they visit the squirrel. Since Step 3 established that the dog likes the dog and Step 4 established that the dog visits the dog, it follows that the dog visits the squirrel.
+Step 4: According to Fact 13, if the dog visits the squirrel then the squirrel is young. Since Step 3 established that the dog visits the squirrel, it follows that the squirrel is young and the hypothesis is __PROVED__."""
+
+
+# Step 2 repeats Step 1 and goes; the citations in Step 4 are a run and a
+# slash pair, and every number in them has to follow the renumbering.
+RUNS = """Step 1: According to Fact 3, the dog is round. Since Fact 3 states it, it follows that the dog is round.
+Step 2: According to Fact 3, the dog is round. Since Fact 3 states it, it follows that the dog is round.
+Step 3: According to Fact 5, if the dog is round then the dog sees the cat. Since Step 1 established that the dog is round, it follows that the dog sees the cat.
+Step 4: From Steps 3, 2, and 1 (see Step2/Step3), we have that the dog sees the cat. Therefore, from Steps 3, 2, and 1 we can infer, with 4 cases and Step 3 - 3 = 0 aside, that the hypothesis is __PROVED__."""
+
+
+def _forward(text: str) -> list:
+    bad = []
+    current = None
+    for i, part in enumerate(re.split(r"(?m)^\s*Step\s*(\d+)\s*:", text)):
+        if i % 2 == 1:
+            current = int(part)
+            continue
+        if current is None:
+            continue
+        for run in re.finditer(r"\bSteps?\s*\d+(?:\s*(?:,|/|and|&)\s*(?:and\s+)?(?:Steps?\s*)?\d+)*", part):
+            for n in re.findall(r"\d+", run.group(0)):
+                if int(n) >= current:
+                    bad.append(f"Step {current} -> Step {n}")
+    return bad
+
+
 def main() -> int:
     failures = 0
+    out = dedup_trace(RUNS)
+    bad = _forward(out)
+    if bad or "Step 3:" not in out or "Step 4:" in out or "with 4 cases" not in out or " - 3 = 0" not in out:
+        failures += 1
+        print(f"FAIL  renumbering left a citation pointing at itself or ahead, or touched a number that was not one: {bad} / {out!r}")
+    else:
+        print("ok    renum  every number in a citation run follows the renumbering")
+
+    out = dedup_trace(CITATIONS)
+    step3 = [l for l in out.splitlines() if l.startswith("Step 3:")][0]
+    if "Since Step 1 established that the dog likes the dog" not in step3:
+        failures += 1
+        print(f"FAIL  a self-citation was not sent to the step that derived the line: {step3[:160]!r}")
+    elif "Step 2 established that the dog visits the dog" not in step3:
+        failures += 1
+        print(f"FAIL  a forward citation was not sent back to the earlier step: {step3[:160]!r}")
+    elif "Since Step 3 established that the dog visits the squirrel" not in out:
+        failures += 1
+        print("FAIL  a correct citation was changed")
+    else:
+        print("ok    cites  only earlier steps: self- and forward citations repaired, correct ones kept")
+
+    for text, expected, why in UNBOX:
+        got = _unbox_intermediate(text)
+        if got != expected:
+            failures += 1
+            print(f"FAIL  got {got!r}: {why}")
+        else:
+            print(f"ok    unbox  {why}")
+
     for text, expected, why in FRAGMENTS:
         got = _join_label_fragments(text)
         if got != expected:
