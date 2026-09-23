@@ -788,6 +788,18 @@ def dedup_trace(text: str,
     if not text or not text.strip():
         return text
 
+    # What comes before the first step -- a mathematics trace opens with the
+    # problem's own statement of the goal -- is not a step and is kept as
+    # written: its sentences are not restatements of anything, and a "Step 2"
+    # inside it is the problem's own procedure, not a citation.
+    first = _STEP.search(text)
+    if first and text[:first.start()].strip():
+        preamble, rest = text[:first.start()], text[first.start():]
+        out = preamble + dedup_trace(rest, threshold, extractor)
+        if extractor is not None and extractor(out) != extractor(text):
+            return text
+        return out
+
     pieces = _STEP.split(text)
     heads: List[Optional[str]] = []
     bodies: List[str] = []

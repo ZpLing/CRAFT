@@ -172,6 +172,15 @@ def _forward(text: str) -> list:
     return bad
 
 
+# The problem's own algorithm, stated in steps, then the trace: its "Step 2"
+# is not a citation to renumber, and its repeated sentence is not a restatement.
+PREAMBLE = ("The value of $y$ does not change after Step 2: Multiply $x$ and $y$. "
+            "The value of $y$ does not change. What is the final value of $x$?\n"
+            "Step 1: Let $x = 1$ and $y = 2$ at the start.\n"
+            "Step 2: Multiply $x$ by 2, so $x = 2$.\n"
+            "Step 3: Add $y$ and 1.\n"
+            "Step 4: Therefore the final value is $\\boxed{2}$.")
+
 def main() -> int:
     failures = 0
     out = dedup_trace(RUNS)
@@ -294,7 +303,20 @@ def main() -> int:
     else:
         print("ok    keeps  every brace it started with")
 
-    total = len(CASES) + len(CONCLUSIONS) + 6
+    # A mathematics trace opens with the problem's own sentences; the problem
+    # may describe a procedure in numbered steps and may say the same thing
+    # twice, and neither is the trace's doing.
+    opened = dedup_trace(PREAMBLE)
+    if not opened.startswith(PREAMBLE.split("\nStep 1:")[0]):
+        failures += 1
+        print(f"FAIL  the text before Step 1 was rewritten: {opened.splitlines()[0]!r}")
+    elif "Step 3: Add $y$ and 1." not in opened:
+        failures += 1
+        print("FAIL  the body's own dedup was lost")
+    else:
+        print("ok    keeps  the problem's statement before Step 1 as written")
+
+    total = len(CASES) + len(CONCLUSIONS) + 7
     print(f"\n{total - failures}/{total} passed")
     return 1 if failures else 0
 

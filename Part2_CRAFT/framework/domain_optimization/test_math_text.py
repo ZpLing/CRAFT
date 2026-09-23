@@ -138,6 +138,13 @@ def check_goal() -> int:
          prepend_goal("Sally is now 180 cm tall. How tall, in centimetres, is Mary now?\nStep 1: x", "Sally is now 180 cm tall. How tall, in centimetres, is Mary now?"),
          "Sally is now 180 cm tall. How tall, in centimetres, is Mary now?\nStep 1: x"),
         ("nothing to say, nothing added", prepend_goal("Step 1: x", "Let $T=101$."), "Step 1: x"),
+        ("a sentence cut inside a display block, or carrying forum markup, stays out",
+         goal_sentences("Find all positive integer solutions $(m, n)$ to the following equation: $$ m^{2}=1!+2!+\\cdots+n!"
+                        " $$ An [i]animal[/i] with $n$ cells is a connected figure. The cells are equal-sized and the figure is connected."),
+         "The cells are equal-sized and the figure is connected."),
+        ("a sentence that is itself a 'Step N:' line stays out; one that mentions a step mid-sentence may open",
+         goal_sentences("Step 1: Alicia writes down the number $m$ as the first term. The value of $y$ does not change after Step 2: Multiply both numbers."),
+         "The value of $y$ does not change after Step 2: Multiply both numbers."),
     ]
     for name, got, want_ in cases:
         if got != want_:
