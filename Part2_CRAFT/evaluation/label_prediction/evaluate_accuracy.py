@@ -1398,8 +1398,123 @@ async def run_setting_icl(
             "domain":              domain,
         })
     return predictions
+
+# ---------------------------------------------------------------------------
+# export — the trace each cell reports, one JSONL per benchmark and backbone
+# ---------------------------------------------------------------------------
+# A cell's reported number does not always come from `synthesized.json`: the
+# settings differ per configuration and each writes its own file, so reading
+# a run directory and taking the obvious name gives the wrong trace for most
+# cells. This map is the one place that says which file each cell reports
+# from; the export fails rather than falling back if that file is missing.
+#
+# (dataset, model) -> (cell directory under --runs, file, how it was run).
+# The 2026-09-23 run: the atomic synthesizer for every cell; ProofWriter goes
+# through the closed-world recheck with its proof search written back as
+# steps; gpt's ProofWriter trace is then restated with its answer pinned;
+# gemini's mathematics has the adjudicator's derivation written back as steps
+# and opens with the problem's own statement of the goal.
+REPORTED_CELLS = {
+    ("FLD", "gemini-3.1-flash-lite"):
+        ("FLDgem", "synth", "prior_mode=verify"),
+    ("FLD", "gpt-5.4-nano"):
+        ("FLDgpt", "synth", "prior_mode=follow"),
+    ("ProofWriter", "gemini-3.1-flash-lite"):
+        ("PWgem", "cwa_resolve",
+         "prior_mode=verify, weight_by=gold_depth, cwa_recheck (integrated), cwa_resolve"),
+    ("ProofWriter", "gpt-5.4-nano"):
+        ("PWgpt", "polish",
+         "prior_mode=verify, weight_by=gold_depth, cwa_recheck (integrated), cwa_resolve, polish two3"),
+    ("OmniMATH", "gemini-3.1-flash-lite"):
+        ("OMgem", "adj_goal", "prior_mode=verify, adjudication (integrated), goal stated"),
+    ("OmniMATH", "gpt-5.4-nano"):
+        ("OMgpt", "synth", "prior_mode=follow"),
+    ("OlympiadBench", "gemini-3.1-flash-lite"):
+        ("OBgem", "adj_goal", "prior_mode=verify, adjudication (integrated), goal stated"),
+    ("OlympiadBench", "gpt-5.4-nano"):
+        ("OBgpt", "synth", "prior_mode=follow"),
+}
+
+_STEP_HEAD_RE = re.compile(r"(?m)^\s*Step\s*\d+\s*[:.\-]\s*")
+
+
+def main_export(argv) -> None:
+    """Write the trace CRAFT reports for each cell to <out_dir>/<model>/<dataset>_Output.jsonl.
+
+    Each line is one sample: sample_id, source_dataset, domain, model, setting,
+    ground_truth, predicted, n_steps, trace. `predicted` is re-derived from the
+    trace text with the reader `score` uses, so a line cannot disagree with the
+    reported table; a sample Module III produced no trace for is left out, as
+    `score` leaves it out, so the line count is the n its cell reports.
+
+    The trace is written with its restatements removed (dedup_trace), which
+    leaves every sentence that states an answer alone and checks the rewrite
+    against the cell's own reader, so `predicted` cannot move.
+    """
+    parser = argparse.ArgumentParser(
+        prog="evaluate_accuracy.py export", description=main_export.__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--runs", default="craft_runs/full500_v4/traces",
+                        help="Directory holding one folder per cell (see REPORTED_CELLS)")
+    parser.add_argument("--out_dir", default="CRAFT_results/Output")
+    args = parser.parse_args(argv)
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]
+                           / "framework" / "module3_topology_guided_synthesis"))
+    from dedup_trace import dedup_trace  # noqa: E402  (pulls in sympy; only export needs it)
+
+    readers = {"FLD": extract_label, "ProofWriter": extract_label,
+               "OmniMATH": extract_math_answer, "OlympiadBench": extract_math_answer}
+    runs = Path(resolve_input(args.runs))
+    out_dir = Path(resolve_output(args.out_dir))
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    missing = []
+    for (ds, model), (run, stem, setting) in sorted(REPORTED_CELLS.items()):
+        src = runs / run / f"{stem}.json"
+        if not src.exists():
+            missing.append(str(src))
+            continue
+        rows = LOADERS["synthesized"](src)
+        metrics = compute_metrics(rows)
+        shrunk = total = dropped = 0
+        out = out_dir / model / f"{ds}_Output.jsonl"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        reader = readers[ds]
+        with out.open("w", encoding="utf-8") as fh:
+            for r in rows:
+                t = r["traces"][0]
+                original = t["text"] or ""
+                if not original.strip():
+                    dropped += 1
+                    continue
+                text = dedup_trace(original, extractor=reader)
+                n_steps = len(_STEP_HEAD_RE.findall(text)) or t["n_steps"]
+                shrunk += len(original) - len(text)
+                total += len(original)
+                fh.write(json.dumps({
+                    "sample_id": r["sample_id"],
+                    "source_dataset": r["source_dataset"],
+                    "domain": r["domain"],
+                    "model": model,
+                    "setting": setting,
+                    "ground_truth": r["ground_truth"],
+                    "predicted": r["predicted"],
+                    "n_steps": n_steps,
+                    "trace": text,
+                }, ensure_ascii=False) + "\n")
+        print(f"  {model:<22} {ds:<14} {len(rows) - dropped:>4} traces  "
+              f"acc {100*metrics['accuracy']:5.1f}  steps {metrics['avg_steps']:4.1f}  "
+              f"trimmed {100*shrunk/max(total,1):4.1f}%"
+              + (f"  dropped {dropped}" if dropped else "") + f"  -> {out}")
+
+    if missing:
+        raise SystemExit("These cells have no reported trace file:\n  "
+                         + "\n  ".join(missing))
+
+
 def main() -> None:
-    """Score one pipeline output.
+    """Score one pipeline output (`score`), or export the traces the cells report (`export`).
 
     The Settings A-E ablation that used to live here is gone. The paper's
     ablation is the six named rows, which other_evaluation/ablation_study
@@ -1407,7 +1522,7 @@ def main() -> None:
     one place the ablation is defined.
     """
     import sys as _sys
-    modes = {"score": main_score}
+    modes = {"score": main_score, "export": main_export}
     if len(_sys.argv) < 2 or _sys.argv[1] not in modes:
         print(__doc__)
         raise SystemExit(2)
