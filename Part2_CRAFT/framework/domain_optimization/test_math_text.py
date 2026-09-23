@@ -14,6 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from framework.domain_optimization.math_text import (  # noqa: E402
+    goal_sentences, prepend_goal,
     balanced, find_math, normalize_math, protect_factorials, split_steps)
 
 # gpt-5.4-nano: header line, then the mathematics on lines of its own, then a
@@ -113,6 +114,39 @@ def check_factorials() -> int:
     if not fails:
         print("ok    factorials: a factorial's '!' no longer ends a sentence, prose '!' does")
     return fails
+
+def check_goal() -> int:
+    """Which sentences of a problem may open its trace."""
+    failures = 0
+    problem = ("Quadrilateral $ABCD$ has $\\angle BCD=\\angle DAB=90^{\\circ}$. The perimeter of "
+               "$ABCD$ is 224 and its area is 2205. One side of $ABCD$ has length 7. Compute "
+               "$\\sum_{i=1}^{\\infty} \\frac{a i}{a^{i}}$ for $a>1$. Points lie such that $$x=1$$ "
+               "holds. Present the answer as coordinates (e.g. $(1,2)$). What is the integer "
+               "formed by the rightmost two digits of the sum of the squares of the side lengths?")
+    want = ("The perimeter of $ABCD$ is 224 and its area is 2205. One side of $ABCD$ has length 7. "
+            "Present the answer as coordinates (e.g. $(1,2)$). What is the integer formed by the "
+            "rightmost two digits of the sum of the squares of the side lengths?")
+    cases = [
+        ("keeps whole sentences with little mathematics, drops the formula-heavy and display ones",
+         goal_sentences(problem), want),
+        ("a problem that is all formula gives nothing",
+         goal_sentences("Let $T=101$. Find $\\angle PAQ$ in $$ABC$$."), ""),
+        ("the goal becomes the first line, before Step 1",
+         prepend_goal("Step 1: Let $x$ be the side.", "Sally is now 180 cm tall. How tall, in centimetres, is Mary now?"),
+         "Sally is now 180 cm tall. How tall, in centimetres, is Mary now?\nStep 1: Let $x$ be the side."),
+        ("a trace that already opens with the goal is left alone",
+         prepend_goal("Sally is now 180 cm tall. How tall, in centimetres, is Mary now?\nStep 1: x", "Sally is now 180 cm tall. How tall, in centimetres, is Mary now?"),
+         "Sally is now 180 cm tall. How tall, in centimetres, is Mary now?\nStep 1: x"),
+        ("nothing to say, nothing added", prepend_goal("Step 1: x", "Let $T=101$."), "Step 1: x"),
+    ]
+    for name, got, want_ in cases:
+        if got != want_:
+            failures += 1
+            print(f"FAIL  {name}\n      got  {got!r}\n      want {want_!r}")
+        else:
+            print(f"ok    {name}")
+    return failures
+
 
 def main() -> int:
     failures = 0
@@ -225,6 +259,7 @@ def main() -> int:
     total = 17
     print(f"\n{total - failures}/{total} passed")
     failures += check_factorials()
+    failures += check_goal()
     return 1 if failures else 0
 
 
