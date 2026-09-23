@@ -1,0 +1,146 @@
+{
+  "model": "gpt-5.4-nano",
+  "side": "craft",
+  "trace": "the trace Module III synthesizes from the consensus RKG, after deduplication",
+  "scores": "ROSCOE's own, all thirteen higher-is-better",
+  "pooling": "per-trace scores pooled across the cell's shards; a trace re-scored after its text changed keeps only its latest score",
+  "stability": "standard error of the mean over the cell's traces",
+  "datasets": {
+    "ProofWriter": {
+      "n_traces": 500,
+      "metrics": {
+        "faithfulness": 0.8687025232315063,
+        "faithfulness_ww": 0.9507196209430695,
+        "informativeness_step": 0.858050115942955,
+        "informativeness_chain": 0.9401769515275955,
+        "repetition_word": 0.015067012190818787,
+        "repetition_step": 0.01993194556236267,
+        "grammar_step": 0.8532772592496743,
+        "grammar_step_max": 0.47696800109371545,
+        "discourse_representation": 0.002255859375,
+        "coherence_step_vs_step": 0.002029296875,
+        "perplexity_step": 0.006830475552781554,
+        "perplexity_chain": 0.17746296325507255,
+        "perplexity_step_max": 0.0027750886764865436
+      },
+      "n_shards": 17,
+      "se": {
+        "faithfulness": 0.0006468672909481853,
+        "faithfulness_ww": 0.0002062986132477146,
+        "informativeness_step": 0.0005881351643262237,
+        "informativeness_chain": 0.0005516464096271021,
+        "repetition_word": 0.0002864964091949816,
+        "repetition_step": 0.00047835155955151413,
+        "grammar_step": 0.0035394023589072933,
+        "grammar_step_max": 0.01061542853303754,
+        "discourse_representation": 9.94106332008654e-05,
+        "coherence_step_vs_step": 0.00015383715299665442,
+        "perplexity_step": 8.238677865559415e-05,
+        "perplexity_chain": 0.002440536523594157,
+        "perplexity_step_max": 4.6900071364214365e-05
+      }
+    },
+    "FLD": {
+      "n_traces": 494,
+      "metrics": {
+        "faithfulness": 0.8566072180203581,
+        "faithfulness_ww": 0.939123000210596,
+        "informativeness_step": 0.8435192902078513,
+        "informativeness_chain": 0.9213324306223557,
+        "repetition_word": 0.017131937177557694,
+        "repetition_step": 0.012565155803915942,
+        "grammar_step": 0.6274558965633691,
+        "grammar_step_max": 0.16353147590027647,
+        "discourse_representation": 0.008868877704326924,
+        "coherence_step_vs_step": 0.003967038050354251,
+        "perplexity_step": 0.007411121719931155,
+        "perplexity_chain": 0.11998091012979448,
+        "perplexity_step_max": 0.002028921937550026
+      },
+      "n_shards": 11,
+      "se": {
+        "faithfulness": 0.0013886816849246707,
+        "faithfulness_ww": 0.00046782287982261885,
+        "informativeness_step": 0.0014047732660371949,
+        "informativeness_chain": 0.000932169141059753,
+        "repetition_word": 0.00039906934231203006,
+        "repetition_step": 0.0003897511353262515,
+        "grammar_step": 0.00589631648000264,
+        "grammar_step_max": 0.006197119229613666,
+        "discourse_representation": 0.0020236296589935237,
+        "coherence_step_vs_step": 0.001303495421187523,
+        "perplexity_step": 0.00012898771901267655,
+        "perplexity_chain": 0.0015215253098587436,
+        "perplexity_step_max": 5.405126310711338e-05
+      }
+    },
+    "OmniMATH": {
+      "n_traces": 491,
+      "metrics": {
+        "faithfulness": 0.7844477475539244,
+        "faithfulness_ww": 0.9132303096536772,
+        "informativeness_step": 0.7957612481233787,
+        "informativeness_chain": 0.9263402438455104,
+        "repetition_word": 0.01577108212255412,
+        "repetition_step": 0.01787251665004645,
+        "grammar_step": 0.8683528126229147,
+        "grammar_step_max": 0.5847989439266277,
+        "discourse_representation": 0.21351635965941637,
+        "coherence_step_vs_step": 0.00557595309317719,
+        "perplexity_step": 0.02804414686672762,
+        "perplexity_chain": 0.16921611247005997,
+        "perplexity_step_max": 0.004696307828063611
+      },
+      "n_shards": 10,
+      "se": {
+        "faithfulness": 0.001640656347609569,
+        "faithfulness_ww": 0.0008787935656852095,
+        "informativeness_step": 0.0015077702669704701,
+        "informativeness_chain": 0.0009519985906036995,
+        "repetition_word": 0.0003452626792296412,
+        "repetition_step": 0.00044079283552721183,
+        "grammar_step": 0.0018084527606466794,
+        "grammar_step_max": 0.007772580142300078,
+        "discourse_representation": 0.011545802248175002,
+        "coherence_step_vs_step": 0.0005745494662665808,
+        "perplexity_step": 0.0008887366210902642,
+        "perplexity_chain": 0.002463887000227412,
+        "perplexity_step_max": 0.0002573290858312049
+      }
+    },
+    "OlympiadBench": {
+      "n_traces": 496,
+      "metrics": {
+        "faithfulness": 0.7880334211212974,
+        "faithfulness_ww": 0.9205657630756474,
+        "informativeness_step": 0.7981601483639209,
+        "informativeness_chain": 0.9318351404320809,
+        "repetition_word": 0.015617859940375052,
+        "repetition_step": 0.017296655764502865,
+        "grammar_step": 0.8729407868605962,
+        "grammar_step_max": 0.6050919929308997,
+        "discourse_representation": 0.1978737000496157,
+        "coherence_step_vs_step": 0.005677253969254032,
+        "perplexity_step": 0.028396436567354126,
+        "perplexity_chain": 0.17441818548193372,
+        "perplexity_step_max": 0.00463196070048748
+      },
+      "n_shards": 10,
+      "se": {
+        "faithfulness": 0.001529020315216119,
+        "faithfulness_ww": 0.0007674265144755278,
+        "informativeness_step": 0.0013755432866279528,
+        "informativeness_chain": 0.0009231049997235057,
+        "repetition_word": 0.00031963796137521663,
+        "repetition_step": 0.0004615155293545543,
+        "grammar_step": 0.0018027661169617076,
+        "grammar_step_max": 0.007242715889694967,
+        "discourse_representation": 0.0109663564810734,
+        "coherence_step_vs_step": 0.0004229466276496775,
+        "perplexity_step": 0.0007353495945266354,
+        "perplexity_chain": 0.0022913012889252877,
+        "perplexity_step_max": 0.00022214970302919935
+      }
+    }
+  }
+}
