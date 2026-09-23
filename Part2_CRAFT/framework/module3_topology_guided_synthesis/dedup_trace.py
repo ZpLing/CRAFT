@@ -842,7 +842,14 @@ def _unbox_intermediate(text: str) -> str:
             # \\boxed{None} and \\boxed{\\text{None}} are placeholders for a step
             # that reached no value; they go with their line either way.
             if content and _math_key(content) not in _PLACEHOLDERS and not _stated_in(content, prose):
-                out.append(f"This gives ${_trim_box(content)}$.")
+                value = _trim_box(content)
+                # A cases or aligned environment, or anything spanning lines,
+                # is display mathematics; inline dollars around it would put
+                # the closing one on a later line.
+                if "\n" in value or "\\begin{" in value:
+                    out.append(f"This gives\n$$\n{value}\n$$")
+                else:
+                    out.append(f"This gives ${value}$.")
                 out.append(text[line_end:line_end + 1])   # keep the newline
             last = min(line_end + 1, len(text))
             continue
