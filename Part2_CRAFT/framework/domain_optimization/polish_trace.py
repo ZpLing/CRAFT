@@ -13,7 +13,7 @@ The styles are the experiments. Each names one hypothesis about what the
 trace should read like; the record keeps which style produced it.
 
     python polish_trace.py --synth <synth.json> --k_traces <k_traces.json> \
-        --dataset ProofWriter --style fluent --model <m> --output <out.json>
+        --dataset ProofWriter --style two3 --model <m> --output <out.json>
 """
 from __future__ import annotations
 
@@ -266,7 +266,8 @@ def main() -> None:
     ap.add_argument("--k_traces", default=None,
                     help="Where the problem text lives; records may carry problem_text themselves")
     ap.add_argument("--dataset", required=True, choices=["ProofWriter", "FLD", "OmniMATH", "OlympiadBench"])
-    ap.add_argument("--style", default="fluent", choices=sorted(STYLES))
+    ap.add_argument("--style", required=True, choices=sorted(STYLES),
+                    help="Which rewrite to ask for; the styles in STYLES are the ones kept")
     ap.add_argument("--model", required=True)
     ap.add_argument("--api_key", default=None)
     ap.add_argument("--base_url", default=None)
