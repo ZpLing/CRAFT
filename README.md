@@ -115,52 +115,70 @@ framework of §3.2.
 
 ```
 .
-├── Part1_Pilot Study/               § 4.1  Correct Answer Guidance Study (w/ vs w/o Answer)
+├── Part1_Pilot Study/
 │   ├── dataset/
-│   │   ├── prmbench/                simplicity / soundness / sensitivity .jsonl (200 each)
-│   │   └── roscoe/                  cosmos / drop / esnli / gsm8k .jsonl (125 each)
+│   │   ├── prmbench/
+│   │   └── roscoe/
 │   ├── experiments/
-│   │   ├── prmbench_experiment/     step-level verification — StepAcc, 1stErr, F1
-│   │   └── roscoe_experiment/       trace quality — Faithfulness, Informativeness, Grammar
-│   └── results/<model>/             prmbench/ and roscoe/, one directory per model
-├── Part2_CRAFT/                     § 3.2  The CRAFT framework
-│   ├── dataset/                       the four sets, flat — every experiment in
-│   │   ├── FLD.json                 this part runs on these and only these
-│   │   ├── ProofWriter.json         (logical; FLD carries its published proofs)
-│   │   ├── OmniMATH.json            (mathematical)
+│   │   ├── prmbench_experiment/
+│   │   ├── roscoe_experiment/
+│   │   └── significance_test.py
+│   └── results/<model>/
+├── Part2_CRAFT/
+│   ├── dataset/
+│   │   ├── FLD.json
+│   │   ├── ProofWriter.json
+│   │   ├── OmniMATH.json
 │   │   └── OlympiadBench.json
-│   ├── framework/                     one package per module of §3.2, named as §3.2 names them
-│   │   ├── module1_generation_filtering/       Module I   — K traces, TF-IRF terms,
-│   │   │                                       z-score steps filtering
-│   │   ├── module2_consensus_rkg_construction/ Module II  — per-trace RKGs, consensus RKG G*
-│   │   ├── module3_topology_guided_synthesis/  Module III — one step per node of G*
-│   │   └── domain_optimization/                after Module III, per dataset — not part
-│   │                                           of the three-module framework; also
-│   │                                           math_text.py, the one definition of the
-│   │                                           mathematics in a trace (how it is found,
-│   │                                           written and cut into steps) that every
-│   │                                           module and the ROSCOE adapter read through
+│   ├── framework/
+│   │   ├── module1_generation_filtering/
+│   │   │   ├── generate_traces.py
+│   │   │   ├── steps_filter.py
+│   │   │   └── tfirf_terms.py
+│   │   ├── module2_consensus_rkg_construction/
+│   │   │   └── build_rkg.py
+│   │   ├── module3_topology_guided_synthesis/
+│   │   │   ├── synthesize_trace.py
+│   │   │   ├── dedup_trace.py
+│   │   │   └── test_dedup_trace.py
+│   │   └── domain_optimization/
+│   │       ├── math_text.py
+│   │       ├── cwa_recheck.py
+│   │       ├── adjudicate_math.py
+│   │       ├── apply_adjudication.py
+│   │       ├── polish_trace.py
+│   │       ├── state_goal.py
+│   │       ├── test_math_text.py
+│   │       ├── test_cwa_recheck.py
+│   │       └── test_apply_adjudication.py
 │   ├── evaluation/
-│   │   ├── label_prediction/          main-table accuracy and its Wilson CIs
-│   │   │                              answer_match.py — one adapter per dataset
-│   │   ├── reasoning_traces_quality/  ROSCOE/ (§4)
-│   │   │                              dataset_adapters.py — the same four, for traces
-│   │   ├── Ablation_Study/            the six settings of the ablation table (§4.5)
-│   │   └── other_evaluation/          the analyses behind the appendix
-│   │       ├── hyperparameter_sensitivity/  accuracy and RKG size against K
-│   │       └── rkg_construct_robustness/  does the backbone change the graph
+│   │   ├── label_prediction/
+│   │   │   ├── evaluate_accuracy.py
+│   │   │   ├── answer_match.py
+│   │   │   ├── extract_label.py
+│   │   │   └── step_count.py
+│   │   ├── reasoning_traces_quality/
+│   │   │   ├── dataset_adapters.py
+│   │   │   ├── ROSCOE/
+│   │   │   │   ├── roscoe_adapter_craft.py
+│   │   │   │   └── roscoe_score.py
+│   │   │   └── SFT/
+│   │   │       ├── build_test_set.py
+│   │   │       ├── build_sft_data.py
+│   │   │       └── sft_trace_utility.py
+│   │   └── Ablation_Study/
+│   │       └── ablation_study.py
 │   └── results/
-│       ├── baseline_results/<model>/<baseline>/  the 12 main-table baselines,
-│       │                            one directory each: results.json and traces.jsonl
-│       └── CRAFT_results/  mirrors evaluation/ above, one directory per
-│           ├── label_prediction/     experiment, so a result sits where its
-│           ├── reasoning_traces_quality/  code does
-│           │   └── ROSCOE/<model>/    ROSCOE_CRAFT.json, ROSCOE_Raw_CoT.json
-│           ├── Ablation_Study/<model>/  one JSON per ablated cell: the six
-│           │                        settings, their accuracy, macro-F1, average
-│           │                        steps and the samples each rests on
-│           └── other_results/        the remaining appendix analyses
-└── config.py                        API credentials (local only, git-ignored)
+│       ├── baseline_results/<model>/<baseline>/
+│       └── CRAFT_results/
+│           ├── Output/<model>/
+│           ├── label_prediction/<model>/
+│           ├── reasoning_traces_quality/
+│           │   ├── ROSCOE/<model>/
+│           │   └── SFT/
+│           ├── Ablation_Study/<model>/
+│           └── other_results/
+└── config.py
 ```
 
 ### The four datasets
@@ -288,6 +306,39 @@ metrics per dataset, pooled over the cell's per-trace scores with the trace coun
 each mean rests on. On the current traces CRAFT is above raw CoT on 80 of the 104
 dataset × metric cells; the losses sit almost entirely in the two max-over-pairs
 statistics (repetition-step and coherence), which a longer trace can only lose.
+
+After Module III each dataset gets its own passes, then the trace a cell reports is
+exported with its restatements removed:
+
+```bash
+DO=framework/domain_optimization
+
+# ProofWriter: closed-world recheck, the proof search written back as steps, then resolve
+python $DO/cwa_recheck.py --synth $RUN/synthesized.json    --k_traces $K_TRACES --direction prove   --output $RUN/synth_cwa.json
+python $DO/cwa_recheck.py --synth $RUN/synth_cwa.json      --k_traces $K_TRACES --direction resolve --output $RUN/synth_cwa_resolve.json
+# ProofWriter on gpt-5.4-nano: restated with the answer pinned
+python $DO/polish_trace.py --synth $RUN/synth_cwa_resolve.json --k_traces $K_TRACES --dataset ProofWriter --style two3 --output $RUN/polish.json
+
+# Omni-MATH / OlympiadBench on gemini: split votes adjudicated, the derivation written back as steps, the goal stated first
+python $DO/adjudicate_math.py   --k_traces $K_TRACES --dataset OmniMATH --model gemini-3.1-flash-lite --output $RUN/adjudicated.json
+python $DO/apply_adjudication.py --synth $RUN/synthesized.json --adjudicated $RUN/adjudicated.json --dataset OmniMATH --output $RUN/adj_applied.json
+python $DO/state_goal.py         --synth $RUN/adj_applied.json --problems $RUN/cleaned.json --output $RUN/adj_goal.json
+
+# the trace each cell reports -> results/CRAFT_results/Output/<model>/<dataset>_Output.jsonl
+python evaluation/label_prediction/evaluate_accuracy.py export
+```
+
+The trace-utility experiment fine-tunes one student on each side of the paired
+traces and answers held-out problems; its results sit under
+`results/CRAFT_results/reasoning_traces_quality/SFT/`:
+
+```bash
+SFT=evaluation/reasoning_traces_quality/SFT
+python $SFT/build_test_set.py
+python $SFT/build_sft_data.py                       # problems both sides got right; --all_pairs for every concluded trace
+python $SFT/sft_trace_utility.py --model Qwen/Qwen3.5-9B --train_file data/train_craft.jsonl \
+    --test_file data/test.jsonl --out_dir runs/craft-s0 --seed 0 --max_len 8192 --gen_max_new 8192
+```
 
 Hyperparameters fixed across all experiments (§4.6): Module I `K=5`, `T=0.7`,
 `β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. These are the
