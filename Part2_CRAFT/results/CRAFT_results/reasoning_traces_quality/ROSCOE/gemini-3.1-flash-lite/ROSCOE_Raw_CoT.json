@@ -1,0 +1,146 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "side": "raw_cot",
+  "trace": "the model's own CoT response from the run the main table reports (baseline_results/<model>/cot, raw_response)",
+  "scores": "ROSCOE's own, all thirteen higher-is-better",
+  "pooling": "mean over a cell's shards, weighted by each shard's sample count",
+  "stability": "standard error of the raw mean across the cell's shards",
+  "datasets": {
+    "ProofWriter": {
+      "n_traces": 500,
+      "metrics": {
+        "coherence_step_vs_step": 0.0013599999999999999,
+        "discourse_representation": 0.00178,
+        "faithfulness": 0.8260899999999999,
+        "faithfulness_ww": 0.9432699999999998,
+        "grammar_step": 0.9017000000000001,
+        "grammar_step_max": 0.5234,
+        "informativeness_chain": 0.9304999999999999,
+        "informativeness_step": 0.87003,
+        "perplexity_chain": 0.13591999999999999,
+        "perplexity_step": 0.00384,
+        "perplexity_step_max": 0.00047,
+        "repetition_step": 0.01534,
+        "repetition_word": 0.00866
+      },
+      "n_shards": 10,
+      "se": {
+        "coherence_step_vs_step": 3.0550504633038946e-05,
+        "discourse_representation": 9.165151389911679e-05,
+        "faithfulness": 0.0011866338946785611,
+        "faithfulness_ww": 0.0003259345537578604,
+        "grammar_step": 0.002223260868384292,
+        "grammar_step_max": 0.01241353204280626,
+        "informativeness_chain": 0.000964825833448139,
+        "informativeness_step": 0.0011440716760762863,
+        "perplexity_chain": 0.0016962573180059949,
+        "perplexity_step": 5.617433182117573e-05,
+        "perplexity_step_max": 1.5275252316519463e-05,
+        "repetition_step": 0.000510163372525573,
+        "repetition_word": 0.00021197484127446188
+      }
+    },
+    "FLD": {
+      "n_traces": 496,
+      "metrics": {
+        "coherence_step_vs_step": 0.008798790322580645,
+        "discourse_representation": 0.004978225806451613,
+        "faithfulness": 0.7985842741935484,
+        "faithfulness_ww": 0.9398451612903225,
+        "grammar_step": 0.745808870967742,
+        "grammar_step_max": 0.20358911290322582,
+        "informativeness_chain": 0.9307709677419356,
+        "informativeness_step": 0.8327540322580647,
+        "perplexity_chain": 0.12328467741935482,
+        "perplexity_step": 0.004449596774193548,
+        "perplexity_step_max": 0.0004100806451612903,
+        "repetition_step": 0.021409677419354838,
+        "repetition_word": 0.012504032258064516
+      },
+      "n_shards": 10,
+      "se": {
+        "coherence_step_vs_step": 0.002367579866704093,
+        "discourse_representation": 0.0015520830059687666,
+        "faithfulness": 0.0011822516389851192,
+        "faithfulness_ww": 0.0006345680499463546,
+        "grammar_step": 0.004617592415425595,
+        "grammar_step_max": 0.009088257040906931,
+        "informativeness_chain": 0.0011358982218903691,
+        "informativeness_step": 0.0015122700020248295,
+        "perplexity_chain": 0.0016776148174992875,
+        "perplexity_step": 0.00013238906168848603,
+        "perplexity_step_max": 1.0035742287008116e-05,
+        "repetition_step": 0.0010804545651210958,
+        "repetition_word": 0.0005578118924971584
+      }
+    },
+    "OmniMATH": {
+      "n_traces": 392,
+      "metrics": {
+        "coherence_step_vs_step": 0.02610765306122449,
+        "discourse_representation": 0.0930030612244898,
+        "faithfulness": 0.7314806122448979,
+        "faithfulness_ww": 0.9091438775510203,
+        "grammar_step": 0.9168158163265305,
+        "grammar_step_max": 0.638233163265306,
+        "informativeness_chain": 0.9386663265306124,
+        "informativeness_step": 0.7752617346938776,
+        "perplexity_chain": 0.2094188775510204,
+        "perplexity_step": 0.026031632653061222,
+        "perplexity_step_max": 0.0026275510204081635,
+        "repetition_step": 0.025481632653061224,
+        "repetition_word": 0.01176122448979592
+      },
+      "n_shards": 8,
+      "se": {
+        "coherence_step_vs_step": 0.002888695484781329,
+        "discourse_representation": 0.005718790199289343,
+        "faithfulness": 0.0011931126228095302,
+        "faithfulness_ww": 0.0007380647282234432,
+        "grammar_step": 0.0014061663889980884,
+        "grammar_step_max": 0.003975557100038596,
+        "informativeness_chain": 0.0009009380255467753,
+        "informativeness_step": 0.0011660475620910047,
+        "perplexity_chain": 0.00294499131959563,
+        "perplexity_step": 0.001324924740024183,
+        "perplexity_step_max": 0.0004524078957612053,
+        "repetition_step": 0.0008755231162442274,
+        "repetition_word": 0.0008014497187551737
+      }
+    },
+    "OlympiadBench": {
+      "n_traces": 447,
+      "metrics": {
+        "coherence_step_vs_step": 0.030592841163310965,
+        "discourse_representation": 0.07681856823266218,
+        "faithfulness": 0.7393004474272931,
+        "faithfulness_ww": 0.9140859060402685,
+        "grammar_step": 0.9156192393736019,
+        "grammar_step_max": 0.6369624161073825,
+        "informativeness_chain": 0.9417263982102909,
+        "informativeness_step": 0.7785959731543624,
+        "perplexity_chain": 0.21169373601789712,
+        "perplexity_step": 0.023794630872483218,
+        "perplexity_step_max": 0.0024277404921700216,
+        "repetition_step": 0.02764228187919463,
+        "repetition_word": 0.013499776286353469
+      },
+      "n_shards": 9,
+      "se": {
+        "coherence_step_vs_step": 0.006205206307325908,
+        "discourse_representation": 0.008136295553665468,
+        "faithfulness": 0.0012191747206961737,
+        "faithfulness_ww": 0.0005873577718395251,
+        "grammar_step": 0.0016470190805264768,
+        "grammar_step_max": 0.0059682884152921665,
+        "informativeness_chain": 0.001334200832981635,
+        "informativeness_step": 0.0008797073363754394,
+        "perplexity_chain": 0.0021186955737533893,
+        "perplexity_step": 0.001037747721712215,
+        "perplexity_step_max": 0.0008076701685723249,
+        "repetition_step": 0.0024325998829013637,
+        "repetition_word": 0.002520072105429291
+      }
+    }
+  }
+}
