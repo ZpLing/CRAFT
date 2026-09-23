@@ -23,7 +23,7 @@ over PROVED/DISPROVED for logic, the domain is the majority of the batch, and
 a refused sample leaves the denominator rather than counting as a failure.
 
 The A-E ablation is gone with it. The paper's ablation is six named rows, and
-other_evaluation/ablation_study builds them from the loaders and the metric
+evaluation/Ablation_Study/ablation_study.py builds them from the loaders and the metric
 here, so there is one scorer and one definition of the ablation rather than a
 second table that can drift from the first.
 
