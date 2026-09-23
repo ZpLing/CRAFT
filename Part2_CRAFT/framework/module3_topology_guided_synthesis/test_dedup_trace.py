@@ -136,6 +136,15 @@ UNBOX = [
      "Step 2: We get $\\frac{3}{1009^2}$.\nStep 4: Thus $\\boxed{773}$.",
      "nested braces inside the intermediate box are kept whole"),
     ("Step 1: Therefore $\\boxed{5}$.", "Step 1: Therefore $\\boxed{5}$.", "a single box is left alone"),
+    ("Step 2: The sum is $\\frac{30}{10}$, which simplifies to 3.\n\n\\boxed{3}\nStep 3: Hence $\\boxed{3}$.",
+     "Step 2: The sum is $\\frac{30}{10}$, which simplifies to 3.\n\nStep 3: Hence $\\boxed{3}$.",
+     "a box alone on its line restates the step's own result and goes with its line"),
+    ("Step 1: No value yet.\n$\\boxed{None}$\nStep 2: We get $\\boxed{7}$.",
+     "Step 1: No value yet.\nStep 2: We get $\\boxed{7}$.",
+     "a bare $\\boxed{None}$ line goes too"),
+    ("Step 1: So $x = \\boxed{4}$ here.\nStep 2: Thus $\\boxed{8}$.",
+     "Step 1: So $x = 4$ here.\nStep 2: Thus $\\boxed{8}$.",
+     "a box inside a sentence still only loses the box"),
 ]
 
 
