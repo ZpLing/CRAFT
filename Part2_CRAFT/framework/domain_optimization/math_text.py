@@ -208,3 +208,56 @@ def split_steps(text: str, keep_conclusion_lines: bool = True,
             continue
         steps.append("\n".join(block))
     return [restore(s) for s in steps]
+
+
+# ── Stating the goal ──────────────────────────────────────────────────────
+# A sentence boundary: end punctuation, then space, then something that
+# starts a sentence. "e.g." and "i.e." are not boundaries.
+_SENTENCE_END = re.compile(r"(?<!\be\.g\.)(?<!\bi\.e\.)(?<=[.?!])\s+(?=[A-Z\"\u201c$(\\])")
+
+
+def goal_sentences(problem: str, lo: int = 6, hi: int = 40, max_math: int = 2) -> str:
+    """The problem's own sentences that can open a trace, verbatim, or "".
+
+    A mathematics trace that begins by restating what is given and what is
+    asked is the trace a solver writes; the synthesizer's first step tends to
+    jump into a construction instead. This picks the sentences of the problem
+    statement that read as sentences on their own -- a whole sentence with its
+    end mark, no display block, at most `max_math` pieces of inline
+    mathematics, and between `lo` and `hi` words counting each piece of
+    mathematics as one -- and returns them in order, joined by a space. A
+    sentence that is mostly a formula, or a definition that runs for a
+    paragraph, is not a statement of the goal and stays out.
+    """
+    keep = []
+    for sentence in _SENTENCE_END.split(problem.strip()):
+        sentence = sentence.strip()
+        if not sentence or sentence[-1] not in ".?!":
+            continue
+        if has_display(sentence) or "\\begin" in sentence:
+            continue
+        spans = find_math(sentence)
+        if len(spans) > max_math:
+            continue
+        prose = sentence
+        for start, end, _ in sorted(spans, reverse=True):
+            prose = prose[:start] + " MATH " + prose[end:]
+        if not lo <= len(prose.split()) <= hi:
+            continue
+        keep.append(sentence)
+    return " ".join(keep)
+
+
+def prepend_goal(trace: str, problem: str) -> str:
+    """The trace with the problem's goal sentences as its first line.
+
+    The line goes before "Step 1" and is not a step: it is what the steps are
+    about. Nothing is added when the problem has no sentence that qualifies
+    or when the trace already opens with the line.
+    """
+    goal = goal_sentences(problem)
+    trace = trace.lstrip("\n")
+    if not goal or trace.startswith(goal):
+        return trace
+    return goal + "\n" + trace
+
