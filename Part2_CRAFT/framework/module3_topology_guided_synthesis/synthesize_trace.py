@@ -659,6 +659,8 @@ def _apply_reasoning_budget(payload: dict, model: str) -> dict:
 # the number a run was expected to need. Each stage writes it into its own
 # metadata as api_calls, which is where the cost of a run is read from.
 API_CALLS = {"count": 0}
+# Replies that came back cut off even at the largest budget this module asks for.
+TRUNCATED = {"count": 0}
 
 
 @backoff.on_exception(
@@ -696,7 +698,24 @@ async def generate_reasoning_trace(
             raise RuntimeError(f"HTTP {resp.status}: {detail[:200]}")
         
         data = await resp.json()
-        msg = data["choices"][0]["message"]
+        choice = data["choices"][0]
+        # A reply cut off by the token budget is not a reply: the trace ends
+        # in the middle of a \\boxed{} or a sentence, and nothing downstream
+        # can tell. Gemini bills its hidden reasoning against max_tokens, so a
+        # budget sized for a step can run out before the step is written; the
+        # same request is made again with twice the budget, up to a ceiling.
+        budget = max_tokens or RESPONSE_TOKENS
+        if choice.get("finish_reason") == "length":
+            if budget < 32000:
+                return await generate_reasoning_trace(session, prompt, model,
+                                                      max_tokens=min(budget * 2, 32000))
+            # Cut off at the ceiling too. The text is returned -- a step that
+            # stops early is still something the caller's own checks (the
+            # \\boxed{} on a final step, the label on a logical one) can act
+            # on -- but it is counted and said, not passed off as whole.
+            TRUNCATED["count"] += 1
+            print(f"  ! reply still cut off at {budget} tokens ({model})", flush=True)
+        msg = choice["message"]
         # o4-mini / deepseek-r1 put reasoning in reasoning_content, not content
         if model in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1"):
             content = (msg.get("reasoning_content") or msg.get("content") or "").strip()
@@ -1578,7 +1597,11 @@ async def synthesize_trace_rkg(
                     generated_steps.append(step_content)
                 elif response and response.strip():
                     generated_steps.append(response.strip())
-                else:
+                # The final step has to land on \\boxed{}; one that does not --
+                # empty, or cut short of the answer -- is continued from what
+                # was written rather than left as it is.
+                if not (response and response.strip()) or (
+                        is_last and "\\boxed" not in (response or "")):
                     if is_last:
                         prev_text = "\n".join(generated_steps)
                         retry_prompt = (
@@ -1759,7 +1782,10 @@ async def synthesize_trace_rkg(
         }
 
     except Exception as e:
-        return {"sample_id": sample_id, "error": str(e), "synthesized_trace": None}
+        # A timeout's str() is empty, and 150 blank errors in a run said
+        # nothing about what had happened; the type name at least does.
+        return {"sample_id": sample_id, "error": str(e) or type(e).__name__,
+                "synthesized_trace": None}
 
 
 def parse_step_from_response(response: str, step_number: int) -> Optional[str]:
