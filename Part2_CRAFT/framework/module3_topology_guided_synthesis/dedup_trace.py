@@ -777,11 +777,14 @@ def _math_key(s: str, whole: bool = True) -> str:
 
 def _stated_in(content: str, prose: str) -> bool:
     """Whether the prose already writes this value out, as a whole token."""
-    key = _math_key(content)
-    if not key:
+    haystack = _math_key(prose, whole=False)
+    # Both spellings of the value: with its inner spaces ("5 cm") and without
+    # ("5cm"), since the prose may write either.
+    keys = {_math_key(content), _math_key(content, whole=False)} - {""}
+    if not keys:
         return True
-    return re.search(r"(?<![0-9a-z])" + re.escape(key) + r"(?![0-9a-z])",
-                     _math_key(prose, whole=False)) is not None
+    return any(re.search(r"(?<![0-9a-z])" + re.escape(k) + r"(?![0-9a-z])", haystack)
+               for k in keys)
 
 
 def _unbox_intermediate(text: str) -> str:
@@ -817,10 +820,10 @@ def _unbox_intermediate(text: str) -> str:
             prose = text[(heads[-1] if heads else 0):line_start]
             content = m.group(1).strip()
             out.append(text[last:line_start])
-            # A box holding a claim in words -- \\boxed{3x \\text{ is odd}} -- is
-            # the prose's own sentence boxed, not a value; it goes with the line.
-            if (content and content.lower() != "none" and "\\text" not in content
-                    and not _stated_in(content, prose)):
+            # Nothing is dropped on a guess: a box with words in it may be a
+            # unit -- \\boxed{5 \\text{ cm}} -- so it is kept unless the prose
+            # states it, like any other value.
+            if content and content.lower() != "none" and not _stated_in(content, prose):
                 out.append(f"This gives ${content}$.")
                 out.append(text[line_end:line_end + 1])   # keep the newline
             last = min(line_end + 1, len(text))
