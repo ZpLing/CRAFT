@@ -53,6 +53,25 @@ PROSE = """We want the largest n.
 Try n = 7: it works.
 \\boxed{7}"""
 
+# A trace that writes "Conclusion:" and then, on the lines after it, the
+# display holding its answer; and one that boxes a tentative answer under
+# "Final answer:" midway and a different one at the end. The lines after a
+# trailer belong to it, and a trailer stays where it was written: moving it
+# to the end once put a trace's abandoned first answer last, where the
+# reader takes the answer from.
+TRAILER_TAIL = """Step 1: Count the keystrokes.
+Step 2: Check 20 and 21.
+Conclusion: Since 22 work while 21 do not, the fewest required is
+$$
+\\boxed{21}.
+$$"""
+TRAILER_MID = """Step 1: Try the first search.
+Final answer: $\\boxed{5762}$
+Step 2: The search above is not verified.
+$$
+\\boxed{\\text{unverified}}
+$$"""
+
 # A $$ opened and never closed before the next step, whose own $$ would pair
 # with it and hide the header inside a "display".
 UNCLOSED = """Step 1: We have
@@ -130,6 +149,25 @@ def main() -> int:
     else:
         print("ok    reads  an unclosed $$ line by line instead of hiding the next header in it")
 
+    steps = split_steps(TRAILER_TAIL, keep_trailers=True)
+    if len(steps) != 3 or "\\boxed{21}" not in steps[-1] or not steps[-1].startswith("Conclusion:"):
+        failures += 1
+        print(f"FAIL  the display after a Conclusion line was lost or detached: {steps[-1][:60]!r}")
+    else:
+        print("ok    keeps  the lines after a trailer with it")
+
+    steps = split_steps(TRAILER_MID, keep_trailers=True)
+    if len(steps) != 3 or not steps[1].startswith("Final answer") or "unverified" not in steps[-1]:
+        failures += 1
+        print(f"FAIL  a mid-trace trailer was moved: {[s[:20] for s in steps]}")
+    else:
+        print("ok    leaves a mid-trace trailer where it was written")
+    if any("Final answer" in s for s in split_steps(TRAILER_MID)):
+        failures += 1
+        print("FAIL  Module I's cut kept a trailer block it should leave out")
+    else:
+        print("ok    leaves trailer blocks out of Module I's cut")
+
     kinds = [k for _, _, k in find_math("Set \\[ a \\] and $$ b $$ with \\(x\\), $y$, \\begin{cases} c \\end{cases}.")]
     if kinds != ["display", "display", "inline", "inline", "display"]:
         failures += 1
@@ -155,7 +193,7 @@ def main() -> int:
     else:
         print("ok    tells  an unclosed $$, \\[ or brace from a closed one")
 
-    total = 14
+    total = 17
     print(f"\n{total - failures}/{total} passed")
     return 1 if failures else 0
 

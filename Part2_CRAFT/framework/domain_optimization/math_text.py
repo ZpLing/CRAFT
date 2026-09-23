@@ -22,7 +22,7 @@ goes through it.
 from __future__ import annotations
 
 import re
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 # ── What mathematics looks like ───────────────────────────────────────────
 # A display block: \[ ... \], $$ ... $$, or an environment. Written on lines of
@@ -134,12 +134,14 @@ def split_steps(text: str, keep_conclusion_lines: bool = True,
     and are left out.
 
     A trailer is a line that closes the reasoning rather than continuing a
-    step: "Summary: ...", "Final Answer: ...". Module I leaves trailers out,
-    keeping only a "Final Conclusion" line or one carrying a
-    __PROVED__/__DISPROVED__ token as a step of its own (`keep_conclusion_lines`),
-    which is where the RKG reads the conclusion. A scorer that must see the
-    whole text as written passes `keep_trailers`, and every trailer stays, as
-    its own step, in order.
+    step: "Summary: ...", "Final Answer: ...". It opens a block of its own,
+    in place, with the lines that follow it, so that what a model writes after
+    "Conclusion: ..." -- the display holding its boxed answer, say -- is
+    neither lost nor moved. Module I leaves trailer blocks out, keeping only a
+    "Final Conclusion" line or one carrying a __PROVED__/__DISPROVED__ token
+    (`keep_conclusion_lines`), which is where the RKG reads the conclusion. A
+    scorer that must see the whole text as written passes `keep_trailers`,
+    and every block stays where it was.
 
     A text with no "Step N:" line at all is returned as its non-empty lines,
     display blocks kept whole.
@@ -158,26 +160,25 @@ def split_steps(text: str, keep_conclusion_lines: bool = True,
     if not any(STEP_HEAD_RE.match(ln) for ln in lines):
         return [restore(ln) for ln in lines]
 
-    steps: List[str] = []
-    current: List[str] = []
-    trailers: List[str] = []
+    # (lines, is_trailer_block) in the order written
+    blocks: List[Tuple[List[str], bool]] = []
+    current: Optional[List[str]] = None
     for ln in lines:
         if STEP_HEAD_RE.match(ln):
-            if current:
-                steps.append("\n".join(current))
             current = [ln]
+            blocks.append((current, False))
         elif TRAILER_RE.match(ln) or LABEL_RE.search(ln):
-            if current:
-                steps.append("\n".join(current))
-                current = []
-            if keep_trailers or (keep_conclusion_lines
-                                 and (FINAL_CONCLUSION_RE.search(ln) or LABEL_RE.search(ln))):
-                trailers.append(ln)
-        elif current:
+            current = [ln]
+            blocks.append((current, True))
+        elif current is not None:
             current.append(ln)
-    if current:
-        steps.append("\n".join(current))
-    for ln in trailers:
-        if ln not in steps:
-            steps.append(ln)
+
+    steps: List[str] = []
+    for block, is_trailer in blocks:
+        if is_trailer and not keep_trailers:
+            head = block[0]
+            if keep_conclusion_lines and (FINAL_CONCLUSION_RE.search(head) or LABEL_RE.search(head)):
+                steps.append(head)
+            continue
+        steps.append("\n".join(block))
     return [restore(s) for s in steps]
