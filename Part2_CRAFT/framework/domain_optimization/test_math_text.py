@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from framework.domain_optimization.math_text import (  # noqa: E402
-    balanced, find_math, normalize_math, split_steps)
+    balanced, find_math, normalize_math, protect_factorials, split_steps)
 
 # gpt-5.4-nano: header line, then the mathematics on lines of its own, then a
 # trailer and the answer. Only the header used to survive.
@@ -84,6 +84,35 @@ c = d
 $$
 follows."""
 
+
+
+# The splitter ends a sentence at every "!", including a factorial's: the
+# trace below is three sentences, and the second must stay whole.
+FACTORIALS = ("Therefore the number of $n$ with $n!!\\mid 2012!!$ is $\\boxed{1006}$. "
+              "So $5! = 120$. Wow! Really. The condition \u201c$n!!$! divides $2012!!.\u201d holds, "
+              "and $(2k)!/k!$ is an integer. Great!")
+
+
+def check_factorials() -> int:
+    from nltk.tokenize import sent_tokenize
+    fails = 0
+    got = protect_factorials(FACTORIALS)
+    n = len(sent_tokenize(got))
+    if n != 6:
+        fails += 1
+        print(f"FAIL  factorials: {n} sentences, wanted 6: {sent_tokenize(got)}")
+    if "Wow!\u2060" in got or "Great!\u2060" in got or not got.endswith("Great!"):
+        fails += 1
+        print("FAIL  factorials: a prose '!' was touched")
+    if protect_factorials(got) != got:
+        fails += 1
+        print("FAIL  factorials: not idempotent")
+    if got.replace("\u2060", "") != FACTORIALS:
+        fails += 1
+        print("FAIL  factorials: changed something besides adding joiners")
+    if not fails:
+        print("ok    factorials: a factorial's '!' no longer ends a sentence, prose '!' does")
+    return fails
 
 def main() -> int:
     failures = 0
@@ -195,6 +224,7 @@ def main() -> int:
 
     total = 17
     print(f"\n{total - failures}/{total} passed")
+    failures += check_factorials()
     return 1 if failures else 0
 
 
