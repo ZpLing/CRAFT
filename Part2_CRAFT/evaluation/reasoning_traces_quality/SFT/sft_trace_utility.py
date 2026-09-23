@@ -60,8 +60,6 @@ _add_scorer_path()
 from answer_match import answers_match  # noqa: E402
 from step_count import count_steps, count_tokens  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from score_sft_run import _metrics  # noqa: E402
 from extract_label import extract_label, extract_math_answer  # noqa: E402
 
 # The reader and the comparison a held-out problem is marked with are the ones
@@ -69,6 +67,47 @@ from extract_label import extract_label, extract_math_answer  # noqa: E402
 # everywhere else in this project.
 _READER = {"FLD": extract_label, "ProofWriter": extract_label,
            "OmniMATH": extract_math_answer, "OlympiadBench": extract_math_answer}
+
+
+_LOGICAL = {"FLD", "ProofWriter"}
+_BINARY = ["__PROVED__", "__DISPROVED__"]
+
+
+def _metrics(rows: list) -> dict:
+    """Accuracy and average steps for every set, plus macro-F1 for a logical one.
+
+    The paper's table reads three numbers off a logical column and two off a
+    mathematical one, because F1 needs classes to average over and a maths
+    answer is not a class. The formula is evaluate_accuracy's, so a number here
+    means what the same name means in the main table.
+    """
+    n = len(rows)
+    out = {
+        "n": n,
+        "accuracy": round(sum(r["correct"] for r in rows) / max(n, 1), 4),
+        "avg_steps": round(sum(r["n_steps"] for r in rows) / max(n, 1), 2),
+        "avg_tokens": round(sum(r["n_tokens"] for r in rows) / max(n, 1), 1),
+    }
+    if rows and rows[0]["dataset"] not in _LOGICAL:
+        out["macro_f1"] = None       # no classes to average over
+        return out
+
+    confusion = {g: {p: 0 for p in _BINARY} for g in _BINARY}
+    for r in rows:
+        gold, pred = r["answer"], r["predicted"]
+        if gold in confusion and pred in _BINARY:
+            confusion[gold][pred] += 1
+    f1s = {}
+    for cls in _BINARY:
+        tp = confusion[cls][cls]
+        fp = sum(confusion[g][cls] for g in _BINARY if g != cls)
+        fn = sum(confusion[cls][p] for p in _BINARY if p != cls)
+        prec = tp / (tp + fp) if (tp + fp) else 0.0
+        rec = tp / (tp + fn) if (tp + fn) else 0.0
+        f1s[cls] = round(2 * prec * rec / (prec + rec) if (prec + rec) else 0.0, 4)
+    out["macro_f1"] = round(sum(f1s.values()) / len(_BINARY), 4)
+    out["per_class_f1"] = f1s
+    return out
 
 
 ANSWER_PAT = re.compile(r"__(?:PROVED|DISPROVED)__|\b(?:PROVED|DISPROVED)\b"
