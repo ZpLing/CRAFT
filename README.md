@@ -279,15 +279,15 @@ ROS=$RTQ/ROSCOE
 python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json \
     --raw_model gemini-3.1-flash-lite --output_dir $RUN/roscoe_export
 python $ROS/roscoe_score.py         --export_dir $RUN/roscoe_export
-python $ROS/roscoe_build_table.py   --summaries "Gemini-3.1-flash-lite:$RUN/roscoe_export/evaluation_results.json" \
-    --results_dir results/CRAFT_results/reasoning_traces_quality/ROSCOE \
-    --latex_out $RUN/roscoe_craft_table.tex
 ```
 
-`--results_dir` files each model's run under a directory of its own, as the two
-sides it compares — `<model>/ROSCOE_CRAFT.json` and `<model>/ROSCOE_Raw_CoT.json`,
-all thirteen metrics per dataset. Passing that directory alone, with no
-`--summaries`, rebuilds the table from them.
+The scores the paper reads are filed per backbone under
+`results/CRAFT_results/reasoning_traces_quality/ROSCOE/<model>/` as the two sides
+it compares — `ROSCOE_CRAFT.json` and `ROSCOE_Raw_CoT.json` — all thirteen
+metrics per dataset, pooled over the cell's per-trace scores with the trace count
+each mean rests on. On the current traces CRAFT is above raw CoT on 80 of the 104
+dataset × metric cells; the losses sit almost entirely in the two max-over-pairs
+statistics (repetition-step and coherence), which a longer trace can only lose.
 
 Hyperparameters fixed across all experiments (§4.6): Module I `K=5`, `T=0.7`,
 `β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. These are the
