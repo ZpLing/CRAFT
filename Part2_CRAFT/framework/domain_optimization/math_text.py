@@ -213,6 +213,9 @@ def split_steps(text: str, keep_conclusion_lines: bool = True,
 # ── Stating the goal ──────────────────────────────────────────────────────
 # A sentence boundary: end punctuation, then space, then something that
 # starts a sentence. "e.g." and "i.e." are not boundaries.
+# Forum markup some problem statements carry ([i]...[/i], [list], [*]).
+_MARKUP_TAG = re.compile(r"\[/?(?:[a-z]+|\*)\]")
+_STEP_HEADER = re.compile(r"\s*\**\s*Step\s*\d+\s*\**\s*[:.\-]")
 _SENTENCE_END = re.compile(r"(?<!\be\.g\.)(?<!\bi\.e\.)(?<=[.?!])\s+(?=[A-Z\"\u201c$(\\])")
 
 
@@ -234,7 +237,11 @@ def goal_sentences(problem: str, lo: int = 6, hi: int = 40, max_math: int = 2) -
         sentence = sentence.strip()
         if not sentence or sentence[-1] not in ".?!":
             continue
-        if has_display(sentence) or "\\begin" in sentence:
+        if (has_display(sentence) or "$$" in sentence or "\\begin" in sentence
+                or not balanced(sentence) or _MARKUP_TAG.search(sentence)
+                or _STEP_HEADER.match(sentence)):
+            # A problem that lists its own procedure as "Step 1: ..." would
+            # open the trace with what reads as the trace's first step.
             continue
         spans = find_math(sentence)
         if len(spans) > max_math:
