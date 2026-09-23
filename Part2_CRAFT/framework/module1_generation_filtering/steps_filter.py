@@ -73,6 +73,8 @@ except ImportError:
     _SYMPY_AVAILABLE = False
 
 from framework.domain_optimization.math_text import split_steps, STEP_HEAD_RE  # noqa: E402
+# Module II and III import this name for their own header matching.
+STEP_PATTERN = re.compile(r"^Step\s*\d+\s*:", re.IGNORECASE | re.MULTILINE)
 
 
 def parse_steps_from_trace(trace: Dict[str, Any]) -> List[Dict[str, Any]]:
