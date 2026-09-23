@@ -25,6 +25,7 @@ Part2_CRAFT/results/CRAFT_results/other_results/
 Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/*
 # ...but the ROSCOE scores of the two sides (raw CoT and CRAFT, per backbone) are results the paper reads, so they are tracked.
 !Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/ROSCOE/
+!Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/SFT/
 # Backups the eviction tool leaves behind are working files, not results.
 *.bak
 *.jsonl.bak
