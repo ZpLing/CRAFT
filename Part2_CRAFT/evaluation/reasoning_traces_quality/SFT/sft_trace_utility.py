@@ -196,6 +196,11 @@ def main() -> None:
                          "(they then lose their middle). Off by default: a "
                          "student is meant to learn from whole traces, so an "
                          "over-budget training set is refused and named")
+    ap.add_argument("--tag", default="",
+                    help="A word for the run's name, between the side and the "
+                         "seed, when the training set is not the default "
+                         "both-correct pairs -- e.g. 'all' for every concluded "
+                         "trace, right or wrong")
     ap.add_argument("--save_merged", action="store_true",
                     help="Also write the backbone with the adapter merged in "
                          "(about 18 GB); the adapter alone is always saved")
@@ -333,10 +338,11 @@ def main() -> None:
     side = "CRAFT" if "craft" in Path(args.train_file).stem else "Raw_CoT"
     # Qwen/Qwen3.5-9B -> Qwen-3.5-9B, so a file says which backbone it is.
     slug = re.sub(r"^([A-Za-z]+)(?=\d)", r"\1-", args.model.rsplit("/", 1)[-1])
-    name = f"{slug}_SFT_{side}_Seed{args.seed}"
+    name = f"{slug}_SFT_{side}{'_' + args.tag if args.tag else ''}_Seed{args.seed}"
     summary = {
         "run": name,
         "side": "craft" if side == "CRAFT" else "raw",
+        "training_set": args.tag or "both_correct_pairs",
         "seed": args.seed,
         "model": args.model,
         "train_file": Path(args.train_file).name,

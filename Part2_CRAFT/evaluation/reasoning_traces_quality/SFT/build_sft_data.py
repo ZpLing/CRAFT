@@ -131,6 +131,17 @@ def main() -> None:
                          "pipeline never touched, by build_test_set.py, so the "
                          "run's 500 per cell can all be trained on")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--all_pairs", action="store_true", default=False,
+                    help="Keep every problem both sides wrote a concluded trace "
+                         "for, right or wrong, instead of only the problems both "
+                         "got right. This asks a different question -- whether "
+                         "a pipeline's whole output is the better thing to learn "
+                         "from, answers included -- so its runs are named apart")
+    ap.add_argument("--max_tokens", type=int, default=0,
+                    help="Drop a pair when either side's prompt + trace would not "
+                         "fit this many tokens of --tokenizer, so the students "
+                         "train on whole traces and on the same problems. 0 keeps all")
+    ap.add_argument("--tokenizer", default="Qwen/Qwen3.5-9B")
     ap.add_argument("--strip_answer", action="store_true", default=False,
                     help="Cut each training trace off before it states its "
                          "answer. Off by default — a student is trained on the "
@@ -192,7 +203,7 @@ def main() -> None:
 
                 craft_ok = r["predicted"] == r["ground_truth"]
                 raw_ok = rr.get("predicted") == rr.get("ground_truth")
-                if not (craft_ok and raw_ok):
+                if not args.all_pairs and not (craft_ok and raw_ok):
                     continue
                 raw_trace = (rr.get("traces") or [""])[0] or ""
                 if not r.get("trace") or not raw_trace:
@@ -228,6 +239,25 @@ def main() -> None:
 
     assert [r["sample_id"] for r in train_craft] == [r["sample_id"] for r in train_raw], \
         "the two training sets must cover the same problems in the same order"
+
+    if args.max_tokens:
+        # The same budget the trainer is given; a pair goes when either side
+        # would not fit, so neither student sees a trace with its middle cut.
+        from transformers import AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(args.tokenizer)
+
+        def fits(rec: Dict) -> bool:
+            prompt = f"{rec['instruction']}\n\n{rec['problem']}\n\nReasoning:\n"
+            n = (len(tok(prompt, add_special_tokens=False)["input_ids"])
+                 + len(tok(rec["trace"], add_special_tokens=False)["input_ids"]) + 1)
+            return n <= args.max_tokens
+
+        keep = [fits(c) and fits(r) for c, r in zip(train_craft, train_raw)]
+        dropped = [c["sample_id"] for c, k in zip(train_craft, keep) if not k]
+        train_craft = [c for c, k in zip(train_craft, keep) if k]
+        train_raw = [r for r, k in zip(train_raw, keep) if k]
+        print(f"  over {args.max_tokens} tokens on either side, dropped from both: "
+              f"{len(dropped)} {dropped[:6]}{' ...' if len(dropped) > 6 else ''}")
     # A problem solved by both backbones contributes twice, once per backbone's
     # trace. That is left in: it is how the traces were produced, and it falls on
     # both sides equally, so it cannot favour either student.
