@@ -89,3 +89,5 @@ Part2_CRAFT/evaluation/token_accounting.py
 
 # ── Dropped baselines and pre-swap backups — kept locally, never pushed ──
 Part2_CRAFT/results/baseline_results/_archive/
+# The ROSCOE table builder is a local reporting script, not part of the method or its evaluation.
+Part2_CRAFT/evaluation/reasoning_traces_quality/ROSCOE/roscoe_build_table.py
