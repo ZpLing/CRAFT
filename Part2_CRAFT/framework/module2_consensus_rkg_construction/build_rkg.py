@@ -68,7 +68,7 @@ import sys as _sys
 from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from framework.module1_generation_filtering.steps_filter import parse_steps_from_trace, STEP_PATTERN
+from framework.module1_generation_filtering.steps_filter import parse_steps_from_trace
 
 #########################
 # Configuration — loaded from root config.py; change models there
@@ -1161,6 +1161,7 @@ async def build_rkgs_for_dataset(
     expected_depth: Optional[int] = None,
     consensus_scope: str = "all",
     dataset_name: Optional[str] = None,
+    use_alignment: bool = False,
 ) -> None:
     """Build RKGs for all samples in a dataset and write output to rkg.json."""
     print(f"Reading file: {input_file}")
@@ -1197,6 +1198,7 @@ async def build_rkgs_for_dataset(
                         edge_lambda=edge_lambda,
                         consensus_scope=consensus_scope,
                         dataset_name=dataset_name,
+                        use_alignment=use_alignment,
                     )
                 except Exception as e:
                     results[idx] = {
@@ -1253,6 +1255,9 @@ def rebuild_consensus(
     traces_file: Optional[Path] = None,
     domain: str = "logical",
     dataset: Optional[str] = None,
+    use_alignment: bool = False,
+    model: str = DEFAULT_MODEL,
+    concurrency: int = 10,
 ) -> None:
     """Recompute consensus_rkg in an existing RKG file from its cached trace_rkgs.
 
@@ -1293,12 +1298,49 @@ def rebuild_consensus(
 
     n_scoped = n_dropped = 0
 
+    # Cross-trace alignment on the cached per-trace graphs: one LLM call per
+    # sample, so a rebuilt consensus can vote over steps rather than positions
+    # without extracting the graphs again.
+    alignments: Dict[str, Dict[Tuple[int, str], str]] = {}
+    if use_alignment:
+        async def _align_all() -> None:
+            sem = asyncio.Semaphore(concurrency)
+            connector = aiohttp.TCPConnector(limit=concurrency)
+            async with aiohttp.ClientSession(connector=connector) as session:
+                async def one(r: Dict[str, Any]) -> None:
+                    rkgs = [t for t in (r.get("trace_rkgs") or r.get("trace_dags") or [])
+                            if t.get("extraction_method") != "error"]
+                    if len(rkgs) < 2:
+                        return
+                    steps = [[n for n in t.get("nodes", []) if n.get("type") == "step"] for t in rkgs]
+                    async with sem:
+                        mapping = await align_steps_across_traces(session, steps, model=model)
+                    for t in rkgs:
+                        for n in t.get("nodes", []):
+                            if n.get("type") == "conclusion":
+                                mapping[(t["trace_idx"], n["id"])] = "ConcFinal"
+                    alignments[r["sample_id"]] = mapping
+                await asyncio.gather(*(one(r) for r in results))
+        asyncio.run(_align_all())
+        print(f"aligned {len(alignments)}/{len(results)} samples")
+
     for r in results:
         valid = [copy.deepcopy(t) for t in (r.get("trace_rkgs") or r.get("trace_dags") or [])
                  if t.get("extraction_method") != "error"]
         if not valid:
             r["consensus_rkg"] = {"nodes": [], "edges": []}
             continue
+        mapping = alignments.get(r.get("sample_id"))
+        if mapping:
+            for t in valid:
+                t.update(remap_rkg_with_alignment(t, t["trace_idx"], mapping))
+            cid_counts = Counter(mapping.values())
+            r["alignment"] = {
+                "used": True,
+                "n_canonical_ids": len(cid_counts),
+                "n_shared_groups": sum(1 for v in cid_counts.values() if v > 1),
+                "n_total_steps": sum(1 for k in mapping if k[1] != "ConcFinal"),
+            }
 
         if consensus_scope == "majority":
             src_traces = traces_map.get(r.get("sample_id")) or []
@@ -1382,6 +1424,11 @@ def main() -> None:
     parser.add_argument("--node_threshold", type=float, default=None,
                         help="Node frequency threshold beta (default: same as --consensus_threshold)")
     parser.add_argument("--max_samples", type=int, default=None)
+    parser.add_argument("--align", action="store_true",
+                        help="Align steps across the K traces (one LLM call per sample) before "
+                             "voting, so a node is a step and not a position: without it Step 2 "
+                             "of every trace is one node whatever each trace did second, and the "
+                             "synthesized trace re-derives what a collided node hides")
     parser.add_argument("--similarity", choices=["jaccard", "embedding"],
                         default="jaccard",
                         help="The overlap measure fused into W(e): term Jaccard "
@@ -1421,6 +1468,14 @@ def main() -> None:
     args = parser.parse_args()
     set_similarity(args.similarity)
 
+    global OPENAI_API_KEY, OPENAI_BASE_URL, CHAT_URL, HEADERS
+    if args.api_key:
+        OPENAI_API_KEY = args.api_key
+        HEADERS["Authorization"] = f"Bearer {OPENAI_API_KEY}"
+    if args.base_url:
+        OPENAI_BASE_URL = args.base_url
+        CHAT_URL = OPENAI_BASE_URL.rstrip("/") + "/chat/completions"
+
     if args.rebuild_consensus:
         rebuild_consensus(
             input_file=_cfg.resolve_input(args.input),
@@ -1435,16 +1490,11 @@ def main() -> None:
             traces_file=_cfg.resolve_input(args.traces_file) if args.traces_file else None,
             domain=args.domain,
             dataset=args.dataset_name,
+            use_alignment=args.align,
+            model=args.model,
+            concurrency=args.concurrency,
         )
         return
-
-    global OPENAI_API_KEY, OPENAI_BASE_URL, CHAT_URL, HEADERS
-    if args.api_key:
-        OPENAI_API_KEY = args.api_key
-        HEADERS["Authorization"] = f"Bearer {OPENAI_API_KEY}"
-    if args.base_url:
-        OPENAI_BASE_URL = args.base_url
-        CHAT_URL = OPENAI_BASE_URL.rstrip("/") + "/chat/completions"
 
     asyncio.run(build_rkgs_for_dataset(
         input_file=_cfg.resolve_input(args.input),
@@ -1460,6 +1510,7 @@ def main() -> None:
         expected_depth=args.expected_depth,
         consensus_scope=args.consensus_scope,
         dataset_name=args.dataset_name,
+        use_alignment=args.align,
     ))
 
 
