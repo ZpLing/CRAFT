@@ -76,23 +76,25 @@ ANSWER_PAT = re.compile(r"__(?:PROVED|DISPROVED)__|\b(?:PROVED|DISPROVED)\b"
 
 
 class AnswerStated(StoppingCriteria):
-    """Stop once every sequence in the batch has stated an answer.
+    """Stop each sequence once it has stated an answer.
 
     Generation is what makes this job long, and a student that has written its
-    conclusion has nothing left to say that is scored. Stopping on the whole
-    batch rather than per sequence keeps it simple and keeps both students under
-    the same rule; a sequence that finished early just pads.
+    conclusion has nothing left to say that is scored. The rule is per
+    sequence: a finished row is padded from then on while the rest of the
+    batch goes on, so nothing is appended after a stated answer -- the first
+    version stopped on the whole batch, and a student that had answered kept
+    writing until the slowest row in its batch did, which put a second
+    \\boxed{} after the first on a few problems and moved their mark.
     """
 
     def __init__(self, tok, prompt_len: int):
         self.tok, self.prompt_len = tok, prompt_len
 
-    def __call__(self, input_ids, scores, **kwargs) -> bool:
-        for row in input_ids:
-            text = self.tok.decode(row[self.prompt_len:], skip_special_tokens=True)
-            if not ANSWER_PAT.search(text):
-                return False
-        return True
+    def __call__(self, input_ids, scores, **kwargs):
+        done = [bool(ANSWER_PAT.search(
+                    self.tok.decode(row[self.prompt_len:], skip_special_tokens=True)))
+                for row in input_ids]
+        return torch.tensor(done, dtype=torch.bool, device=input_ids.device)
 
 
 def seed_everything(seed: int) -> None:
@@ -109,6 +111,17 @@ def read_jsonl(path: Path) -> List[Dict]:
 
 def build_prompt(rec: Dict) -> str:
     return (f"{rec['instruction']}\n\n{rec['problem']}\n\nReasoning:\n")
+
+
+def over_budget(rows: List[Dict], tok, max_len: int) -> List[str]:
+    """sample_ids whose prompt + trace + eos would not fit in max_len."""
+    out = []
+    for rec in rows:
+        n = (len(tok(build_prompt(rec), add_special_tokens=False)["input_ids"])
+             + len(tok(rec["trace"] + tok.eos_token, add_special_tokens=False)["input_ids"]))
+        if n > max_len:
+            out.append(rec["sample_id"])
+    return out
 
 
 class TraceSFT(Dataset):
@@ -178,6 +191,14 @@ def main() -> None:
                          "answer")
     ap.add_argument("--lora_r", type=int, default=16)
     ap.add_argument("--grad_accum", type=int, default=8)
+    ap.add_argument("--allow_truncation", action="store_true",
+                    help="Train even when some traces do not fit --max_len "
+                         "(they then lose their middle). Off by default: a "
+                         "student is meant to learn from whole traces, so an "
+                         "over-budget training set is refused and named")
+    ap.add_argument("--save_merged", action="store_true",
+                    help="Also write the backbone with the adapter merged in "
+                         "(about 18 GB); the adapter alone is always saved")
     args = ap.parse_args()
 
     seed_everything(args.seed)
@@ -202,6 +223,17 @@ def main() -> None:
     train_rows = read_jsonl(Path(args.train_file))
     print(f"  training on {len(train_rows)} traces from {Path(args.train_file).name}",
           flush=True)
+    long = over_budget(train_rows, tok, args.max_len)
+    if long:
+        msg = (f"  {len(long)} of {len(train_rows)} traces do not fit --max_len "
+               f"{args.max_len}: {', '.join(long[:8])}{' ...' if len(long) > 8 else ''}")
+        if not args.allow_truncation:
+            raise SystemExit(msg + "\n  raise --max_len, drop them from both "
+                             "sides, or pass --allow_truncation")
+        print(msg + "  (kept, middles cut)", flush=True)
+    else:
+        print(f"  every trace fits --max_len {args.max_len}; nothing is truncated",
+              flush=True)
 
     trainer = Trainer(
         model=model,
@@ -232,6 +264,19 @@ def main() -> None:
     )
     trainer.train()
 
+    # The student itself, so a run can be re-scored or reused without
+    # training again: the LoRA adapter and the tokenizer, and on request the
+    # backbone with the adapter merged in.
+    model.save_pretrained(str(out / "adapter"))
+    tok.save_pretrained(str(out / "adapter"))
+    print(f"  adapter saved -> {out / 'adapter'}", flush=True)
+    if args.save_merged:
+        merged = model.merge_and_unload()
+        merged.save_pretrained(str(out / "merged"), safe_serialization=True)
+        tok.save_pretrained(str(out / "merged"))
+        print(f"  merged model saved -> {out / 'merged'}", flush=True)
+        model = merged
+
     # ── answer the held-out problems ────────────────────────────────────────
     model.config.use_cache = True
     model.eval()
@@ -261,11 +306,16 @@ def main() -> None:
                                  stopping_criteria=StoppingCriteriaList(
                                      [AnswerStated(tok, enc["input_ids"].shape[1])]))
             for r, row in zip(batch, gen):
-                text = tok.decode(row[enc["input_ids"].shape[1]:],
-                                  skip_special_tokens=True)
+                new_ids = row[enc["input_ids"].shape[1]:]
+                text = tok.decode(new_ids, skip_special_tokens=True)
+                n_new = int((new_ids != tok.pad_token_id).sum())
                 preds.append({**{k: r[k] for k in
                                  ("sample_id", "dataset", "domain", "answer")},
-                              "generated": text})
+                              "generated": text,
+                              # A generation that used its whole budget without
+                              # stating an answer was cut off, not finished.
+                              "hit_budget": bool(n_new >= args.gen_max_new
+                                                 and not ANSWER_PAT.search(text))})
             print(f"    {len(preds)}/{len(test_rows)}", flush=True)
 
     # ── mark them, and write the one file this run is read from ─────────────
@@ -296,6 +346,10 @@ def main() -> None:
         "lr": args.lr,
         "lora_r": args.lora_r,
         "accuracy": round(sum(r["correct"] for r in preds) / max(len(preds), 1), 4),
+        "max_len": args.max_len,
+        "gen_max_new": args.gen_max_new,
+        "n_no_answer": sum(1 for r in preds if r["predicted"] is None),
+        "n_hit_budget": sum(1 for r in preds if r["hit_budget"]),
         "avg_steps": round(sum(r["n_steps"] for r in preds) / max(len(preds), 1), 2),
         "by_dataset": {d: _metrics(rs) for d, rs in sorted(by_ds.items())},
         "predictions": preds,
@@ -303,7 +357,9 @@ def main() -> None:
     with (out / f"{name}.json").open("w", encoding="utf-8") as fh:
         json.dump(summary, fh, ensure_ascii=False, indent=1)
     print(f"  {name}: accuracy {100*summary['accuracy']:.1f}  "
-          f"steps {summary['avg_steps']:.1f}  over {len(preds)} problems", flush=True)
+          f"steps {summary['avg_steps']:.1f}  over {len(preds)} problems  "
+          f"(no answer {summary['n_no_answer']}, cut off at the budget "
+          f"{summary['n_hit_budget']})", flush=True)
     for d, m in summary["by_dataset"].items():
         f1 = "  —  " if m["macro_f1"] is None else f"{m['macro_f1']:.3f}"
         print(f"      {d:<16} acc {100*m['accuracy']:5.1f}   F1 {f1}   "
