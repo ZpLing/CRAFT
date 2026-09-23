@@ -28,6 +28,9 @@ cell's own reader, so `predicted` cannot move -- over the 3969 traces here it
 does not, on any of them.
 
     python export_craft_traces.py --out_dir CRAFT_results/Output
+
+The run directory holds one folder per cell (see CELLS) with the file that
+cell reports from; the 2026-09-23 run lives under craft_runs/full500_v4/traces.
 """
 
 from __future__ import annotations
@@ -55,33 +58,38 @@ _READER = {"FLD": extract_label, "ProofWriter": extract_label,
 
 _STEP_HEAD = re.compile(r"(?m)^\s*Step\s*\d+\s*[:.\-]\s*")
 
-# (dataset, model) -> (run directory, file, how it was run)
+# (dataset, model) -> (cell directory under --runs, file, how it was run).
+# The 2026-09-23 run: the atomic synthesizer for every cell; ProofWriter goes
+# through the closed-world recheck with its proof search written back as
+# steps; gpt's ProofWriter trace is then restated with its answer pinned;
+# gemini's mathematics has the adjudicator's derivation written back as steps
+# and opens with the problem's own statement of the goal.
 CELLS = {
     ("FLD", "gemini-3.1-flash-lite"):
-        ("FLD_gemini-3.1-flash-lite", "synth_prior", "prior_mode=verify"),
+        ("FLDgem", "synth", "prior_mode=verify"),
     ("FLD", "gpt-5.4-nano"):
-        ("FLD_gpt-5.4-nano", "synthesized", "prior_mode=follow"),
+        ("FLDgpt", "synth", "prior_mode=follow"),
     ("ProofWriter", "gemini-3.1-flash-lite"):
-        ("ProofWriter_gd", "synth_cwa_resolve",
-         "prior_mode=verify, weight_by=gold_depth, cwa_recheck, cwa_resolve"),
+        ("PWgem", "cwa_resolve",
+         "prior_mode=verify, weight_by=gold_depth, cwa_recheck (integrated), cwa_resolve"),
     ("ProofWriter", "gpt-5.4-nano"):
-        ("ProofWriter_gpt-5.4-nano", "synth_cwa_resolve",
-         "prior_mode=verify, weight_by=gold_depth, cwa_recheck, cwa_resolve"),
+        ("PWgpt", "polish",
+         "prior_mode=verify, weight_by=gold_depth, cwa_recheck (integrated), cwa_resolve, polish two3"),
     ("OmniMATH", "gemini-3.1-flash-lite"):
-        ("OmniMATH_gemini-3.1-flash-lite", "synthesized", "prior_mode=verify"),
+        ("OMgem", "adj_goal", "prior_mode=verify, adjudication (integrated), goal stated"),
     ("OmniMATH", "gpt-5.4-nano"):
-        ("OmniMATH_gpt-5.4-nano", "synth_follow2", "prior_mode=follow"),
+        ("OMgpt", "synth", "prior_mode=follow"),
     ("OlympiadBench", "gemini-3.1-flash-lite"):
-        ("OlympiadBench_gemini-3.1-flash-lite", "synthesized", "prior_mode=verify"),
+        ("OBgem", "adj_goal", "prior_mode=verify, adjudication (integrated), goal stated"),
     ("OlympiadBench", "gpt-5.4-nano"):
-        ("OlympiadBench_gpt-5.4-nano", "synth_follow2", "prior_mode=follow"),
+        ("OBgpt", "synth", "prior_mode=follow"),
 }
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--runs", default="craft_runs/full500")
+    ap.add_argument("--runs", default="craft_runs/full500_v4/traces")
     ap.add_argument("--out_dir", default="CRAFT_results/Output")
     args = ap.parse_args()
 

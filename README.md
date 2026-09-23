@@ -15,9 +15,9 @@ traces, drops the steps they disagree on, aggregates the survivors into a consen
 | Backbone | Setting | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | GPT-5.4-nano | Best of 12 baselines | 78.8 | 0.785 | **7.7** | 94.0 | 0.940 | 18.9 | 49.8 | 78.4 | 57.5 | 74.1 |
-| GPT-5.4-nano | **CRAFT** | **82.8** | **0.828** | 9.0 | **97.2** | **0.972** | **9.6** | **54.9** | **9.4** | **60.6** | **9.3** |
+| GPT-5.4-nano | **CRAFT** | **81.6** | **0.815** | 9.4 | **95.6** | **0.956** | **9.5** | **55.1** | **8.2** | **61.6** | **8.3** |
 | Gemini-3.1-flash-lite | Best of 12 baselines | **90.3** | **0.903** | 11.1 | 68.6 | 0.678 | 14.8 | 56.3 | 24.9 | 65.8 | 25.0 |
-| Gemini-3.1-flash-lite | **CRAFT** | 89.5 | 0.895 | **9.2** | **87.4** | **0.874** | **8.9** | **62.6** | **9.5** | **75.7** | **9.6** |
+| Gemini-3.1-flash-lite | **CRAFT** | 88.7 | 0.887 | **9.2** | **85.6** | **0.856** | **9.2** | **61.6** | **8.3** | **74.5** | **8.7** |
 
 Label-prediction accuracy, macro-F1 and average reasoning steps, all scored by
 `evaluation/label_prediction/evaluate_accuracy.py` and its answer readers; **bold** is the
