@@ -788,6 +788,9 @@ def _stated_in(content: str, prose: str) -> bool:
 
 
 _PLACEHOLDERS = {"", "none", "n/a", "null"}
+# An unescaped $ or \[ \( inside a boxed value: the value brought its own
+# delimiters. `\\[4pt]` in a cases environment is a line break, not one.
+_OWN_DELIMS = re.compile(r"(?<!\\)\$|(?<!\\)\\[\[(]")
 
 
 def _trim_box(content: str) -> str:
@@ -843,10 +846,15 @@ def _unbox_intermediate(text: str) -> str:
             # that reached no value; they go with their line either way.
             if content and _math_key(content) not in _PLACEHOLDERS and not _stated_in(content, prose):
                 value = _trim_box(content)
-                # A cases or aligned environment, or anything spanning lines,
-                # is display mathematics; inline dollars around it would put
-                # the closing one on a later line.
-                if "\n" in value or "\\begin{" in value:
+                if _OWN_DELIMS.search(value):
+                    # The value already carries its own delimiters -- a box
+                    # written around "$x$ and $y$" -- so none are added:
+                    # dollars inside dollars would nest.
+                    out.append(f"This gives {value}.")
+                elif "\n" in value or "\\begin{" in value:
+                    # A cases or aligned environment, or anything spanning
+                    # lines, is display mathematics; inline dollars around it
+                    # would put the closing one on a later line.
                     out.append(f"This gives\n$$\n{value}\n$$")
                 else:
                     out.append(f"This gives ${value}$.")
