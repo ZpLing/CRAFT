@@ -74,6 +74,34 @@ def _ref_parts(m: "re.Match"):
     return m.group("pre2"), m.group("n2")
 # The looser form, for counting and for the "Step 2 and Step 2" cleanup.
 _STEP_REF_ANY = re.compile(r"(?i)(\bSteps?\s*)(\d+)")
+# What follows a citation inside a run: ", 8", " and 4", "/Step 7", "–Step 7".
+# The rest of a run. A number after "and", "to" or "through" is the run's
+# last member wherever it stands ("Steps 6, 8, and 7 we can infer"); a bare
+# number after a comma, slash or dash counts only if what follows it is
+# another separator, a closing bracket, sentence punctuation or the end, so
+# "From Step 3, 4 cases remain" and "Step 4 - 3 = 1" are left alone. A
+# number written with its own "Step" is a citation wherever it stands.
+_RUN_TAIL = re.compile(
+    r"(?i)(\s*(?P<sep>,|/|&|–|-|\band\b|\bto\b|\bthrough\b)\s*(?:and\s+)?(?P<word>Steps?\s*)?)(?P<n>\d+)(?!\d)")
+_RUN_NEXT = re.compile(r"(?i)\s*(?:,|/|&|–|-|\band\b|\)|\]|\.|;|:|$)")
+
+
+def _tail_is_citation(tail: "re.Match", rest: str) -> bool:
+    if tail.group("word"):
+        return True
+    lead = tail.group(1)
+    if re.search(r"(?i)\b(?:and|to|through)\b", lead) or tail.group("sep") == "&":
+        return True
+    if tail.group("sep") == "–":          # an en dash is a range: "Steps 5–9"
+        return True
+    if tail.group("sep") == "-" and lead == "-":   # "Steps 5-9" is a range; "Step 4 - 3" is a subtraction
+        return True
+    return bool(_RUN_NEXT.match(rest))
+
+
+_QUOTED = re.compile(r"[“\"][^”\"\n]{3,300}[”\"]")
+_OWN_PROCEDURE = re.compile(r"(?i)(?:problem|algorithm|procedure|instruction|game|rule)[’']s\s*$|(?:the|its|each)\s+(?:given|stated)\s*$")
+_OWN_PROCEDURE_AFTER = re.compile(r"(?i)^\s+(?:of|in)\s+the\s+(?:algorithm|procedure|problem|process|instructions?|game|puzzle)\b")
 _PARA = re.compile(r"\n\s*\n")
 _SENT = re.compile(r"(?<=[.!?])\s+")
 # A subscripted symbol is one name: split c_a into "c" and "a" and it stops
@@ -601,7 +629,11 @@ def _repeat_conclusions(bodies: List[str],
 _CITE_CLAIM = re.compile(
     r"(?i)\b(Steps?\s*)(\d+)(\s*(?:establish(?:es|ed)?|show(?:s|ed)?|"
     r"give(?:s)?|gave|derive(?:s|d)?|state(?:s|d)?|as the premise that|"
-    r"we (?:have|know|established) that)\s*(?:that\s+)?)([^,.;]{10,140})")
+    r"we (?:have|know|established) that)\s*(?:that\s+)?)"
+    # The claim runs to the next clause, and not into a second citation
+    # joined by "and": "Step 3 established that A and Step 4 established
+    # that B" is two claims.
+    r"((?:(?!\s+and\s+(?:Steps?|Fact)\s*\d)[^,.;]){10,140})")
 
 
 def _fix_citations(text: str, bodies: List[str],
@@ -625,15 +657,16 @@ def _fix_citations(text: str, bodies: List[str],
             return m.group(0)
         holds = [o for o, b in by_owner.items()
                  if not (want - _substance(b))]
-        # A step cannot stand on itself, so a self-citation is repaired even
-        # when the step does contain the claim -- it is citing the line it is
-        # about to write. Otherwise the named step has to be wrong about the
-        # claim before anything moves.
-        if here is not None and named == here:
-            holds = [o for o in holds if o != here]
-        elif named in holds:
-            return m.group(0)
-        if len(holds) != 1:
+        # Only a step before this one can be what a citation rests on. The
+        # step itself always "holds" the claim -- it is the line being
+        # written -- and a later step may repeat it, and both were being
+        # chosen: 21 of 50 ProofWriter traces came out with "Step 6: ...
+        # Since Step 6 established ..." or a citation of a step yet to come.
+        if here is not None and here.isdigit():
+            holds = [o for o in holds if o.isdigit() and int(o) < int(here)]
+            if named.isdigit() and int(named) >= int(here) and len(holds) == 1:
+                return m.group(1) + holds[0] + m.group(3) + m.group(4)
+        if named in holds or len(holds) != 1:
             return m.group(0)
         return m.group(1) + holds[0] + m.group(3) + m.group(4)
 
@@ -706,6 +739,27 @@ def _join_label_fragments(text: str) -> str:
     text = _QUOTED_STOP.sub(r"\1\3", text)
     return _LABEL_ECHO.sub(lambda m: m.group("lab") + (m.group("punct") or "."),
                            text.rstrip())
+
+
+# gpt-5.4-nano boxes what it has just computed -- "$\\boxed{0<c\\le\\sqrt5}$"
+# three steps before the answer "$\\boxed{(0,1]}$" -- and a trace then reads
+# as stating several answers. The last box is the answer (the extractor reads
+# the last one); the earlier ones keep their contents and lose the box.
+_ANY_BOXED = re.compile(r"\\boxed\{((?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)\}")
+
+
+def _unbox_intermediate(text: str) -> str:
+    boxes = list(_ANY_BOXED.finditer(text))
+    if len(boxes) < 2:
+        return text
+    out = []
+    last = 0
+    for m in boxes[:-1]:
+        out.append(text[last:m.start()])
+        out.append(m.group(1))
+        last = m.end()
+    out.append(text[last:])
+    return "".join(out)
 
 
 def _resolve(alias: Dict[str, str]) -> Dict[str, str]:
@@ -816,25 +870,61 @@ def dedup_trace(text: str,
         # citing one that was dropped is sent to the step it repeated, and that
         # step may be this one under its new number. A step cannot stand on
         # itself, so such a citation keeps the number it had.
-        live = {n for n in renumber.values()}
+        live = sorted({int(n) for n in renumber.values()})
+        max_old = max((int(o) for o in owners if o and o.isdigit()), default=0)
 
-        def redirect_for(current: Optional[str]):
-            def redirect(m: re.Match) -> str:
-                pre, old_no = _ref_parts(m)
-                new_no = renumber.get(old_no, old_no)
-                if current is None or new_no != current:
-                    return pre + new_no
-                # The citation would name the step carrying it. Keeping the
-                # number it had only works if that number still exists; where
-                # it does not, the nearest surviving earlier step is the one
-                # this step was built on.
-                if old_no in live:
-                    return m.group(0)
-                earlier = [n for n in live if n.isdigit() and int(n) < int(current)]
-                if not earlier:
-                    return m.group(0)
-                return pre + max(earlier, key=int)
-            return redirect
+        def map_no(current: Optional[str], old_no: str) -> Optional[str]:
+            """The new number, or None when the citation can only name the citing step."""
+            new_no = renumber.get(old_no, old_no)
+            if current is None or new_no != current:
+                return new_no
+            # The citation would name the step carrying it. Keeping the old
+            # number is no answer -- in the new numbering it is some other
+            # step, usually a later one -- so it goes to the nearest earlier
+            # surviving step, the one this step was built on. The first step
+            # has none, and there the citation is written as "this step".
+            earlier = [n for n in live if n < int(current)]
+            return str(earlier[-1]) if earlier else None
+
+        def renumber_piece(piece: str, current: Optional[str]) -> str:
+            # Every "Step N" in a body is a citation of this trace's steps,
+            # bar two things: text the trace quotes from the problem (inside
+            # quotation marks) and the problem's own procedure ("the
+            # problem's Step 2 rule"). Matching a fixed list of reference
+            # words around the citation left "what Step 3 concludes" and
+            # "Step 5–Step 7" with their old numbers, which after the steps
+            # around them were renumbered could be the citing step's own.
+            quoted = [(m.start(), m.end()) for m in _QUOTED.finditer(piece)]
+            out = []
+            pos = 0
+            for m in _STEP_REF_ANY.finditer(piece):
+                if m.start() < pos:
+                    continue
+                if any(a <= m.start() < b for a, b in quoted):
+                    continue
+                if _OWN_PROCEDURE.search(piece[max(0, m.start() - 24):m.start()]) \
+                        or _OWN_PROCEDURE_AFTER.match(piece[m.end():m.end() + 40]):
+                    continue
+                # A number no step of the trace ever had is not a citation.
+                if int(m.group(2)) > max_old:
+                    continue
+                out.append(piece[pos:m.start()])
+                mapped = map_no(current, m.group(2))
+                out.append(m.group(1) + mapped if mapped is not None else "this step")
+                end = m.end()
+                # The rest of a run -- "Steps 9, 8, 5, and 4", "Step 3/Step 7",
+                # "Step 5–Step 7" -- as bare numbers or further citations.
+                while True:
+                    tail = _RUN_TAIL.match(piece, end)
+                    if not tail or int(tail.group("n")) > max_old \
+                            or not _tail_is_citation(tail, piece[tail.end():]):
+                        break
+                    mapped = map_no(current, tail.group("n"))
+                    out.append(tail.group(1) + mapped if mapped is not None else tail.group(0))
+                    end = tail.end()
+                pos = end
+            out.append(piece[pos:])
+            return "".join(out)
 
         rebuilt = []
         current: Optional[str] = None
@@ -844,7 +934,7 @@ def dedup_trace(text: str,
                 current = found.group(1) if found else None
                 rebuilt.append(piece)
             else:
-                rebuilt.append(_STEP_REF.sub(redirect_for(current), piece or ""))
+                rebuilt.append(renumber_piece(piece or "", current))
         rewritten = "".join(rebuilt)
         pass
 
@@ -852,6 +942,7 @@ def dedup_trace(text: str,
     # renumbered, so this runs on every trace.
     rewritten = _tidy_citation_lists(rewritten)
     rewritten = _join_label_fragments(rewritten)
+    rewritten = _unbox_intermediate(rewritten)
 
     if extractor is not None and extractor(rewritten) != extractor(text):
         return text
