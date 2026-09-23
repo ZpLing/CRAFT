@@ -787,6 +787,9 @@ def _stated_in(content: str, prose: str) -> bool:
                for k in keys)
 
 
+_PLACEHOLDERS = {"", "none", "n/a", "na", "null", "?"}
+
+
 def _unbox_intermediate(text: str) -> str:
     """Every box but the last loses its box; a bare box line is dropped or made a sentence.
 
@@ -823,8 +826,10 @@ def _unbox_intermediate(text: str) -> str:
             # Nothing is dropped on a guess: a box with words in it may be a
             # unit -- \\boxed{5 \\text{ cm}} -- so it is kept unless the prose
             # states it, like any other value.
-            if content and content.lower() != "none" and not _stated_in(content, prose):
-                out.append(f"This gives ${content}$.")
+            # \\boxed{None} and \\boxed{\\text{None}} are placeholders for a step
+            # that reached no value; they go with their line either way.
+            if content and _math_key(content) not in _PLACEHOLDERS and not _stated_in(content, prose):
+                out.append(f"This gives ${content.rstrip('.,; ')}$.")
                 out.append(text[line_end:line_end + 1])   # keep the newline
             last = min(line_end + 1, len(text))
             continue
