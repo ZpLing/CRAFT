@@ -458,7 +458,11 @@ def _trim(bodies: List[str], owners: List[Optional[str]],
     for body, owner in zip(trimmed, owners):
         if owner is not None and not body.strip() and sources.get(owner):
             picks = sources[owner]
-            alias[owner] = max(set(picks), key=picks.count)
+            # Ties go to the earliest step, and deterministically: `max` over a
+            # set of strings follows Python's per-process hash order, so two
+            # exports of the same trace cited different steps.
+            alias[owner] = max(sorted(set(picks), key=lambda o: (int(o) if o.isdigit() else 0, o)),
+                               key=picks.count)
     return trimmed, alias
 
 
@@ -813,7 +817,10 @@ def _unbox_intermediate(text: str) -> str:
             prose = text[(heads[-1] if heads else 0):line_start]
             content = m.group(1).strip()
             out.append(text[last:line_start])
-            if content and content.lower() != "none" and not _stated_in(content, prose):
+            # A box holding a claim in words -- \\boxed{3x \\text{ is odd}} -- is
+            # the prose's own sentence boxed, not a value; it goes with the line.
+            if (content and content.lower() != "none" and "\\text" not in content
+                    and not _stated_in(content, prose)):
                 out.append(f"This gives ${content}$.")
                 out.append(text[line_end:line_end + 1])   # keep the newline
             last = min(line_end + 1, len(text))
