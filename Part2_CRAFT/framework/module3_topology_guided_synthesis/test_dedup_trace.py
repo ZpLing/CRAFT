@@ -13,8 +13,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from dedup_trace import (_conclusion, _repeats, _tokens,  # noqa: E402
-                         dedup_steps, dedup_trace)
+from dedup_trace import (_conclusion, _join_label_fragments,  # noqa: E402
+                         _repeats, _tokens, dedup_steps, dedup_trace)
 
 _HEAD = re.compile(r"(?m)^\s*Step\s*(\d+)\s*:")
 
@@ -101,8 +101,41 @@ UNBALANCED = """Step 1: Consider \\begin{cases} x = 1. \\\\ y = 2. \\end{cases} 
 Step 2: Consider \\begin{cases} x = 1. \\\\ y = 2. \\end{cases} and note it is finite."""
 
 
+# (closing text as written, what it must become, why). The first two came
+# apart at the sentence splitter in gpt-5.4-nano's ProofWriter traces and
+# scored as one-word sentences; the rest must not be touched.
+FRAGMENTS = [
+    ('Step 3: Therefore, the hypothesis "The cat is blue." is __PROVED__.',
+     'Step 3: Therefore, the hypothesis "The cat is blue" is __PROVED__.',
+     "a full stop inside the quoted hypothesis split `is __PROVED__.` off"),
+    ("Step 3: Therefore, the hypothesis (“The cow sees the squirrel”) is __PROVED__. __PROVED__",
+     "Step 3: Therefore, the hypothesis (“The cow sees the squirrel”) is __PROVED__.",
+     "a label echoed after the sentence that already ends on it"),
+    ("Step 3: Therefore, the hypothesis “The bear sees the bear” is __PROVED__.\n\n__PROVED__",
+     "Step 3: Therefore, the hypothesis “The bear sees the bear” is __PROVED__.",
+     "the same echo on a line of its own"),
+    ("Step 3: X is __DISPROVED__.\nFinal Conclusion: __DISPROVED__.",
+     "Step 3: X is __DISPROVED__.\nFinal Conclusion: __DISPROVED__.",
+     "a trailer that names the label is a sentence, not an echo"),
+    ("Step 3: the hypothesis “The cat is blue.” It follows.",
+     "Step 3: the hypothesis “The cat is blue.” It follows.",
+     "a quoted sentence that ends the sentence keeps its stop"),
+    ("Step 3: X is __PROVED__. __DISPROVED__",
+     "Step 3: X is __PROVED__. __DISPROVED__",
+     "a different label after the sentence is not an echo, and stays for the reader"),
+]
+
+
 def main() -> int:
     failures = 0
+    for text, expected, why in FRAGMENTS:
+        got = _join_label_fragments(text)
+        if got != expected:
+            failures += 1
+            print(f"FAIL  got {got!r}: {why}")
+        else:
+            print(f"ok    {'joins' if got != text else 'keeps':<5}  {why}")
+
     for later, earlier, expected, why in CASES:
         got = _repeats(later, earlier, _tokens(later), _tokens(earlier), 0.75)
         if got != expected:

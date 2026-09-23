@@ -688,6 +688,26 @@ def _tidy_citation_lists(text: str) -> str:
     return _CITE_RUN.sub(fix, text)
 
 
+# Two ways a closing line comes apart at the sentence splitter, both from
+# gpt-5.4-nano's ProofWriter traces. A hypothesis quoted with its own full
+# stop -- `the hypothesis "The cat is blue." is __PROVED__.` -- splits after
+# the quote, leaving `is __PROVED__.` as a sentence on its own; and a label
+# written once more after the sentence that already ends on it --
+# `... is __PROVED__. __PROVED__` -- leaves a one-word sentence. Both
+# fragments score as sentences: they align with nothing in the problem and
+# read as ungrammatical. Neither rewrite touches which label comes last.
+_QUOTED_STOP = re.compile(
+    r'([“"][^”"\n]{3,240}?)([.!?])([”"])(?=\s+(?:is|are|was|were|holds|follows|must|cannot|does|do)\b)')
+_LABEL_ECHO = re.compile(
+    r"(?P<lab>__(?:DIS)?PROVED__)(?P<punct>[.!]?)\s*(?:\n\s*)*(?:is\s+)?(?P=lab)[.!]?\s*$")
+
+
+def _join_label_fragments(text: str) -> str:
+    text = _QUOTED_STOP.sub(r"\1\3", text)
+    return _LABEL_ECHO.sub(lambda m: m.group("lab") + (m.group("punct") or "."),
+                           text.rstrip())
+
+
 def _resolve(alias: Dict[str, str]) -> Dict[str, str]:
     """Follow a chain of dropped steps back to the one that still exists."""
     out: Dict[str, str] = {}
@@ -831,6 +851,7 @@ def dedup_trace(text: str,
     # A run of citations can name one step twice whether or not anything was
     # renumbered, so this runs on every trace.
     rewritten = _tidy_citation_lists(rewritten)
+    rewritten = _join_label_fragments(rewritten)
 
     if extractor is not None and extractor(rewritten) != extractor(text):
         return text

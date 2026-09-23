@@ -103,6 +103,116 @@ _BY_ABSENCE = re.compile(
 
 _REACHED_RE = re.compile(r"REACHED:\s*(HYPOTHESIS|NEGATION|NEITHER)", re.IGNORECASE)
 
+# What a pass appends when it changes an answer, and the step heads of the
+# trace it appends to.
+_HEADER_RE = re.compile(
+    r"\n*\[(?:Directed proof search|Two-sided proof search|Derivation audit"
+    r"|Premise-by-premise check)\]\n")
+_STEP_HEAD = re.compile(r"(?m)^\s*\**\s*Step\s*(\d+)\s*\**\s*[:.\-]\s*")
+_STEP_REF = re.compile(r"\bStep\s*\d+\b")
+
+
+def split_recheck(trace: str):
+    """(claimed, header, body) for a trace that carries an appended pass, else None."""
+    m = _HEADER_RE.search(trace or "")
+    if not m:
+        return None
+    return trace[:m.start()].rstrip(), m.group(0).strip(), trace[m.end():].strip()
+
+
+def cut_before_label(claimed: str, old_label: Optional[str]):
+    """Drop the step that carries the answer being replaced.
+
+    Returns (kept, next_step_number). The step is cut from its head, so a
+    derivation it also contained goes with it; the rewrite below sees the
+    whole trace and re-derives what the chain still needs.
+    """
+    heads = list(_STEP_HEAD.finditer(claimed))
+    if not old_label or not heads:
+        return claimed.rstrip(), len(heads) + 1
+    pos = claimed.rfind(old_label)
+    if pos < 0:
+        return claimed.rstrip(), len(heads) + 1
+    before = [h for h in heads if h.start() <= pos]
+    if not before:
+        return claimed.rstrip(), len(heads) + 1
+    cut = before[-1]
+    return claimed[:cut.start()].rstrip(), int(cut.group(1))
+
+
+def build_integrate_prompt(problem: str, kept: str, chain: str, want: str,
+                           reached: Optional[str], next_no: int) -> str:
+    """Write the chain a pass found as steps in the trace's own format.
+
+    The pass's reply is a search transcript -- rounds, `F8`/`R19` shorthand,
+    bullets, a formalised copy of the premises -- and pasting it under a
+    header leaves a trace whose last step says one label and whose appendix
+    says the other. The chain is what the flip was accepted on; this asks for
+    the same chain written as the steps that continue the trace, and the
+    caller accepts the rewrite only if it keeps the label and cites what it
+    chained, exactly the gate the flip itself passed.
+    """
+    what = ("the negation of the hypothesis" if reached == "NEGATION"
+            else "the hypothesis")
+    close = (f'Step M: Since Step M-1 established that <{what}, written out as a '
+             f'statement>, the hypothesis "<hypothesis as written>" is {want}.')
+    return (
+        "You are finishing one closed-world deduction trace.\n\n"
+        f"{problem}\n\n"
+        "The trace so far:\n"
+        f"{kept}\n\n"
+        "Its next step had reasoned from the absence of a derivation and reached "
+        "the wrong answer. A second search then found the derivation below; these "
+        "are the searcher's own notes, in its own shorthand:\n"
+        f"{chain}\n\n"
+        f"Rewrite that derivation as the steps that continue the trace, numbered "
+        f"from Step {next_no}. Write each step on its own line in exactly the "
+        "trace's format:\n"
+        "  Step N: According to Fact X, <that fact or rule as written in the "
+        "problem>. Since <what it is applied to, citing Fact numbers or earlier "
+        "Steps>, it follows that <the derived statement>.\n"
+        "Use the problem's own numbering and wording. Do not use shorthand such as "
+        "F1 or R8, arrows, bullets, rounds or headings, and do not restate a "
+        "statement the trace already derived -- cite the Step that derived it. "
+        "Include only the steps the chain actually needs. End with one line:\n"
+        f"  {close}\n"
+        "Output the steps only."
+    )
+
+
+async def integrate_chain(session, problem: str, claimed: str, chain: str,
+                          want: str, reached: Optional[str], before: Optional[str],
+                          model: str):
+    """(trace with the chain written into it, None), or (None, why) to keep the appendix.
+
+    Accepted only when the rewrite is steps, ends on the pass's label and
+    nothing else, and cites at least as many premises as the flip required.
+    Anything short of that keeps the appended form, so the answer read back
+    off the trace is the pass's answer either way.
+    """
+    kept, next_no = cut_before_label(claimed, before if before != want else None)
+    prompt = build_integrate_prompt(problem, kept, chain, want, reached, next_no)
+    try:
+        reply = (await generate_reasoning_trace(session, prompt, model) or "").strip()
+    except Exception as exc:
+        return None, f"error: {str(exc)[:120]}"
+    reply = _HEADER_RE.sub("\n", reply).strip()
+    labels = {f"__{h.upper().strip('_')}__" for h in LABEL_RE.findall(reply)}
+    if not _STEP_HEAD.search(reply):
+        return None, "no steps"
+    if labels != {want} or reply.count(want) != 1:
+        return None, f"labels {sorted(labels)} x{reply.count(want)}"
+    if not reply.rstrip().rstrip(".").endswith(want):
+        return None, "label not last"
+    # A continuation grounds on the trace as much as on the problem, so a
+    # reference to an earlier Step counts alongside a Fact; the heads that
+    # number the new steps do not.
+    refs = (len(CITE_RE.findall(reply)) + len(_STEP_REF.findall(reply))
+            - len(_STEP_HEAD.findall(reply)))
+    if refs < MIN_CITATIONS:
+        return None, "uncited"
+    return kept + "\n" + reply, None
+
 
 def justified_by_absence(text: str) -> bool:
     """Does the trace end by reporting a failed search instead of a derivation?"""
@@ -284,7 +394,7 @@ def build_direct_prompt(problem: str) -> str:
 
 
 async def recheck_one(session, sem, rec, problem, depth, model,
-                      direction="prove") -> Dict[str, Any]:
+                      direction="prove", integrate=True) -> Dict[str, Any]:
     claimed = rec.get("synthesized_trace") or ""
     prompt = {"prove": lambda: build_prompt(problem, depth),
               "audit": lambda: build_audit_prompt(problem, claimed),
@@ -343,7 +453,44 @@ async def recheck_one(session, sem, rec, problem, depth, model,
             # The answer is read back off the trace, so a reply that stated its
             # result only as a marker has to leave the label behind in writing.
             body += f"\n\n{want}"
-        out["synthesized_trace"] = claimed.rstrip() + f"\n\n{header}\n" + body
+        # The chain is kept in the record; the trace gets it written as steps
+        # when the rewrite passes the gate, and the appended form otherwise.
+        note["chain"] = body
+        integrated, why = None, "off"
+        if integrate:
+            async with sem:
+                integrated, why = await integrate_chain(
+                    session, problem, claimed, body, want, note.get("reached"),
+                    last_label(claimed), model)
+        note["integrated"] = integrated is not None
+        if why:
+            note["integrate_rejected"] = why
+        out["synthesized_trace"] = (integrated if integrated is not None
+                                    else claimed.rstrip() + f"\n\n{header}\n" + body)
+    return out
+
+
+async def integrate_one(session, sem, rec, problem, model) -> Dict[str, Any]:
+    """Rewrite an already-appended pass into steps; for files a pass wrote earlier."""
+    parts = split_recheck(rec.get("synthesized_trace") or "")
+    if parts is None:
+        return rec
+    claimed, _header, body = parts
+    want = last_label(body)
+    if want is None:
+        return rec
+    note = dict(rec.get("cwa_recheck") or {})
+    async with sem:
+        integrated, why = await integrate_chain(
+            session, problem, claimed, body, want, note.get("reached"),
+            last_label(claimed), model)
+    out = dict(rec)
+    note.update({"chain": body, "integrated": integrated is not None})
+    if why:
+        note["integrate_rejected"] = why
+    out["cwa_recheck"] = note
+    if integrated is not None:
+        out["synthesized_trace"] = integrated
     return out
 
 
@@ -355,6 +502,28 @@ async def main_async(args) -> None:
     kraw = json.loads(Path(_cfg.resolve_input(args.k_traces)).read_text(encoding="utf-8"))
     krows = kraw.get("results", kraw) if isinstance(kraw, dict) else kraw
     problems = {r["sample_id"]: r.get("problem_text") or "" for r in krows}
+
+    if args.integrate_only:
+        targets = [r for r in rows if split_recheck(r.get("synthesized_trace") or "")]
+        print(f"  {len(rows)} samples, {len(targets)} carry an appended pass — "
+              f"writing those chains as steps")
+        sem = asyncio.Semaphore(args.concurrency)
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=600)) as session:
+            done = await asyncio.gather(*[
+                integrate_one(session, sem, r, problems.get(r["sample_id"], ""), args.model)
+                for r in targets])
+        by_id = {r["sample_id"]: r for r in done}
+        merged = [by_id.get(r["sample_id"], r) for r in rows]
+        n_int = sum(1 for r in done if r["cwa_recheck"].get("integrated"))
+        same = sum(1 for r, t in zip(done, targets)
+                   if last_label(r["synthesized_trace"]) == last_label(t["synthesized_trace"]))
+        print(f"  written as steps: {n_int}   kept appended: {len(done) - n_int}   "
+              f"labels unchanged: {same}/{len(done)}")
+        out = Path(_cfg.resolve_output(args.output))
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(merged, indent=1), encoding="utf-8")
+        print(f"  Saved: {out}")
+        return
 
     if args.direction == "direct":
         targets = list(rows)
@@ -376,12 +545,17 @@ async def main_async(args) -> None:
     async with aiohttp.ClientSession(timeout=timeout) as session:
         done = await asyncio.gather(*[
             recheck_one(session, sem, r, problems.get(r["sample_id"], ""),
-                        args.expected_depth, args.model, args.direction)
+                        args.expected_depth, args.model, args.direction,
+                        integrate=not args.keep_appendix)
             for r in targets])
 
     by_id = {r["sample_id"]: r for r in done}
     merged = [by_id.get(r["sample_id"], r) for r in rows]
     n_flip = sum(1 for r in done if r["cwa_recheck"]["flipped"])
+    n_int = sum(1 for r in done if r["cwa_recheck"].get("integrated"))
+    if n_flip:
+        print(f"  chains written as steps: {n_int} of {n_flip} "
+              f"(the rest keep the appended form)")
     if args.direction in ("resolve", "direct"):
         acc = sum(1 for r in done if r["cwa_recheck"].get("accepted"))
         nei = sum(1 for r in done if r["cwa_recheck"].get("reached") == "NEITHER")
@@ -413,6 +587,12 @@ def main() -> None:
                          "whichever label that produced, and searches both "
                          "directions. Chosen per configuration from where that "
                          "configuration's errors actually are")
+    ap.add_argument("--keep_appendix", action="store_true",
+                    help="Append the pass's reply under a header, as earlier runs "
+                         "did, instead of writing the chain it found as steps")
+    ap.add_argument("--integrate_only", action="store_true",
+                    help="Take a file an earlier run wrote with appended replies and "
+                         "write those chains as steps; no new search is made")
     ap.add_argument("--model", required=True)
     ap.add_argument("--api_key", default=None)
     ap.add_argument("--base_url", default=None)
