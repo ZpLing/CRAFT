@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "ProofWriter",
+  "setting": "w/o CRAFT",
+  "source_file": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano/zero_shot_from_cot.json",
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano",
+  "accuracy": 84.6,
+  "macro_f1": 0.8424,
+  "avg_steps": 22.9,
+  "n_samples": 500,
+  "full_accuracy": 97.2,
+  "delta": -12.6
+}

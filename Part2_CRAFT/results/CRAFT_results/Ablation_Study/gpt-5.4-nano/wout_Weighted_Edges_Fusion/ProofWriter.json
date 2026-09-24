@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "ProofWriter",
+  "setting": "w/o Weighted Edges Fusion",
+  "source_file": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano/abl_lam0_resolve.json",
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano",
+  "accuracy": 97.2,
+  "macro_f1": 0.972,
+  "avg_steps": 9.98,
+  "n_samples": 500,
+  "full_accuracy": 97.2,
+  "delta": 0.0
+}

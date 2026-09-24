@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "ProofWriter",
+  "setting": "w/o RKG",
+  "source_file": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano/synth_wo_rkg.json",
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano",
+  "accuracy": 91.0,
+  "macro_f1": 0.9099,
+  "avg_steps": 9.28,
+  "n_samples": 500,
+  "full_accuracy": 97.2,
+  "delta": -6.2
+}

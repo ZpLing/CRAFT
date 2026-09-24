@@ -1,0 +1,13 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "dataset": "ProofWriter",
+  "setting": "CRAFT (full)",
+  "source_file": "results/craft_runs/full500/ProofWriter_gd/synth_cwa_resolve.json",
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gd",
+  "accuracy": 87.4,
+  "macro_f1": 0.8737,
+  "avg_steps": 8.88,
+  "n_samples": 500,
+  "full_accuracy": 87.4,
+  "delta": null
+}

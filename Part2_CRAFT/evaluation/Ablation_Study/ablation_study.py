@@ -11,6 +11,9 @@ ablation_study.py — the ablation table of §4, one row per removed component.
     w/o Filter & Synthesis       the filter and Module III  vote over the raw K traces
     w/o Weighted Edges Fusion    the lambda term in W(e)    build_rkg --edge_lambda 0
     Embedding Cosine Similarity  Jaccard in the edge weight an embedding-similarity run
+    w/o Rollout (K=1)            the other K-1 traces       the pipeline run on one trace
+    w/o Steps Filtering          Module I's z-score filter  steps_filter --z_score_threshold -1000
+    w/o Edge & Node Filtering    Module II's thresholds     build_rkg --consensus_threshold 0 --node_threshold 0
 
 Scoring is not reimplemented here: the rows are read with the same loaders and
 scored with the same metric as the main table, so an ablation row and a main-table
@@ -34,18 +37,24 @@ read a \\boxed{}. Samples the CRAFT run does not cover are dropped, and samples
 it covers that the baseline is missing are reported rather than silently
 shortening the row. --zero_shot takes a file already in that shape instead.
 
+The results are laid out the way the table reads: one folder per backbone, one
+folder per setting inside it, and in that folder one file per dataset,
+CRAFT_results/Ablation_Study/<model>/<setting>/<dataset>.json, each carrying the
+row's score, the file it was scored from and its change from the full pipeline.
+A setting that was not run on a dataset simply has no file there.
+
 Usage:
     python ablation_study.py --craft_dir craft_runs/olympiad_gemini \\
         --variant "w/o RKG=craft_runs/olympiad_gemini/synthesized_step_by_step.json" \\
         --variant "w/o Weighted Edges Fusion=craft_runs/olympiad_gemini_lam0/synthesized.json" \\
-        --baseline_cot results/baseline_results/gemini-3.1-flash-lite/cot/traces.jsonl \\
-        --output ablation/olympiad_gemini.json
+        --baseline_cot results/baseline_results/gemini-3.1-flash-lite/cot/traces.jsonl
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -65,9 +74,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]
 from evaluate_accuracy import LOADERS, compute_metrics
 
 FULL = "CRAFT (full)"
-VARIANT_ROWS = ("w/o RKG", "w/o Weighted Edges Fusion", "Embedding Cosine Similarity")
-ROW_ORDER = (FULL, "w/o CRAFT", "w/o RKG", "w/o Synthesis", "w/o Filter & Synthesis",
+ROLLOUT = "w/o Rollout (K=1)"
+VARIANT_ROWS = ("w/o RKG", "w/o Weighted Edges Fusion", "Embedding Cosine Similarity",
+                ROLLOUT, "w/o Steps Filtering", "w/o Edge & Node Filtering")
+# The single-trace row used to be called "w/o Consensus"; the old name is still accepted.
+ALIASES = {"w/o Consensus (K=1)": ROLLOUT}
+ROW_ORDER = (FULL, "w/o CRAFT", ROLLOUT, "w/o Steps Filtering", "w/o RKG",
+             "w/o Edge & Node Filtering", "w/o Synthesis", "w/o Filter & Synthesis",
              "w/o Weighted Edges Fusion", "Embedding Cosine Similarity")
+
+
+def slug(setting: str) -> str:
+    """A setting's folder name: 'w/o Edge & Node Filtering' -> 'wout_Edge_and_Node_Filtering'."""
+    s = setting.replace("w/o", "wout").replace("&", "and").replace("=", "")
+    return re.sub(r"[^A-Za-z0-9]+", "_", s).strip("_")
 
 
 def find_one(run_dir: Path, pattern: str) -> Optional[Path]:
@@ -165,10 +185,16 @@ def main() -> None:
                     help=f"Synthesis output for one of: {', '.join(VARIANT_ROWS)}. Repeatable")
     ap.add_argument("--synth_file", default=None,
                     help="The full run's synthesis output (default: synthesized*.json in --craft_dir)")
+    ap.add_argument("--dataset", default=None,
+                    help="The dataset's name in the file names (default: the run "
+                         "directory's name up to its first underscore)")
     ap.add_argument("--output", default=None,
-                    help="Write the table as JSON here. Default: "
-                         "CRAFT_results/Ablation_Study/<model>/ablation_study.json under the results "
-                         "root, with the model read from the run's own metadata")
+                    help="Root of the ablation results, default CRAFT_results/Ablation_Study "
+                         "under the results root; each row is written to "
+                         "<root>/<model>/<setting>/<dataset>.json with the model read from "
+                         "the run's own metadata. The old per-dataset file "
+                         "<root>/<model>/<dataset>.json is also accepted here and read as "
+                         "that root, model and dataset")
     args = ap.parse_args()
 
     run_dir = Path(resolve_input(args.craft_dir))
@@ -186,8 +212,10 @@ def main() -> None:
         FULL: score(synth_path, "synthesized"),
         "w/o Filter & Synthesis": score(k_path, "k_traces"),
     }
+    sources: Dict[str, Path] = {FULL: synth_path, "w/o Filter & Synthesis": k_path}
     if cleaned_path:
         rows["w/o Synthesis"] = score(cleaned_path, "cleaned")
+        sources["w/o Synthesis"] = cleaned_path
     if args.baseline_cot:
         # Not zero_shot.json: several runs already carry a file by that name,
         # and a default that silently overwrites one of a run's own inputs is a
@@ -197,18 +225,23 @@ def main() -> None:
         missing = build_zero_shot(Path(resolve_input(args.baseline_cot)),
                                   synth_path, zs_path)
         rows["w/o CRAFT"] = score(zs_path, "synthesized")
+        sources["w/o CRAFT"] = zs_path
         if missing:
             print(f"  w/o CRAFT: {len(missing)} of the run's samples are absent from "
                   f"the baseline and are left out of that row: {missing[:5]}")
     elif args.zero_shot:
-        rows["w/o CRAFT"] = score(Path(resolve_input(args.zero_shot)), "synthesized")
+        sources["w/o CRAFT"] = Path(resolve_input(args.zero_shot))
+        rows["w/o CRAFT"] = score(sources["w/o CRAFT"], "synthesized")
     for spec in args.variant:
         if "=" not in spec:
             raise SystemExit(f"--variant takes NAME=PATH, got {spec!r}")
-        name, raw = (s.strip() for s in spec.split("=", 1))
+        # Split on the last "=" so a variant name may itself contain one ("w/o Rollout (K=1)").
+        name, raw = (s.strip() for s in spec.rsplit("=", 1))
+        name = ALIASES.get(name, name)
         if name not in VARIANT_ROWS:
             raise SystemExit(f"Unknown variant {name!r}; expected one of {VARIANT_ROWS}")
-        rows[name] = score(Path(resolve_input(raw)), "synthesized")
+        sources[name] = Path(resolve_input(raw))
+        rows[name] = score(sources[name], "synthesized")
 
     full_acc = rows[FULL]["accuracy"]
     print()
@@ -233,16 +266,24 @@ def main() -> None:
         print("  w/o CRAFT: pass --baseline_cot (or --zero_shot).")
 
     model = run_model(synth_path, k_path)
-    out = Path(resolve_output(args.output
-                              or f"CRAFT_results/Ablation_Study/{model}/ablation_study.json"))
-    out.write_text(json.dumps(
-        {"craft_dir": rel(run_dir), "full_accuracy": full_acc,
-         "settings": {n: {**rows[n],
-                          "delta": None if n == FULL
-                          else round(rows[n]["accuracy"] - full_acc, 1)}
-                      for n in ROW_ORDER if n in rows},
-         "not_run": absent}, indent=2), encoding="utf-8")
-    print(f"  Saved: {out}")
+    dataset = args.dataset or run_dir.name.split("_")[0]
+    root = Path(resolve_output(args.output or "CRAFT_results/Ablation_Study"))
+    if root.suffix == ".json":
+        # The old per-dataset file <root>/<model>/<dataset>.json names all three.
+        dataset, model, root = root.stem, root.parent.name, root.parent.parent
+    for name in ROW_ORDER:
+        if name not in rows:
+            continue
+        out = root / model / slug(name) / f"{dataset}.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(
+            {"model": model, "dataset": dataset, "setting": name,
+             "source_file": rel(sources[name]), "craft_dir": rel(run_dir),
+             **rows[name], "full_accuracy": full_acc,
+             "delta": None if name == FULL else round(rows[name]["accuracy"] - full_acc, 1)},
+            indent=2), encoding="utf-8")
+    print(f"  Saved: {root / model}/<setting>/{dataset}.json for "
+          f"{sum(n in rows for n in ROW_ORDER)} settings")
 
 
 if __name__ == "__main__":

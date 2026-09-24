@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "FLD",
+  "setting": "w/o Filter & Synthesis",
+  "source_file": "results/craft_runs/full500/FLD_gpt-5.4-nano/k_traces_500_samples.json",
+  "craft_dir": "results/craft_runs/full500/FLD_gpt-5.4-nano",
+  "accuracy": 82.0,
+  "macro_f1": 0.828,
+  "avg_steps": 8.44,
+  "n_samples": 500,
+  "full_accuracy": 82.8,
+  "delta": -0.8
+}

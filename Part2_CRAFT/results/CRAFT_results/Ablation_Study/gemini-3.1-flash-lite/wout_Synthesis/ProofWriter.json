@@ -1,0 +1,13 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "dataset": "ProofWriter",
+  "setting": "w/o Synthesis",
+  "source_file": "results/craft_runs/full500/ProofWriter_gd/cleaned.json",
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gd",
+  "accuracy": 59.2,
+  "macro_f1": 0.5894,
+  "avg_steps": 6.18,
+  "n_samples": 500,
+  "full_accuracy": 87.4,
+  "delta": -28.2
+}

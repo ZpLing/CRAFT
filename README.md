@@ -176,7 +176,7 @@ framework of §3.2.
 │           ├── reasoning_traces_quality/
 │           │   ├── ROSCOE/<model>/
 │           │   └── SFT/
-│           ├── Ablation_Study/<model>/
+│           ├── Ablation_Study/<model>/<setting>/
 │           ├── Graph_Construction_Noise/<model>/
 │           └── other_results/
 └── config.py

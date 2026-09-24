@@ -1,0 +1,13 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "dataset": "ProofWriter",
+  "setting": "w/o Weighted Edges Fusion",
+  "source_file": "results/craft_runs/full500/ProofWriter_gd/abl_lam0_resolve.json",
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gd",
+  "accuracy": 84.2,
+  "macro_f1": 0.8418,
+  "avg_steps": 8.85,
+  "n_samples": 500,
+  "full_accuracy": 87.4,
+  "delta": -3.2
+}

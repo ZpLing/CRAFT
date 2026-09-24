@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "OmniMATH",
+  "setting": "w/o RKG",
+  "source_file": "results/craft_runs/full500/OmniMATH_gpt-5.4-nano/synth_wo_rkg.json",
+  "craft_dir": "results/craft_runs/full500/OmniMATH_gpt-5.4-nano",
+  "accuracy": 45.3,
+  "macro_f1": null,
+  "avg_steps": 9.39,
+  "n_samples": 492,
+  "full_accuracy": 54.9,
+  "delta": -9.6
+}

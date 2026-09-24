@@ -1,0 +1,13 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "dataset": "FLD",
+  "setting": "w/o CRAFT",
+  "source_file": "results/craft_runs/full500/FLD_gemini-3.1-flash-lite/zero_shot_from_cot.json",
+  "craft_dir": "results/craft_runs/full500/FLD_gemini-3.1-flash-lite",
+  "accuracy": 86.8,
+  "macro_f1": 0.875,
+  "avg_steps": 12.86,
+  "n_samples": 500,
+  "full_accuracy": 89.5,
+  "delta": -2.7
+}

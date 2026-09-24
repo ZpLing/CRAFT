@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "FLD",
+  "setting": "w/o RKG",
+  "source_file": "results/craft_runs/full500/FLD_gpt-5.4-nano/f_wo_rkg.json",
+  "craft_dir": "results/craft_runs/full500/FLD_gpt-5.4-nano",
+  "accuracy": 79.4,
+  "macro_f1": 0.7925,
+  "avg_steps": 9.43,
+  "n_samples": 495,
+  "full_accuracy": 82.8,
+  "delta": -3.4
+}
