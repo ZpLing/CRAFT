@@ -34,13 +34,15 @@ import numpy as np
 try:
     import sympy
     from sympy.parsing.sympy_parser import (
-        parse_expr, standard_transformations, implicit_multiplication,
+        parse_expr, standard_transformations, implicit_multiplication, convert_xor,
     )
     # implicit_multiplication, NOT implicit_multiplication_application. The "application"
     # half rewrites "sin x" as "sin(x)", inserting a call that was never in the text -- so
     # "chr 97" evaluated to 'a' and "open 1" opened file descriptor 1 and closed stdout,
     # neither of which any check on the token stream can see. Only 3p -> 3*p is wanted here.
-    _SYMPY_TRANSFORMS = standard_transformations + (implicit_multiplication,)
+    # convert_xor: without it SymPy reads a^b as bitwise XOR, so "3^0 = 1" (3 xor 0 = 3) and
+    # "5^2 = 25" (7) came back as false arithmetic and the math check deleted correct steps.
+    _SYMPY_TRANSFORMS = standard_transformations + (implicit_multiplication, convert_xor)
     # A namespace holding SymPy's names and nothing else. eval() inserts __builtins__ when
     # the globals lack it, so it is set empty rather than left out, and a bare builtin name
     # resolves to a Symbol instead of the function object.
@@ -258,6 +260,13 @@ _CALLABLE_NAMES = frozenset(name for name in {
 # SymPy does hold, strings and keywords open other grammar, and a length cap bounds the work
 # a single expression can ask for.
 _MAX_EXPR_LEN = 200
+# A power is evaluated, so its size must be bounded: "9^9^9^9" or "10**10**6" would ask SymPy
+# for a number with billions of digits. An exponent must be a plain integer literal of at most
+# _MAX_EXPONENT (optionally negated), a power may not be raised again, and a parenthesized
+# group may not be raised at all. Anything else is
+# refused and the equation goes unjudged, which leaves the step to the z-score.
+_MAX_EXPONENT = 64
+_POWER_OPS = frozenset({'**', '^'})
 _ARITHMETIC_OPS = frozenset({'+', '-', '*', '/', '**', '^', '(', ')'})
 _SKIPPABLE_TOKENS = frozenset({
     tokenize.NEWLINE, tokenize.NL, tokenize.ENDMARKER, tokenize.INDENT, tokenize.DEDENT,
@@ -272,6 +281,24 @@ def _is_pure_arithmetic(expr: str) -> bool:
         tokens = list(tokenize.generate_tokens(io.StringIO(expr).readline))
     except Exception:
         return False
+    significant = [t for t in tokens if t.type not in _SKIPPABLE_TOKENS]
+    for i, token in enumerate(significant):
+        if token.type == tokenize.OP and token.string in _POWER_OPS:
+            if i > 0 and significant[i - 1].string == ')':
+                return False          # (…)^n: nested groups would build a tower again
+            j = i + 1
+            if j < len(significant) and significant[j].string in ('-', '+'):
+                j += 1
+            if j >= len(significant) or significant[j].type != tokenize.NUMBER:
+                return False          # exponent is an expression, a name or missing
+            try:
+                if abs(float(significant[j].string)) > _MAX_EXPONENT:
+                    return False
+            except ValueError:
+                return False
+            k = j + 1
+            if k < len(significant) and significant[k].string in _POWER_OPS:
+                return False          # a tower: a**b**c
     previous_name = None
     for token in tokens:
         if token.type in _SKIPPABLE_TOKENS:
