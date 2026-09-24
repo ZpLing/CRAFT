@@ -8,7 +8,6 @@ ablation_study.py — the ablation table of §4, one row per removed component.
     w/o CRAFT                    the whole pipeline         a single-call run
     w/o RKG                      Module II's graph          --synthesis_strategy step_by_step
     w/o Synthesis                Module III                 vote over the cleaned traces
-    w/o Filter & Synthesis       the filter and Module III  vote over the raw K traces
     w/o Weighted Edges Fusion    the lambda term in W(e)    build_rkg --edge_lambda 0
     Embedding Cosine Similarity  Jaccard in the edge weight an embedding-similarity run
     w/o Rollout (K=1)            the other K-1 traces       the pipeline run on one trace
@@ -17,10 +16,10 @@ ablation_study.py — the ablation table of §4, one row per removed component.
 
 Scoring is not reimplemented here: the rows are read with the same loaders and
 scored with the same metric as the main table, so an ablation row and a main-table
-cell can never disagree about what a run achieved. That also keeps the two vote
-rows honest — the filtered file re-derives each trace's prediction from the text
+cell can never disagree about what a run achieved. That also keeps the vote
+row honest — the filtered file re-derives each trace's prediction from the text
 that survived filtering, rather than reusing the label generation stored, which is
-what makes "w/o Synthesis" differ from "w/o Filter & Synthesis" at all.
+what makes "w/o Synthesis" a measurement of the filter's output.
 
 Three settings need their own run and are passed in with --variant NAME=PATH.
 Settings that were not run are printed as absent, so a partial table cannot be
@@ -80,7 +79,7 @@ VARIANT_ROWS = ("w/o RKG", "w/o Weighted Edges Fusion", "Embedding Cosine Simila
 # The single-trace row used to be called "w/o Consensus"; the old name is still accepted.
 ALIASES = {"w/o Consensus (K=1)": ROLLOUT}
 ROW_ORDER = (FULL, "w/o CRAFT", ROLLOUT, "w/o Steps Filtering", "w/o RKG",
-             "w/o Edge & Node Filtering", "w/o Synthesis", "w/o Filter & Synthesis",
+             "w/o Edge & Node Filtering", "w/o Synthesis",
              "w/o Weighted Edges Fusion", "Embedding Cosine Similarity")
 
 
@@ -208,11 +207,8 @@ def main() -> None:
     cleaned_path = (find_one(run_dir, "cleaned_traces_rkg.json")
                     or find_one(run_dir, "cleaned*.json"))
 
-    rows: Dict[str, Dict[str, Any]] = {
-        FULL: score(synth_path, "synthesized"),
-        "w/o Filter & Synthesis": score(k_path, "k_traces"),
-    }
-    sources: Dict[str, Path] = {FULL: synth_path, "w/o Filter & Synthesis": k_path}
+    rows: Dict[str, Dict[str, Any]] = {FULL: score(synth_path, "synthesized")}
+    sources: Dict[str, Path] = {FULL: synth_path}
     if cleaned_path:
         rows["w/o Synthesis"] = score(cleaned_path, "cleaned")
         sources["w/o Synthesis"] = cleaned_path
