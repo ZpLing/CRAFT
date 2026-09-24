@@ -104,6 +104,32 @@ def rel(path: Path) -> str:
         return str(path)
 
 
+def baseline_row(results_json: Path, dataset: str) -> Dict[str, Any]:
+    """'w/o CRAFT' as the baselines report it.
+
+    The row is the zero-shot CoT baseline of the main table, read from that
+    run's own results.json: its per-dataset accuracy, F1, step count and
+    denominator are taken as written, so the ablation and the main table show
+    the same number for the same run. The run's stored predictions become the
+    per-sample records the paired change is computed from.
+    """
+    raw = json.loads(results_json.read_text(encoding="utf-8"))
+    per = (raw.get("overall") or {}).get("per_dataset") or raw.get("per_dataset") or {}
+    m = per.get(dataset) or per.get(f"{dataset}.json")
+    if m is None:
+        raise SystemExit(f"{results_json} has no per-dataset entry for {dataset!r}; has {sorted(per)}")
+    samples = [{"sample_id": r.get("sample_id", ""), "source_dataset": r.get("source_dataset"),
+                "ground_truth": r.get("ground_truth"), "predicted": r.get("predicted"),
+                "domain": r.get("domain") or ("math" if m.get("domain") == "math" else "logical"),
+                "traces": []}
+               for r in raw.get("predictions", []) if r.get("source_dataset") == dataset]
+    return {"accuracy": round(100.0 * m["accuracy"], 1),
+            "macro_f1": m.get("macro_f1"),
+            "avg_steps": m.get("avg_steps"),
+            "n_samples": m.get("n_total"),
+            "_samples": samples}
+
+
 def build_zero_shot(baseline: Path, covered: Path, out: Path) -> List[str]:
     """Write the 'w/o CRAFT' row from the baseline run that already exists.
 
@@ -189,6 +215,11 @@ def main() -> None:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--craft_dir", required=True,
                     help="The full CRAFT run: k_traces, cleaned traces, synthesized trace")
+    ap.add_argument("--baseline_results", default=None,
+                    help="'w/o CRAFT' taken as the baselines' own zero-shot CoT result: the "
+                         "results.json of that run, whose per-dataset accuracy is the number "
+                         "Table 2 reports. Its predictions give the paired change. Takes "
+                         "precedence over --baseline_cot / --zero_shot")
     ap.add_argument("--baseline_cot", default=None,
                     help="'w/o CRAFT': traces.jsonl from the baselines' zero-shot CoT "
                          "setting for this model. The row is built from it, so the "
@@ -226,7 +257,11 @@ def main() -> None:
 
     rows: Dict[str, Dict[str, Any]] = {FULL: score(synth_path, "synthesized")}
     sources: Dict[str, Path] = {FULL: synth_path}
-    if args.baseline_cot:
+    if args.baseline_results:
+        bpath = Path(resolve_input(args.baseline_results))
+        rows["w/o CRAFT"] = baseline_row(bpath, args.dataset or run_dir.name.split("_")[0])
+        sources["w/o CRAFT"] = bpath
+    elif args.baseline_cot:
         # Not zero_shot.json: several runs already carry a file by that name,
         # and a default that silently overwrites one of a run's own inputs is a
         # default that loses data the first time it is used.
@@ -271,9 +306,12 @@ def main() -> None:
     absent = [n for n in ROW_ORDER if n not in rows]
     if absent:
         print("  Not run: " + ", ".join(absent))
-        print("  w/o RKG: synthesize with --synthesis_strategy step_by_step.")
-        print("  w/o Weighted Edges Fusion: build_rkg --edge_lambda 0, then synthesize.")
-        print("  w/o CRAFT: pass --baseline_cot (or --zero_shot).")
+        hints = {"w/o RKG": "synthesize with --synthesis_strategy step_by_step.",
+                 "w/o Weighted Edges Fusion": "build_rkg --edge_lambda 0, then synthesize.",
+                 "w/o CRAFT": "pass --baseline_results (or --baseline_cot / --zero_shot)."}
+        for name in absent:
+            if name in hints:
+                print(f"  {name}: {hints[name]}")
 
     model = run_model(synth_path, k_path)
     dataset = args.dataset or run_dir.name.split("_")[0]

@@ -2,7 +2,7 @@
   "model": "gemini-3.1-flash-lite",
   "dataset": "ProofWriter",
   "setting": "w/o CRAFT",
-  "source_file": "results/craft_runs/full500/ProofWriter_gd/zero_shot_from_cot.json",
+  "source_file": "results/baseline_results/gemini-3.1-flash-lite/cot/results.json",
   "craft_dir": "results/craft_runs/full500/ProofWriter_gd",
   "accuracy": 61.0,
   "macro_f1": 0.5541,
