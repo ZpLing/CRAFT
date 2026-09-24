@@ -2,16 +2,16 @@
   "model": "gemini-3.1-flash-lite",
   "dataset": "FLD",
   "setting": "w/o CRAFT",
-  "source_file": "results/baseline_results/gemini-3.1-flash-lite/cot/results.json",
+  "source_file": "results/baseline_results/gemini-3.1-flash-lite/direct/results.json",
   "craft_dir": "results/craft_runs/full500/FLD_gemini-3.1-flash-lite",
-  "accuracy": 87.5,
-  "macro_f1": 0.875,
-  "avg_steps": 12.96,
+  "accuracy": 74.8,
+  "macro_f1": 0.7471,
+  "avg_steps": 1.0,
   "n_samples": 496,
   "full_accuracy": 89.5,
-  "delta": -2.0,
+  "delta": -14.7,
   "n_common": 496,
-  "accuracy_common": 87.5,
+  "accuracy_common": 74.8,
   "full_accuracy_common": 89.5,
-  "delta_paired": -2.0
+  "delta_paired": -14.7
 }

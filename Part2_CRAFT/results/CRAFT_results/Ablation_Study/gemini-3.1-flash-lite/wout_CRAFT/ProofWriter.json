@@ -2,16 +2,16 @@
   "model": "gemini-3.1-flash-lite",
   "dataset": "ProofWriter",
   "setting": "w/o CRAFT",
-  "source_file": "results/baseline_results/gemini-3.1-flash-lite/cot/results.json",
+  "source_file": "results/baseline_results/gemini-3.1-flash-lite/direct/results.json",
   "craft_dir": "results/craft_runs/full500/ProofWriter_gd",
-  "accuracy": 61.0,
-  "macro_f1": 0.5541,
-  "avg_steps": 16.71,
+  "accuracy": 62.4,
+  "macro_f1": 0.5889,
+  "avg_steps": 1.0,
   "n_samples": 500,
   "full_accuracy": 87.4,
-  "delta": -26.4,
+  "delta": -25.0,
   "n_common": 500,
-  "accuracy_common": 61.0,
+  "accuracy_common": 62.4,
   "full_accuracy_common": 87.4,
-  "delta_paired": -26.4
+  "delta_paired": -25.0
 }
