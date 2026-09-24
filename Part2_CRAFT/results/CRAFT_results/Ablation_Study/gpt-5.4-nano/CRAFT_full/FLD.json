@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "FLD",
+  "setting": "CRAFT (full)",
+  "source_file": "results/craft_runs/full500/FLD_gpt-5.4-nano/synthesized.json",
+  "craft_dir": "results/craft_runs/full500/FLD_gpt-5.4-nano",
+  "accuracy": 82.8,
+  "macro_f1": 0.828,
+  "avg_steps": 8.96,
+  "n_samples": 495,
+  "full_accuracy": 82.8,
+  "delta": null
+}

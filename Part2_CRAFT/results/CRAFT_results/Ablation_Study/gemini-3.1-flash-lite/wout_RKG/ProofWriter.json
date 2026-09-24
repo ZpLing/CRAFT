@@ -1,0 +1,13 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "dataset": "ProofWriter",
+  "setting": "w/o RKG",
+  "source_file": "results/craft_runs/full500/ProofWriter_gd/abl_wo_rkg_resolve.json",
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gd",
+  "accuracy": 83.6,
+  "macro_f1": 0.8377,
+  "avg_steps": 9.46,
+  "n_samples": 500,
+  "full_accuracy": 87.4,
+  "delta": -3.8
+}

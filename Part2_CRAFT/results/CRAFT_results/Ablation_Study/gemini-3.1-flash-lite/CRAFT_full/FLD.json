@@ -1,0 +1,13 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "dataset": "FLD",
+  "setting": "CRAFT (full)",
+  "source_file": "results/craft_runs/full500/FLD_gemini-3.1-flash-lite/synth_prior.json",
+  "craft_dir": "results/craft_runs/full500/FLD_gemini-3.1-flash-lite",
+  "accuracy": 89.5,
+  "macro_f1": 0.8951,
+  "avg_steps": 9.22,
+  "n_samples": 496,
+  "full_accuracy": 89.5,
+  "delta": null
+}

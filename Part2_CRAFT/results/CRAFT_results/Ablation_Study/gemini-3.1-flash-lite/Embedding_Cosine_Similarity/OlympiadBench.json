@@ -1,0 +1,13 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "dataset": "OlympiadBench",
+  "setting": "Embedding Cosine Similarity",
+  "source_file": "results/craft_runs/full500/OlympiadBench_gemini-3.1-flash-lite/abl_embed_adj.json",
+  "craft_dir": "results/craft_runs/full500/OlympiadBench_gemini-3.1-flash-lite",
+  "accuracy": 75.9,
+  "macro_f1": null,
+  "avg_steps": 8.68,
+  "n_samples": 497,
+  "full_accuracy": 75.6,
+  "delta": 0.3
+}

@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "OlympiadBench",
+  "setting": "w/o Weighted Edges Fusion",
+  "source_file": "results/craft_runs/full500/OlympiadBench_gpt-5.4-nano/abl_lam0.json",
+  "craft_dir": "results/craft_runs/full500/OlympiadBench_gpt-5.4-nano",
+  "accuracy": 59.4,
+  "macro_f1": null,
+  "avg_steps": 8.31,
+  "n_samples": 428,
+  "full_accuracy": 60.6,
+  "delta": -1.2
+}
