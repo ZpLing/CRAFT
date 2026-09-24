@@ -942,7 +942,9 @@ def detect_edge_frequency_anomalies(
     threshold: float = 0.3,
 ) -> Set[str]:
     """Phase 2: Edge-frequency voting: edges in trace_rkg with frequency < threshold in consensus RKG mark dst anomalous."""
-    edge_frequencies = consensus_rkg.get("edge_frequencies", {})
+    # A graph built with --edge_rule weighted carries "edge_support" (votes weighted by
+    # W(e)); the second pass then judges an edge by the same quantity that admitted it.
+    edge_frequencies = consensus_rkg.get("edge_support") or consensus_rkg.get("edge_frequencies", {})
     anomalous: Set[str] = set()
 
     for edge in trace_rkg.get("edges", []):

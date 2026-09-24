@@ -271,13 +271,13 @@ For each reasoning step, identify which facts or EARLIER steps it DIRECTLY depen
 - A step depends on another step if it uses that step's conclusion as a premise.
 - Do NOT list a step as depending on itself.
 - If a step uses no earlier steps or facts, set "uses" to [].
-
+{confidence_rule}
 Output ONLY valid JSON with this exact structure:
 {{
   "dependencies": [
-    {{"step_id": "Step1", "uses": []}},
-    {{"step_id": "Step2", "uses": ["Fact1", "Step1"]}},
-    {{"step_id": "Step3", "uses": ["Step2"]}}
+    {{"step_id": "Step1", "uses": []{confidence_example_empty}}},
+    {{"step_id": "Step2", "uses": ["Fact1", "Step1"]{confidence_example_two}}},
+    {{"step_id": "Step3", "uses": ["Step2"]{confidence_example_one}}}
   ]
 }}
 
@@ -370,13 +370,32 @@ async def extract_rkg_edges_with_llm(
     ) or "  (no explicit facts given)"
 
     steps_block = "\n".join(
-        f"  {s['id']} (Step {s['step_number']}): {s['text'][:200]}"
+        f"  {s['id']} (Step {s['step_number']}): {s['text'][:STEP_TEXT_CHARS]}"
         for s in steps
     )
 
+    # --edge_confidence llm: the model rates each dependency it lists, so W(e)
+    # carries a judgement rather than the constant 0.9 every extracted edge got.
+    fmt = dict(
+        confidence_rule=('- For each entry also give "confidence": a list with one number in [0, 1] '
+                         'per item of "uses", how sure you are that the step really depends on it. '
+                         'Use the whole scale: 1.0 only when the step names or quotes that fact or '
+                         'step and its conclusion could not be reached without it; about 0.7 when the '
+                         'step clearly uses its content without naming it; about 0.4 when the link is '
+                         'plausible but the step would stand without it; below 0.3 when you are '
+                         'guessing.\n'),
+        confidence_example_empty=', "confidence": []',
+        confidence_example_two=', "confidence": [0.95, 0.7]',
+        confidence_example_one=', "confidence": [0.9]',
+    )
+    # legacy (pre-2026-09-23, EDGE_CONFIDENCE == "constant"): no confidence was asked for and
+    # every listed edge got 0.9 below. Kept for reference:
+    # fmt = dict(confidence_rule="", confidence_example_empty="",
+    #            confidence_example_two="", confidence_example_one="")
     prompt = _DEP_PROMPT_TEMPLATE.format(
         facts_block=facts_block,
         steps_block=steps_block,
+        **fmt,
     )
 
     try:
@@ -399,7 +418,11 @@ async def extract_rkg_edges_with_llm(
         dst_id = dep.get("step_id", "")
         if dst_id not in step_ids:
             continue
-        for src_id in dep.get("uses", []):
+        uses = dep.get("uses", []) or []
+        confs = dep.get("confidence")   # legacy: `None` when EDGE_CONFIDENCE == "constant"
+        if not (isinstance(confs, list) and len(confs) == len(uses)):
+            confs = None
+        for i, src_id in enumerate(uses):
             if src_id not in valid_src_ids or src_id == dst_id:
                 continue
             # Prevent forward references (src step_number > dst step_number)
@@ -410,7 +433,13 @@ async def extract_rkg_edges_with_llm(
             key = (src_id, dst_id)
             if key not in seen:
                 seen.add(key)
-                edges.append({"src": src_id, "dst": dst_id, "type": "uses", "confidence": 0.9})
+                conf = 0.9   # only when the model omitted the number (legacy constant)
+                if confs is not None:
+                    try:
+                        conf = min(1.0, max(0.0, float(confs[i])))
+                    except (TypeError, ValueError):
+                        conf = 0.9
+                edges.append({"src": src_id, "dst": dst_id, "type": "uses", "confidence": conf})
 
     if not edges:
         return extract_rkg_edges_regex_fallback(steps, facts), "regex_fallback"
@@ -683,6 +712,25 @@ _EMBEDDER = None
 _EMBED_CACHE: Dict[str, Any] = {}
 
 
+# How an edge is admitted to the consensus RKG (--edge_rule):
+#   "weighted" (default; Algorithm 1 of the paper): each trace's vote for an edge is
+#       its fused weight W(e) = (1-lambda)*conf + lambda*Jaccard, and the edge is kept
+#       when support(e) = sum W_S(e)*w_S / total weight >= theta. lambda and the
+#       confidence therefore decide which edges survive.
+#   "frequency" (legacy; the runs before 2026-09-23): the share of traces containing
+#       the edge must be >= theta, and W(e) is stored but never thresholded. Kept only
+#       to reproduce those runs and as the ablation's "w/o Weighted Edge Fusion".
+# Characters of each step shown to the dependency extractor. 200 (legacy) cut most
+# mathematics steps mid-equation; 500 covers a step of a few sentences.
+STEP_TEXT_CHARS = 500
+EDGE_RULE = "weighted"      # legacy value "frequency" is commented out below, not selectable
+# Where an edge's confidence comes from (--edge_confidence): "llm" (default; the paper's
+# "LLM-reported confidence") asks the model for a number in [0, 1] per dependency it
+# lists. "constant" (legacy) gave 0.9 to every listed edge and 0.6 to a regex-fallback
+# edge, which left W(e) with almost no spread (0.56-0.78 on the reported graphs).
+EDGE_CONFIDENCE = "llm"     # legacy value "constant" is commented out below, not selectable
+
+
 def _embedding_cosine_score(text_a: str, text_b: str) -> float:
     """Cosine of two sentence embeddings, in place of the term-overlap score.
 
@@ -732,8 +780,9 @@ def build_consensus_rkg(
     node_threshold: Optional[float] = None,
     term_overlap_weight: float = 0.3,   # lambda, the edge-weight balance
     proved_threshold: Optional[float] = None,
-    weight_by: str = "uniform",   # "uniform" | "step_count" | "gold_depth"
+    weight_by: str = "uniform",   # "uniform" | "step_count" | "gold_depth" | "support"
     expected_depth: Optional[int] = None,
+    trace_weights_override: Optional[Dict[int, float]] = None,
 ) -> Dict[str, Any]:
     """Equal-weight edge-frequency voting across k trace RKGs to build the Consensus RKG.
 
@@ -770,6 +819,27 @@ def build_consensus_rkg(
     #               ProofWriter slice a trace within two steps of it is right 90%
     #               of the time against 50% for one six steps over, and an equal
     #               vote spends the two the same.
+    # "support"   : weight by how well the consensus supports the trace -- the mean
+    #               W(e)-weighted support of the trace's edges once the graph has
+    #               been built with equal weights. This is where the edge weight
+    #               W(e) = (1-lambda)*conf + lambda*Jaccard reaches the vote:
+    #               Module III weights each trace's answer by these weights, so a
+    #               trace whose dependencies the other traces confirm counts more.
+    if weight_by == "support" and trace_weights_override is None:
+        first = build_consensus_rkg(trace_rkgs, consensus_threshold, node_threshold,
+                                    term_overlap_weight, proved_threshold, "uniform",
+                                    expected_depth)
+        support = first.get("edge_support") or first.get("edge_frequencies") or {}
+        derived: Dict[int, float] = {}
+        for rkg_trace in trace_rkgs:
+            keys = {f"{e['src']}->{e['dst']}" for e in rkg_trace.get("edges", [])}
+            vals = [support.get(k, 0.0) for k in keys]
+            derived[rkg_trace.get("trace_idx", 0)] = max(0.05, sum(vals) / len(vals)) if vals else 0.05
+        mean_w = sum(derived.values()) / max(len(derived), 1)
+        derived = {k: v / mean_w for k, v in derived.items()} if mean_w > 0 else derived
+        return build_consensus_rkg(trace_rkgs, consensus_threshold, node_threshold,
+                                   term_overlap_weight, proved_threshold, "uniform",
+                                   expected_depth, trace_weights_override=derived)
     trace_weights: Dict[int, float] = {}
     for rkg_trace in trace_rkgs:
         tidx = rkg_trace.get("trace_idx", 0)
@@ -777,7 +847,9 @@ def build_consensus_rkg(
                       if n.get("type") in ("step", "conclusion"))
         # gold_depth compares the trace's own length, not the graph's
         n_trace_steps = rkg_trace.get("n_trace_steps") or n_steps
-        if weight_by == "step_count":
+        if trace_weights_override is not None:
+            trace_weights[tidx] = float(trace_weights_override.get(tidx, 1.0))
+        elif weight_by == "step_count":
             # Use a small floor to avoid zero-weight on degenerate traces
             trace_weights[tidx] = float(max(n_steps, 1))
         elif weight_by == "gold_depth" and expected_depth:
@@ -934,12 +1006,21 @@ def build_consensus_rkg(
         key: round(wsum / total_weight, 4)
         for key, wsum in edge_weight_sum.items()
     }
+    # Weighted support: each trace's vote for an edge counts W_S(e) instead of 1.
+    edge_support = {
+        key: round(edge_confidence_sum[key] / total_weight, 4)
+        for key in edge_weight_sum
+    }
+    admission = edge_support
+    # legacy (pre-2026-09-23, EDGE_RULE == "frequency"): admission by the share of traces
+    # containing the edge, W(e) stored but never thresholded. Kept for reference:
+    # admission = edge_frequencies
 
     consensus_edges    = []
     consensus_node_ids: Set[str] = set()
 
     for key, freq in edge_frequencies.items():
-        if freq >= consensus_threshold:
+        if admission[key] >= consensus_threshold:
             src, dst   = key.split("->", 1)
             avg_conf   = edge_confidence_sum[key] / edge_weight_sum[key] if edge_weight_sum[key] else 0.7
             consensus_edges.append({
@@ -948,6 +1029,7 @@ def build_consensus_rkg(
                 "type":      "uses",
                 "confidence": round(avg_conf, 3),
                 "frequency":  round(freq, 3),
+                "support":    edge_support[key],
             })
             consensus_node_ids.add(src)
             consensus_node_ids.add(dst)
@@ -1004,6 +1086,9 @@ def build_consensus_rkg(
         "nodes":           consensus_nodes,
         "edges":           consensus_edges,
         "edge_frequencies": edge_frequencies,
+        # Only a weighted-rule graph publishes its support map; the second-pass filter
+        # (steps_filter --method rkg) reads it in place of the frequencies when present.
+        "edge_support": edge_support,
         "node_frequencies": {nid: round(c / n_traces, 4) for nid, c in node_trace_count.items()},
         "node_texts":      node_texts,
         "trace_weights":   trace_weights,   # uniform (all 1.0)
@@ -1222,6 +1307,8 @@ async def build_rkgs_for_dataset(
             "domain": domain,
             "consensus_threshold": consensus_threshold,
             "edge_lambda": edge_lambda,
+            "edge_rule": EDGE_RULE,
+            "edge_confidence": EDGE_CONFIDENCE,
             "node_threshold": consensus_threshold if node_threshold is None else node_threshold,
             "total_samples": len(samples),
             "successful": sum(1 for r in results if r and "error" not in r),
@@ -1434,6 +1521,15 @@ def main() -> None:
                         help="The overlap measure fused into W(e): term Jaccard "
                              "(the paper) or the cosine of all-mpnet-base-v2 "
                              "embeddings (the ablation's row)")
+    parser.add_argument("--edge_rule", choices=["weighted"], default="weighted",
+                        help="How an edge enters the consensus RKG (Algorithm 1): each trace's vote is "
+                             "weighted by W(e) = (1-lambda)*conf + lambda*Jaccard and the edge is kept when "
+                             "the weighted support is at least theta. The pre-2026-09-23 'frequency' rule "
+                             "is commented out in build_consensus_rkg and no longer selectable")
+    parser.add_argument("--edge_confidence", choices=["llm"], default="llm",
+                        help="The model states a confidence in [0, 1] for each dependency it lists (the "
+                             "paper's LLM-reported confidence). The pre-2026-09-23 constant 0.9 is "
+                             "commented out in extract_rkg_edges and no longer selectable")
     parser.add_argument("--edge_lambda", type=float, default=0.3,
                         help="Edge weight balance lambda: W(e) = (1-lambda)*LLM confidence "
                              "+ lambda*term overlap (paper: 0.3). 0 drops the fusion, which "
@@ -1450,7 +1546,7 @@ def main() -> None:
                         help="The proof depth this dataset is drawn at, for --weight_by "
                              "gold_depth. Only meaningful where the depth is a property of "
                              "the selection and not gold annotation about the sample")
-    parser.add_argument("--weight_by", choices=["uniform", "step_count", "gold_depth"],
+    parser.add_argument("--weight_by", choices=["uniform", "step_count", "gold_depth", "support"],
                         default="uniform",
                         help="--rebuild_consensus: trace weighting; 'step_count' favors longer traces")
     parser.add_argument("--gt_file", default=None,
@@ -1468,7 +1564,9 @@ def main() -> None:
     args = parser.parse_args()
     set_similarity(args.similarity)
 
-    global OPENAI_API_KEY, OPENAI_BASE_URL, CHAT_URL, HEADERS
+    global OPENAI_API_KEY, OPENAI_BASE_URL, CHAT_URL, HEADERS, EDGE_RULE, EDGE_CONFIDENCE
+    EDGE_RULE = args.edge_rule
+    EDGE_CONFIDENCE = args.edge_confidence
     if args.api_key:
         OPENAI_API_KEY = args.api_key
         HEADERS["Authorization"] = f"Bearer {OPENAI_API_KEY}"
