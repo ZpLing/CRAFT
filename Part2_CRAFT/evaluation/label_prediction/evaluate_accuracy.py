@@ -281,11 +281,13 @@ def _infer_dataset(sample_id: str) -> str:
     return "unknown"
 
 
-def balance_samples(samples: List[Dict], n_per_class: int = 125, seed: int = 42) -> List[Dict]:
-    """Keep exactly n_per_class PROVED + n_per_class DISPROVED
+def balance_samples(samples: List[Dict], n_per_class: int = 250, seed: int = 42) -> List[Dict]:
+    """Keep at most n_per_class PROVED + n_per_class DISPROVED
     per source_dataset. Math domain samples are returned as-is (no balancing).
 
-    n_per_class=125 → 250 per logical dataset → 500 total across two datasets.
+    The default, 250 per class, keeps every problem of a 500-problem logical
+    dataset drawn 250/250, so a bare `score` reports the same 500 problems the
+    baselines are scored on. A smaller value draws a balanced subset.
     """
     import random
     rng = random.Random(seed)
@@ -476,7 +478,7 @@ def print_comparison_table(results: List[Tuple[str, Dict]]) -> None:
 # ---------------------------------------------------------------------------
 
 
-def evaluate_single(path: Path, source: str, n_per_class: int = 125, seed: int = 42) -> Tuple[Dict, Dict]:
+def evaluate_single(path: Path, source: str, n_per_class: int = 250, seed: int = 42) -> Tuple[Dict, Dict]:
     samples = LOADERS[source](path)
     samples = balance_samples(samples, n_per_class=n_per_class, seed=seed)
     return compute_metrics(samples), compute_per_dataset(samples)
@@ -517,8 +519,9 @@ Examples:
                         help="Save JSON results to this path (optional)")
     parser.add_argument("--per_dataset",  action="store_true", default=True,
                         help="Print per-dataset breakdown (default: True)")
-    parser.add_argument("--n_per_class",  type=int, default=125,
-                        help="Samples per class per dataset after balancing (default 125 → 250/dataset)")
+    parser.add_argument("--n_per_class",  type=int, default=250,
+                        help="Samples per class per logical dataset after balancing (default 250 → all 500 of a "
+                             "250/250 dataset, the same problems the baselines are scored on)")
     parser.add_argument("--seed",         type=int, default=42)
     args = parser.parse_args(argv)
 
