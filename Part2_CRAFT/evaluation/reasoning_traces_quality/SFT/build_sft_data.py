@@ -121,7 +121,7 @@ def in_test_split(sample_id: str, frac: float, seed: int) -> bool:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--traces", default="results/CRAFT_results/Output")
+    ap.add_argument("--traces", default="results/CRAFT_results/Raw_Output")
     ap.add_argument("--baselines", default="results/baseline_results")
     ap.add_argument("--k_runs", default="results/craft_runs/full500")
     ap.add_argument("--out_dir", default="results/CRAFT_results/other_results/trace_utility/data")

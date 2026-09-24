@@ -171,7 +171,7 @@ framework of §3.2.
 │   └── results/
 │       ├── baseline_results/<model>/<baseline>/
 │       └── CRAFT_results/
-│           ├── Output/<model>/
+│           ├── Raw_Output/<model>/
 │           ├── label_prediction/<model>/
 │           ├── reasoning_traces_quality/
 │           │   ├── ROSCOE/<model>/
@@ -325,7 +325,7 @@ python $DO/adjudicate_math.py   --k_traces $K_TRACES --dataset OmniMATH --model 
 python $DO/apply_adjudication.py --synth $RUN/synthesized.json --adjudicated $RUN/adjudicated.json --dataset OmniMATH --output $RUN/adj_applied.json
 python $DO/state_goal.py         --synth $RUN/adj_applied.json --problems $RUN/cleaned.json --output $RUN/adj_goal.json
 
-# the trace each cell reports -> results/CRAFT_results/Output/<model>/<dataset>_Output.jsonl
+# the trace each cell reports -> results/CRAFT_results/Raw_Output/<model>/<dataset>_Output.jsonl
 python evaluation/label_prediction/evaluate_accuracy.py export
 ```
 
