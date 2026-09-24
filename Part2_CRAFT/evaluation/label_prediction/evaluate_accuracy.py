@@ -1459,7 +1459,7 @@ def main_export(argv) -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--runs", default="craft_runs/full500_v4/traces",
                         help="Directory holding one folder per cell (see REPORTED_CELLS)")
-    parser.add_argument("--out_dir", default="CRAFT_results/Output")
+    parser.add_argument("--out_dir", default="CRAFT_results/Raw_Output")
     args = parser.parse_args(argv)
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]
