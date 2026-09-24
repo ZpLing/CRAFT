@@ -7,11 +7,8 @@ ablation_study.py — the ablation table of §4, one row per removed component.
     CRAFT (full)                 nothing                    the run's synthesized trace
     w/o CRAFT                    the whole pipeline         a single-call run
     w/o RKG                      Module II's graph          --synthesis_strategy step_by_step
-    w/o Weighted Edges Fusion    the lambda term in W(e)    build_rkg --edge_lambda 0
     Embedding Cosine Similarity  Jaccard in the edge weight an embedding-similarity run
     w/o Rollout (K=1)            the other K-1 traces       the pipeline run on one trace
-    w/o Steps Filtering          Module I's z-score filter  steps_filter --z_score_threshold -1000
-    w/o Edge & Node Filtering    Module II's thresholds     build_rkg --consensus_threshold 0 --node_threshold 0
 
 Scoring is not reimplemented here: the rows are read with the same loaders and
 scored with the same metric as the main table, so an ablation row and a main-table
@@ -41,7 +38,7 @@ A setting that was not run on a dataset simply has no file there.
 Usage:
     python ablation_study.py --craft_dir craft_runs/olympiad_gemini \\
         --variant "w/o RKG=craft_runs/olympiad_gemini/synthesized_step_by_step.json" \\
-        --variant "w/o Weighted Edges Fusion=craft_runs/olympiad_gemini_lam0/synthesized.json" \\
+        --variant "Embedding Cosine Similarity=craft_runs/olympiad_gemini_embed/synthesized.json" \\
         --baseline_cot results/baseline_results/gemini-3.1-flash-lite/cot/traces.jsonl
 """
 
@@ -70,17 +67,14 @@ from evaluate_accuracy import LOADERS, compute_metrics
 
 FULL = "CRAFT (full)"
 ROLLOUT = "w/o Rollout (K=1)"
-VARIANT_ROWS = ("w/o RKG", "w/o Weighted Edges Fusion", "Embedding Cosine Similarity",
-                ROLLOUT, "w/o Steps Filtering", "w/o Edge & Node Filtering")
+VARIANT_ROWS = ("w/o RKG", "Embedding Cosine Similarity", ROLLOUT)
 # The single-trace row used to be called "w/o Consensus"; the old name is still accepted.
 ALIASES = {"w/o Consensus (K=1)": ROLLOUT}
-ROW_ORDER = (FULL, "w/o CRAFT", ROLLOUT, "w/o Steps Filtering", "w/o RKG",
-             "w/o Edge & Node Filtering",
-             "w/o Weighted Edges Fusion", "Embedding Cosine Similarity")
+ROW_ORDER = (FULL, "w/o CRAFT", ROLLOUT, "w/o RKG", "Embedding Cosine Similarity")
 
 
 def slug(setting: str) -> str:
-    """A setting's folder name: 'w/o Edge & Node Filtering' -> 'wout_Edge_and_Node_Filtering'."""
+    """A setting's folder name: 'w/o Rollout (K=1)' -> 'wout_Rollout_K1'."""
     s = setting.replace("w/o", "wout").replace("&", "and").replace("=", "")
     return re.sub(r"[^A-Za-z0-9]+", "_", s).strip("_")
 
@@ -307,7 +301,7 @@ def main() -> None:
     if absent:
         print("  Not run: " + ", ".join(absent))
         hints = {"w/o RKG": "synthesize with --synthesis_strategy step_by_step.",
-                 "w/o Weighted Edges Fusion": "build_rkg --edge_lambda 0, then synthesize.",
+                 "Embedding Cosine Similarity": "build_rkg --similarity embedding, then synthesize.",
                  "w/o CRAFT": "pass --baseline_results (or --baseline_cot / --zero_shot)."}
         for name in absent:
             if name in hints:
