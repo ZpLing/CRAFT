@@ -26,6 +26,9 @@ Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/*
 # ...but the ROSCOE scores of the two sides (raw CoT and CRAFT, per backbone) are results the paper reads, so they are tracked.
 !Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/ROSCOE/
 !Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/SFT/
+# The gold traces of the graph-construction noise analysis are FLD's own proofs re-rendered one fact to a line;
+# dataset/FLD.json already ships them, so only the scored edges are kept.
+Part2_CRAFT/results/CRAFT_results/Graph_Construction_Noise/gold_traces.json
 # Backups the eviction tool leaves behind are working files, not results.
 *.bak
 *.jsonl.bak
