@@ -20,7 +20,7 @@ dataset_adapters.py, since none of the benchmark's four sets stores that pair th
 way ROSCOE's own sets did. They are the scorer's reference fields and never enter
 a prompt; Module I's loader is what keeps them out of generation.
 
-The three metrics the paper reports — Grammar, Rep-Step, Rep-Word — are
+The thirteen metrics the paper reports are
 reference-free and defined on any trace, and the scorer selects them on its own
 when a set carries no reference chain, which none of these four does.
 

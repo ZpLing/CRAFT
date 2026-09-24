@@ -49,7 +49,7 @@ def has_conclusion(trace: str, domain: str) -> bool:
     """Whether a trajectory states an answer at all, rather than being cut off.
 
     A logical answer is written three ways across these runs. CRAFT's synthesis
-    is told to emit __PROVED__ and does; the baselines' zero-shot CoT was told
+    is told to emit __PROVED__ and does; the Raw CoT baseline was told
     the same and often ends with a bare PROVED instead, which is what their own
     extractor reads and scores. Matching only the underscored form called 276
     of nano's 500 ProofWriter chains unfinished when every one of them ends in a

@@ -19,7 +19,7 @@ Settings that were not run are printed as absent, so a partial table cannot be
 mistaken for a complete one.
 
 'w/o CRAFT' needs no run at all. Removing the whole pipeline leaves one call to
-the backbone, which is what the baselines' zero-shot CoT setting already is over
+the backbone, which is what the Direct baseline already is over
 the same samples and the same model, so --baseline_cot reads that run's
 traces.jsonl and writes the row from it rather than spending the calls again to
 get the same thing, then scores that file like every other row. Only the trace text crosses over: the label is re-derived
@@ -101,7 +101,7 @@ def rel(path: Path) -> str:
 def baseline_row(results_json: Path, dataset: str) -> Dict[str, Any]:
     """'w/o CRAFT' as the baselines report it.
 
-    The row is the zero-shot CoT baseline of the main table, read from that
+    The row is the Direct baseline of the main table, read from that
     run's own results.json: its per-dataset accuracy, F1, step count and
     denominator are taken as written, so the ablation and the main table show
     the same number for the same run. The run's stored predictions become the
@@ -210,12 +210,13 @@ def main() -> None:
     ap.add_argument("--craft_dir", required=True,
                     help="The full CRAFT run: k_traces, cleaned traces, synthesized trace")
     ap.add_argument("--baseline_results", default=None,
-                    help="'w/o CRAFT' taken as the baselines' own zero-shot CoT result: the "
+                    help="'w/o CRAFT' taken as the Direct baseline's own result "
+                         "(baseline_results/<model>/direct/results.json): the "
                          "results.json of that run, whose per-dataset accuracy is the number "
                          "Table 2 reports. Its predictions give the paired change. Takes "
                          "precedence over --baseline_cot / --zero_shot")
     ap.add_argument("--baseline_cot", default=None,
-                    help="'w/o CRAFT': traces.jsonl from the baselines' zero-shot CoT "
+                    help="'w/o CRAFT': traces.jsonl from a single-call baseline "
                          "setting for this model. The row is built from it, so the "
                          "single call is not paid for twice")
     ap.add_argument("--zero_shot", default=None,

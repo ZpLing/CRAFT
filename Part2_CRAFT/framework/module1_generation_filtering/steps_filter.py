@@ -5,7 +5,7 @@ steps_filter.py  (Module I — Z-score Steps Filtering)
 Scores each step by its Jaccard overlap with T_Con, z-normalizes within the K
 traces, and drops the steps below gamma. The --method rkg pass belongs to the
 same stage but runs after Module II, pruning steps against the consensus graph.
-Detect and remove anomalous reasoning steps using GRPO-inspired z-score filtering.
+Steps Filtering (Module I): z-score filtering of reasoning steps against the consensus terms T_Con, following GRPO's group-relative comparison.
 
 Two detection methods are provided:
 
@@ -314,10 +314,10 @@ def compute_sample_consensus_core(
     consensus_threshold: float = 0.3,
 ) -> Set[str]:
     """
-    Compute the consensus core for a sample.
+    Compute the consensus terms T_Con for a sample.
 
     Inspired by GRPO: find terms that appear frequently within the sample
-    to form a "semantic consensus core".
+    to form the consensus terms T_Con.
 
     Args:
         steps_with_terms: list of step info dicts for all steps
@@ -325,7 +325,7 @@ def compute_sample_consensus_core(
                              appears in at least 30% of steps)
 
     Returns:
-        Set of consensus core terms
+        Set of consensus terms (T_Con)
     """
     if not steps_with_terms:
         return set()
@@ -359,7 +359,7 @@ def detect_anomalous_steps_supervised(
 
     Args:
         steps_with_terms: step info for each step_number across all traces
-        similarity_threshold: steps below this similarity are flagged as anomalous
+        similarity_threshold: steps below this similarity are filtered out
 
     Returns:
         Set[Tuple[step_number, trace_idx]]: anomalous steps
@@ -369,7 +369,7 @@ def detect_anomalous_steps_supervised(
 
     Args:
         steps_with_terms: step info for each step_number across all traces
-        similarity_threshold: steps below this similarity are flagged as anomalous
+        similarity_threshold: steps below this similarity are filtered out
 
     Returns:
         Set[Tuple[step_number, trace_idx]]: anomalous steps
@@ -620,8 +620,8 @@ def detect_anomalous_steps_unsupervised(
         similarity_threshold: similarity threshold (fallback when not using GRPO optimization)
         min_similar_steps: minimum number of similar steps required to be considered normal
         use_grpo_optimization: whether to use GRPO optimization (default True)
-        z_score_threshold: z-score cutoff gamma; steps below this are flagged as anomalous (paper: -1.0)
-        consensus_threshold: consensus core threshold (default 0.3, i.e. term appears in >= 30% of steps)
+        z_score_threshold: z-score step cutoff gamma; steps below this are filtered out (paper: -1.0)
+        consensus_threshold: TF-IRF frequency threshold beta (default 0.3, i.e. term appears in >= 30% of steps)
         use_weighted_similarity: whether to use weighted Jaccard similarity (default True)
         domain: "logical" or "math"
 
@@ -790,7 +790,7 @@ def remove_anomalous_steps(
     """Remove anomalous steps from traces (always preserving the final conclusion step).
 
     The detector scores a step by how far its terms sit from the sample's
-    consensus core, which is a measure of how typical the step is and not of
+    consensus terms T_Con, which is a measure of how typical the step is and not of
     whether it is redundant. On the logical datasets those come apart: a step
     that cites a fact no other trace happened to use reads as atypical, and
     deleting it costs the trace content nothing else carries. Measured over
@@ -1315,7 +1315,7 @@ def process_sample(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Detect and remove anomalous reasoning steps"
+        description="Module I Steps Filtering: z-score filtering against the consensus terms T_Con (--method unsupervised), and the second pass against the consensus RKG (--method rkg)"
     )
     parser.add_argument(
         "--input",
@@ -1377,7 +1377,7 @@ def main():
         "--similarity_threshold",
         type=float,
         default=0.3,
-        help="Similarity threshold; steps below this are flagged as anomalous (default 0.3)",
+        help="Similarity threshold; steps below this are filtered out (default 0.3)",
     )
     parser.add_argument(
         "--method",
@@ -1424,13 +1424,13 @@ def main():
         "--z_score_threshold",
         type=float,
         default=-1.0,
-        help="Z-score cutoff gamma; steps below this are flagged as anomalous (--method unsupervised only; paper: -1.0)",
+        help="Z-score step cutoff gamma; steps below this are filtered out (--method unsupervised only; paper: -1.0)",
     )
     parser.add_argument(
         "--consensus_threshold",
         type=float,
         default=0.3,
-        help="Consensus core threshold; fraction of steps a term must appear in to be included in the consensus core (default 0.3)",
+        help="TF-IRF frequency threshold beta; fraction of steps a term must appear in to be included in the consensus core (default 0.3)",
     )
     parser.add_argument(
         "--use_weighted_similarity",
