@@ -1074,7 +1074,7 @@ async def call_llm(
                     if resp.status == 200:
                         data = await resp.json()
                         msg = data["choices"][0]["message"]
-                        # o4-mini / deepseek-r1 via Bosch API put the reply in
+                        # o4-mini / deepseek-r1 via our API gateway put the reply in
                         # reasoning_content; content field is empty
                         content = (msg.get("reasoning_content") or
                                    msg.get("content") or "")
