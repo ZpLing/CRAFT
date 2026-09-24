@@ -14,9 +14,9 @@ traces, drops the steps they disagree on, aggregates the survivors into a consen
 
 | Backbone | Setting | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| GPT-5.4-nano | Best of 12 baselines | 78.8 | 0.785 | **7.7** | 94.0 | 0.940 | 18.9 | 49.8 | 78.4 | 57.5 | 74.1 |
+| GPT-5.4-nano | Best of 12 baselines | 78.6 | 0.785 | **7.7** | 94.0 | 0.940 | 18.9 | 48.8 | 78.4 | 57.6 | 74.1 |
 | GPT-5.4-nano | **CRAFT** | **81.6** | **0.815** | 9.4 | **96.2** | **0.962** | **9.4** | **55.1** | **8.2** | **61.6** | **8.3** |
-| Gemini-3.1-flash-lite | Best of 12 baselines | **90.3** | **0.903** | 11.1 | 68.6 | 0.678 | 14.8 | 56.3 | 24.9 | 65.8 | 25.0 |
+| Gemini-3.1-flash-lite | Best of 12 baselines | **90.3** | **0.903** | 11.1 | 68.6 | 0.678 | 14.8 | 55.1 | 24.9 | 65.8 | 25.0 |
 | Gemini-3.1-flash-lite | **CRAFT** | 88.7 | 0.887 | **9.2** | **86.8** | **0.868** | **9.2** | **61.6** | **8.3** | **74.5** | **8.7** |
 
 Label-prediction accuracy, macro-F1 and average reasoning steps, all scored by
@@ -24,20 +24,21 @@ Label-prediction accuracy, macro-F1 and average reasoning steps, all scored by
 better of the two rows. Macro-F1 is averaged over PROVED and DISPROVED, so the two maths
 datasets have no classes to average and leave it out rather than printing their accuracy
 twice.
-Every cell scores CRAFT and all 12 baselines on the sample ids they share, so neither side
-is charged for a question the other was never asked; that leaves 492 to 500 of the 500 per
-cell, and the three metrics are read off that same set. The baseline row is the best of the
-12 *on that cell*, chosen by accuracy, so it is a different method in almost every column
-and its F1 and steps are that method's rather than the best any baseline reached.
-CRAFT is ahead on 7 of the 8 accuracy cells, 6 of them at p<0.05 under an exact two-sided
-McNemar; the eighth, Gemini on FLD, is 0.8 behind PNS-Optimization at p=0.65. It is also
-the shorter trace on 7 of the 8, and not by a little — 9.4 steps against Self-Consistency's
-78.4 on nano's Omni-MATH, at 5.1 points higher accuracy. The exception is nano's FLD, where
-Faithful CoT answers in 7.7 steps to CRAFT's 9.0 and 4.0 points less accurately.
+These are the numbers of the paper's main table, read from each cell's result file under
+`Part2_CRAFT/results/`; the few problems no method could score are dropped, leaving 492 to
+500 of the 500 per cell. The baseline row is the best of the 12 *on that cell*, chosen by
+accuracy, so it is a different method in almost every column and its F1 and steps are that
+method's rather than the best any baseline reached.
+CRAFT is ahead on 7 of the 8 accuracy cells, 5 of them at p<0.05 under an exact two-sided
+McNemar test on the problems both methods answered; the eighth, Gemini on FLD, is 1.6 behind
+PNS-Optimization at p=0.34. It is also the shorter trace on 7 of the 8, and not by a little:
+8.2 steps against Self-Consistency's 78.4 on nano's Omni-MATH, at 6.3 points higher accuracy.
+The exception is nano's FLD, where Faithful CoT answers in 7.7 steps to CRAFT's 9.4 and 3.0
+points less accurately.
 
-> FOLIO and GSM8K were dropped after the pilot — both backbones had run out of room on
-> them, a median 49/50 on GSM8K and 46/50 on FOLIO, where no method can show a difference
-> — and replaced by ProofWriter depth-5 and Omni-MATH.
+> FOLIO and GSM8K were dropped after the pilot: both backbones were already close to the
+> ceiling on them, leaving no room for a method to show a difference, and they were replaced
+> by ProofWriter depth-5 and Omni-MATH.
 
 ## Installation
 
@@ -70,7 +71,7 @@ ROSCOE's scorer is two files fetched from ParlAI on first use rather than vendor
 One full CRAFT run. Each stage writes a JSON file the next one reads, and naming the
 run directory in every path keeps one experiment together. Module I's step filter runs
 twice — once on terms alone, then again against the consensus RKG once Module II has
-built it. Every default below is the paper's (§4.6), so this runs the reported
+built it. Every default below is the paper's (§3.2), so this runs the reported
 configuration as written.
 
 ```bash
@@ -185,29 +186,21 @@ framework of §3.2.
 ### The four datasets
 
 Two logical and two mathematical, chosen so that no column is decided before a
-method is applied. Zero-shot accuracy on 30 samples, which is what a backbone
-reaches without any of the methods being compared:
-
-| dataset | | GPT-5.4-nano | Gemini-3.1-flash-lite |
-| --- | --- | ---: | ---: |
-| FLD | logical | .667 | .800 |
-| ProofWriter (depth-5, RelNeg-OWA) | logical | .667 | .667 |
-| Omni-MATH | math | .400 | .500 |
-| OlympiadBench | math | .533 | .800 |
+method is applied: the Direct and Raw CoT rows of the paper's main table show how
+much room each backbone leaves on each dataset.
 
 500 samples each, the logical two balanced between proved and disproved.
 
 ProofWriter is taken at question depth 5 — the answer needs a five-step
 deduction — and from its RelNeg-OWA configuration, relational predicates with
-negation. It is the only one of the five configurations where both backbones
-have room: AttNeg-OWA is 1.00 on both. Its test and validation splits are used,
+negation, the configuration on which both backbones had the most room. Its test and validation splits are used,
 never train.
 
 Omni-MATH drops the problems that cannot be scored rather than scoring them
 wrong: those that depend on a figure, and those whose gold answer describes a
 family of solutions ("All positive integers n with prime factors 1 mod 4")
-rather than naming a value. Six hundred of those would deduct the same points
-from every method, measuring the scorer rather than the method.
+rather than naming a value. Keeping them would deduct the same points from
+every method, measuring the scorer rather than the method.
 
 Each part is self-contained: its inputs live in `<part>/dataset/` and every artifact it
 produces lands in `<part>/results/`. A script resolves a **relative** `--output` /
@@ -247,18 +240,18 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 ## Part 2 — CRAFT (§3.2)
 
 The stages of the Quick start above run in order. Trace quality is then scored by
-ROSCOE (§4), whose directory holds three roles — adapt a CRAFT run into the
+ROSCOE (§4.5), whose directory holds three roles — adapt a CRAFT run into the
 scorer's schema, score raw CoT against the synthesized trace, tabulate the result
-— and reports Grammar, Rep-Step and Rep-Word.
+— and reports its thirteen reference-free metrics.
 
 ROSCOE is a metric rather than a benchmark — it scores whatever traces it is given
 — so it scores the same traces, on the same four datasets, and this part
-introduces no data beyond them. The rollout that gives the main table its accuracy
-is the one it reads: its first candidate trace is the raw CoT and its synthesized
-trace is CRAFT's, so `--dataset` is simply the `dataset/` file that run was
-generated from. ROSCOE's own annotated sets are not used here; its reference-based
+introduces no data beyond them. The raw side is the Raw CoT baseline's own
+response (`baseline_results/<model>/cot/results.json`) and the other side is CRAFT's
+synthesized trace, on the problems behind the main table, so `--dataset` is simply
+the `dataset/` file that run was generated from. ROSCOE's own annotated sets are not used here; its reference-based
 metrics need a reference chain none of these four carries, and the scorer drops
-them on its own, leaving the three reference-free ones we report.
+them on its own, leaving the thirteen reference-free ones we report.
 
 ReCEval was the other candidate and is not used. Its Entail and Contradict are computed over
 reasoning units an SRL parser extracts from each step, and that parser is a BERT
@@ -284,7 +277,7 @@ files on first use.
 ```bash
 RTQ=evaluation/reasoning_traces_quality
 
-# label prediction — the main table, and the A–E ablation
+# label prediction — the main table, and the ablation
 python evaluation/label_prediction/evaluate_accuracy.py score --input $RUN/synthesized.json --source synthesized
 ```
 
@@ -341,7 +334,7 @@ python $SFT/sft_trace_utility.py --model Qwen/Qwen3.5-9B --train_file data/train
     --test_file data/test.jsonl --out_dir runs/craft-s0 --seed 0 --max_len 8192 --gen_max_new 8192
 ```
 
-Hyperparameters fixed across all experiments (§4.6): Module I `K=5`, `T=0.7`,
+Hyperparameters fixed across all experiments (§3.2): Module I `K=5`, `T=0.7`,
 `β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. These are the
 CLI defaults, so a stage run without flags uses them.
 
