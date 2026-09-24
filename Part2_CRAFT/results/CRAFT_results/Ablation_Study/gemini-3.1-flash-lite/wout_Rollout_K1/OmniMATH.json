@@ -1,0 +1,13 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "dataset": "OmniMATH",
+  "setting": "w/o Rollout (K=1)",
+  "source_file": "results/craft_runs/full500/OmniMATH_gemini-3.1-flash-lite/abl_k1.json",
+  "craft_dir": "results/craft_runs/full500/OmniMATH_gemini-3.1-flash-lite",
+  "accuracy": 61.8,
+  "macro_f1": null,
+  "avg_steps": 7.54,
+  "n_samples": 492,
+  "full_accuracy": 62.6,
+  "delta": -0.8
+}
