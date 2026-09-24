@@ -578,24 +578,20 @@ def calculate_idf(all_documents: List[List[str]], term: str) -> float:
 class DocFreqTable:
     """Document frequencies for a fixed corpus, so IDF can be scored without re-scanning it.
 
-    This is what makes the two IRF settings comparable. Under ``idf_scope="sample"`` the
-    corpus is one sample's own steps (a fresh table per sample, matching what
-    calculate_idf() computes on the fly); under ``idf_scope="global"`` it is every step of
-    every sample, built once and shared. Only the corpus differs — the scoring is identical.
+    Under ``idf_scope="sample"`` the corpus is one sample's own steps (a fresh table per
+    sample, matching what calculate_idf() computes on the fly).
     """
 
     def __init__(self, n_docs: int = 0, df: Optional[Dict[str, int]] = None,
                  normalize: bool = False, domain: Optional[str] = None):
         self.n_docs = n_docs
         self.df: Counter = Counter(df or {})
-        # log(N/df) ranges over [0, log(N)], so its scale follows corpus size: the same raw
-        # score means something different under a 44-document sample corpus and a 17k-document
-        # global one. Dividing by log(N) maps it to [0, 1] so absolute thresholds such as
-        # min_tfidf carry the same meaning whichever corpus is in play.
+        # log(N/df) ranges over [0, log(N)], so its scale follows corpus size. Dividing by
+        # log(N) maps it to [0, 1] so absolute thresholds such as min_tfidf carry the same
+        # meaning whatever the corpus size.
         self.normalize = normalize
         # Tokenisation differs per domain -- math emits MATH:/EQ: formula tokens where
-        # logical emits words -- so frequencies from one domain say nothing about the
-        # other. The domain is recorded here so a table cannot be loaded into the wrong run.
+        # logical emits words -- so the table records which one built it.
         self.domain = domain
 
     def add_document(self, tokens: List[str]) -> None:
@@ -629,62 +625,8 @@ class DocFreqTable:
                 idf /= scale
         return idf
 
-    def to_dict(self) -> Dict[str, Any]:
-        return {"n_docs": self.n_docs, "df": dict(self.df), "normalize": self.normalize,
-                "domain": self.domain}
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "DocFreqTable":
-        return cls(n_docs=data.get("n_docs", 0), df=data.get("df", {}),
-                   normalize=data.get("normalize", False), domain=data.get("domain"))
-
-    def save(self, path: Path) -> None:
-        path = Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("w", encoding="utf-8") as f:
-            json.dump(self.to_dict(), f, ensure_ascii=False)
-
-    @classmethod
-    def load(cls, path: Path) -> "DocFreqTable":
-        with Path(path).open("r", encoding="utf-8") as f:
-            return cls.from_dict(json.load(f))
-
     def __len__(self) -> int:
         return len(self.df)
-
-
-def check_df_table(table: "DocFreqTable", domain: str, normalize: bool) -> None:
-    """Reject a saved DF table whose corpus does not match the run loading it.
-
-    A table holds frequencies for one tokenisation of one corpus on one IDF scale. Scoring
-    against a table built for the other domain, or the other scale, yields numbers that look
-    perfectly ordinary and mean nothing, so a mismatch is raised rather than absorbed. A
-    table saved before the domain was recorded carries None and is accepted.
-    """
-    if table.normalize != normalize:
-        raise ValueError(
-            f"--df_table was built with idf_norm="
-            f"{'log_n' if table.normalize else 'raw'}, but this run asks for "
-            f"{'log_n' if normalize else 'raw'}; rebuild the table or match the flag"
-        )
-    if table.domain is not None and table.domain != domain:
-        raise ValueError(
-            f"--df_table was built for domain={table.domain!r}, but this run is "
-            f"domain={domain!r}; each domain needs its own table"
-        )
-
-
-def resolve_df_table_path(path) -> Path:
-    """Resolve a --df_table path identically in every module that touches it.
-
-    resolve_input() leaves a relative path that does not exist yet pointing at the CWD, so
-    the module that saves the table and the module that later loads it would disagree
-    whenever they run from different directories, and the loader would silently rebuild a
-    different corpus instead of reusing the saved one. Sending a not-yet-existing path
-    through resolve_output() instead pins both sides to RESULTS_ROOT.
-    """
-    existing = _cfg.resolve_input(path)
-    return existing if existing.exists() else _cfg.resolve_output(path)
 
 
 class FlatDocFreqTable(DocFreqTable):

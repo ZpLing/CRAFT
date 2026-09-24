@@ -43,14 +43,11 @@ from framework.module1_generation_filtering.tfirf_terms import (
     calculate_idf,
     DocFreqTable,
     FlatDocFreqTable,
-    resolve_df_table_path,
-    check_df_table,
     COMMON_LOGICAL_WORDS,
     MATH_COMMON_WORDS,
 )
 from framework.module1_generation_filtering.steps_filter import (
     parse_steps_from_trace,
-    build_global_df_table,
     STEP_PATTERN,
 )
 
@@ -82,36 +79,6 @@ def _normalise_math_pred(s: Optional[str]) -> Optional[str]:
     return s or None
 
 
-def _normalise_math_pred_legacy(s: Optional[str]) -> Optional[str]:
-    """The previous rewriting behaviour, kept for reference. Not called."""
-    try:
-        import sys as _sys
-        _eval_dir = str(_pl.Path(__file__).resolve().parents[2] / "evaluation" / "label_prediction")
-        if _eval_dir not in _sys.path:
-            _sys.path.insert(0, _eval_dir)
-        from extract_label import normalise_math_answer
-        return normalise_math_answer(s)
-    except ImportError:
-        pass
-    # Fallback: minimal inline normalization
-    if s is None:
-        return None
-    s = s.strip().strip("$").strip()
-    if not s:
-        return None
-    s = s.replace('\u2013', '-').replace('\u2014', '-').replace('\u2212', '-')
-    s = re.sub(r'\^?\{?\\circ\}?|°|\\degree', '', s)
-    s = re.sub(r'\\(?:text|mathrm|mbox)\{[^}]*\}', '', s)
-    s = re.sub(r'\\[a-zA-Z]+\*?', '', s)
-    s = re.sub(r'[{}]', '', s)
-    s = s.strip().lstrip("$\\").strip(";")
-    s = re.sub(r'\s+', '', s).strip().lower()
-    try:
-        f = float(s)
-        return str(int(f)) if f == int(f) else str(f)
-    except (ValueError, OverflowError):
-        pass
-    return s if s else None
 _cfg_path = _pl.Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_root_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
@@ -146,9 +113,9 @@ def extract_step_terms_with_tfidf(
 ) -> Tuple[List[str], Dict[str, float]]:
     """Extract important terms and their TF-IRF scores for a single step (domain-aware).
 
-    df_table: when given, IDF is scored against that corpus (the global IRF setting) and
-    all_step_documents is ignored; when None, IDF comes from all_step_documents, i.e. the
-    within-sample setting.
+    df_table: when given, IDF is scored against that table (FlatDocFreqTable for
+    --idf_scope none) and all_step_documents is ignored; when None, IDF comes from
+    all_step_documents, i.e. the within-sample setting.
     """
     if not step_text:
         return [], {}
@@ -243,8 +210,8 @@ def collect_terms_by_step_position(
                 "weight":      trace_weight,   # underthinking trace weight 0.3
             })
 
-    # Under the global setting df_table already carries the corpus; otherwise build this
-    # sample's own, which is the within-sample setting.
+    # Under --idf_scope none df_table is the flat table; otherwise build this sample's
+    # own, which is the within-sample setting.
     if df_table is None:
         df_table = DocFreqTable.from_documents(
             [tokenize_text(text, domain=domain) for text in all_step_texts],
@@ -952,7 +919,6 @@ def build_rkg_synthesis_prompt(
     gt_label: Optional[str] = None,
     step_terms_summary: Optional[Dict[int, Dict]] = None,
     previous_steps: Optional[List[str]] = None,
-    prev_context: str = "all",
 ) -> str:
     """Build generation prompt for a single RKG node.
 
@@ -991,11 +957,7 @@ def build_rkg_synthesis_prompt(
     # the same 49 samples, that cost 4.1 points on FLD and 3.6 extra steps, while
     # maths — which saw everything — came out level. The topology still fixes the
     # order and the dependencies; it no longer hides what has been derived.
-    # --prev_context direct narrows this to the graph's own dependencies, which
-    # is what the logical branch used to do on its own and what the comment
-    # above records the cost of. It is here so the choice can be measured
-    # rather than assumed, not because the default is in doubt.
-    if previous_steps and prev_context == "all":
+    if previous_steps:
         prompt += "\n**Previously Generated Steps**:\n"
         for prev_step in previous_steps:
             prompt += f"{prev_step}\n"
@@ -1308,11 +1270,8 @@ async def synthesize_trace_rkg(
     sample_rkg: Dict[str, Any],
     model: str = DEFAULT_MODEL,
     domain: str = "logical",
-    anchor_conclusion: bool = False,
-    no_mv: bool = False,
     prior_mode: str = "verify",
     atomic_steps: bool = False,
-    prev_context: str = "all",
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
     min_tfidf: float = 0.01,
@@ -1368,8 +1327,6 @@ async def synthesize_trace_rkg(
     _mv_answer: Optional[str] = None   # math domain
     _mv_strength: Optional[float] = None  # share of the weighted vote behind _mv_label
     _all_traces = sample.get("cleaned_traces") or sample.get("traces", [])
-    if no_mv:
-        _all_traces = []  # skip MV computation entirely
 
     # The weight Module II gave each trace when it built the consensus. This
     # vote used to count every trace as one, which meant Module II's weighting
@@ -1645,23 +1602,6 @@ async def synthesize_trace_rkg(
             step_pos   = entry.get("step_position", len(generated_steps) + 1)
             is_last_e  = (step_pos == total_steps)
 
-            # Logical domain conclusion nodes: use RKG consensus label directly
-            if anchor_conclusion and domain == "logical":
-                ref_hint = entry.get("node_text_hint", "").strip()
-                _is_conclusion_node = (
-                    entry.get("node_type") == "conclusion"
-                    or ref_hint.lower().startswith("final conclusion")
-                )
-                if _is_conclusion_node and any(
-                    lbl in ref_hint
-                    for lbl in ["__PROVED__", "__DISPROVED__"]
-                ):
-                    nid = entry["node_id"]
-                    generated_nodes[nid] = ref_hint
-                    step_num = entry.get("step_position", len(generated_steps) + 1)
-                    generated_steps.append(f"Step {step_num}: {ref_hint}")
-                    continue
-
             prompt = build_rkg_synthesis_prompt(
                 problem_input, entry, generated_nodes,
                 domain=domain, total_steps=total_steps,
@@ -1671,7 +1611,6 @@ async def synthesize_trace_rkg(
                 gt_label=None,
                 step_terms_summary=_step_terms_summary,
                 previous_steps=generated_steps,
-                prev_context=prev_context,
             )
             response = await generate_reasoning_trace(session, prompt, model)
             nid      = entry["node_id"]
@@ -2057,19 +1996,15 @@ async def synthesize_traces_for_dataset(
     domain: str = "logical",
     synthesis_strategy: str = "step_by_step",
     rkg_file: Optional[Path] = None,
-    anchor_conclusion: bool = False,
-    no_mv: bool = False,
     prior_mode: str = "verify",
     atomic_steps: bool = False,
-    prev_context: str = "all",
     idf_scope: str = "sample",
     idf_norm: str = "raw",
-    df_table_path: Optional[Path] = None,
 ):
     """Generate high-quality reasoning traces for the dataset (supports step_by_step and rkg strategies).
 
     idf_scope selects the IRF corpus: "sample" scores IDF within each sample's own steps
-    (default, current behaviour); "global" scores it over every step of every sample.
+    (default, current behaviour); "none" disables the IRF factor.
     """
     print(f"Reading file: {input_file}")
     with open(input_file, 'r', encoding='utf-8') as f:
@@ -2136,23 +2071,9 @@ async def synthesize_traces_for_dataset(
         except Exception as e:
             print(f"Warning: failed to load original file: {e}")
     
-    # Build (or reuse) the global IRF corpus once. Built from the full file, before the
-    # --max_samples cut, so a truncated debug run scores terms exactly like a full run and
-    # so Module II and Module III agree on the same input.
+    # IRF corpus: the flat table disables IRF; None means each sample's own steps
     df_table = None
-    if idf_scope == "global":
-        if df_table_path is not None and Path(df_table_path).exists():
-            df_table = DocFreqTable.load(df_table_path)
-            print(f"Loading global DF table: {df_table_path}")
-        else:
-            df_table = build_global_df_table(samples, domain=domain,
-                                             normalize=(idf_norm == "log_n"))
-            if df_table_path is not None:
-                df_table.save(Path(df_table_path))
-                print(f"Saved global DF table: {df_table_path}")
-        print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
-        check_df_table(df_table, domain, idf_norm == "log_n")
-    elif idf_scope == "none":
+    if idf_scope == "none":
         df_table = FlatDocFreqTable()
         print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
     else:
@@ -2200,7 +2121,7 @@ async def synthesize_traces_for_dataset(
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
                 sample_rkg = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, anchor_conclusion=anchor_conclusion, no_mv=no_mv, prior_mode=prior_mode, atomic_steps=atomic_steps, prev_context=prev_context, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
+                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, prior_mode=prior_mode, atomic_steps=atomic_steps, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
             else:
                 tasks.append(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
@@ -2260,14 +2181,10 @@ async def retry_failed_synthesis(
     model: str = DEFAULT_MODEL,
     concurrency: int = 4,
     domain: str = "logical",
-    anchor_conclusion: bool = False,
-    no_mv: bool = False,
     prior_mode: str = "verify",
     atomic_steps: bool = False,
-    prev_context: str = "all",
     idf_scope: str = "sample",
     idf_norm: str = "raw",
-    df_table_path: Optional[Path] = None,
     in_place: bool = False,
 ) -> None:
     """Re-synthesize only the samples a prior run left without a pred_label.
@@ -2288,19 +2205,8 @@ async def retry_failed_synthesis(
     rkg_lookup     = {r["sample_id"]: r for r in _load_records(rkg_file) if "sample_id" in r}
     cleaned_lookup = {s["sample_id"]: s for s in _load_records(input_file) if "sample_id" in s}
 
-    # A retry only sees the failed subset, so a sample-local corpus would differ from the
-    # original run's; the global table has to come from the file that run saved.
     df_table = None
-    if idf_scope == "global":
-        if df_table_path is None or not Path(df_table_path).exists():
-            raise ValueError(
-                "--idf_scope global needs --df_table pointing at the table the original run "
-                "saved; a retry sees only the failed subset and cannot rebuild that corpus"
-            )
-        df_table = DocFreqTable.load(Path(df_table_path))
-        print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
-        check_df_table(df_table, domain, idf_norm == "log_n")
-    elif idf_scope == "none":
+    if idf_scope == "none":
         df_table = FlatDocFreqTable()
         print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
     else:
@@ -2321,9 +2227,7 @@ async def retry_failed_synthesis(
                 try:
                     return sid, await synthesize_trace_rkg(
                         session, sample, rkg, model=model, domain=domain,
-                        anchor_conclusion=anchor_conclusion, no_mv=no_mv,
                         prior_mode=prior_mode, atomic_steps=atomic_steps,
-                        prev_context=prev_context,
                         df_table=df_table, idf_norm=(idf_norm == "log_n"),
                     )
                 except Exception as e:
@@ -2390,10 +2294,9 @@ def main():
         "--idf_scope",
         type=str,
         default="sample",
-        choices=["sample", "global", "none"],
+        choices=["sample", "none"],
         help="IRF corpus: 'sample' scores IDF within each sample's own steps (default, "
-             "current behaviour); 'global' scores it over every step of every sample; "
-             "'none' disables the IRF factor entirely, leaving TF-IRF == TF"
+             "current behaviour); 'none' disables the IRF factor entirely, leaving TF-IRF == TF"
     )
     parser.add_argument(
         "--idf_norm",
@@ -2401,14 +2304,7 @@ def main():
         default="raw",
         choices=["raw", "log_n"],
         help="IDF scale: 'raw' is log(N/df) (default); 'log_n' divides by log(N) so the "
-             "score lands in [0,1] and min_tfidf means the same under either --idf_scope"
-    )
-    parser.add_argument(
-        "--df_table",
-        type=str,
-        default=None,
-        help="Path to a global DF table JSON (used with --idf_scope global). Loaded if it "
-             "exists, otherwise built from the input and saved here for reuse across modules"
+             "score lands in [0,1]"
     )
     parser.add_argument(
         "--concurrency",
@@ -2478,27 +2374,6 @@ def main():
         help="RKG JSON file path (required for synthesis_strategy=rkg; from build_rkg.py)",
     )
     parser.add_argument(
-        "--anchor_conclusion",
-        action="store_true",
-        default=False,
-        help=(
-            "For logical domain RKG synthesis: use the RKG consensus node_text "
-            "directly for conclusion nodes instead of LLM re-generation. "
-            "Recommended for complex FOL tasks where synthesis accuracy "
-            "falls below MV baseline. NOT recommended for FLD where synthesis "
-            "already beats MV through reference-guided intermediate steps."
-        ),
-    )
-
-    parser.add_argument(
-        "--prev_context", choices=["all", "direct"], default="all",
-        help="What a step is shown of the trace so far: 'all' every step "
-             "written before it, 'direct' only the ones the graph makes it "
-             "depend on. 'all' is the default because withholding the rest "
-             "cost 4.1 points on FLD and 3.6 extra steps when it was measured; "
-             "the switch is here to measure it again, not because that is in "
-             "doubt.")
-    parser.add_argument(
         "--atomic_steps", action="store_true", default=False,
         help="Ask each synthesized step for one inference rather than for all "
              "the intermediate work. Raises the step count with it — the two "
@@ -2513,12 +2388,6 @@ def main():
              "Selected per configuration on a validation split: a model whose "
              "single re-derivation is weaker than its own vote does better with "
              "'follow'.",
-    )
-    parser.add_argument(
-        "--no_mv",
-        action="store_true",
-        default=False,
-        help="Ablation: disable majority-vote closed-loop verification in RKG synthesis.",
     )
 
     # Repair mode: re-run only the samples a finished run left without a pred_label.
@@ -2582,14 +2451,10 @@ def main():
                 model=args.model,
                 concurrency=args.concurrency,
                 domain=args.domain,
-                anchor_conclusion=args.anchor_conclusion,
-                no_mv=args.no_mv,
                 prior_mode=args.prior_mode,
                 atomic_steps=args.atomic_steps,
-                prev_context=args.prev_context,
                 idf_scope=args.idf_scope,
                 idf_norm=args.idf_norm,
-                df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
                 in_place=args.in_place,
             )
         )
@@ -2619,14 +2484,10 @@ def main():
             domain=args.domain,
             synthesis_strategy=synthesis_strategy,
             rkg_file=_cfg.resolve_input(args.rkg_file) if args.rkg_file else None,
-            anchor_conclusion=args.anchor_conclusion,
-            no_mv=args.no_mv,
             prior_mode=args.prior_mode,
             atomic_steps=args.atomic_steps,
-            prev_context=args.prev_context,
             idf_scope=args.idf_scope,
             idf_norm=args.idf_norm,
-            df_table_path=resolve_df_table_path(args.df_table) if args.df_table else None,
         )
     )
 

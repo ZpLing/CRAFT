@@ -55,8 +55,6 @@ from framework.module1_generation_filtering.tfirf_terms import (
     calculate_idf,
     DocFreqTable,
     FlatDocFreqTable,
-    resolve_df_table_path,
-    check_df_table,
     iter_equations,
     safe_parse_expr,
     COMMON_LOGICAL_WORDS,
@@ -105,30 +103,6 @@ def parse_steps_from_trace(trace: Dict[str, Any]) -> List[Dict[str, Any]]:
     return parsed_steps
 
 
-def build_global_df_table(
-    samples: List[Dict[str, Any]],
-    domain: str = "logical",
-    normalize: bool = False,
-) -> DocFreqTable:
-    """Build one DF table over every step of every sample — the global IRF setting.
-
-    The document unit stays a single step, exactly as in the within-sample setting, so the
-    only thing that changes is the corpus: a term's IDF now reflects how common it is
-    across problems rather than how widely it spreads inside one problem. Traces are read
-    with the same precedence process_sample() uses, so the corpus covers the steps that
-    actually get scored.
-    """
-    table = DocFreqTable(normalize=normalize, domain=domain)
-    for sample in samples:
-        traces = sample.get("traces", []) or sample.get("cleaned_traces", [])
-        for trace in traces:
-            for step_info in parse_steps_from_trace(trace):
-                step_text = step_info["step_text"]
-                if step_text:
-                    table.add_document(tokenize_text(step_text, domain=domain))
-    return table
-
-
 def extract_step_terms(
     step_text: str,
     all_step_documents: List[List[str]],
@@ -140,9 +114,9 @@ def extract_step_terms(
 ) -> List[str]:
     """Extract important terms for a single step (domain-aware).
 
-    df_table: when given, IDF is scored against that corpus (the global IRF setting) and
-    all_step_documents is ignored; when None, IDF comes from all_step_documents, i.e. the
-    within-sample setting.
+    df_table: when given, IDF is scored against that table (FlatDocFreqTable for
+    --idf_scope none) and all_step_documents is ignored; when None, IDF comes from
+    all_step_documents, i.e. the within-sample setting.
     """
     if not step_text:
         return []
@@ -221,9 +195,9 @@ def extract_terms_for_all_steps(
                     "step_text": step_text,
                 })
 
-    # Under the global setting df_table already carries the corpus; otherwise build this
-    # sample's own, which is the within-sample setting. Either way the terms below are
-    # scored against a table, so no raw document list needs to reach them.
+    # Under --idf_scope none df_table is the flat table; otherwise build this sample's
+    # own, which is the within-sample setting. Either way the terms below are scored
+    # against a table, so no raw document list needs to reach them.
     if df_table is None:
         df_table = DocFreqTable.from_documents(
             [tokenize_text(text, domain=domain) for text in all_step_texts],
@@ -506,7 +480,7 @@ def collect_all_steps_with_terms(
                     "step_text": step_text,
                 })
 
-    # Same corpus choice as extract_terms_for_all_steps(): global table, or this sample's own.
+    # Same corpus choice as extract_terms_for_all_steps(): flat table, or this sample's own.
     if df_table is None:
         df_table = DocFreqTable.from_documents(
             [tokenize_text(text, domain=domain) for text in all_step_texts],
@@ -600,7 +574,6 @@ def detect_anomalous_steps_unsupervised(
     min_similar_steps: int = 2,
     use_grpo_optimization: bool = True,
     z_score_threshold: float = -1.0,
-    coverage_guard: float = 0.0,
     consensus_threshold: float = 0.3,
     use_weighted_similarity: bool = True,
     domain: str = "logical",
@@ -769,42 +742,11 @@ def detect_anomalous_steps_unsupervised(
         return anomalous_steps
 
 
-_GUARD_STOP = {"the", "a", "an", "is", "are", "was", "were", "be", "been",
-               "have", "has", "had", "this", "that", "and", "or", "but", "so",
-               "then", "if", "we", "it", "its", "from", "to", "of", "in", "on",
-               "at", "by", "for", "with", "can", "not", "no", "step",
-               "therefore", "thus", "hence", "since", "because", "which",
-               "as", "there"}
-
-
-def _content_words(text: str) -> Set[str]:
-    return {w for w in re.findall(r"[a-z0-9]+", (text or "").lower())
-            if len(w) > 2 and w not in _GUARD_STOP}
-
-
 def remove_anomalous_steps(
     sample_traces: List[Dict[str, Any]],
     anomalous_steps: Set[Tuple[int, int]],
-    coverage_guard: float = 0.0,
 ) -> List[Dict[str, Any]]:
-    """Remove anomalous steps from traces (always preserving the final conclusion step).
-
-    The detector scores a step by how far its terms sit from the sample's
-    consensus terms T_Con, which is a measure of how typical the step is and not of
-    whether it is redundant. On the logical datasets those come apart: a step
-    that cites a fact no other trace happened to use reads as atypical, and
-    deleting it costs the trace content nothing else carries. Measured over
-    2480 FLD traces, deletion took 28.9% of the steps and 28.9% of the distinct
-    content words with them, and near-duplicate step pairs fell only 19.5% --
-    substance going out at the same rate as length, which is not what removing
-    redundancy looks like. On Omni-MATH the same filter behaves as intended,
-    keeping 91% of the content while duplicates fall 39%.
-
-    coverage_guard closes that gap. A flagged step is deleted only when what it
-    says is already said by the steps being kept: at least this fraction of its
-    content words must appear elsewhere in the surviving trace. At 0.0 nothing
-    is protected and the behaviour is what it was.
-    """
+    """Remove anomalous steps from traces (always preserving the final conclusion step)."""
     cleaned_traces = []
 
     for trace_idx, trace in enumerate(sample_traces):
@@ -825,26 +767,6 @@ def remove_anomalous_steps(
                 continue
             if (n, trace_idx) in anomalous_steps or (trace_idx, n) in anomalous_steps:
                 flagged.add(n)
-
-        # The guard asks what the trace would still say without each flagged
-        # step. "Elsewhere" is every step not flagged, plus the conclusion, so
-        # two flagged steps cannot excuse each other's deletion.
-        if coverage_guard > 0.0 and flagged:
-            kept_words: Set[str] = set()
-            for step_info in parsed_steps:
-                if step_info["step_number"] not in flagged:
-                    kept_words |= _content_words(step_info["step_text"])
-            for step_info in parsed_steps:
-                n = step_info["step_number"]
-                if n not in flagged:
-                    continue
-                own = _content_words(step_info["step_text"])
-                if not own:
-                    continue
-                covered = len(own & kept_words) / len(own)
-                if covered < coverage_guard:
-                    flagged.discard(n)          # it carries something of its own
-                    kept_words |= own
 
         cleaned_steps = [si for si in parsed_steps
                          if si["step_number"] == last_step_number
@@ -1137,7 +1059,6 @@ def process_sample(
     min_similar_steps: int = 2,
     use_grpo_optimization: bool = True,
     z_score_threshold: float = -1.0,
-    coverage_guard: float = 0.0,
     consensus_threshold: float = 0.3,
     use_weighted_similarity: bool = True,
     domain: str = "logical",
@@ -1154,8 +1075,8 @@ def process_sample(
         method: "supervised" | "unsupervised" | "rkg"
         sample_rkg: required when method="rkg"; RKG data for this sample (from build_rkg.py)
         domain: "logical" or "math"
-        df_table: global IRF corpus from build_global_df_table(); None keeps IDF within the sample
-        idf_norm: divide IDF by log(N) so thresholds mean the same under either corpus
+        df_table: FlatDocFreqTable for --idf_scope none; None keeps IDF within the sample
+        idf_norm: divide IDF by log(N) so the score lands in [0,1]
     """
     traces = sample.get("traces", []) or sample.get("cleaned_traces", [])
     if not traces:
@@ -1196,8 +1117,7 @@ def process_sample(
         anomalous_steps = detect_anomalous_steps_supervised(
             steps_with_terms_dict, similarity_threshold=similarity_threshold,
         )
-        cleaned_traces = remove_anomalous_steps(traces, anomalous_steps,
-                                                coverage_guard=coverage_guard)
+        cleaned_traces = remove_anomalous_steps(traces, anomalous_steps)
         for step_num, trace_idx in anomalous_steps:
             step_info = next(
                 (s for s in steps_with_terms_dict.get(step_num, []) if s["trace_idx"] == trace_idx),
@@ -1224,8 +1144,7 @@ def process_sample(
             use_weighted_similarity=use_weighted_similarity,
             domain=domain,
         )
-        cleaned_traces = remove_anomalous_steps(traces, anomalous_steps,
-                                                coverage_guard=coverage_guard)
+        cleaned_traces = remove_anomalous_steps(traces, anomalous_steps)
         for trace_idx, step_num in anomalous_steps:
             step_info = next(
                 (s for s in steps_with_terms_list
@@ -1339,10 +1258,9 @@ def main():
         "--idf_scope",
         type=str,
         default="sample",
-        choices=["sample", "global", "none"],
+        choices=["sample", "none"],
         help="IRF corpus: 'sample' scores IDF within each sample's own steps (default, "
-             "current behaviour); 'global' scores it over every step of every sample; "
-             "'none' disables the IRF factor entirely, leaving TF-IRF == TF",
+             "current behaviour); 'none' disables the IRF factor entirely, leaving TF-IRF == TF",
     )
     parser.add_argument(
         "--idf_norm",
@@ -1350,14 +1268,7 @@ def main():
         default="raw",
         choices=["raw", "log_n"],
         help="IDF scale: 'raw' is log(N/df) (default); 'log_n' divides by log(N) so the "
-             "score lands in [0,1] and min_tfidf means the same under either --idf_scope",
-    )
-    parser.add_argument(
-        "--df_table",
-        type=str,
-        default=None,
-        help="Path to a global DF table JSON (used with --idf_scope global). Loaded if it "
-             "exists, otherwise built from the input and saved here for reuse across modules",
+             "score lands in [0,1]",
     )
     parser.add_argument(
         "--min_idf",
@@ -1413,14 +1324,6 @@ def main():
         help="Disable GRPO optimization (use original method)",
     )
     parser.add_argument(
-        "--coverage_guard", type=float, default=0.0,
-        help="Keep a flagged step unless this fraction of its content words is "
-             "already carried by the steps being kept. The detector flags a "
-             "step for being atypical, which on the logical datasets deletes "
-             "content nothing else says: 28.9%% of FLD's steps went and 28.9%% "
-             "of its distinct content words with them. 0 disables the guard",
-    )
-    parser.add_argument(
         "--z_score_threshold",
         type=float,
         default=-1.0,
@@ -1450,12 +1353,6 @@ def main():
         default="logical",
         choices=["logical", "math"],
         help="Reasoning domain: 'logical' (logical reasoning, default) or 'math' (mathematical reasoning, enables SymPy equation verification)",
-    )
-    parser.add_argument(
-        "--protect_last_step",
-        action="store_true",
-        default=False,
-        help="Always preserve the last step (conclusion step) of each trace",
     )
     parser.add_argument(
         "--underthinking_threshold",
@@ -1494,22 +1391,9 @@ def main():
         rkg_lookup = {r["sample_id"]: r for r in rkg_results if "sample_id" in r}
         print(f"Loading RKG file: {rkg_path} ({len(rkg_lookup)} samples)")
 
-    # Build (or reuse) the global IRF corpus once, before any per-sample work
+    # IRF corpus: the flat table disables IRF; None means each sample's own steps
     df_table = None
-    if args.idf_scope == "global":
-        table_path = resolve_df_table_path(args.df_table) if args.df_table else None
-        if table_path is not None and table_path.exists():
-            df_table = DocFreqTable.load(table_path)
-            print(f"Loading global DF table: {table_path}")
-        else:
-            df_table = build_global_df_table(samples, domain=args.domain,
-                                             normalize=(args.idf_norm == "log_n"))
-            if table_path is not None:
-                df_table.save(table_path)
-                print(f"Saved global DF table: {table_path}")
-        print(f"IRF scope: global | {df_table.n_docs} step documents, {len(df_table)} terms")
-        check_df_table(df_table, args.domain, args.idf_norm == "log_n")
-    elif args.idf_scope == "none":
+    if args.idf_scope == "none":
         df_table = FlatDocFreqTable()
         print("IRF scope: none (IRF factor disabled, TF-IRF == TF)")
     else:
@@ -1535,7 +1419,6 @@ def main():
             min_similar_steps=args.min_similar_steps,
             use_grpo_optimization=args.use_grpo_optimization if args.method == "unsupervised" else False,
             z_score_threshold=args.z_score_threshold if args.method == "unsupervised" else -1.0,
-            coverage_guard=args.coverage_guard,
             consensus_threshold=args.consensus_threshold,
             use_weighted_similarity=args.use_weighted_similarity if args.method == "unsupervised" else False,
             domain=args.domain,

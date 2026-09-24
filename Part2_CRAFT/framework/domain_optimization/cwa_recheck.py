@@ -21,7 +21,7 @@ earlier answer; no gold label is read, and samples already answered
 `__PROVED__` are not touched, so the pass can only move in the direction the
 closed-world asymmetry predicts.
 
-A third pass, `resolve`, is keyed to the reasoning rather than to the label.
+A second pass, `resolve`, is keyed to the reasoning rather than to the label.
 A trace that ends on the absence of a derivation reaches whichever label the
 hypothesis's polarity suggests -- a positive hypothesis nobody derived is
 called __DISPROVED__, a negative one __PROVED__ because "it does not happen"
@@ -106,8 +106,7 @@ _REACHED_RE = re.compile(r"REACHED:\s*(HYPOTHESIS|NEGATION|NEITHER)", re.IGNOREC
 # What a pass appends when it changes an answer, and the step heads of the
 # trace it appends to.
 _HEADER_RE = re.compile(
-    r"\n*\[(?:Directed proof search|Two-sided proof search|Derivation audit"
-    r"|Premise-by-premise check)\]\n")
+    r"\n*\[(?:Directed proof search|Two-sided proof search)\]\n")
 _STEP_HEAD = re.compile(r"(?m)^\s*\**\s*Step\s*(\d+)\s*\**\s*[:.\-]\s*")
 _STEP_REF = re.compile(r"\bStep\s*\d+\b")
 
@@ -220,46 +219,6 @@ def justified_by_absence(text: str) -> bool:
     return bool(_BY_ABSENCE.search(" ".join(lines[-2:])))
 
 
-def build_audit_prompt(problem: str, claimed: str) -> str:
-    """The mirror pass: check a claimed derivation instead of searching for one.
-
-    Where a model over-produces __DISPROVED__ it is failing to search; where it
-    over-produces __PROVED__ it is accepting a chain that does not hold, and on
-    FLD gemini does the second — 33 of its 52 errors are a hypothesis that does
-    not follow, reported as proved.
-
-    It does not work, and the measurement is the point of keeping it. On those
-    500 FLD samples it flips 60 of the 261 answered __PROVED__ and 47 of the 60
-    are wrong: 22% precision, against 92% for the search direction on
-    ProofWriter. Gating it on a split consensus does not rescue it — 38%
-    precision on the 26 non-unanimous flips, still net negative — and the
-    unanimous stratum is 9%. Asked to check a chain the model finds a fault
-    whether or not one is there.
-
-    So the two directions are not symmetric, and the pipeline only runs the one
-    that is safe. That asymmetry is also why the search direction can be trusted
-    at all: it accepts a flip only on positive evidence, a chain the reply
-    exhibits, and never on a claim that no chain exists.
-    """
-    return (
-        "Check one derivation, step by step. Do not write your own.\n\n"
-        f"{problem}\n\n"
-        "Claimed derivation:\n"
-        f"{claimed}\n\n"
-        "Go through it one step at a time. For each step, say which premises it "
-        "uses and whether the step follows from exactly those premises. Watch for "
-        "the three ways these derivations fail: a step that uses something never "
-        "stated, a step that reverses a conditional (concluding A from B and "
-        "'if A then B'), and a final step whose conclusion is not the hypothesis "
-        "as written.\n\n"
-        "Then finish in exactly one of these two ways:\n"
-        "  - If every step holds and the chain reaches the hypothesis: __PROVED__\n"
-        "  - If some step does not follow: name that step, say which premise it "
-        "misuses, then __DISPROVED__\n\n"
-        "Do not write __DISPROVED__ unless you can name the step that fails."
-    )
-
-
 def build_prompt(problem: str, depth: Optional[int]) -> str:
     budget = (f"The dataset's hypotheses are derivable in at most {depth} steps "
               f"when they are derivable at all, so a chain longer than that is a "
@@ -286,8 +245,8 @@ def build_prompt(problem: str, depth: Optional[int]) -> str:
 def build_resolve_prompt(problem: str, depth: Optional[int]) -> str:
     """Two directed searches on a sample that was answered by absence.
 
-    The single-direction passes above each start from a label and ask about
-    that label, which only works where the errors sit on one side. They do on
+    The single-direction pass above starts from a label and asks about that
+    label, which only works where the errors sit on one side. They do on
     nano -- 63 of its 65 by-absence answers on ProofWriter are __DISPROVED__ --
     and they do not on gemini, whose 230 are 145 against 85. A pass keyed to
     the label therefore leaves a third of gemini's by-absence samples untouched,
@@ -334,72 +293,11 @@ def build_resolve_prompt(problem: str, depth: Optional[int]) -> str:
     )
 
 
-def build_direct_prompt(problem: str) -> str:
-    """One premise at a time, against a hypothesis that follows from one.
-
-    FLD's proofs are short -- `sent4 -> hypothesis` is a third of them, and
-    another quarter are two premises -- and its traces are not: the ones that
-    get it wrong build a conditional proof or a case analysis and wander. One
-    of them derived the right conditional, said so, and then wrote the other
-    label. Accuracy on a hypothesis that is itself a negation is 77-82%,
-    against 82-95% on a positive one, and the gap is widest exactly where the
-    gold proof is one step.
-
-    So this pass asks for the short read instead of a better long one, and
-    names the premises rather than the rounds. One premise is a whole proof
-    here, so unlike the other directions it accepts a single citation.
-
-    It does not work either, and that is the fourth reading of the same result.
-    On 100 of nano's FLD samples it commits on 28 and changes 4, two of them to
-    the right answer and two to the wrong one. `resolve` on FLD's by-absence
-    stratum is 6 right against 4 wrong, `prove` over everything answered
-    __DISPROVED__ is 5 against 8, and `audit` is 13 against 47. Four passes,
-    every one of them at or below a coin flip, while the same gate on
-    ProofWriter accepted 90 flips and got 90 of them right.
-
-    The gate is what differs, not the model. ProofWriter's rules are Horn
-    clauses over concrete relations, so a chain the reply writes out can be
-    read and is either there or not. FLD's hypotheses are themselves negations,
-    conjunctions and conditionals, and whether a premise entails one is a
-    proof-theoretic question that citing the premise does not answer. Asking
-    for a citation therefore filters nothing here, and what gets through is
-    whatever the model happened to say. Deciding FLD needs a checker that can
-    decide entailment, not a second opinion from the same model.
-    """
-    return (
-        "You are checking one thing about a formal-logic problem.\n\n"
-        f"{problem}\n\n"
-        "An earlier attempt built a long derivation and may have wandered off. "
-        "A hypothesis that follows here follows in a few steps, most often from "
-        "a single fact read directly against it.\n\n"
-        "So go fact by fact, and for each one ask only:\n"
-        "  - does this fact on its own entail the hypothesis as written?\n"
-        "  - does it entail the negation of the hypothesis?\n"
-        "Then try the pairs of facts that share a term. Do not build a "
-        "conditional proof, do not argue by cases, and do not assume anything "
-        "the facts do not state.\n\n"
-        "Watch the polarity. The hypothesis may itself be a negation, a "
-        "conjunction or a conditional, and entailing \"not P\" is not the same "
-        "as failing to entail \"P\". A conjunction needs every part; a "
-        "conditional is about what follows from its antecedent, not about "
-        "whether the antecedent holds.\n\n"
-        "Finish in exactly one of these three ways:\n"
-        "  - a fact or pair entails the hypothesis: name them, then "
-        "REACHED: HYPOTHESIS and __PROVED__\n"
-        "  - a fact or pair entails its negation: name them, then "
-        "REACHED: NEGATION and __DISPROVED__\n"
-        "  - neither does: write REACHED: NEITHER and nothing after it\n\n"
-        "Name the facts you used. Do not write a label without them."
-    )
-
-
 async def recheck_one(session, sem, rec, problem, depth, model,
-                      direction="prove", integrate=True) -> Dict[str, Any]:
+                      direction="prove") -> Dict[str, Any]:
     claimed = rec.get("synthesized_trace") or ""
     prompt = {"prove": lambda: build_prompt(problem, depth),
-              "audit": lambda: build_audit_prompt(problem, claimed),
-              "resolve": lambda: build_resolve_prompt(problem, depth),
-              "direct": lambda: build_direct_prompt(problem)}[direction]()
+              "resolve": lambda: build_resolve_prompt(problem, depth)}[direction]()
     async with sem:
         try:
             reply = await generate_reasoning_trace(session, prompt, model)
@@ -416,7 +314,7 @@ async def recheck_one(session, sem, rec, problem, depth, model,
     cites = len(CITE_RE.findall(reply or ""))
     note = {"label": label, "citations": cites, "direction": direction}
 
-    if direction in ("resolve", "direct"):
+    if direction == "resolve":
         # The reply says which of the two chains it closed, and the label has
         # to agree with it: a label without its marker, or against it, is the
         # same assertion-without-a-derivation this pass exists to remove.
@@ -428,22 +326,17 @@ async def recheck_one(session, sem, rec, problem, depth, model,
         # chain they closed and then stop. Requiring the token as well threw all
         # 50 away. A reply that writes a token contradicting its own marker is
         # incoherent rather than resolved, and is still refused.
-        # A single premise is a whole proof in FLD, so the direct pass takes
-        # one citation where the saturating one needs two.
-        floor = 1 if direction == "direct" else MIN_CITATIONS
-        accepted = (want is not None and label in (None, want) and cites >= floor)
+        accepted = (want is not None and label in (None, want) and cites >= MIN_CITATIONS)
         before = last_label(claimed)
         flipped = bool(accepted and want != before)
         note.update({"reached": reached, "accepted": accepted,
                      "before": before, "flipped": flipped})
-        header = ("[Premise-by-premise check]" if direction == "direct"
-                  else "[Two-sided proof search]")
+        header = "[Two-sided proof search]"
     else:
-        want = "__PROVED__" if direction == "prove" else "__DISPROVED__"
+        want = "__PROVED__"
         flipped = label == want and cites >= MIN_CITATIONS
         note["flipped"] = flipped
-        header = ("[Directed proof search]" if direction == "prove"
-                  else "[Derivation audit]")
+        header = "[Directed proof search]"
 
     out = dict(rec)
     out["cwa_recheck"] = note
@@ -456,12 +349,10 @@ async def recheck_one(session, sem, rec, problem, depth, model,
         # The chain is kept in the record; the trace gets it written as steps
         # when the rewrite passes the gate, and the appended form otherwise.
         note["chain"] = body
-        integrated, why = None, "off"
-        if integrate:
-            async with sem:
-                integrated, why = await integrate_chain(
-                    session, problem, claimed, body, want, note.get("reached"),
-                    last_label(claimed), model)
+        async with sem:
+            integrated, why = await integrate_chain(
+                session, problem, claimed, body, want, note.get("reached"),
+                last_label(claimed), model)
         note["integrated"] = integrated is not None
         if why:
             note["integrate_rejected"] = why
@@ -525,16 +416,13 @@ async def main_async(args) -> None:
         print(f"  Saved: {out}")
         return
 
-    if args.direction == "direct":
-        targets = list(rows)
-        side = "every sample"
-    elif args.direction == "resolve":
+    if args.direction == "resolve":
         # Keyed to how the trace ends, not to the label it ends on.
         targets = [r for r in rows
                    if justified_by_absence(r.get("synthesized_trace") or "")]
         side = "by absence"
     else:
-        side = "__DISPROVED__" if args.direction == "prove" else "__PROVED__"
+        side = "__DISPROVED__"
         targets = [r for r in rows
                    if last_label(r.get("synthesized_trace") or "") == side]
     print(f"  {len(rows)} samples, {len(targets)} answered {side} — "
@@ -545,8 +433,7 @@ async def main_async(args) -> None:
     async with aiohttp.ClientSession(timeout=timeout) as session:
         done = await asyncio.gather(*[
             recheck_one(session, sem, r, problems.get(r["sample_id"], ""),
-                        args.expected_depth, args.model, args.direction,
-                        integrate=not args.keep_appendix)
+                        args.expected_depth, args.model, args.direction)
             for r in targets])
 
     by_id = {r["sample_id"]: r for r in done}
@@ -556,13 +443,13 @@ async def main_async(args) -> None:
     if n_flip:
         print(f"  chains written as steps: {n_int} of {n_flip} "
               f"(the rest keep the appended form)")
-    if args.direction in ("resolve", "direct"):
+    if args.direction == "resolve":
         acc = sum(1 for r in done if r["cwa_recheck"].get("accepted"))
         nei = sum(1 for r in done if r["cwa_recheck"].get("reached") == "NEITHER")
         print(f"  closed a chain: {acc}   left open: {nei}   "
               f"answers changed: {n_flip}")
     else:
-        want = "__PROVED__" if args.direction == "prove" else "__DISPROVED__"
+        want = "__PROVED__"
         said = sum(1 for r in done if r["cwa_recheck"]["label"] == want)
         print(f"  said {want}: {said}   of those naming what they used: {n_flip}")
 
@@ -578,18 +465,14 @@ def main() -> None:
     ap.add_argument("--synth", required=True)
     ap.add_argument("--k_traces", required=True)
     ap.add_argument("--expected_depth", type=int, default=None)
-    ap.add_argument("--direction", choices=["prove", "audit", "resolve", "direct"], default="prove",
+    ap.add_argument("--direction", choices=["prove", "resolve"], default="prove",
                     help="Which side the errors sit on. 'prove' searches again "
                          "for a derivation on the samples answered __DISPROVED__; "
-                         "'audit' checks the claimed derivation on the samples "
-                         "answered __PROVED__; 'resolve' takes the samples whose "
+                         "'resolve' takes the samples whose "
                          "final step reasons from the absence of a derivation, "
                          "whichever label that produced, and searches both "
                          "directions. Chosen per configuration from where that "
                          "configuration's errors actually are")
-    ap.add_argument("--keep_appendix", action="store_true",
-                    help="Append the pass's reply under a header, as earlier runs "
-                         "did, instead of writing the chain it found as steps")
     ap.add_argument("--integrate_only", action="store_true",
                     help="Take a file an earlier run wrote with appended replies and "
                          "write those chains as steps; no new search is made")
