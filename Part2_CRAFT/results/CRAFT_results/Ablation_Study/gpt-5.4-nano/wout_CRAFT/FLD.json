@@ -2,16 +2,16 @@
   "model": "gpt-5.4-nano",
   "dataset": "FLD",
   "setting": "w/o CRAFT",
-  "source_file": "results/baseline_results/gpt-5.4-nano/cot/results.json",
+  "source_file": "results/baseline_results/gpt-5.4-nano/direct/results.json",
   "craft_dir": "results/craft_runs/full500/FLD_gpt-5.4-nano",
-  "accuracy": 77.0,
-  "macro_f1": 0.7653,
-  "avg_steps": 15.71,
+  "accuracy": 66.1,
+  "macro_f1": 0.6601,
+  "avg_steps": 1.0,
   "n_samples": 496,
   "full_accuracy": 82.8,
-  "delta": -5.8,
+  "delta": -16.7,
   "n_common": 495,
-  "accuracy_common": 77.0,
+  "accuracy_common": 66.1,
   "full_accuracy_common": 82.8,
-  "delta_paired": -5.9
+  "delta_paired": -16.7
 }
