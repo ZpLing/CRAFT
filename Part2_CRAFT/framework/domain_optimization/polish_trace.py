@@ -45,39 +45,6 @@ _FORBIDDEN = re.compile(
     r"(?m)^\s*(?:#{1,6}\s|[-*•]\s|\d+\.\s)|\b[FR]\d+\b|->|=>|→|⇒|\[(?:Two-sided|Directed) proof search\]")
 
 STYLES: Dict[str, str] = {
-    "varied2": (
-        "- Keep every step in order under its 'Step N:' header, and keep the same "
-        "number of steps and the same claims and citations.\n"
-        "- Every quotation of a fact or rule stays exactly as written, wherever it "
-        "occurs, including when the same fact is applied again.\n"
-        "- Rewrite only the sentences around the quotations: no two of them in the "
-        "whole trace may share their opening words or their main verb phrase; a "
-        "result derived earlier is referred to by its step, never restated in the "
-        "same words.\n"
-        "- Complete sentences, with articles and verbs. No bullet points, no "
-        "headings, no arrows, no shorthand such as F1 or R8.\n"
-        "- Do not add reasoning, hedging or commentary, and do not drop a derivation."
-    ),
-    "two4": (
-        "- Keep every step in order under its 'Step N:' header, and keep the same "
-        "number of steps.\n"
-        "- Each step is exactly two sentences.\n"
-        "  The first begins with 'According to Fact N,' and then gives that fact or "
-        "rule in its own words, ending with a full stop: 'According to Fact 17, if "
-        "something is red and young then it chases the bald eagle.'\n"
-        "  The second applies it in one complete sentence that names each premise "
-        "with the Fact or an EARLIER Step that established it (a step never cites "
-        "itself or a later step) and states what follows: 'Since Step 2 established "
-        "that the tiger is red and Fact 4 states that the tiger is young, it follows "
-        "that the tiger chases the bald eagle.'\n"
-        "- Every sentence has its subject, verb, articles and commas. No quotation "
-        "marks except around the hypothesis in the last step, no arrows, no shorthand "
-        "such as F1 or R8, no parentheses, no bullet points, no headings.\n"
-        "- Say each thing once; do not restate the hypothesis inside the steps. The "
-        "last step reads: 'Since Step M established that <statement>, the hypothesis "
-        "\u201c<the hypothesis exactly as the problem states it>\u201d is <label>.'\n"
-        "- Do not add reasoning, hedging or commentary, and do not drop a derivation."
-    ),
     "two3": (
         "- Keep every step in order under its 'Step N:' header, and keep the same "
         "number of steps.\n"

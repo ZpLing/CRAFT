@@ -98,76 +98,6 @@ _GIVEN_LINE = re.compile(r'^(?:given|let|assume|suppose)[:\s]+(.+)$', re.IGNOREC
 
 
 #########################
-# Trace selection for the consensus
-#########################
-
-# The scorer's matcher, so "the traces that agree" means agreement about the
-# answer rather than about how it is spelled. \frac{1}{2}, \dfrac{1}{2} and 0.5
-# are one answer here and three answers to a string count.
-import sys as _sys
-_EVAL_DIR = str(_pl.Path(__file__).resolve().parents[2] / "evaluation" / "label_prediction")
-if _EVAL_DIR not in _sys.path:
-    _sys.path.insert(0, _EVAL_DIR)
-from answer_match import answers_match as _answers_match      # noqa: E402
-from extract_label import extract_pred as _extract_pred       # noqa: E402
-
-
-def select_majority_traces(
-    traces: List[Dict[str, Any]],
-    domain: str = "logical",
-    dataset: Optional[str] = None,
-    answer_type: Optional[str] = None,
-) -> List[int]:
-    """Indices of the traces that reach the majority answer.
-
-    The consensus used to be built over all k traces whatever they concluded, and
-    on 69.5% of Omni-MATH samples that meant merging traces that had reached
-    different answers. Node identity in the consensus is the step's position, so
-    such a merge takes step 1 from the chain that ended at 1995 and step 3 from
-    the chain that ended at 1996 and calls the result one derivation. Module III
-    then re-derives along a path no trace ever took, which is why its answer was
-    worse than a plain vote over the same traces in every agreement bucket.
-
-    Restricting the consensus to the traces that agree costs nothing — they are
-    already generated — and leaves the pipeline's shape untouched: Module I still
-    filters, Module II still votes on edges, Module III still walks the graph.
-    Ties keep the first group, matching the vote's own tie-break.
-
-    Returns every index when no answer can be read, so a sample is never left
-    without a consensus.
-    """
-    answers: List[Tuple[int, str]] = []
-    for i, t in enumerate(traces):
-        text = t.get("raw_response") or t.get("reasoning_text") or ""
-        if not text and t.get("reasoning_steps"):
-            text = "\n".join(str(s) for s in t["reasoning_steps"])
-        pred = t.get("label") if domain == "logical" else None
-        pred = pred or _extract_pred(text, domain)
-        if pred:
-            answers.append((i, pred))
-    if len(answers) < 2:
-        return list(range(len(traces)))
-
-    groups: List[List[int]] = []
-    reps: List[str] = []
-    for i, a in answers:
-        for g, rep in zip(groups, reps):
-            try:
-                same = _answers_match(a, rep, dataset=dataset, answer_type=answer_type)
-            except Exception:
-                same = (a == rep)
-            if same:
-                g.append(i)
-                break
-        else:
-            groups.append([i])
-            reps.append(a)
-
-    best = max(groups, key=len)
-    return sorted(best)
-
-
-#########################
 # Fact Node Extraction
 #########################
 
@@ -517,133 +447,6 @@ async def build_rkg_for_trace(
 
 
 #########################
-# Cross-Trace Step Alignment
-#########################
-
-_ALIGN_PROMPT_TEMPLATE = """\
-You are given {k} reasoning traces for the same problem. Your task is to identify \
-which steps across different traces are SEMANTICALLY EQUIVALENT — meaning they reach \
-the same intermediate conclusion through the same logical operation, even if worded differently.
-
-Rules:
-- Only group steps that genuinely express the same reasoning sub-goal.
-- A step that has no equivalent in ANY other trace gets its own singleton group.
-- Do NOT force alignment — it is fine if most steps are singletons.
-- Each step must appear in exactly one group.
-
-Output ONLY valid JSON:
-{{
-  "groups": [
-    {{"canonical_id": "C1", "members": [{{"trace": 0, "step": "Step2"}}, {{"trace": 1, "step": "Step3"}}]}},
-    {{"canonical_id": "C2", "members": [{{"trace": 0, "step": "Step4"}}]}},
-    ...
-  ]
-}}
-
-{traces_block}
-
-Respond with ONLY the JSON."""
-
-
-async def align_steps_across_traces(
-    session: aiohttp.ClientSession,
-    all_trace_steps: List[List[Dict[str, Any]]],
-    model: str = DEFAULT_MODEL,
-) -> Dict[Tuple[int, str], str]:
-    """Ask the LLM to align semantically equivalent steps across k traces.
-
-    Returns a mapping (trace_idx, original_step_id) -> canonical_id.
-    Steps with no cross-trace match get a unique canonical ID T{t}_S{n}.
-    Falls back to identity mapping (no alignment) on LLM failure.
-    """
-    k = len(all_trace_steps)
-    if k == 0:
-        return {}
-
-    # Build the traces block for the prompt
-    trace_lines = []
-    for t_idx, steps in enumerate(all_trace_steps):
-        trace_lines.append(f"=== Trace {t_idx} ===")
-        for s in steps:
-            text_preview = s["text"][:150].replace("\n", " ")
-            trace_lines.append(f"  {s['id']}: {text_preview}")
-    traces_block = "\n".join(trace_lines)
-
-    prompt = _ALIGN_PROMPT_TEMPLATE.format(k=k, traces_block=traces_block)
-
-    try:
-        result = await _call_llm_json(session, prompt, model)
-    except Exception:
-        result = None
-
-    # Build identity fallback mapping
-    identity: Dict[Tuple[int, str], str] = {}
-    for t_idx, steps in enumerate(all_trace_steps):
-        for s in steps:
-            identity[(t_idx, s["id"])] = f"T{t_idx}_{s['id']}"
-
-    if result is None or "groups" not in result:
-        return identity
-
-    # Parse groups → mapping
-    mapping: Dict[Tuple[int, str], str] = {}
-    seen_members: set = set()
-
-    for group in result.get("groups", []):
-        cid = group.get("canonical_id", "")
-        if not cid:
-            continue
-        for member in group.get("members", []):
-            t = member.get("trace")
-            sid = member.get("step", "")
-            if t is None or not sid:
-                continue
-            t = int(t)
-            if 0 <= t < k and (t, sid) not in seen_members:
-                mapping[(t, sid)] = cid
-                seen_members.add((t, sid))
-
-    # Fill in any missing steps with unique IDs
-    for t_idx, steps in enumerate(all_trace_steps):
-        for s in steps:
-            key = (t_idx, s["id"])
-            if key not in mapping:
-                mapping[key] = f"T{t_idx}_{s['id']}"
-
-    return mapping
-
-
-def remap_rkg_with_alignment(
-    rkg: Dict[str, Any],
-    trace_idx: int,
-    alignment: Dict[Tuple[int, str], str],
-) -> Dict[str, Any]:
-    """Remap step node IDs in a per-trace RKG using the alignment mapping.
-    Fact nodes are never remapped (they're shared across all traces already).
-    """
-    def _remap(node_id: str) -> str:
-        if node_id.startswith("Fact") or node_id.startswith("Given") or node_id == "Problem":
-            return node_id  # Facts are already shared
-        return alignment.get((trace_idx, node_id), f"T{trace_idx}_{node_id}")
-
-    new_nodes = []
-    for node in rkg.get("nodes", []):
-        new_node = dict(node)
-        new_node["id"] = _remap(node["id"])
-        new_nodes.append(new_node)
-
-    new_edges = []
-    for edge in rkg.get("edges", []):
-        new_edge = dict(edge)
-        new_edge["src"] = _remap(edge["src"])
-        new_edge["dst"] = _remap(edge["dst"])
-        if new_edge["src"] != new_edge["dst"]:
-            new_edges.append(new_edge)
-
-    return {**rkg, "nodes": new_nodes, "edges": new_edges}
-
-
-#########################
 # Consensus RKG Construction (BuildRKG)
 #########################
 
@@ -731,8 +534,7 @@ def build_consensus_rkg(
     consensus_threshold: float = 0.3,
     node_threshold: Optional[float] = None,
     term_overlap_weight: float = 0.3,   # lambda, the edge-weight balance
-    proved_threshold: Optional[float] = None,
-    weight_by: str = "uniform",   # "uniform" | "step_count" | "gold_depth"
+    weight_by: str = "uniform",   # "uniform" | "gold_depth"
     expected_depth: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Equal-weight edge-frequency voting across k trace RKGs to build the Consensus RKG.
@@ -762,8 +564,6 @@ def build_consensus_rkg(
 
     # ── Trace weights ──────────────────────────────────────────────────────
     # "uniform"   : every trace counts as 1.0 (default — plain MV)
-    # "step_count": weight ∝ #step+conclusion nodes; longer traces are more thorough
-    #               and empirically more reliable on logical-deduction tasks.
     # "gold_depth": weight by how near a trace lands to the depth the dataset is
     #               drawn at, and only where that depth is a property of the
     #               selection rather than of the sample. On the depth-5
@@ -777,10 +577,7 @@ def build_consensus_rkg(
                       if n.get("type") in ("step", "conclusion"))
         # gold_depth compares the trace's own length, not the graph's
         n_trace_steps = rkg_trace.get("n_trace_steps") or n_steps
-        if weight_by == "step_count":
-            # Use a small floor to avoid zero-weight on degenerate traces
-            trace_weights[tidx] = float(max(n_steps, 1))
-        elif weight_by == "gold_depth" and expected_depth:
+        if weight_by == "gold_depth" and expected_depth:
             # Exponent chosen on the first 250 ProofWriter samples and checked on
             # the other 250, where it is worth 5.2 points over an equal vote
             # (0.584 -> 0.636). Sharper exponents score higher on that second
@@ -903,11 +700,6 @@ def build_consensus_rkg(
     # ("I conclude __DISPROVED__" vs "Final Conclusion: __DISPROVED__") and
     # split the vote. Re-tally __PROVED__/__DISPROVED__ across all traces and
     # rewrite the consensus text to use the majority label.
-    #
-    # Asymmetric voting: many models exhibit a class-bias (e.g. gpt-5.4-nano
-    # over-predicts __DISPROVED__). We use a calibrated threshold τ on the
-    # PROVED ratio: predict PROVED if (PROVED_weight / total) ≥ τ. With τ=0.5
-    # this is plain majority vote; with τ<0.5 we counteract DISPROVED bias.
     for nid, counter in node_type_votes.items():
         if counter.most_common(1)[0][0] != "conclusion":
             continue
@@ -921,12 +713,7 @@ def build_consensus_rkg(
                 label_w["__UNKNOWN__"] += w
         if not label_w:
             continue
-        total_w = sum(label_w.values())
-        p_ratio = label_w.get("__PROVED__", 0) / total_w if total_w else 0
-        if proved_threshold is not None and "__UNKNOWN__" not in label_w:
-            best = "__PROVED__" if p_ratio >= proved_threshold else "__DISPROVED__"
-        else:
-            best = max(label_w, key=lambda l: label_w[l])
+        best = max(label_w, key=lambda l: label_w[l])
         node_texts[nid] = f"Final Conclusion: {best}"
 
     # ── Filter high-weight edges ───────────────────────────────────────────
@@ -968,8 +755,6 @@ def build_consensus_rkg(
     consensus_node_ids |= fact_ids
 
     # Conclusion nodes are always retained (regardless of edge frequency).
-    # When alignment is on, all conclusions share canonical id "ConcFinal".
-    # When alignment is off, conclusion ids are positional (e.g. "Step10").
     conclusion_ids = {nid for nid, ntype in node_types.items() if ntype == "conclusion"}
     consensus_node_ids |= conclusion_ids
     # Also retain any incoming edges to conclusion nodes that meet a relaxed threshold,
@@ -1021,19 +806,11 @@ async def build_rkgs_for_sample(
     domain: str = "logical",
     consensus_threshold: float = 0.3,
     node_threshold: Optional[float] = None,
-    use_alignment: bool = False,
     edge_lambda: float = 0.3,
     weight_by: str = "uniform",
     expected_depth: Optional[int] = None,
-    consensus_scope: str = "all",
-    dataset_name: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Concurrently build per-trace RKGs for a sample, then compute the consensus RKG.
-
-    When use_alignment=True, first runs a cross-trace step alignment LLM call to
-    assign canonical node IDs to semantically equivalent steps, eliminating positional
-    mismatch before edge-frequency voting.
-    """
+    """Concurrently build per-trace RKGs for a sample, then compute the consensus RKG."""
     traces = sample.get("cleaned_traces") or sample.get("traces", [])
     problem_text = (
         sample.get("problem_text")
@@ -1073,64 +850,8 @@ async def build_rkgs_for_sample(
 
     valid_rkgs = [d for d in trace_rkgs if d.get("extraction_method") != "error"]
 
-    # Every trace keeps its own graph in the output — the ablation's "consensus
-    # over all traces" row is then a free offline rebuild — but only the traces
-    # that agree on the answer are voted into the consensus. Merging chains that
-    # ended at different answers, which is what "all" does on most samples,
-    # produces a graph that describes no derivation any trace performed.
-    consensus_rkgs = valid_rkgs
-    scope_info: Dict[str, Any] = {"scope": consensus_scope}
-    if consensus_scope == "majority" and len(valid_rkgs) > 1:
-        keep = set(select_majority_traces(
-            traces, domain=domain, dataset=dataset_name,
-            answer_type=(traces[0] or {}).get("answer_type") if traces else None,
-        ))
-        scoped = [d for d in valid_rkgs if d.get("trace_idx") in keep]
-        if scoped:
-            consensus_rkgs = scoped
-            scope_info["kept"] = sorted(keep)
-            scope_info["dropped"] = len(valid_rkgs) - len(scoped)
-
-    # Optional: cross-trace alignment before consensus voting
-    alignment_info: Dict[str, Any] = {"used": False}
-    if use_alignment and len(valid_rkgs) > 1:
-        # Collect ONLY step nodes for LLM alignment (conclusion nodes share a canonical ID)
-        all_trace_steps = [
-            [n for n in rkg.get("nodes", []) if n.get("type") == "step"]
-            for rkg in valid_rkgs
-        ]
-        alignment = await align_steps_across_traces(session, all_trace_steps, model=model)
-
-        # Force all conclusion nodes across traces to share a single canonical ID.
-        # Each trace has exactly one final conclusion → they should always be grouped.
-        for rkg in valid_rkgs:
-            t_idx = rkg["trace_idx"]
-            for n in rkg.get("nodes", []):
-                if n.get("type") == "conclusion":
-                    alignment[(t_idx, n["id"])] = "ConcFinal"
-
-        # Count how many steps got grouped with at least one other step
-        from collections import Counter
-        cid_counts = Counter(alignment.values())
-        n_shared = sum(1 for v in cid_counts.values() if v > 1)
-        n_total_steps = sum(len(s) for s in all_trace_steps)
-
-        alignment_info = {
-            "used":            True,
-            "n_canonical_ids": len(cid_counts),
-            "n_shared_groups": n_shared,
-            "n_total_steps":   n_total_steps,
-            "shared_ratio":    round(n_shared / max(len(cid_counts), 1), 3),
-        }
-
-        # Remap step IDs in each valid RKG
-        for rkg in valid_rkgs:
-            t_idx = rkg["trace_idx"]
-            remapped = remap_rkg_with_alignment(rkg, t_idx, alignment)
-            rkg.update(remapped)
-
     consensus = build_consensus_rkg(
-        consensus_rkgs,
+        valid_rkgs,
         consensus_threshold=consensus_threshold,
         node_threshold=node_threshold,
         term_overlap_weight=edge_lambda,
@@ -1142,8 +863,6 @@ async def build_rkgs_for_sample(
         "sample_id":       sample.get("sample_id", "unknown"),
         "trace_rkgs":      trace_rkgs,
         "consensus_rkg":   consensus,
-        "alignment":       alignment_info,
-        "consensus_scope": scope_info,
     }
 
 
@@ -1159,9 +878,6 @@ async def build_rkgs_for_dataset(
     edge_lambda: float = 0.3,
     weight_by: str = "uniform",
     expected_depth: Optional[int] = None,
-    consensus_scope: str = "all",
-    dataset_name: Optional[str] = None,
-    use_alignment: bool = False,
 ) -> None:
     """Build RKGs for all samples in a dataset and write output to rkg.json."""
     print(f"Reading file: {input_file}")
@@ -1196,9 +912,6 @@ async def build_rkgs_for_dataset(
                         consensus_threshold=consensus_threshold,
                         node_threshold=node_threshold,
                         edge_lambda=edge_lambda,
-                        consensus_scope=consensus_scope,
-                        dataset_name=dataset_name,
-                        use_alignment=use_alignment,
                     )
                 except Exception as e:
                     results[idx] = {
@@ -1247,17 +960,9 @@ def rebuild_consensus(
     consensus_threshold: float = 0.3,
     node_threshold: Optional[float] = None,
     term_overlap_weight: float = 0.3,
-    proved_threshold: Optional[float] = None,
     weight_by: str = "uniform",
     gt_file: Optional[Path] = None,
     expected_depth: Optional[int] = None,
-    consensus_scope: str = "all",
-    traces_file: Optional[Path] = None,
-    domain: str = "logical",
-    dataset: Optional[str] = None,
-    use_alignment: bool = False,
-    model: str = DEFAULT_MODEL,
-    concurrency: int = 10,
 ) -> None:
     """Recompute consensus_rkg in an existing RKG file from its cached trace_rkgs.
 
@@ -1282,79 +987,12 @@ def rebuild_consensus(
     correct = total = no_conclusion = 0
     matrix: Counter = Counter()
 
-    # consensus_scope="majority" needs each trace's answer, which the cached
-    # graphs do not carry; it comes from the trace file the run was built from.
-    traces_map: Dict[str, List[Dict[str, Any]]] = {}
-    if consensus_scope == "majority":
-        if not traces_file or not Path(traces_file).exists():
-            raise SystemExit("--consensus_scope majority needs --traces_file")
-        with open(traces_file) as f:
-            t_raw = json.load(f)
-        t_rows = t_raw.get("results", t_raw) if isinstance(t_raw, dict) else t_raw
-        traces_map = {
-            s["sample_id"]: (s.get("cleaned_traces") or s.get("traces") or [])
-            for s in t_rows
-        }
-
-    n_scoped = n_dropped = 0
-
-    # Cross-trace alignment on the cached per-trace graphs: one LLM call per
-    # sample, so a rebuilt consensus can vote over steps rather than positions
-    # without extracting the graphs again.
-    alignments: Dict[str, Dict[Tuple[int, str], str]] = {}
-    if use_alignment:
-        async def _align_all() -> None:
-            sem = asyncio.Semaphore(concurrency)
-            connector = aiohttp.TCPConnector(limit=concurrency)
-            async with aiohttp.ClientSession(connector=connector) as session:
-                async def one(r: Dict[str, Any]) -> None:
-                    rkgs = [t for t in (r.get("trace_rkgs") or r.get("trace_dags") or [])
-                            if t.get("extraction_method") != "error"]
-                    if len(rkgs) < 2:
-                        return
-                    steps = [[n for n in t.get("nodes", []) if n.get("type") == "step"] for t in rkgs]
-                    async with sem:
-                        mapping = await align_steps_across_traces(session, steps, model=model)
-                    for t in rkgs:
-                        for n in t.get("nodes", []):
-                            if n.get("type") == "conclusion":
-                                mapping[(t["trace_idx"], n["id"])] = "ConcFinal"
-                    alignments[r["sample_id"]] = mapping
-                await asyncio.gather(*(one(r) for r in results))
-        asyncio.run(_align_all())
-        print(f"aligned {len(alignments)}/{len(results)} samples")
-
     for r in results:
         valid = [copy.deepcopy(t) for t in (r.get("trace_rkgs") or r.get("trace_dags") or [])
                  if t.get("extraction_method") != "error"]
         if not valid:
             r["consensus_rkg"] = {"nodes": [], "edges": []}
             continue
-        mapping = alignments.get(r.get("sample_id"))
-        if mapping:
-            for t in valid:
-                t.update(remap_rkg_with_alignment(t, t["trace_idx"], mapping))
-            cid_counts = Counter(mapping.values())
-            r["alignment"] = {
-                "used": True,
-                "n_canonical_ids": len(cid_counts),
-                "n_shared_groups": sum(1 for v in cid_counts.values() if v > 1),
-                "n_total_steps": sum(1 for k in mapping if k[1] != "ConcFinal"),
-            }
-
-        if consensus_scope == "majority":
-            src_traces = traces_map.get(r.get("sample_id")) or []
-            if len(src_traces) >= 2:
-                keep = set(select_majority_traces(
-                    src_traces, domain=domain, dataset=dataset,
-                    answer_type=(src_traces[0] or {}).get("answer_type"),
-                ))
-                scoped = [t for t in valid if t.get("trace_idx") in keep]
-                if scoped:
-                    n_dropped += len(valid) - len(scoped)
-                    n_scoped += 1
-                    valid = scoped
-            r["consensus_scope"] = consensus_scope
         # lambda and the node threshold travel with the rest. They used not to:
         # a rebuild always used build_consensus_rkg's defaults for both, so
         # --edge_lambda 0 rebuilt a graph byte-identical to --edge_lambda 0.3 —
@@ -1365,7 +1003,6 @@ def rebuild_consensus(
             consensus_threshold=consensus_threshold,
             node_threshold=node_threshold,
             term_overlap_weight=term_overlap_weight,
-            proved_threshold=proved_threshold,
             weight_by=weight_by,
             expected_depth=expected_depth,
         )
@@ -1413,20 +1050,11 @@ def main() -> None:
     parser.add_argument("--base_url", default=None, help="API Base URL")
     parser.add_argument("--concurrency", type=int, default=10, help="Concurrency level (default 10)")
     parser.add_argument("--domain", default="logical", choices=["logical", "math"])
-    parser.add_argument("--dataset_name", default=None,
-                        choices=[None, "FLD", "ProofWriter", "OlympiadBench", "OmniMATH"],
-                        help="Which dataset adapter compares two answers for --consensus_scope "
-                             "majority; without it the comparison falls back to string equality")
     parser.add_argument("--consensus_threshold", type=float, default=0.3,
                         help="Edge weight threshold theta: an edge enters G* when at least this fraction of the K traces contain it (default 0.3)")
     parser.add_argument("--node_threshold", type=float, default=None,
                         help="Node threshold: fraction of the K traces a node must appear in (default: same as --consensus_threshold)")
     parser.add_argument("--max_samples", type=int, default=None)
-    parser.add_argument("--align", action="store_true",
-                        help="Align steps across the K traces (one LLM call per sample) before "
-                             "voting, so a node is a step and not a position: without it Step 2 "
-                             "of every trace is one node whatever each trace did second, and the "
-                             "synthesized trace re-derives what a collided node hides")
     parser.add_argument("--similarity", choices=["jaccard", "embedding"],
                         default="jaccard",
                         help="The overlap measure fused into W(e): term Jaccard "
@@ -1440,28 +1068,16 @@ def main() -> None:
     parser.add_argument("--rebuild_consensus", action="store_true",
                         help="Recompute consensus_rkg in --input in place from its cached "
                              "trace_rkgs (no LLM calls); --output is ignored")
-    parser.add_argument("--proved_threshold", type=float, default=None,
-                        help="--rebuild_consensus: asymmetric voting tau; predict PROVED when the "
-                             "PROVED weight ratio >= tau (default: plain majority vote)")
     parser.add_argument("--expected_depth", type=int, default=None,
                         help="The proof depth this dataset is drawn at, for --weight_by "
                              "gold_depth. Only meaningful where the depth is a property of "
                              "the selection and not gold annotation about the sample")
-    parser.add_argument("--weight_by", choices=["uniform", "step_count", "gold_depth"],
+    parser.add_argument("--weight_by", choices=["uniform", "gold_depth"],
                         default="uniform",
-                        help="--rebuild_consensus: trace weighting; 'step_count' favors longer traces")
+                        help="--rebuild_consensus: trace weighting; 'gold_depth' favors traces "
+                             "whose length is near --expected_depth")
     parser.add_argument("--gt_file", default=None,
                         help="--rebuild_consensus: cleaned_with_problem.json, for conclusion-label diagnostics")
-    parser.add_argument("--consensus_scope", choices=["all", "majority"], default="all",
-                        help="Which traces the consensus is built over. 'all' merges every "
-                             "trace whatever it concluded, which on 69.5%% of Omni-MATH "
-                             "samples means merging traces that reached different answers "
-                             "into one graph whose nodes are matched by step position. "
-                             "'majority' keeps the traces that agree on the answer, so the "
-                             "graph describes one derivation. Needs --traces_file")
-    parser.add_argument("--traces_file", default=None,
-                        help="--consensus_scope majority: the cleaned/k_traces file the run was "
-                             "built from, read for each trace's answer")
     args = parser.parse_args()
     set_similarity(args.similarity)
 
@@ -1479,17 +1095,9 @@ def main() -> None:
             consensus_threshold=args.consensus_threshold,
             node_threshold=args.node_threshold,
             term_overlap_weight=args.edge_lambda,
-            proved_threshold=args.proved_threshold,
             weight_by=args.weight_by,
             expected_depth=args.expected_depth,
             gt_file=_cfg.resolve_input(args.gt_file) if args.gt_file else None,
-            consensus_scope=args.consensus_scope,
-            traces_file=_cfg.resolve_input(args.traces_file) if args.traces_file else None,
-            domain=args.domain,
-            dataset=args.dataset_name,
-            use_alignment=args.align,
-            model=args.model,
-            concurrency=args.concurrency,
         )
         return
 
@@ -1505,9 +1113,6 @@ def main() -> None:
         edge_lambda=args.edge_lambda,
         weight_by=args.weight_by,
         expected_depth=args.expected_depth,
-        consensus_scope=args.consensus_scope,
-        dataset_name=args.dataset_name,
-        use_alignment=args.align,
     ))
 
 

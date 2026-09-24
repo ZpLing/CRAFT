@@ -444,8 +444,6 @@ async def generate_single_trace(
     max_retries: int = 3,
     domain: str = "logical",
     fixed_temp: bool = False,
-    temp_min: Optional[float] = None,
-    temp_max: Optional[float] = None,
 ) -> Optional[Dict[str, Any]]:
     """Generate a single reasoning trace.
 
@@ -456,8 +454,6 @@ async def generate_single_trace(
         max_retries: Maximum number of retry attempts
         domain: "logical" or "math"
         fixed_temp: True → all traces use the same temperature (base_temperature), disables linear spacing
-        temp_min: Lower bound for linear spacing (takes precedence over base±0.3 when specified)
-        temp_max: Upper bound for linear spacing (takes precedence over base±0.3 when specified)
 
     Returns:
         Generated trace dict, or None on failure
@@ -466,11 +462,8 @@ async def generate_single_trace(
         temperature = base_temperature
     else:
         # Arithmetic sampling: k traces uniformly cover [t_min, t_max]
-        if temp_min is not None and temp_max is not None:
-            t_min, t_max = temp_min, temp_max
-        else:
-            t_min = max(0.3, base_temperature - 0.3)
-            t_max = min(1.2, base_temperature + 0.3)
+        t_min = max(0.3, base_temperature - 0.3)
+        t_max = min(1.2, base_temperature + 0.3)
         temperature = round(t_min + (t_max - t_min) * trace_idx / (k - 1), 2)
 
     if domain == "math":
@@ -523,8 +516,6 @@ async def generate_k_traces_for_sample(
     base_temperature: float = 0.7,
     domain: Optional[str] = None,
     fixed_temp: bool = False,
-    temp_min: Optional[float] = None,
-    temp_max: Optional[float] = None,
 ) -> Dict[str, Any]:
     """Generate k reasoning traces for a single sample."""
     problem_text = sample_entry["problem_text"]
@@ -533,8 +524,7 @@ async def generate_k_traces_for_sample(
 
     tasks = [
         generate_single_trace(session, problem_text, trace_idx, k, base_temperature,
-                              domain=sample_domain, fixed_temp=fixed_temp,
-                              temp_min=temp_min, temp_max=temp_max)
+                              domain=sample_domain, fixed_temp=fixed_temp)
         for trace_idx in range(k)
     ]
     traces_results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -577,8 +567,6 @@ async def generate_k_traces_dataset(
     base_temperature: float = 0.7,
     domain: str = "logical",
     fixed_temp: bool = False,
-    temp_min: Optional[float] = None,
-    temp_max: Optional[float] = None,
 ) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
     """Process all samples in batch, generating k traces per sample.
 
@@ -602,7 +590,7 @@ async def generate_k_traces_dataset(
                     # Per-sample domain: read from sample_entry, do not pass global domain parameter
                     results[idx] = await generate_k_traces_for_sample(
                         session, entry, k, base_temperature, domain=domain,
-                        fixed_temp=fixed_temp, temp_min=temp_min, temp_max=temp_max
+                        fixed_temp=fixed_temp
                     )
                 except Exception as e:
                     results[idx] = {
@@ -795,11 +783,6 @@ def parse_args() -> argparse.Namespace:
         help="Fixed temperature mode: all k traces use the same temperature, no linear spacing",
     )
     parser.add_argument(
-        "--temp_range",
-        type=float, nargs=2, metavar=("MIN", "MAX"),
-        help="Explicitly specify temperature range for linear spacing, e.g. --temp_range 0.3 0.6 (overrides base±0.3 default)",
-    )
-    parser.add_argument(
         "--domain",
         type=str,
         default="logical",
@@ -850,13 +833,8 @@ def main() -> None:
     print(f"Model: {MODEL_NAME}")
     print(f"Samples loaded: {len(samples)}")
     print(f"Traces per sample: {args.k}")
-    temp_min = args.temp_range[0] if args.temp_range else None
-    temp_max = args.temp_range[1] if args.temp_range else None
     if args.fixed_temp:
         temp_desc = f"fixed {args.temperature}"
-    elif temp_min is not None:
-        step = (temp_max - temp_min) / max(args.k - 1, 1)
-        temp_desc = f"linear [{temp_min:.2f} -> {temp_max:.2f}], step={step:.3f}"
     else:
         t_min = max(0.3, args.temperature - 0.3)
         t_max = min(1.2, args.temperature + 0.3)
@@ -875,8 +853,6 @@ def main() -> None:
             base_temperature=args.temperature,
             domain=args.domain,
             fixed_temp=args.fixed_temp,
-            temp_min=temp_min,
-            temp_max=temp_max,
         )
     )
 

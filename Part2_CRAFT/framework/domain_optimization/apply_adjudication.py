@@ -149,9 +149,6 @@ def main() -> None:
                     help="Only override where the consensus had at most this "
                          "many of the k votes behind it")
     ap.add_argument("--output", required=True)
-    ap.add_argument("--keep_appendix", action="store_true",
-                    help="Append the adjudicator's reply under a header, as earlier "
-                         "runs did, instead of writing its derivation as the trace's steps")
     ap.add_argument("--model", default=None,
                     help="Model that writes the derivation as steps (default: the "
                          "adjudicated file's model, else gemini-3.1-flash-lite)")
@@ -176,7 +173,7 @@ def main() -> None:
                 overrides[r["sample_id"]] = (a, src)
 
     written = {}
-    if overrides and not args.keep_appendix:
+    if overrides:
         import synthesize_trace as _st
         if args.api_key:
             _st.OPENAI_API_KEY = args.api_key
