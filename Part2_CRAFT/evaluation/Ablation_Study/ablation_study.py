@@ -7,7 +7,6 @@ ablation_study.py — the ablation table of §4, one row per removed component.
     CRAFT (full)                 nothing                    the run's synthesized trace
     w/o CRAFT                    the whole pipeline         a single-call run
     w/o RKG                      Module II's graph          --synthesis_strategy step_by_step
-    w/o Synthesis                Module III                 vote over the cleaned traces
     w/o Weighted Edges Fusion    the lambda term in W(e)    build_rkg --edge_lambda 0
     Embedding Cosine Similarity  Jaccard in the edge weight an embedding-similarity run
     w/o Rollout (K=1)            the other K-1 traces       the pipeline run on one trace
@@ -16,10 +15,7 @@ ablation_study.py — the ablation table of §4, one row per removed component.
 
 Scoring is not reimplemented here: the rows are read with the same loaders and
 scored with the same metric as the main table, so an ablation row and a main-table
-cell can never disagree about what a run achieved. That also keeps the vote
-row honest — the filtered file re-derives each trace's prediction from the text
-that survived filtering, rather than reusing the label generation stored, which is
-what makes "w/o Synthesis" a measurement of the filter's output.
+cell can never disagree about what a run achieved.
 
 Three settings need their own run and are passed in with --variant NAME=PATH.
 Settings that were not run are printed as absent, so a partial table cannot be
@@ -79,7 +75,7 @@ VARIANT_ROWS = ("w/o RKG", "w/o Weighted Edges Fusion", "Embedding Cosine Simila
 # The single-trace row used to be called "w/o Consensus"; the old name is still accepted.
 ALIASES = {"w/o Consensus (K=1)": ROLLOUT}
 ROW_ORDER = (FULL, "w/o CRAFT", ROLLOUT, "w/o Steps Filtering", "w/o RKG",
-             "w/o Edge & Node Filtering", "w/o Synthesis",
+             "w/o Edge & Node Filtering",
              "w/o Weighted Edges Fusion", "Embedding Cosine Similarity")
 
 
@@ -147,22 +143,45 @@ def build_zero_shot(baseline: Path, covered: Path, out: Path) -> List[str]:
     return sorted(wanted - seen)
 
 
+def paired(a: List[Dict[str, Any]], b: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Accuracy of two rows on the problems both of them scored.
+
+    A variant run that failed on some samples has a smaller denominator than
+    the full run, and the two accuracies then move for a reason that has
+    nothing to do with the component. The change a row reports is therefore
+    taken on the common problems, and the count is written next to it.
+    """
+    ia = {s["sample_id"]: s for s in a if str(s.get("ground_truth") or "").strip()}
+    ib = {s["sample_id"]: s for s in b if str(s.get("ground_truth") or "").strip()}
+    common = [i for i in ia if i in ib]
+    if not common:
+        return {"n_common": 0}
+    ma = compute_metrics([ia[i] for i in common])
+    mb = compute_metrics([ib[i] for i in common])
+    return {"n_common": len(common),
+            "accuracy_common": round(100.0 * ma["accuracy"], 1),
+            "full_accuracy_common": round(100.0 * mb["accuracy"], 1),
+            "delta_paired": round(100.0 * (ma["accuracy"] - mb["accuracy"]), 1)}
+
+
 def score(path: Path, source: str) -> Dict[str, Any]:
     """One row, scored exactly as evaluate_accuracy would score it.
 
     n_samples is the row's own denominator, not the slice's size. They are not
     always the same number: a sample whose consensus RKG came out empty has no
     graph for Module III to walk and the pipeline drops it, so a synthesis row
-    can rest on fewer samples than the vote rows beside it, which read the
-    traces directly and keep all 500. A drop of a tenth of a point across
+    can rest on fewer samples than a row that reads the traces directly and
+    keeps all 500. A drop of a tenth of a point across
     denominators that differ by five is inside that difference, so the column
     carries the count rather than leaving it to be assumed.
     """
-    metrics = compute_metrics(LOADERS[source](path))
+    samples = LOADERS[source](path)
+    metrics = compute_metrics(samples)
     return {"accuracy": round(100.0 * metrics["accuracy"], 1),
             "macro_f1": metrics["macro_f1"],
             "avg_steps": metrics.get("avg_steps"),
-            "n_samples": metrics.get("n_total")}
+            "n_samples": metrics.get("n_total"),
+            "_samples": samples}
 
 
 def main() -> None:
@@ -204,14 +223,9 @@ def main() -> None:
                   else find_one(run_dir, "synthesized*.json"))
     if synth_path is None:
         raise FileNotFoundError(f"No synthesized*.json in {run_dir}")
-    cleaned_path = (find_one(run_dir, "cleaned_traces_rkg.json")
-                    or find_one(run_dir, "cleaned*.json"))
 
     rows: Dict[str, Dict[str, Any]] = {FULL: score(synth_path, "synthesized")}
     sources: Dict[str, Path] = {FULL: synth_path}
-    if cleaned_path:
-        rows["w/o Synthesis"] = score(cleaned_path, "cleaned")
-        sources["w/o Synthesis"] = cleaned_path
     if args.baseline_cot:
         # Not zero_shot.json: several runs already carry a file by that name,
         # and a default that silently overwrites one of a run's own inputs is a
@@ -272,11 +286,14 @@ def main() -> None:
             continue
         out = root / model / slug(name) / f"{dataset}.json"
         out.parent.mkdir(parents=True, exist_ok=True)
+        row = {k: v for k, v in rows[name].items() if k != "_samples"}
+        pair = {} if name == FULL else paired(rows[name]["_samples"], rows[FULL]["_samples"])
         out.write_text(json.dumps(
             {"model": model, "dataset": dataset, "setting": name,
              "source_file": rel(sources[name]), "craft_dir": rel(run_dir),
-             **rows[name], "full_accuracy": full_acc,
-             "delta": None if name == FULL else round(rows[name]["accuracy"] - full_acc, 1)},
+             **row, "full_accuracy": full_acc,
+             "delta": None if name == FULL else round(rows[name]["accuracy"] - full_acc, 1),
+             **pair},
             indent=2), encoding="utf-8")
     print(f"  Saved: {root / model}/<setting>/{dataset}.json for "
           f"{sum(n in rows for n in ROW_ORDER)} settings")

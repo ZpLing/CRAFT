@@ -1,0 +1,17 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "OlympiadBench",
+  "setting": "Embedding Cosine Similarity",
+  "source_file": "results/craft_runs/full500/OlympiadBench_gpt-5.4-nano/abl_embed.json",
+  "craft_dir": "results/craft_runs/full500/OlympiadBench_gpt-5.4-nano",
+  "accuracy": 60.7,
+  "macro_f1": null,
+  "avg_steps": 8.3,
+  "n_samples": 422,
+  "full_accuracy": 60.6,
+  "delta": 0.1,
+  "n_common": 422,
+  "accuracy_common": 60.7,
+  "full_accuracy_common": 60.2,
+  "delta_paired": 0.5
+}
