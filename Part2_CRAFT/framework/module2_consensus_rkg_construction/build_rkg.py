@@ -780,9 +780,8 @@ def build_consensus_rkg(
     node_threshold: Optional[float] = None,
     term_overlap_weight: float = 0.3,   # lambda, the edge-weight balance
     proved_threshold: Optional[float] = None,
-    weight_by: str = "uniform",   # "uniform" | "step_count" | "gold_depth" | "support"
+    weight_by: str = "uniform",   # "uniform" | "step_count" | "gold_depth"
     expected_depth: Optional[int] = None,
-    trace_weights_override: Optional[Dict[int, float]] = None,
 ) -> Dict[str, Any]:
     """Equal-weight edge-frequency voting across k trace RKGs to build the Consensus RKG.
 
@@ -819,27 +818,6 @@ def build_consensus_rkg(
     #               ProofWriter slice a trace within two steps of it is right 90%
     #               of the time against 50% for one six steps over, and an equal
     #               vote spends the two the same.
-    # "support"   : weight by how well the consensus supports the trace -- the mean
-    #               W(e)-weighted support of the trace's edges once the graph has
-    #               been built with equal weights. This is where the edge weight
-    #               W(e) = (1-lambda)*conf + lambda*Jaccard reaches the vote:
-    #               Module III weights each trace's answer by these weights, so a
-    #               trace whose dependencies the other traces confirm counts more.
-    if weight_by == "support" and trace_weights_override is None:
-        first = build_consensus_rkg(trace_rkgs, consensus_threshold, node_threshold,
-                                    term_overlap_weight, proved_threshold, "uniform",
-                                    expected_depth)
-        support = first.get("edge_support") or first.get("edge_frequencies") or {}
-        derived: Dict[int, float] = {}
-        for rkg_trace in trace_rkgs:
-            keys = {f"{e['src']}->{e['dst']}" for e in rkg_trace.get("edges", [])}
-            vals = [support.get(k, 0.0) for k in keys]
-            derived[rkg_trace.get("trace_idx", 0)] = max(0.05, sum(vals) / len(vals)) if vals else 0.05
-        mean_w = sum(derived.values()) / max(len(derived), 1)
-        derived = {k: v / mean_w for k, v in derived.items()} if mean_w > 0 else derived
-        return build_consensus_rkg(trace_rkgs, consensus_threshold, node_threshold,
-                                   term_overlap_weight, proved_threshold, "uniform",
-                                   expected_depth, trace_weights_override=derived)
     trace_weights: Dict[int, float] = {}
     for rkg_trace in trace_rkgs:
         tidx = rkg_trace.get("trace_idx", 0)
@@ -847,9 +825,7 @@ def build_consensus_rkg(
                       if n.get("type") in ("step", "conclusion"))
         # gold_depth compares the trace's own length, not the graph's
         n_trace_steps = rkg_trace.get("n_trace_steps") or n_steps
-        if trace_weights_override is not None:
-            trace_weights[tidx] = float(trace_weights_override.get(tidx, 1.0))
-        elif weight_by == "step_count":
+        if weight_by == "step_count":
             # Use a small floor to avoid zero-weight on degenerate traces
             trace_weights[tidx] = float(max(n_steps, 1))
         elif weight_by == "gold_depth" and expected_depth:
@@ -1546,7 +1522,7 @@ def main() -> None:
                         help="The proof depth this dataset is drawn at, for --weight_by "
                              "gold_depth. Only meaningful where the depth is a property of "
                              "the selection and not gold annotation about the sample")
-    parser.add_argument("--weight_by", choices=["uniform", "step_count", "gold_depth", "support"],
+    parser.add_argument("--weight_by", choices=["uniform", "step_count", "gold_depth"],
                         default="uniform",
                         help="--rebuild_consensus: trace weighting; 'step_count' favors longer traces")
     parser.add_argument("--gt_file", default=None,
