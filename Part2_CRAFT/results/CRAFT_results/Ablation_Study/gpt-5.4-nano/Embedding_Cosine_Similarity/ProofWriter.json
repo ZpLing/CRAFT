@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "ProofWriter",
+  "setting": "Embedding Cosine Similarity",
+  "source_file": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano/abl_embed_resolve.json",
+  "craft_dir": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano",
+  "accuracy": 98.4,
+  "macro_f1": 0.984,
+  "avg_steps": 10.04,
+  "n_samples": 500,
+  "full_accuracy": 97.2,
+  "delta": 1.2
+}
