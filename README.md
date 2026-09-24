@@ -6,11 +6,11 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
 </p>
 
-A correct label does not mean the steps behind it were correct, and handing the model
-the correct answer does not repair them — our pilot study finds no consistent gain from
-that guidance. So **CRAFT** repairs the *structure* instead: it rolls out `K` candidate
-traces, drops the steps they disagree on, aggregates the survivors into a consensus
-**Reasoning Knowledge Graph (RKG)**, and synthesizes one trace by walking that graph.
+A correct label does not mean the steps behind it are correct, and giving the model the
+correct answer does not fix them: our pilot study finds no consistent gain from it.
+**CRAFT** repairs the structure of the reasoning instead. It rolls out `K` candidate traces,
+drops the steps they disagree on, merges the rest into a consensus **Reasoning Knowledge
+Graph (RKG)**, and writes one trace by walking that graph.
 
 | Backbone | Setting | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -19,26 +19,8 @@ traces, drops the steps they disagree on, aggregates the survivors into a consen
 | Gemini-3.1-flash-lite | Best of 12 baselines | **90.3** | **0.903** | 11.1 | 68.6 | 0.678 | 14.8 | 55.1 | 24.9 | 65.8 | 25.0 |
 | Gemini-3.1-flash-lite | **CRAFT** | 88.7 | 0.887 | **9.2** | **86.8** | **0.868** | **9.2** | **61.6** | **8.3** | **74.5** | **8.7** |
 
-Label-prediction accuracy, macro-F1 and average reasoning steps, all scored by
-`evaluation/label_prediction/evaluate_accuracy.py` and its answer readers; **bold** is the
-better of the two rows. Macro-F1 is averaged over PROVED and DISPROVED, so the two maths
-datasets have no classes to average and leave it out rather than printing their accuracy
-twice.
-These are the numbers of the paper's main table, read from each cell's result file under
-`Part2_CRAFT/results/`; the few problems no method could score are dropped, leaving 492 to
-500 of the 500 per cell. The baseline row is the best of the 12 *on that cell*, chosen by
-accuracy, so it is a different method in almost every column and its F1 and steps are that
-method's rather than the best any baseline reached.
-CRAFT is ahead on 7 of the 8 accuracy cells, 5 of them at p<0.05 under an exact two-sided
-McNemar test on the problems both methods answered; the eighth, Gemini on FLD, is 1.6 behind
-PNS-Optimization at p=0.34. It is also the shorter trace on 7 of the 8, and not by a little:
-8.2 steps against Self-Consistency's 78.4 on nano's Omni-MATH, at 6.3 points higher accuracy.
-The exception is nano's FLD, where Faithful CoT answers in 7.7 steps to CRAFT's 9.4 and 3.0
-points less accurately.
-
-> FOLIO and GSM8K were dropped after the pilot: both backbones were already close to the
-> ceiling on them, leaving no room for a method to show a difference, and they were replaced
-> by ProofWriter depth-5 and Omni-MATH.
+> FOLIO and GSM8K were dropped after the pilot because both backbones were already close to
+> the ceiling on them. ProofWriter (depth 5) and Omni-MATH replaced them.
 
 ## Installation
 
@@ -49,11 +31,10 @@ python -m pip install -r requirements.txt
 python -m nltk.downloader punkt averaged_perceptron_tagger
 ```
 
-`requirements.txt` is one file for the whole repo — both parts, the baselines and
-the scorers run in the environment it describes. Versions in it are floors, not pins.
+`requirements.txt` covers the whole repo: both parts, the baselines and the scorers.
+The versions in it are minimums.
 
-Credentials live in a repo-root `config.py`, which is git-ignored and has to be written
-by hand:
+API credentials go in a repo-root `config.py`. It is git-ignored, so you write it yourself:
 
 ```python
 # config.py
@@ -64,15 +45,13 @@ MODEL_TRACE_GEN = MODEL_RKG_BUILD = MODEL_SYNTHESIS = "gemini-3.1-flash-lite"
 REQUEST_TIMEOUT = 180
 ```
 
-ROSCOE's scorer is two files fetched from ParlAI on first use rather than vendored.
+The ROSCOE scorer downloads two files from ParlAI the first time it runs.
 
 ## Quick start
 
-One full CRAFT run. Each stage writes a JSON file the next one reads, and naming the
-run directory in every path keeps one experiment together. Module I's step filter runs
-twice — once on terms alone, then again against the consensus RKG once Module II has
-built it. Every default below is the paper's (§3.2), so this runs the reported
-configuration as written.
+A full CRAFT run on one dataset. Each stage writes a JSON file that the next stage reads,
+so keep every path inside one run directory. Module I's step filter runs twice: first
+against the consensus terms, then against the consensus RKG once Module II has built it.
 
 ```bash
 cd Part2_CRAFT
@@ -101,18 +80,16 @@ python framework/module3_topology_guided_synthesis/synthesize_trace.py --input $
     --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
 ```
 
-One run directory holds one dataset: every stage after generation takes a single
-`--domain`, so Omni-MATH and OlympiadBench are run separately with `--domain math`
-on each. The file names above are the ones the evaluations glob for — a run
-directory is found by `k_traces_*_samples.json`, `cleaned_z*.json`, `cleaned.json`,
-`rkg*.json` and `synthesized.json` — so a stage renamed is a stage the evaluations
-cannot see. `tfirf_terms.py` is not a pipeline stage: it dumps the TF-IRF terms
-for inspection, and the filters call its functions directly.
+Every stage after generation takes a single `--domain`, so run Omni-MATH and
+OlympiadBench separately with `--domain math`. Keep the file names above: the evaluation
+scripts find a run by `k_traces_*_samples.json`, `cleaned_z*.json`, `cleaned.json`,
+`rkg*.json` and `synthesized.json`. `tfirf_terms.py` is not a pipeline stage. It prints
+the TF-IRF terms for inspection, and the filters import its functions.
 
 ## Repository layout
 
-The layout mirrors the paper: Part 1 is the pilot study of §4.1, Part 2 is the CRAFT
-framework of §3.2.
+The layout follows the paper: Part 1 is the pilot study (§4.1) and Part 2 is the CRAFT
+framework (§3.2).
 
 ```
 .
@@ -185,45 +162,15 @@ framework of §3.2.
 
 ### The four datasets
 
-Two logical and two mathematical, chosen so that no column is decided before a
-method is applied: the Direct and Raw CoT rows of the paper's main table show how
-much room each backbone leaves on each dataset.
+Two logical and two mathematical datasets, 500 problems each; the logical two are balanced
+between proved and disproved. Neither backbone is near the ceiling on any of them before a
+method is applied (see the Direct and Raw CoT rows of the paper's main table). ProofWriter
+is always used at question depth 5, so every problem needs a five-step deduction.
 
-500 samples each, the logical two balanced between proved and disproved.
 
-ProofWriter is taken at question depth 5 — the answer needs a five-step
-deduction — and from its RelNeg-OWA configuration, relational predicates with
-negation, the configuration on which both backbones had the most room. Its test and validation splits are used,
-never train.
+## Part 1: Pilot Study (§4.1)
 
-Omni-MATH drops the problems that cannot be scored rather than scoring them
-wrong: those that depend on a figure, and those whose gold answer describes a
-family of solutions ("All positive integers n with prime factors 1 mod 4")
-rather than naming a value. Keeping them would deduct the same points from
-every method, measuring the scorer rather than the method.
-
-Each part is self-contained: its inputs live in `<part>/dataset/` and every artifact it
-produces lands in `<part>/results/`. A script resolves a **relative** `--output` /
-`--export_dir` under its own part's results root, so reruns land beside the existing runs
-no matter which directory you launch from. A relative `--input` prefers the working
-directory and falls back to the same results root, which is what lets one stage read the
-previous stage's output by bare name. Absolute paths always pass through untouched, and
-`CRAFT_RESULTS_ROOT` overrides one part's results location. Results and credentials are
-git-ignored and stay local.
-
-A run belongs to the model that produced it, so Part 2 files its baselines and appendix
-analyses the way Part 1 files its benchmarks, and `CRAFT_results/` mirrors
-`evaluation/` directory for directory, so a result is found where its code is. A baseline takes the model
-from its own `--model`; an analysis reads it from the `metadata.model` of the run it is
-reading, so the directory cannot disagree with what actually generated the numbers. The
-two artifacts that belong to no single model — FLD's gold edge annotations and the
-cross-model `rkg_construct_robustness.json` — stay at the top of that experiment's
-directory rather than under one model.
-
-## Part 1 — Pilot Study (§4.1)
-
-Both benchmarks are evaluated in a single pass under two settings, `w/ Answer` and
-`w/o Answer`.
+Both benchmarks run once under two settings, `w/ Answer` and `w/o Answer`.
 
 ```bash
 P1="Part1_Pilot Study"
@@ -237,42 +184,9 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 ```
 
 
-## Part 2 — CRAFT (§3.2)
+## Part 2: CRAFT (§3.2)
 
-The stages of the Quick start above run in order. Trace quality is then scored by
-ROSCOE (§4.5), whose directory holds three roles — adapt a CRAFT run into the
-scorer's schema, score raw CoT against the synthesized trace, tabulate the result
-— and reports its thirteen reference-free metrics.
-
-ROSCOE is a metric rather than a benchmark — it scores whatever traces it is given
-— so it scores the same traces, on the same four datasets, and this part
-introduces no data beyond them. The raw side is the Raw CoT baseline's own
-response (`baseline_results/<model>/cot/results.json`) and the other side is CRAFT's
-synthesized trace, on the problems behind the main table, so `--dataset` is simply
-the `dataset/` file that run was generated from. ROSCOE's own annotated sets are not used here; its reference-based
-metrics need a reference chain none of these four carries, and the scorer drops
-them on its own, leaving the thirteen reference-free ones we report.
-
-ReCEval was the other candidate and is not used. Its Entail and Contradict are computed over
-reasoning units an SRL parser extracts from each step, and that parser is a BERT
-whose 512 positions a competition-maths step overruns: a third of the steps CRAFT
-synthesizes on Omni-MATH and OlympiadBench are longer than it can encode, against
-none of the steps on either logical set. Scoring the raw side whole and the CRAFT
-side truncated would have compared the two under different treatment, on the half
-of the benchmark where an NLI model has the least to say about whether one step
-follows from another.
-
-The four benchmark datasets disagree about how a problem is stored — ProofWriter's
-facts are a list where FLD's are one string, and the mathematical two name their
-answer `answer` where the logical two name it `proof_label` — so each has an
-adapter, the way `label_prediction/answer_match.py` already gives each one a way
-to compare an answer. `reasoning_traces_quality/dataset_adapters.py` is that layer
-for traces: it hands the scorer the same four fields (premises, hypothesis,
-answer, the gold step count), and the adapter beside it dispatches on the dataset
-a run recorded rather than guessing from the fields present. Only the two logical
-sets annotate a step count — FLD in its proof string, ProofWriter in `QDep` — so
-that field is None on the mathematical two. ROSCOE fetches upstream's two scoring
-files on first use.
+Label prediction, for the main table and the ablation:
 
 ```bash
 RTQ=evaluation/reasoning_traces_quality
@@ -281,9 +195,8 @@ RTQ=evaluation/reasoning_traces_quality
 python evaluation/label_prediction/evaluate_accuracy.py score --input $RUN/synthesized.json --source synthesized
 ```
 
-Trace quality pairs the raw CoT with the CRAFT trace and scores both. ROSCOE reads
-the run directly — adapt, score, tabulate. Scoring needs about 5 GB of local
-models, so it is the half that usually runs elsewhere:
+Trace quality: ROSCOE scores the Raw CoT trace and the CRAFT trace of each problem. The
+scorer needs about 5 GB of local models, so it usually runs on another machine:
 
 ```bash
 ROS=$RTQ/ROSCOE
@@ -293,16 +206,8 @@ python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json 
 python $ROS/roscoe_score.py         --export_dir $RUN/roscoe_export
 ```
 
-The scores the paper reads are filed per backbone under
-`results/CRAFT_results/reasoning_traces_quality/ROSCOE/<model>/` as the two sides
-it compares — `ROSCOE_CRAFT.json` and `ROSCOE_Raw_CoT.json` — all thirteen
-metrics per dataset, pooled over the cell's per-trace scores with the trace count
-each mean rests on. On the current traces CRAFT is above raw CoT on 80 of the 104
-dataset × metric cells; the losses sit almost entirely in the two max-over-pairs
-statistics (repetition-step and coherence), which a longer trace can only lose.
-
-After Module III each dataset gets its own passes, then the trace a cell reports is
-exported with its restatements removed:
+After Module III, ProofWriter and the mathematical datasets get their own passes, and the
+trace each cell reports is then exported:
 
 ```bash
 DO=framework/domain_optimization
@@ -322,8 +227,8 @@ python $DO/state_goal.py         --synth $RUN/adj_applied.json --problems $RUN/c
 python evaluation/label_prediction/evaluate_accuracy.py export
 ```
 
-The trace-utility experiment fine-tunes one student on each side of the paired
-traces and answers held-out problems; its results sit under
+The trace-utility experiment fine-tunes one student on each side of the paired traces and
+tests it on held-out problems. Results are in
 `results/CRAFT_results/reasoning_traces_quality/SFT/`:
 
 ```bash
@@ -334,15 +239,15 @@ python $SFT/sft_trace_utility.py --model Qwen/Qwen3.5-9B --train_file data/train
     --test_file data/test.jsonl --out_dir runs/craft-s0 --seed 0 --max_len 8192 --gen_max_new 8192
 ```
 
-Hyperparameters fixed across all experiments (§3.2): Module I `K=5`, `T=0.7`,
-`β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. These are the
-CLI defaults, so a stage run without flags uses them.
+All experiments use the same hyperparameters (§3.2): Module I `K=5`, `T=0.7`, `β=0.3`,
+`γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. They are the CLI defaults, so a
+stage run without flags uses them.
 
 ## Configuration
 
-Credentials live only in the repo-root `config.py` (git-ignored); every module reads them through
-`Part2_CRAFT/config.py`. All values can be overridden per run via `--api_key` / `--base_url` /
-`--model` or the `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_MODEL` environment variables.
+Every module reads its credentials from the repo-root `config.py` (git-ignored) through
+`Part2_CRAFT/config.py`. A single run can override them with `--api_key`, `--base_url` and
+`--model`.
 
 ## Citation
 
@@ -360,7 +265,7 @@ Credentials live only in the repo-root `config.py` (git-ignored); every module r
 
 ## Contact
 
-Questions and issues are welcome, please reach out to **zpling0816@gmail.com**.
+Questions and issues are welcome at zpling0816@gmail.com.
 
 ## License
 
