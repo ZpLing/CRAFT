@@ -111,7 +111,7 @@ for inspection, and the filters call its functions directly.
 
 ## Repository layout
 
-The layout mirrors the paper: Part 1 is the empirical study of §4.1, Part 2 is the CRAFT
+The layout mirrors the paper: Part 1 is the pilot study of §4.1, Part 2 is the CRAFT
 framework of §3.2.
 
 ```
@@ -220,7 +220,7 @@ two artifacts that belong to no single model — FLD's gold edge annotations and
 cross-model `rkg_construct_robustness.json` — stay at the top of that experiment's
 directory rather than under one model.
 
-## Part 1 — Empirical study (§4.1)
+## Part 1 — Pilot Study (§4.1)
 
 Both benchmarks are evaluated in a single pass under two settings, `w/ Answer` and
 `w/o Answer`.

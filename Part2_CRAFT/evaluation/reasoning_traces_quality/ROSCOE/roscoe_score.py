@@ -470,8 +470,7 @@ def main() -> None:
         "--metrics", nargs="+", default=None,
         help="Score only these, out of the thirteen. The chain-level "
              "perplexities are where a run spends its time \u2014 a whole trace "
-             "against a 1024-token model \u2014 so asking for the three the paper's "
-             "table carries (grammar_step, repetition_step, repetition_word) is "
+             "against a 1024-token model \u2014 so a subset without them is "
              "what makes a run feasible without a GPU.")
     parser.add_argument("--roscoe_model", default="all-mpnet-base-v2")
     parser.add_argument("--discourse_batch", type=int, default=64)

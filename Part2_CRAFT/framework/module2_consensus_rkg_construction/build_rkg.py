@@ -1359,9 +1359,7 @@ def rebuild_consensus(
         # a rebuild always used build_consensus_rkg's defaults for both, so
         # --edge_lambda 0 rebuilt a graph byte-identical to --edge_lambda 0.3 —
         # node sets, edge sets and edge confidences all unchanged on 100 of 100
-        # graphs. The ablation's "w/o Weighted Edges Fusion" row was therefore
-        # scoring the full model against itself and reporting no difference,
-        # which is exactly what a component with no effect would look like.
+        # graphs, so a lambda sweep compared the full model with itself.
         consensus = build_consensus_rkg(
             valid,
             consensus_threshold=consensus_threshold,
@@ -1406,7 +1404,7 @@ def rebuild_consensus(
 #########################
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build RKGs for reasoning traces")
+    parser = argparse.ArgumentParser(description="Module II Consensus RKG Construction: per-trace RKGs, edge and node filtering, aggregation into the consensus RKG G*")
     parser.add_argument("--input", required=True, help="Path to cleaned_traces.json")
     parser.add_argument("--output", default="rkg.json",
                         help="Output RKG JSON path (relative paths resolve under the results root)")
@@ -1420,9 +1418,9 @@ def main() -> None:
                         help="Which dataset adapter compares two answers for --consensus_scope "
                              "majority; without it the comparison falls back to string equality")
     parser.add_argument("--consensus_threshold", type=float, default=0.3,
-                        help="Edge frequency threshold theta (default 0.3)")
+                        help="Edge weight threshold theta: an edge enters G* when at least this fraction of the K traces contain it (default 0.3)")
     parser.add_argument("--node_threshold", type=float, default=None,
-                        help="Node frequency threshold beta (default: same as --consensus_threshold)")
+                        help="Node threshold: fraction of the K traces a node must appear in (default: same as --consensus_threshold)")
     parser.add_argument("--max_samples", type=int, default=None)
     parser.add_argument("--align", action="store_true",
                         help="Align steps across the K traces (one LLM call per sample) before "
@@ -1436,8 +1434,7 @@ def main() -> None:
                              "embeddings (the ablation's row)")
     parser.add_argument("--edge_lambda", type=float, default=0.3,
                         help="Edge weight balance lambda: W(e) = (1-lambda)*LLM confidence "
-                             "+ lambda*term overlap (paper: 0.3). 0 drops the fusion, which "
-                             "is the ablation's 'w/o Weighted Edges Fusion' setting")
+                             "+ lambda*term overlap (paper: 0.3)")
 
     # Offline mode: re-vote an existing RKG file's cached trace_rkgs, no LLM calls.
     parser.add_argument("--rebuild_consensus", action="store_true",

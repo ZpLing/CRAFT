@@ -1,5 +1,5 @@
 {
- "setting": "Zero-shot CoT",
+ "setting": "Raw CoT",
  "setting_key": "cot",
  "overall": {
   "accuracy": 0.5995,

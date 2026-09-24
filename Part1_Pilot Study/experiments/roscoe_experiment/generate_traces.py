@@ -1,7 +1,7 @@
 """
 generate_traces.py
 ---------------------------
-ReCEval — Reasoning Trace Quality: with_answer vs wout_answer
+ROSCOE — reasoning traces for the pilot study: w/ Answer vs w/o Answer
 
 Research question: Does telling the LLM the correct answer/label produce
 higher-quality reasoning traces than letting it reason freely?
@@ -624,8 +624,8 @@ async def run_generate(args: argparse.Namespace) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "ReCEval / ROSCOE — Generate reasoning traces (with_answer vs wout_answer).\n"
-            "Two modes: --roscoe_mode (ROSCOE datasets) or --input (Entailment Bank)."
+            "ROSCOE — Generate reasoning traces for the pilot study (w/ Answer vs w/o Answer).\n"
+            "The paper uses --roscoe_mode (ROSCOE datasets); --input (Entailment Bank) is an earlier mode."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

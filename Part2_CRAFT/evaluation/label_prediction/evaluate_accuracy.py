@@ -22,7 +22,7 @@ decides maths equivalence symbolically, macro-F1 is None for maths and real
 over PROVED/DISPROVED for logic, the domain is the majority of the batch, and
 a refused sample leaves the denominator rather than counting as a failure.
 
-The A-E ablation is gone with it. The paper's ablation is six named rows, and
+The A-E ablation is gone with it. The paper's ablation is five named rows, and
 evaluation/Ablation_Study/ablation_study.py builds them from the loaders and the metric
 here, so there is one scorer and one definition of the ablation rather than a
 second table that can drift from the first.
@@ -490,19 +490,19 @@ def main_score(argv) -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Evaluate synthesized traces (Step 5 output)
+  # Evaluate synthesized traces (Module III output)
   python evaluate_accuracy.py score \\
       --input craft_runs/<run>/synthesized.json --source synthesized
 
-  # Evaluate k_traces (Step 1) — majority vote across k traces
+  # Evaluate the K traces of Module I — majority vote across them
   python evaluate_accuracy.py score \\
       --input craft_runs/<run>/k_traces.json --source k_traces
 
-  # Ablation: compare multiple outputs (Settings B-E)
+  # Compare several outputs, e.g. w/o RKG against CRAFT
   python evaluate_accuracy.py score --compare \\
       craft_runs/<run>/synthesized_step_by_step.json \\
       craft_runs/<run>/synthesized.json \\
-      --labels "Setting D: step_by_step" "Setting E: RKG" \\
+      --labels "w/o RKG" "CRAFT" \\
       --source synthesized --output ablation.json
 """,
     )
@@ -512,7 +512,7 @@ Examples:
 
     parser.add_argument("--source", choices=["synthesized", "k_traces", "cleaned"],
                         default="synthesized",
-                        help="Trace type: synthesized (Step 5) | k_traces (Step 1) | cleaned (Step 3/3.6)")
+                        help="Trace type: synthesized (Module III) | k_traces (Module I rollouts) | cleaned (after Steps Filtering)")
     parser.add_argument("--labels",      nargs="+", default=None,
                         help="Display labels for --compare mode")
     parser.add_argument("--output",       type=Path, default=None,
@@ -1520,7 +1520,7 @@ def main() -> None:
     """Score one pipeline output (`score`), or export the traces the cells report (`export`).
 
     The Settings A-E ablation that used to live here is gone. The paper's
-    ablation is the six named rows, which other_evaluation/ablation_study
+    ablation is the five named rows, which evaluation/Ablation_Study/ablation_study.py
     builds from this module's loaders and metric, so there is one scorer and
     one place the ablation is defined.
     """

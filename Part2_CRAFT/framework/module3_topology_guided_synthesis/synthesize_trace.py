@@ -36,7 +36,7 @@ import sys as _sys
 from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-# Reuse functions from Module I's tfirf_terms and Module II's steps_filter
+# Reuse functions from Module I's tfirf_terms and steps_filter
 from framework.module1_generation_filtering.tfirf_terms import (
     tokenize_text,
     calculate_tf,
@@ -2384,7 +2384,7 @@ def main():
         "--min_tfidf",
         type=float,
         default=0.01,
-        help="Minimum TF-IRF threshold (default: 0.01)"
+        help="TF-IRF importance floor alpha (default: 0.01)"
     )
     parser.add_argument(
         "--idf_scope",

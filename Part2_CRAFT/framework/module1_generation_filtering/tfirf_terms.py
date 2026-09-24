@@ -944,7 +944,7 @@ def extract_important_terms(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Extract important logical words and terms from reasoning traces"
+        description="TF-IRF (Term Frequency-Inverse Reasoning Frequency): dump the consensus terms of reasoning traces for inspection"
     )
     parser.add_argument(
         "--input",
