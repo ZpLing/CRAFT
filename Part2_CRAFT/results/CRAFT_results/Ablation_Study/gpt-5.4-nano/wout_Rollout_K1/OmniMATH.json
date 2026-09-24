@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "OmniMATH",
+  "setting": "w/o Rollout (K=1)",
+  "source_file": "results/craft_runs/full500/OmniMATH_gpt-5.4-nano/abl_k1.json",
+  "craft_dir": "results/craft_runs/full500/OmniMATH_gpt-5.4-nano",
+  "accuracy": 48.8,
+  "macro_f1": null,
+  "avg_steps": 7.1,
+  "n_samples": 492,
+  "full_accuracy": 54.9,
+  "delta": -6.1
+}

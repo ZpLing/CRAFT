@@ -1,0 +1,13 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "OlympiadBench",
+  "setting": "w/o Rollout (K=1)",
+  "source_file": "results/craft_runs/full500/OlympiadBench_gpt-5.4-nano/abl_k1.json",
+  "craft_dir": "results/craft_runs/full500/OlympiadBench_gpt-5.4-nano",
+  "accuracy": 58.1,
+  "macro_f1": null,
+  "avg_steps": 7.02,
+  "n_samples": 497,
+  "full_accuracy": 60.6,
+  "delta": -2.5
+}
