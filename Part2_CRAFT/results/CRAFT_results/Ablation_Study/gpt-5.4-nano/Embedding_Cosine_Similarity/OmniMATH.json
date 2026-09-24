@@ -1,0 +1,17 @@
+{
+  "model": "gpt-5.4-nano",
+  "dataset": "OmniMATH",
+  "setting": "Embedding Cosine Similarity",
+  "source_file": "results/craft_runs/full500/OmniMATH_gpt-5.4-nano/abl_embed.json",
+  "craft_dir": "results/craft_runs/full500/OmniMATH_gpt-5.4-nano",
+  "accuracy": 55.3,
+  "macro_f1": null,
+  "avg_steps": 8.24,
+  "n_samples": 389,
+  "full_accuracy": 54.9,
+  "delta": 0.4,
+  "n_common": 389,
+  "accuracy_common": 55.3,
+  "full_accuracy_common": 55.0,
+  "delta_paired": 0.3
+}

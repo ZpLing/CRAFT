@@ -9,5 +9,9 @@
   "avg_steps": 9.34,
   "n_samples": 497,
   "full_accuracy": 60.6,
-  "delta": -5.3
+  "delta": -5.3,
+  "n_common": 497,
+  "accuracy_common": 55.3,
+  "full_accuracy_common": 60.6,
+  "delta_paired": -5.2
 }
