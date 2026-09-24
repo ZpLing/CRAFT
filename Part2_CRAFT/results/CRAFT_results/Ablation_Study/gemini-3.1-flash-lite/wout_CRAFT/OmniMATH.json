@@ -2,16 +2,16 @@
   "model": "gemini-3.1-flash-lite",
   "dataset": "OmniMATH",
   "setting": "w/o CRAFT",
-  "source_file": "results/baseline_results/gemini-3.1-flash-lite/cot/results.json",
+  "source_file": "results/baseline_results/gemini-3.1-flash-lite/direct/results.json",
   "craft_dir": "results/craft_runs/full500/OmniMATH_gemini-3.1-flash-lite",
-  "accuracy": 45.1,
+  "accuracy": 17.5,
   "macro_f1": null,
-  "avg_steps": 27.51,
+  "avg_steps": 1.0,
   "n_samples": 492,
   "full_accuracy": 62.6,
-  "delta": -17.5,
+  "delta": -45.1,
   "n_common": 492,
-  "accuracy_common": 46.3,
+  "accuracy_common": 18.9,
   "full_accuracy_common": 62.6,
-  "delta_paired": -16.3
+  "delta_paired": -43.7
 }

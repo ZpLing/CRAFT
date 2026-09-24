@@ -2,16 +2,16 @@
   "model": "gpt-5.4-nano",
   "dataset": "ProofWriter",
   "setting": "w/o CRAFT",
-  "source_file": "results/baseline_results/gpt-5.4-nano/cot/results.json",
+  "source_file": "results/baseline_results/gpt-5.4-nano/direct/results.json",
   "craft_dir": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano",
-  "accuracy": 84.6,
-  "macro_f1": 0.8424,
-  "avg_steps": 22.9,
+  "accuracy": 72.0,
+  "macro_f1": 0.7102,
+  "avg_steps": 1.0,
   "n_samples": 500,
   "full_accuracy": 97.2,
-  "delta": -12.6,
+  "delta": -25.2,
   "n_common": 500,
-  "accuracy_common": 84.6,
+  "accuracy_common": 72.0,
   "full_accuracy_common": 97.2,
-  "delta_paired": -12.6
+  "delta_paired": -25.2
 }

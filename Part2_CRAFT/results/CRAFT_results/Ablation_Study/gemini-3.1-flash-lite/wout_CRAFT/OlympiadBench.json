@@ -2,16 +2,16 @@
   "model": "gemini-3.1-flash-lite",
   "dataset": "OlympiadBench",
   "setting": "w/o CRAFT",
-  "source_file": "results/baseline_results/gemini-3.1-flash-lite/cot/results.json",
+  "source_file": "results/baseline_results/gemini-3.1-flash-lite/direct/results.json",
   "craft_dir": "results/craft_runs/full500/OlympiadBench_gemini-3.1-flash-lite",
-  "accuracy": 61.6,
+  "accuracy": 18.9,
   "macro_f1": null,
-  "avg_steps": 26.69,
+  "avg_steps": 1.03,
   "n_samples": 497,
   "full_accuracy": 75.6,
-  "delta": -14.0,
+  "delta": -56.7,
   "n_common": 497,
-  "accuracy_common": 61.6,
-  "full_accuracy_common": 75.6,
-  "delta_paired": -14.1
+  "accuracy_common": 18.9,
+  "full_accuracy_common": 75.7,
+  "delta_paired": -56.8
 }
