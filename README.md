@@ -231,6 +231,13 @@ The trace-utility experiment fine-tunes one student on each side of the paired t
 tests it on held-out problems. Results are in
 `results/CRAFT_results/reasoning_traces_quality/SFT/`:
 
+| Student (Qwen3.5-9B, LoRA) | Training set | Acc (%) seed 0 / 1 | Avg. steps seed 0 / 1 |
+| --- | --- | ---: | ---: |
+| Raw CoT | problems both sides got right (2,031) | 57.4 / 55.7 | 30.5 / 30.3 |
+| Raw CoT | every concluded trace (3,953) | 55.2 / 55.2 | 30.0 / 29.6 |
+
+618 held-out problems; the CRAFT students are still being scored.
+
 ```bash
 SFT=evaluation/reasoning_traces_quality/SFT
 python $SFT/build_test_set.py
