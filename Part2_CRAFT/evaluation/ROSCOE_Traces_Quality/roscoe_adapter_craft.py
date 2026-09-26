@@ -42,13 +42,13 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 try:
     from config import resolve_input, resolve_output
 except ImportError:  # running outside the part
     resolve_input = resolve_output = Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dataset_adapters import adapt
 
 
@@ -56,9 +56,9 @@ from framework.domain_optimization.math_text import (  # noqa: E402
     normalize_math, protect_factorials, split_steps)
 # The CRAFT side is scored as it is reported: deduplicated by dedup_trace,
 # checked against the answer reader the cell is scored with.
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]
                        / "framework" / "module3_topology_guided_synthesis"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "label_prediction"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "label_prediction"))
 from dedup_trace import dedup_trace  # noqa: E402
 from extract_label import extract_label, extract_math_answer  # noqa: E402
 
@@ -227,7 +227,7 @@ def main() -> None:
     ap.add_argument("--dataset", default="dataset",
                     help="The data the run was generated from: the dataset directory "
                          "or a single file in it")
-    ap.add_argument("--output_dir", default="CRAFT_results/reasoning_traces_quality/ROSCOE",
+    ap.add_argument("--output_dir", default="CRAFT_results/ROSCOE_Traces_Quality",
                     help="Where the {dataset}_{raw,craft}.jsonl pairs are written; "
                          "a relative path resolves under the results root")
     ap.add_argument("--synth_file", default=None,

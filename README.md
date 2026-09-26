@@ -135,11 +135,10 @@ framework (§3.2).
 │   │   │   ├── answer_match.py
 │   │   │   ├── extract_label.py
 │   │   │   └── step_count.py
-│   │   ├── reasoning_traces_quality/
+│   │   ├── ROSCOE_Traces_Quality/
 │   │   │   ├── dataset_adapters.py
-│   │   │   └── ROSCOE/
-│   │   │       ├── roscoe_adapter_craft.py
-│   │   │       └── roscoe_score.py
+│   │   │   ├── roscoe_adapter_craft.py
+│   │   │   └── roscoe_score.py
 │   │   └── Ablation_Study/
 │   │       └── ablation_study.py
 │   └── results/
@@ -147,8 +146,7 @@ framework (§3.2).
 │       └── CRAFT_results/
 │           ├── Raw_Output/<model>/
 │           ├── label_prediction/<model>/
-│           ├── reasoning_traces_quality/
-│           │   └── ROSCOE/<model>/
+│           ├── ROSCOE_Traces_Quality/<model>/
 │           ├── Ablation_Study/<model>/<setting>/
 │           ├── Graph_Construction_Noise/<model>/
 │           └── other_results/
@@ -184,8 +182,6 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 Label prediction, for the main table and the ablation:
 
 ```bash
-RTQ=evaluation/reasoning_traces_quality
-
 # label prediction — the main table, and the ablation
 python evaluation/label_prediction/evaluate_accuracy.py score --input $RUN/synthesized.json --source synthesized
 ```
@@ -194,7 +190,7 @@ Trace quality: ROSCOE scores the Raw CoT trace and the CRAFT trace of each probl
 scorer needs about 5 GB of local models, so it usually runs on another machine:
 
 ```bash
-ROS=$RTQ/ROSCOE
+ROS=evaluation/ROSCOE_Traces_Quality
 
 python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json \
     --raw_model gemini-3.1-flash-lite --output_dir $RUN/roscoe_export

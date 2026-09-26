@@ -20,11 +20,9 @@ Part2_CRAFT/results/*
 # The analyses behind the appendix are small — kilobytes — and are what the
 # appendix numbers are read from, so they are tracked too.
 !Part2_CRAFT/results/CRAFT_results/
-# ...except other_results/ and reasoning_traces_quality/, whose outputs stay local.
+# ...except other_results/, whose outputs stay local.
 Part2_CRAFT/results/CRAFT_results/other_results/
-Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/*
-# ...but the ROSCOE scores of the two sides (raw CoT and CRAFT, per backbone) are results the paper reads, so they are tracked.
-!Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/ROSCOE/
+# The ROSCOE scores of the two sides (raw CoT and CRAFT, per backbone) in ROSCOE_Traces_Quality/ are results the paper reads, so they are tracked.
 # The gold traces of the graph-construction noise analysis are FLD's own proofs re-rendered one fact to a line;
 # dataset/FLD.json already ships them, so only the scored edges are kept.
 Part2_CRAFT/results/CRAFT_results/Graph_Construction_Noise/gold_traces.json
@@ -41,7 +39,7 @@ Part2_CRAFT/dataset/_source/
 # ── Vendored third-party code (clone separately) ──────────────────────
 /third_party/
 Part1_Pilot Study/experiments/roscoe_experiment/ParlAI/
-Part2_CRAFT/evaluation/reasoning_traces_quality/ROSCOE/ParlAI/
+Part2_CRAFT/evaluation/ROSCOE_Traces_Quality/ParlAI/
 
 # ── Python cache ─────────────────────────────────────────────────────
 __pycache__/
@@ -95,10 +93,10 @@ Part2_CRAFT/evaluation/token_accounting.py
 # ── Dropped baselines and pre-swap backups — kept locally, never pushed ──
 Part2_CRAFT/results/baseline_results/_archive/
 # The ROSCOE table builder is a local reporting script, not part of the method or its evaluation.
-Part2_CRAFT/evaluation/reasoning_traces_quality/ROSCOE/roscoe_build_table.py
+Part2_CRAFT/evaluation/ROSCOE_Traces_Quality/roscoe_build_table.py
 
 # SFT trace-utility experiment: code, data and results stay local / on the cluster
-Part2_CRAFT/evaluation/reasoning_traces_quality/SFT/
+Part2_CRAFT/evaluation/SFT/
 Part2_CRAFT/evaluation/other_evaluation/trace_utility/
-Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/SFT/
+Part2_CRAFT/results/CRAFT_results/SFT/
 Part2_CRAFT/results/CRAFT_results/other_results/trace_utility/

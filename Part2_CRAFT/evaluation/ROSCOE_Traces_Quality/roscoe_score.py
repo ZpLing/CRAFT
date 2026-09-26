@@ -481,10 +481,10 @@ def main() -> None:
                         format="%(asctime)s %(levelname)s %(message)s")
 
     try:
-        sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
         from config import RESULTS_ROOT
     except ImportError:
-        RESULTS_ROOT = Path(__file__).resolve().parents[3] / "results"
+        RESULTS_ROOT = Path(__file__).resolve().parents[2] / "results"
 
     roscoe_dir = Path(args.roscoe_parlai_dir) / "projects" / "roscoe"
     for raw in args.export_dir:
