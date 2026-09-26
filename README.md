@@ -137,13 +137,9 @@ framework (§3.2).
 │   │   │   └── step_count.py
 │   │   ├── reasoning_traces_quality/
 │   │   │   ├── dataset_adapters.py
-│   │   │   ├── ROSCOE/
-│   │   │   │   ├── roscoe_adapter_craft.py
-│   │   │   │   └── roscoe_score.py
-│   │   │   └── SFT/
-│   │   │       ├── build_test_set.py
-│   │   │       ├── build_sft_data.py
-│   │   │       └── sft_trace_utility.py
+│   │   │   └── ROSCOE/
+│   │   │       ├── roscoe_adapter_craft.py
+│   │   │       └── roscoe_score.py
 │   │   └── Ablation_Study/
 │   │       └── ablation_study.py
 │   └── results/
@@ -152,8 +148,7 @@ framework (§3.2).
 │           ├── Raw_Output/<model>/
 │           ├── label_prediction/<model>/
 │           ├── reasoning_traces_quality/
-│           │   ├── ROSCOE/<model>/
-│           │   └── SFT/
+│           │   └── ROSCOE/<model>/
 │           ├── Ablation_Study/<model>/<setting>/
 │           ├── Graph_Construction_Noise/<model>/
 │           └── other_results/
@@ -225,18 +220,6 @@ python $DO/state_goal.py         --synth $RUN/adj_applied.json --problems $RUN/c
 
 # the trace each cell reports -> results/CRAFT_results/Raw_Output/<model>/<dataset>_Output.jsonl
 python evaluation/label_prediction/evaluate_accuracy.py export
-```
-
-The trace-utility experiment fine-tunes one student on each side of the paired traces and
-tests it on held-out problems. Results are in
-`results/CRAFT_results/reasoning_traces_quality/SFT/`:
-
-```bash
-SFT=evaluation/reasoning_traces_quality/SFT
-python $SFT/build_test_set.py
-python $SFT/build_sft_data.py                       # problems both sides got right; --all_pairs for every concluded trace
-python $SFT/sft_trace_utility.py --model Qwen/Qwen3.5-9B --train_file data/train_craft.jsonl \
-    --test_file data/test.jsonl --out_dir runs/craft-s0 --seed 0 --max_len 8192 --gen_max_new 8192
 ```
 
 All experiments use the same hyperparameters (§3.2): Module I `K=5`, `T=0.7`, `β=0.3`,
