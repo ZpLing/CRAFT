@@ -25,7 +25,6 @@ Part2_CRAFT/results/CRAFT_results/other_results/
 Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/*
 # ...but the ROSCOE scores of the two sides (raw CoT and CRAFT, per backbone) are results the paper reads, so they are tracked.
 !Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/ROSCOE/
-!Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/SFT/
 # The gold traces of the graph-construction noise analysis are FLD's own proofs re-rendered one fact to a line;
 # dataset/FLD.json already ships them, so only the scored edges are kept.
 Part2_CRAFT/results/CRAFT_results/Graph_Construction_Noise/gold_traces.json
@@ -97,3 +96,9 @@ Part2_CRAFT/evaluation/token_accounting.py
 Part2_CRAFT/results/baseline_results/_archive/
 # The ROSCOE table builder is a local reporting script, not part of the method or its evaluation.
 Part2_CRAFT/evaluation/reasoning_traces_quality/ROSCOE/roscoe_build_table.py
+
+# SFT trace-utility experiment: code, data and results stay local / on the cluster
+Part2_CRAFT/evaluation/reasoning_traces_quality/SFT/
+Part2_CRAFT/evaluation/other_evaluation/trace_utility/
+Part2_CRAFT/results/CRAFT_results/reasoning_traces_quality/SFT/
+Part2_CRAFT/results/CRAFT_results/other_results/trace_utility/
