@@ -1184,8 +1184,8 @@ def process_sample(
     method: str = "supervised",
     min_similar_steps: int = 2,
     use_grpo_optimization: bool = True,
-    z_score_threshold: float = GAMMA,
-    consensus_threshold: float = BETA,
+    z_score_threshold: Optional[float] = None,
+    consensus_threshold: Optional[float] = None,
     use_weighted_similarity: bool = True,
     domain: str = "logical",
     sample_rkg: Optional[Dict[str, Any]] = None,
@@ -1248,9 +1248,13 @@ def process_sample(
             },
         }
 
-    beta  = consensus_threshold if beta is None else beta
-    theta = consensus_threshold if theta is None else theta
-    gamma = z_score_threshold if gamma is None else gamma
+    # Each falls back to its own value in config.py; the old names, when given,
+    # set beta and theta together (consensus_threshold) or gamma (z_score_threshold).
+    beta  = beta  if beta  is not None else (consensus_threshold if consensus_threshold is not None else BETA)
+    theta = theta if theta is not None else (consensus_threshold if consensus_threshold is not None else THETA)
+    gamma = gamma if gamma is not None else (z_score_threshold if z_score_threshold is not None else GAMMA)
+    consensus_threshold = beta
+    z_score_threshold = gamma
 
     anomalous_info = []
     n_underthinking = 0  # only populated for method="rkg"
@@ -1621,7 +1625,6 @@ def main():
             min_similar_steps=args.min_similar_steps,
             use_grpo_optimization=args.use_grpo_optimization if args.method == "unsupervised" else False,
             z_score_threshold=args.gamma,
-            consensus_threshold=0.3,
             alpha=args.alpha,
             beta=args.beta,
             gamma=args.gamma,
