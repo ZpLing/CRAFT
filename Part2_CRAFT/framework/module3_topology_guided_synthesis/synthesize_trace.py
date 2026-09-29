@@ -1277,19 +1277,9 @@ suggestion, not a settled result):
     else:
         prompt += (
             "- Build this step on the prerequisites named above\n"
-            + ((("- ONE inference only: apply exactly one rule to exactly one set "
-                "of premises and state what follows. Do not chain two rules in "
-                "this step, and do not restate what earlier steps established\n")
-               if not is_last else
-               # The final step is where a sparse G* leaves inferences undone,
-               # and held to one inference it declared the hypothesis refuted
-               # for want of a derivation. The appendix asks it to establish
-               # whatever it still needs first, so it may chain them.
-               ("- This is the final step: first derive, one sentence each, any "
-                "part of the hypothesis the steps above have not yet established, "
-                "from the facts or those steps, and only then give the verdict. "
-                "__DISPROVED__ needs the negation of the hypothesis to follow; a "
-                "part not yet derived is to be derived, not read as a refutation\n"))
+            + ("- ONE inference only: apply exactly one rule to exactly one set "
+               "of premises and state what follows. Do not chain two rules in "
+               "this step, and do not restate what earlier steps established\n"
                # Not restating an earlier step and not quoting the premise are
                # different economies, and asking for the first got both. The
                # restatement is what the repetition scores punish; the quoted
