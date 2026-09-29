@@ -762,6 +762,22 @@ def extract_facts_from_traces(traces: List[Dict[str, Any]]) -> str:
 # RKG-Guided Synthesis
 #########################
 
+# A task line the model repeated as a heading: "### Step 3 (of 7):", "**Step 2**",
+# "Step 4 (Step 4 of 9)", "(requested as Step5):". Only header-shaped text is
+# matched -- a heading marker, or an "of N" / parenthetical tag, and then a
+# colon or the end of the line -- so a sentence that cites a step
+# ("Step 2 shows that ...", "From Step 2, ...") is left alone.
+_HDR_TAG = r"(?:\s*\((?:Step\s*\d+\s*)?of\s*\d+\)|\s+of\s+\d+|\s*\((?:FINAL|requested as[^)\n]*|Step\s*\d+\s*overall)\))"
+_ECHOED_HEADER = re.compile(
+    r"^(?:"
+    r"[ \t]*(?:#{1,6}[ \t]*Step\s*\d+" + _HDR_TAG + r"*|\*\*Step\s*\d+" + _HDR_TAG + r"*\*\*|Step\s*\d+" + _HDR_TAG + r"+)"
+    r"[ \t]*:?[ \t]*(?:\n|$)"
+    r"|[ \t]*(?:#{1,6}[ \t]*Step\s*\d+" + _HDR_TAG + r"*|\*\*Step\s*\d+" + _HDR_TAG + r"*\*\*|Step\s*\d+" + _HDR_TAG + r"+)[ \t]*:[ \t]*"
+    r"|[ \t]*\((?:requested as[^)\n]*|Step\s*\d+\s*overall)\)[ \t]*:?[ \t]*\n?"
+    r")+",
+    re.IGNORECASE)
+
+
 def break_cycles_by_weight(consensus_rkg: Dict[str, Any]) -> Dict[str, Any]:
     """Remove the lowest-W(e) edge of every cycle of G*, as Module III describes.
 
@@ -1850,6 +1866,9 @@ async def synthesize_trace_rkg(
                                     content, re.IGNORECASE)
             if prefix_m:
                 content = content[prefix_m.end():].strip()
+            # The model sometimes repeats the task line as a heading before the
+            # step itself; it is not reasoning, so it is removed.
+            content = _ECHOED_HEADER.sub("", content).strip()
             if not content:
                 content = response.strip()
             generated_nodes[nid] = content
@@ -2227,8 +2246,16 @@ async def synthesize_traces_for_dataset(
     atomic_steps: bool = False,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
+    resume: bool = True,
 ):
     """Generate high-quality reasoning traces for the dataset (supports step_by_step and rkg strategies).
+
+    Each finished sample is appended to <output>.partial.jsonl as it completes,
+    so a run that is interrupted loses only the samples in flight. Started
+    again with the same settings, it reads that file, keeps the samples that
+    produced a trace and synthesizes the rest; the first line records the
+    settings, and a checkpoint written under different ones is refused rather
+    than merged. resume=False ignores the checkpoint and starts over.
 
     idf_scope selects the IRF corpus: "sample" scores IDF within each sample's own steps
     (default, current behaviour); "none" disables the IRF factor.
@@ -2276,14 +2303,59 @@ async def synthesize_traces_for_dataset(
         rkg_lookup = {r["sample_id"]: r for r in rkg_results if "sample_id" in r}
         print(f"Loading RKG file: {rkg_file} ({len(rkg_lookup)} samples)")
 
-    print(f"Processing {len(samples)} samples | strategy: {synthesis_strategy} | model: {model}")
+    # ── Checkpoint: resume an interrupted run with the same settings ───────
+    settings = {
+        # absolute, so a resume started from another directory still matches
+        "input_file": str(Path(input_file).resolve()),
+        "rkg_file": str(Path(rkg_file).resolve()) if rkg_file else None,
+        "model": model, "domain": domain, "synthesis_strategy": synthesis_strategy,
+        "prior_mode": prior_mode, "atomic_steps": atomic_steps, "min_tfidf": min_tfidf,
+        "idf_scope": idf_scope, "idf_norm": idf_norm, "max_samples": max_samples,
+    }
+    partial_path = output_file.with_name(output_file.name + ".partial.jsonl")
+    done: Dict[str, Dict[str, Any]] = {}
+    lines: List[Dict[str, Any]] = []
+    if resume and partial_path.exists():
+        with open(partial_path, encoding="utf-8") as fh:
+            for raw_line in fh:
+                if not raw_line.strip():
+                    continue
+                try:
+                    lines.append(json.loads(raw_line))
+                except json.JSONDecodeError:
+                    # a line cut short by the interruption; its sample is redone
+                    continue
+    if lines and "_settings" in lines[0]:
+        if lines[0]["_settings"] != settings:
+            raise SystemExit(
+                f"{partial_path} was written with other settings than this run's; "
+                "rerun with the settings it records, or pass --no_resume to start over")
+        for rec in lines[1:]:
+            if rec.get("synthesized_trace"):
+                done[rec.get("sample_id")] = rec
+        print(f"Resuming: {len(done)} samples already synthesized, "
+              f"{sum(1 for s_ in samples if s_.get('sample_id') not in done)} to go")
+        # rewrite the checkpoint without the lines that could not be read
+        with open(partial_path, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps({"_settings": settings}) + "\n")
+            for rec in done.values():
+                fh.write(json.dumps(rec, ensure_ascii=False, default=_json_default) + "\n")
+    else:
+        # no checkpoint, --no_resume, or one whose settings line never got
+        # written: start a fresh one
+        partial_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(partial_path, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps({"_settings": settings}) + "\n")
+    todo = [s_ for s_ in samples if s_.get("sample_id", "unknown") not in done]
+
+    print(f"Processing {len(todo)} samples | strategy: {synthesis_strategy} | model: {model}")
 
     connector = aiohttp.TCPConnector(limit=concurrency)
     results = []
 
     async with aiohttp.ClientSession(connector=connector) as session:
         tasks = []
-        for sample in samples:
+        for sample in todo:
             sample_id = sample.get('sample_id', 'unknown')
 
             # Fill in problem information
@@ -2304,12 +2376,21 @@ async def synthesize_traces_for_dataset(
         
         pbar = tqdm(total=len(tasks), desc="Generation progress", unit="sample")
         
-        for coro in asyncio.as_completed(tasks):
-            result = await coro
-            results.append(result)
-            pbar.update(1)
-        
+        with open(partial_path, "a", encoding="utf-8") as ckpt:
+            for coro in asyncio.as_completed(tasks):
+                result = await coro
+                results.append(result)
+                ckpt.write(json.dumps(result, ensure_ascii=False, default=_json_default) + "\n")
+                ckpt.flush()
+                pbar.update(1)
+
         pbar.close()
+
+    # The checkpointed samples and this run's, in the input's order.
+    by_id = dict(done)
+    by_id.update({r.get("sample_id"): r for r in results})
+    results = [by_id[s_.get("sample_id", "unknown")] for s_ in samples
+               if s_.get("sample_id", "unknown") in by_id]
     
     # Save results
     output_data = {
@@ -2326,14 +2407,27 @@ async def synthesize_traces_for_dataset(
     
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(output_data, f, indent=2, ensure_ascii=False)
+        json.dump(output_data, f, indent=2, ensure_ascii=False, default=_json_default)
     
+    partial_path.unlink(missing_ok=True)
+
     print(f"\nDone!")
     print(f"Statistics:")
     print(f"  - Total samples: {len(samples)}")
     print(f"  - Successfully generated: {sum(1 for r in results if r.get('synthesized_trace'))}")
     print(f"  - Failed: {sum(1 for r in results if 'error' in r)}")
     print(f"\nResults saved to: {output_file}")
+
+
+def _json_default(o):
+    """numpy scalars and arrays as plain numbers and lists; anything else as text."""
+    if isinstance(o, np.generic):
+        return o.item()
+    if isinstance(o, np.ndarray):
+        return o.tolist()
+    if isinstance(o, set):
+        return sorted(o)
+    return str(o)
 
 
 def _load_records(path: Path) -> List[Dict[str, Any]]:
@@ -2510,7 +2604,7 @@ async def retry_failed_synthesis(
     metadata["recovered_samples"] = sum(1 for r in recovered.values() if r.get("pred_label"))
     metadata["successful_samples"] = sum(1 for r in merged if r.get("synthesized_trace"))
     with open(out_path, 'w', encoding='utf-8') as f:
-        json.dump({"metadata": metadata, "results": merged}, f, indent=2, ensure_ascii=False)
+        json.dump({"metadata": metadata, "results": merged}, f, indent=2, ensure_ascii=False, default=_json_default)
 
     n_recovered = sum(1 for r in recovered.values() if r.get("pred_label"))
     print(f"\nWrote: {out_path}")
@@ -2631,11 +2725,13 @@ def main():
         help="RKG JSON file path (required for synthesis_strategy=rkg; from build_rkg.py)",
     )
     parser.add_argument(
-        "--atomic_steps", action="store_true", default=False,
-        help="Ask each synthesized step for one inference rather than for all "
-             "the intermediate work. Raises the step count with it — the two "
-             "cannot both be optimised, since a problem needing thirty "
-             "inferences cannot be nine atomic steps",
+        "--atomic_steps", action="store_true", default=True,
+        help="Ask each synthesized step for one inference stated in two sentences, "
+             "the Module III prompt of the paper's appendix (default)",
+    )
+    parser.add_argument(
+        "--no_atomic_steps", action="store_false", dest="atomic_steps",
+        help="Let a step carry all its intermediate work instead",
     )
     parser.add_argument(
         "--prior_mode", choices=["verify", "follow"], default="verify",
@@ -2655,6 +2751,12 @@ def main():
         help="Repair a finished run: re-synthesize the samples in --output that have no "
              "pred_label, reading problem text from --input and graphs from --rkg_file, "
              "and merge the recovered ones back. Pass the same IRF flags the run used.",
+    )
+    parser.add_argument(
+        "--no_resume",
+        action="store_true",
+        default=False,
+        help="Ignore an <output>.partial.jsonl checkpoint and synthesize every sample again",
     )
     parser.add_argument(
         "--no_auto_retry",
@@ -2753,6 +2855,7 @@ def main():
             atomic_steps=args.atomic_steps,
             idf_scope=args.idf_scope,
             idf_norm=args.idf_norm,
+            resume=not args.no_resume,
         )
     )
 
