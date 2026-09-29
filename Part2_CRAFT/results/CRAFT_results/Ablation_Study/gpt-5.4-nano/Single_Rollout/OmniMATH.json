@@ -1,7 +1,7 @@
 {
   "model": "gpt-5.4-nano",
   "dataset": "OmniMATH",
-  "setting": "w/o Rollout (K=1)",
+  "setting": "Single Rollout (K=1)",
   "source_file": "results/craft_runs/full500/OmniMATH_gpt-5.4-nano/abl_k1.json",
   "craft_dir": "results/craft_runs/full500/OmniMATH_gpt-5.4-nano",
   "accuracy": 48.8,

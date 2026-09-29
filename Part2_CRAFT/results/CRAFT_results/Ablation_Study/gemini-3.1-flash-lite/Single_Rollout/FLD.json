@@ -1,7 +1,7 @@
 {
   "model": "gemini-3.1-flash-lite",
   "dataset": "FLD",
-  "setting": "w/o Rollout (K=1)",
+  "setting": "Single Rollout (K=1)",
   "source_file": "results/craft_runs/full500/FLD_gemini-3.1-flash-lite/abl_k1.json",
   "craft_dir": "results/craft_runs/full500/FLD_gemini-3.1-flash-lite",
   "accuracy": 87.1,

@@ -1,7 +1,7 @@
 {
   "model": "gemini-3.1-flash-lite",
   "dataset": "ProofWriter",
-  "setting": "w/o Rollout (K=1)",
+  "setting": "Single Rollout (K=1)",
   "source_file": "results/craft_runs/full500/ProofWriter_gd/abl_k1_resolve.json",
   "craft_dir": "results/craft_runs/full500/ProofWriter_gd",
   "accuracy": 85.4,

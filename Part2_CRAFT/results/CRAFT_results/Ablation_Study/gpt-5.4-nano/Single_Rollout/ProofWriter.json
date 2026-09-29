@@ -1,7 +1,7 @@
 {
   "model": "gpt-5.4-nano",
   "dataset": "ProofWriter",
-  "setting": "w/o Rollout (K=1)",
+  "setting": "Single Rollout (K=1)",
   "source_file": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano/abl_k1_resolve.json",
   "craft_dir": "results/craft_runs/full500/ProofWriter_gpt-5.4-nano",
   "accuracy": 97.8,

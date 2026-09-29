@@ -8,7 +8,7 @@ ablation_study.py — the ablation table of §4, one row per removed component.
     w/o CRAFT                    the whole pipeline         a single-call run
     w/o RKG                      Module II's graph          --synthesis_strategy step_by_step
     Embedding Cosine Similarity  Jaccard in the edge weight an embedding-similarity run
-    w/o Rollout (K=1)            the other K-1 traces       the pipeline run on one trace
+    Single Rollout (K=1)         the other K-1 traces       the pipeline run on one trace
 
 Scoring is not reimplemented here: the rows are read with the same loaders and
 scored with the same metric as the main table, so an ablation row and a main-table
@@ -66,15 +66,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]
 from evaluate_accuracy import LOADERS, compute_metrics
 
 FULL = "CRAFT (full)"
-ROLLOUT = "w/o Rollout (K=1)"
+ROLLOUT = "Single Rollout (K=1)"
 VARIANT_ROWS = ("w/o RKG", "Embedding Cosine Similarity", ROLLOUT)
-# The single-trace row used to be called "w/o Consensus"; the old name is still accepted.
-ALIASES = {"w/o Consensus (K=1)": ROLLOUT}
+# The single-trace row used to be called "w/o Consensus" and then "w/o Rollout";
+# the old names are still accepted.
+ALIASES = {"w/o Consensus (K=1)": ROLLOUT, "w/o Rollout (K=1)": ROLLOUT}
+# Settings whose folder is not their slug.
+FOLDERS = {ROLLOUT: "Single_Rollout"}
 ROW_ORDER = (FULL, "w/o CRAFT", ROLLOUT, "w/o RKG", "Embedding Cosine Similarity")
 
 
 def slug(setting: str) -> str:
-    """A setting's folder name: 'w/o Rollout (K=1)' -> 'wout_Rollout_K1'."""
+    """A setting's folder name: 'w/o RKG' -> 'wout_RKG', 'Single Rollout (K=1)' -> 'Single_Rollout'."""
+    if setting in FOLDERS:
+        return FOLDERS[setting]
     s = setting.replace("w/o", "wout").replace("&", "and").replace("=", "")
     return re.sub(r"[^A-Za-z0-9]+", "_", s).strip("_")
 
@@ -275,7 +280,7 @@ def main() -> None:
     for spec in args.variant:
         if "=" not in spec:
             raise SystemExit(f"--variant takes NAME=PATH, got {spec!r}")
-        # Split on the last "=" so a variant name may itself contain one ("w/o Rollout (K=1)").
+        # Split on the last "=" so a variant name may itself contain one ("Single Rollout (K=1)").
         name, raw = (s.strip() for s in spec.rsplit("=", 1))
         name = ALIASES.get(name, name)
         if name not in VARIANT_ROWS:
