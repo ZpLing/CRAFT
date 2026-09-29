@@ -868,7 +868,10 @@ def remove_anomalous_steps(
             n = step_info["step_number"]
             if n == last_step_number:
                 continue
-            if (n, trace_idx) in anomalous_steps or (trace_idx, n) in anomalous_steps:
+            # (trace_idx, step_number) only. Accepting either order also removed
+            # the mirror step of another trace: flagging trace 2 / step 1 took
+            # step 2 out of trace 1.
+            if (trace_idx, n) in anomalous_steps:
                 flagged.add(n)
 
         cleaned_steps = [si for si in parsed_steps
@@ -893,7 +896,8 @@ def remove_anomalous_steps(
             cleaned_trace["reasoning_text"] = ""
 
         # Record number of removed steps
-        cleaned_trace["original_num_steps"] = len(parsed_steps)
+        # the length as generated, not after an earlier pass shortened it
+        cleaned_trace["original_num_steps"] = trace.get("original_num_steps", len(parsed_steps))
         cleaned_trace["cleaned_num_steps"] = len(cleaned_steps)
         cleaned_trace["removed_steps"] = len(parsed_steps) - len(cleaned_steps)
 
@@ -1163,7 +1167,8 @@ def remove_anomalous_steps_rkg(
             )
         else:
             cleaned_trace["reasoning_text"] = ""
-        cleaned_trace["original_num_steps"] = len(parsed_steps)
+        # the length as generated, not after an earlier pass shortened it
+        cleaned_trace["original_num_steps"] = trace.get("original_num_steps", len(parsed_steps))
         cleaned_trace["cleaned_num_steps"] = len(cleaned_steps)
         cleaned_trace["removed_steps"] = len(parsed_steps) - len(cleaned_steps)
 
@@ -1268,7 +1273,9 @@ def process_sample(
         anomalous_steps = detect_anomalous_steps_supervised(
             steps_with_terms_dict, similarity_threshold=similarity_threshold,
         )
-        cleaned_traces = remove_anomalous_steps(traces, anomalous_steps)
+        # this detector reports (step_number, trace_idx); removal takes the reverse
+        cleaned_traces = remove_anomalous_steps(
+            traces, {(t, s_) for s_, t in anomalous_steps})
         for step_num, trace_idx in anomalous_steps:
             step_info = next(
                 (s for s in steps_with_terms_dict.get(step_num, []) if s["trace_idx"] == trace_idx),

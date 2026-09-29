@@ -671,6 +671,34 @@ def align_step_nodes(trace_rkgs: List[Dict[str, Any]]) -> Dict[int, Dict[str, st
     return dict(mapping)
 
 
+def restore_original_ids(rkg_trace: Dict[str, Any]) -> None:
+    """Undo a previous consensus pass's renaming of one trace graph, in place.
+
+    build_consensus_rkg rewrites a trace graph's ids (the conclusion to
+    ConcShared, aligned steps to their group names) and a saved run stores the
+    graphs that way. A later rebuild from those graphs would align the aligned
+    ids again and could merge two nodes; putting every node back under the id
+    extraction gave it first makes a rebuild start from the same graph a fresh
+    run does.
+    """
+    back: Dict[str, str] = {}
+    nodes = []
+    for n in rkg_trace.get("nodes", []):
+        orig = n.get("orig_conc_id") or n.get("orig_id")
+        if orig and orig != n["id"]:
+            back[n["id"]] = orig
+            n = {k: v for k, v in n.items() if k not in ("orig_id", "orig_conc_id")}
+            n["id"] = orig
+        nodes.append(n)
+    if not back:
+        return
+    rkg_trace["nodes"] = nodes
+    rkg_trace["edges"] = [
+        dict(e, src=back.get(e["src"], e["src"]), dst=back.get(e["dst"], e["dst"]))
+        for e in rkg_trace.get("edges", [])
+    ]
+
+
 def build_consensus_rkg(
     trace_rkgs: List[Dict[str, Any]],
     theta: float = THETA,
@@ -757,11 +785,22 @@ def build_consensus_rkg(
     _CONC_ID = "ConcShared"
     _LBL_PAT = re.compile(r"__(?:PROVED|DISPROVED|UNKNOWN)__")
     for rkg_trace in trace_rkgs:
+        restore_original_ids(rkg_trace)
+    for rkg_trace in trace_rkgs:
         # Find all conclusion-like nodes in this trace
         concl_node_ids = {
             n["id"] for n in rkg_trace.get("nodes", [])
             if _LBL_PAT.search(n.get("text", ""))
         }
+        if not concl_node_ids:
+            # A maths trace carries no verdict marker; its last step is the node
+            # extraction typed "conclusion". Left under its own StepN id it could
+            # share a name with an aligned step group, which merged one trace's
+            # answer with another trace's intermediate step.
+            concl_node_ids = {
+                n["id"] for n in rkg_trace.get("nodes", [])
+                if n.get("type") == "conclusion"
+            }
         if not concl_node_ids:
             continue
         # Pick the highest-step-number one as "the" conclusion
@@ -1097,6 +1136,8 @@ async def build_rkgs_for_dataset(
                         model=model, domain=domain,
                         theta=theta,
                         lam=lam,
+                        weight_by=weight_by,
+                        expected_depth=expected_depth,
                     )
                 except Exception as e:
                     results[idx] = {

@@ -1064,11 +1064,15 @@ def pad_math_plan(plan: List[Dict[str, Any]], total_steps: int) -> List[Dict[str
         return plan
     slots: List[Optional[Dict[str, Any]]] = [None] * total_steps
     n = len(steps)
-    for i, e in enumerate(steps):
-        pos = min(total_steps - 1, max(0, round((i + 1) * total_steps / (n + 1)) - 1))
-        while slots[pos] is not None and pos < total_steps - 1:
+    # The last node of G* is where the traces agree the derivation ends, so it
+    # takes the last slot; the others spread over the slots before it.
+    for i, e in enumerate(steps[:-1]):
+        pos = min(total_steps - 2, max(0, round((i + 1) * (total_steps - 1) / n) - 1))
+        while slots[pos] is not None and pos < total_steps - 2:
             pos += 1
         slots[pos] = e
+    if steps:
+        slots[total_steps - 1] = steps[-1]
     out: List[Dict[str, Any]] = []
     for pos, e in enumerate(slots):
         if e is None:
@@ -2371,6 +2375,15 @@ async def synthesize_traces_for_dataset(
     connector = aiohttp.TCPConnector(limit=concurrency)
     results = []
 
+    # Every sample's coroutine starts at once; without a bound they all wait on
+    # the connection pool, and aiohttp counts that wait against the request
+    # timeout, which is where most of the TimeoutErrors came from.
+    _sem = asyncio.Semaphore(concurrency)
+
+    async def _bounded(coro):
+        async with _sem:
+            return await coro
+
     async with aiohttp.ClientSession(connector=connector) as session:
         tasks = []
         for sample in todo:
@@ -2382,16 +2395,16 @@ async def synthesize_traces_for_dataset(
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
                 sample_rkg = rkg_lookup.get(sample_id, {})
-                tasks.append(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, prior_mode=prior_mode, atomic_steps=atomic_steps, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf))
+                tasks.append(_bounded(synthesize_trace_rkg(session, sample, sample_rkg, model=model, domain=domain, prior_mode=prior_mode, atomic_steps=atomic_steps, df_table=df_table, idf_norm=(idf_norm == "log_n"), min_tfidf=min_tfidf)))
             else:
-                tasks.append(synthesize_trace_for_sample(
+                tasks.append(_bounded(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
                     step_by_step=(synthesis_strategy != "all_at_once"),
                     domain=domain,
                     df_table=df_table,
                     idf_norm=(idf_norm == "log_n"),
                     atomic_steps=atomic_steps,
-                ))
+                )))
         
         pbar = tqdm(total=len(tasks), desc="Generation progress", unit="sample")
         
@@ -2543,6 +2556,7 @@ async def retry_failed_synthesis(
     in_place: bool = False,
     min_tfidf: float = ALPHA,
     original_file: Optional[Path] = None,
+    only_errors: Optional[str] = None,
 ) -> None:
     """Re-synthesize only the samples a prior run left without a pred_label.
 
@@ -2552,8 +2566,11 @@ async def retry_failed_synthesis(
     scored on a different term weighting than the ones beside them in the file.
     """
     synth_records = _load_records(synth_file)
+    # only_errors="Timeout" limits the retry to samples whose error says so, so a
+    # deterministic failure (an empty graph, a refused prompt) is not re-run.
     failed_sids = {r["sample_id"] for r in synth_records
-                   if "sample_id" in r and not r.get("pred_label")}
+                   if "sample_id" in r and not r.get("pred_label")
+                   and (only_errors is None or only_errors in str(r.get("error") or ""))}
     print(f"Failed samples to retry: {len(failed_sids)}")
     if not failed_sids:
         print("Nothing to retry.")
@@ -2908,6 +2925,7 @@ def main():
                     in_place=True,
                     min_tfidf=args.min_tfidf,
                     original_file=original_path,
+                    only_errors="Timeout",
                 )
             )
 
