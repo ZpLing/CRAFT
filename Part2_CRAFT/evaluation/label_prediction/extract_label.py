@@ -139,11 +139,12 @@ def extract_math_answer(text: str) -> Optional[str]:
     m = _extract_boxed_content(text)
     if m:
         raw = m[-1].strip()
-        # Remove thousands-separator commas only (e.g. 1,000 → 1000), and only
-        # when the whole answer is that one number: inside a tuple or a set,
-        # (312,123,231) is three numbers, not 312123231.
-        if re.fullmatch(r'-?\d{1,3}(?:,\d{3})+(?:\.\d+)?', raw):
-            raw = raw.replace(',', '')
+        # Remove thousands-separator commas only (e.g. 1,000 → 1000). Inside a
+        # tuple, interval or set, (312,123,231) is three numbers, not
+        # 312123231, so there a comma counts as a separator only when the
+        # items themselves are split by ", " as in [1,000, 2,000].
+        if not re.search(r'[(\[]|\\\{', raw) or ', ' in raw:
+            raw = re.sub(r'(?<=\d),(?=\d{3}(?!\d))', '', raw)
         return raw
     m2 = _HASH_ANS_RE.findall(text)
     if m2:
