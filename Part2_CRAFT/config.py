@@ -30,6 +30,21 @@ else:
 DEFAULT_MODEL   = MODEL_SYNTHESIS
 REQUEST_TIMEOUT = int(os.getenv("OPENAI_REQUEST_TIMEOUT", "180"))
 
+# ── Hyperparameters of Algorithm 1 (Table 1) ────────────────────────────────
+# Every default of these in Modules I-III reads the value here, so one change
+# (or one CRAFT_<NAME> variable) moves the whole pipeline together.
+def _env_num(name, default, kind=float):
+    raw = os.getenv(name)
+    return kind(raw) if raw not in (None, "") else default
+
+K      = _env_num("CRAFT_K",      5, int)    # traces rolled out per sample
+T      = _env_num("CRAFT_T",      0.7)       # sampling temperature
+ALPHA  = _env_num("CRAFT_ALPHA",  0.01)      # TF-IRF threshold of T_Con
+BETA   = _env_num("CRAFT_BETA",   0.3)       # step frequency threshold of T_Con
+GAMMA  = _env_num("CRAFT_GAMMA",  -1.0)      # z-score step cutoff
+LAMBDA = _env_num("CRAFT_LAMBDA", 0.3)       # weight of Jaccard in W_S(e)
+THETA  = _env_num("CRAFT_THETA",  0.3)       # edge filtering threshold on W(e)
+
 # ── Module III prompt ────────────────────────────────────────────────────────
 # One switch for every atomic_steps default in the synthesis code: True writes
 # each step as one inference stated in two sentences, the Module III prompt of

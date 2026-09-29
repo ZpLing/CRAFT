@@ -82,6 +82,9 @@ def _normalise_math_pred(s: Optional[str]) -> Optional[str]:
 _cfg_path = _pl.Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_root_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
+# Table 1 hyperparameters, set once in config.py
+ALPHA = _cfg.ALPHA
+
 
 OPENAI_API_KEY        = _cfg.OPENAI_API_KEY
 OPENAI_BASE_URL       = _cfg.OPENAI_BASE_URL
@@ -109,7 +112,7 @@ def extract_step_terms_with_tfidf(
     all_step_documents: List[List[str]],
     min_tf: float = 0.001,
     min_idf: float = 0.1,
-    min_tfidf: float = 0.01,
+    min_tfidf: float = ALPHA,
     domain: str = "logical",
     df_table: Optional[DocFreqTable] = None,
 ) -> Tuple[List[str], Dict[str, float]]:
@@ -159,7 +162,7 @@ def extract_step_terms_with_tfidf(
 
 def collect_terms_by_step_position(
     sample_traces: List[Dict[str, Any]],
-    min_tfidf: float = 0.01,
+    min_tfidf: float = ALPHA,
     use_percentage_alignment: bool = True,
     num_buckets: int = 10,
     domain: str = "logical",
@@ -1492,7 +1495,7 @@ async def synthesize_trace_rkg(
     atomic_steps: bool = ATOMIC_STEPS,
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
-    min_tfidf: float = 0.01,
+    min_tfidf: float = ALPHA,
 ) -> Dict[str, Any]:
     """RKG-guided high-quality trace generation (blind synthesis, no access to ground_truth).
 
@@ -1993,12 +1996,13 @@ def parse_step_from_response(response: str, step_number: int) -> Optional[str]:
 async def synthesize_trace_for_sample(
     session: aiohttp.ClientSession,
     sample: Dict[str, Any],
-    min_tfidf: float = 0.01,
+    min_tfidf: float = ALPHA,
     model: str = DEFAULT_MODEL,
     step_by_step: bool = True,
     domain: str = "logical",
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
+    atomic_steps: bool = ATOMIC_STEPS,
 ) -> Dict[str, Any]:
     """
     Generate a high-quality reasoning trace for a single sample.
@@ -2122,6 +2126,7 @@ async def synthesize_trace_for_sample(
                     previous_steps=generated_steps,
                     domain=domain,
                     answer_is_prior=answer_is_prior,
+                    atomic_steps=atomic_steps,
                 )
 
                 response = await generate_reasoning_trace(
@@ -2189,7 +2194,8 @@ async def synthesize_trace_for_sample(
             prompt = build_synthesis_prompt(
                 problem_input, step_terms_summary, ground_truth, domain=domain,
                 answer_is_prior=answer_is_prior,
-            )
+                    atomic_steps=atomic_steps,
+                )
             synthesized_text = await generate_reasoning_trace(session, prompt, model)
 
         # Extract pred_label from synthesized text
@@ -2235,7 +2241,7 @@ async def synthesize_trace_for_sample(
 async def synthesize_traces_for_dataset(
     input_file: Path,
     output_file: Path,
-    min_tfidf: float = 0.01,
+    min_tfidf: float = ALPHA,
     model: str = DEFAULT_MODEL,
     concurrency: int = 20,
     max_samples: Optional[int] = None,
@@ -2374,6 +2380,7 @@ async def synthesize_traces_for_dataset(
                     domain=domain,
                     df_table=df_table,
                     idf_norm=(idf_norm == "log_n"),
+                    atomic_steps=atomic_steps,
                 ))
         
         pbar = tqdm(total=len(tasks), desc="Generation progress", unit="sample")
@@ -2524,7 +2531,7 @@ async def retry_failed_synthesis(
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     in_place: bool = False,
-    min_tfidf: float = 0.01,
+    min_tfidf: float = ALPHA,
     original_file: Optional[Path] = None,
 ) -> None:
     """Re-synthesize only the samples a prior run left without a pred_label.
@@ -2640,7 +2647,7 @@ def main():
         "--alpha", "--min_tfidf",
         dest="min_tfidf",
         type=float,
-        default=0.01,
+        default=ALPHA,
         help="TF-IRF threshold alpha below which a term is not shown as a key term (paper: 0.01)"
     )
     parser.add_argument(

@@ -70,6 +70,10 @@ import importlib.util as _ilu, pathlib as _pl
 _cfg_path = _pl.Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_root_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
+# Table 1 hyperparameters, set once in config.py
+K = _cfg.K
+T = _cfg.T
+
 
 OPENAI_API_KEY:  str            = _cfg.OPENAI_API_KEY
 MODEL_NAME:      str            = _cfg.MODEL_TRACE_GEN   # Step 1: generate k diverse traces
@@ -440,7 +444,7 @@ async def generate_single_trace(
     problem_text: str,
     trace_idx: int,
     k: int,
-    base_temperature: float = 0.7,
+    base_temperature: float = T,
     max_retries: int = 3,
     domain: str = "logical",
     fixed_temp: bool = True,
@@ -513,7 +517,7 @@ async def generate_k_traces_for_sample(
     session: aiohttp.ClientSession,
     sample_entry: Dict[str, Any],
     k: int,
-    base_temperature: float = 0.7,
+    base_temperature: float = T,
     domain: Optional[str] = None,
     fixed_temp: bool = True,
 ) -> Dict[str, Any]:
@@ -564,7 +568,7 @@ async def generate_k_traces_dataset(
     output_path: Path,
     k: int,
     concurrency: int,
-    base_temperature: float = 0.7,
+    base_temperature: float = T,
     domain: str = "logical",
     fixed_temp: bool = True,
 ) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
@@ -769,15 +773,15 @@ def parse_args() -> argparse.Namespace:
         "--K", "--k",
         dest="k",
         type=int,
-        default=5,
-        help="Number of traces K rolled out per sample (paper: K=5)",
+        default=K,
+        help="Number of traces K rolled out per sample (default: config.K)",
     )
     parser.add_argument(
         "--T", "--temperature",
         dest="temperature",
         type=float,
-        default=0.7,
-        help="Sampling temperature T of every trace (paper: 0.7)",
+        default=T,
+        help="Sampling temperature T of every trace (default: config.T)",
     )
     parser.add_argument(
         "--spread_temp",

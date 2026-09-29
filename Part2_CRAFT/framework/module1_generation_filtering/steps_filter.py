@@ -47,6 +47,9 @@ import importlib.util as _ilu
 _cfg_path = _Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_part_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
+# Table 1 hyperparameters, set once in config.py
+ALPHA, BETA, GAMMA, THETA = _cfg.ALPHA, _cfg.BETA, _cfg.GAMMA, _cfg.THETA
+
 
 # Reuse functions from tfirf_terms.py (Step 2: TF-IRF Term Extraction)
 from framework.module1_generation_filtering.tfirf_terms import (
@@ -285,7 +288,7 @@ def weighted_jaccard_similarity(
 
 def compute_sample_consensus_core(
     steps_with_terms: List[Dict[str, Any]],
-    consensus_threshold: float = 0.3,
+    consensus_threshold: float = BETA,
 ) -> Set[str]:
     """
     Compute the consensus terms T_Con for a sample.
@@ -581,8 +584,8 @@ def _step_term_set(text: str, domain: str) -> Set[str]:
 
 def paper_consensus_terms(
     steps_info: List[Dict[str, Any]],
-    alpha: float = 0.01,
-    beta: float = 0.3,
+    alpha: float = ALPHA,
+    beta: float = BETA,
     domain: str = "logical",
 ) -> Tuple[Set[str], Dict[str, Dict[str, float]]]:
     """T_Con of Algorithm 1 line 4, from Eqs. (1)-(3) of the appendix.
@@ -631,9 +634,9 @@ def paper_consensus_terms(
 
 def detect_anomalous_steps_zscore(
     steps_info: List[Dict[str, Any]],
-    alpha: float = 0.01,
-    beta: float = 0.3,
-    gamma: float = -1.0,
+    alpha: float = ALPHA,
+    beta: float = BETA,
+    gamma: float = GAMMA,
     domain: str = "logical",
 ) -> Tuple[Set[Tuple[int, int]], Set[str]]:
     """Module I steps filtering, Algorithm 1 lines 4-7.
@@ -673,8 +676,8 @@ def detect_anomalous_steps_unsupervised(
     similarity_threshold: float = 0.3,
     min_similar_steps: int = 2,
     use_grpo_optimization: bool = True,
-    z_score_threshold: float = -1.0,
-    consensus_threshold: float = 0.3,
+    z_score_threshold: float = GAMMA,
+    consensus_threshold: float = BETA,
     use_weighted_similarity: bool = True,
     domain: str = "logical",
 ) -> Set[Tuple[int, int]]:
@@ -961,7 +964,7 @@ def detect_structural_anomalies(
 def detect_edge_frequency_anomalies(
     trace_rkg: Dict[str, Any],
     consensus_rkg: Dict[str, Any],
-    threshold: float = 0.3,
+    threshold: float = THETA,
 ) -> Set[str]:
     """Pass 2 edge filter: a step whose incoming edge has consensus weight W(e) < theta.
 
@@ -1035,7 +1038,7 @@ def detect_underthinking_traces(
 def detect_anomalous_steps_rkg(
     trace_rkgs: List[Dict[str, Any]],
     consensus_rkg: Dict[str, Any],
-    consensus_threshold: float = 0.3,
+    consensus_threshold: float = THETA,
     underthinking_threshold: float = 0.3,
     domain: str = "logical",
 ) -> Tuple[Set[Tuple[int, str]], Set[int], Dict[Tuple[int, str], str]]:
@@ -1181,15 +1184,15 @@ def process_sample(
     method: str = "supervised",
     min_similar_steps: int = 2,
     use_grpo_optimization: bool = True,
-    z_score_threshold: float = -1.0,
-    consensus_threshold: float = 0.3,
+    z_score_threshold: float = GAMMA,
+    consensus_threshold: float = BETA,
     use_weighted_similarity: bool = True,
     domain: str = "logical",
     sample_rkg: Optional[Dict[str, Any]] = None,
     underthinking_threshold: float = 0.3,
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
-    alpha: float = 0.01,
+    alpha: float = ALPHA,
     beta: Optional[float] = None,
     gamma: Optional[float] = None,
     theta: Optional[float] = None,
@@ -1496,26 +1499,26 @@ def main():
     parser.add_argument(
         "--alpha",
         type=float,
-        default=0.01,
-        help="TF-IRF threshold alpha of T_Con (paper: 0.01)",
+        default=ALPHA,
+        help="TF-IRF threshold alpha of T_Con (default: config.ALPHA)",
     )
     parser.add_argument(
         "--gamma", "--z_score_threshold",
         dest="gamma",
         type=float,
-        default=-1.0,
+        default=GAMMA,
         help="Z-score step cutoff gamma; steps below this are filtered out (--method unsupervised only; paper: -1.0)",
     )
     parser.add_argument(
         "--beta",
         type=float,
-        default=0.3,
-        help="Step frequency threshold beta of T_Con: RF(w) >= beta (paper: 0.3)",
+        default=BETA,
+        help="Step frequency threshold beta of T_Con: RF(w) >= beta (default: config.BETA)",
     )
     parser.add_argument(
         "--theta",
         type=float,
-        default=0.3,
+        default=THETA,
         help="Edge filtering threshold theta for --method rkg: a step whose incoming "
              "edge has W(e) < theta is removed (paper: 0.3)",
     )

@@ -80,6 +80,9 @@ import importlib.util as _ilu, pathlib as _pl
 _cfg_path = _pl.Path(__file__).resolve().parents[2] / "config.py"
 _spec = _ilu.spec_from_file_location("_root_config", _cfg_path)
 _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
+# Table 1 hyperparameters, set once in config.py
+THETA, LAMBDA = _cfg.THETA, _cfg.LAMBDA
+
 
 OPENAI_API_KEY  = _cfg.OPENAI_API_KEY
 OPENAI_BASE_URL = _cfg.OPENAI_BASE_URL
@@ -670,8 +673,8 @@ def align_step_nodes(trace_rkgs: List[Dict[str, Any]]) -> Dict[int, Dict[str, st
 
 def build_consensus_rkg(
     trace_rkgs: List[Dict[str, Any]],
-    theta: float = 0.3,
-    lam: float = 0.3,
+    theta: float = THETA,
+    lam: float = LAMBDA,
     weight_by: str = "uniform",   # "uniform" | "gold_depth"
     expected_depth: Optional[int] = None,
     node_threshold: Optional[float] = None,
@@ -990,8 +993,8 @@ async def build_rkgs_for_sample(
     sample: Dict[str, Any],
     model: str = DEFAULT_MODEL,
     domain: str = "logical",
-    theta: float = 0.3,
-    lam: float = 0.3,
+    theta: float = THETA,
+    lam: float = LAMBDA,
     weight_by: str = "uniform",
     expected_depth: Optional[int] = None,
 ) -> Dict[str, Any]:
@@ -1056,9 +1059,9 @@ async def build_rkgs_for_dataset(
     model: str = DEFAULT_MODEL,
     concurrency: int = 10,
     domain: str = "logical",
-    theta: float = 0.3,
+    theta: float = THETA,
     max_samples: Optional[int] = None,
-    lam: float = 0.3,
+    lam: float = LAMBDA,
     weight_by: str = "uniform",
     expected_depth: Optional[int] = None,
 ) -> None:
@@ -1138,8 +1141,8 @@ async def build_rkgs_for_dataset(
 
 def rebuild_consensus(
     input_file: Path,
-    theta: float = 0.3,
-    lam: float = 0.3,
+    theta: float = THETA,
+    lam: float = LAMBDA,
     weight_by: str = "uniform",
     gt_file: Optional[Path] = None,
     expected_depth: Optional[int] = None,
@@ -1229,7 +1232,7 @@ def main() -> None:
     parser.add_argument("--base_url", default=None, help="API Base URL")
     parser.add_argument("--concurrency", type=int, default=10, help="Concurrency level (default 10)")
     parser.add_argument("--domain", default="logical", choices=["logical", "math"])
-    parser.add_argument("--theta", "--consensus_threshold", dest="theta", type=float, default=0.3,
+    parser.add_argument("--theta", "--consensus_threshold", dest="theta", type=float, default=THETA,
                         help="Edge filtering threshold theta: an edge stays in G* when its consensus "
                              "weight W(e) = 1/K * sum_S W_S(e) is at least theta (paper: 0.3)")
     parser.add_argument("--node_threshold", type=float, default=None,
@@ -1240,7 +1243,7 @@ def main() -> None:
                         help="The overlap measure fused into W(e): term Jaccard "
                              "(the paper) or the cosine of all-mpnet-base-v2 "
                              "embeddings (the ablation's row)")
-    parser.add_argument("--lambda", "--edge_lambda", dest="lam", type=float, default=0.3,
+    parser.add_argument("--lambda", "--edge_lambda", dest="lam", type=float, default=LAMBDA,
                         help="Weight of Jaccard in W_S(e), lambda: W_S(e) = (1-lambda)*conf(e) "
                              "+ lambda*Jaccard(u,v) (paper: 0.3)")
 
