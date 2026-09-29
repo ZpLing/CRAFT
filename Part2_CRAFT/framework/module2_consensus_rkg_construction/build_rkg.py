@@ -671,7 +671,7 @@ def align_step_nodes(trace_rkgs: List[Dict[str, Any]]) -> Dict[int, Dict[str, st
     return dict(mapping)
 
 
-def restore_original_ids(rkg_trace: Dict[str, Any]) -> None:
+def restore_original_ids(rkg_trace: Dict[str, Any]) -> bool:
     """Undo a previous consensus pass's renaming of one trace graph, in place.
 
     build_consensus_rkg rewrites a trace graph's ids (the conclusion to
@@ -681,6 +681,14 @@ def restore_original_ids(rkg_trace: Dict[str, Any]) -> None:
     extraction gave it first makes a rebuild start from the same graph a fresh
     run does.
     """
+    ids = [n["id"] for n in rkg_trace.get("nodes", [])]
+    if len(ids) != len(set(ids)):
+        # Two nodes under one id (a graph saved before maths conclusions were
+        # merged): an edge to that id could mean either, so restoring would
+        # route it to one of them at random. Leave the graph as it is and say
+        # so; it needs extracting again.
+        rkg_trace["restore_failed"] = True
+        return False
     back: Dict[str, str] = {}
     nodes = []
     for n in rkg_trace.get("nodes", []):
@@ -691,12 +699,13 @@ def restore_original_ids(rkg_trace: Dict[str, Any]) -> None:
             n["id"] = orig
         nodes.append(n)
     if not back:
-        return
+        return True
     rkg_trace["nodes"] = nodes
     rkg_trace["edges"] = [
         dict(e, src=back.get(e["src"], e["src"]), dst=back.get(e["dst"], e["dst"]))
         for e in rkg_trace.get("edges", [])
     ]
+    return True
 
 
 def build_consensus_rkg(
@@ -784,8 +793,7 @@ def build_consensus_rkg(
     # the conclusion vote splits across distinct ids → consensus picks an arbitrary trace.
     _CONC_ID = "ConcShared"
     _LBL_PAT = re.compile(r"__(?:PROVED|DISPROVED|UNKNOWN)__")
-    for rkg_trace in trace_rkgs:
-        restore_original_ids(rkg_trace)
+    unrestorable = sum(1 for rkg_trace in trace_rkgs if not restore_original_ids(rkg_trace))
     for rkg_trace in trace_rkgs:
         # Find all conclusion-like nodes in this trace
         concl_node_ids = {
@@ -1020,6 +1028,7 @@ def build_consensus_rkg(
         "theta":            theta,
         "lambda":           lam,
         "node_alignment":   {str(k): v for k, v in node_alignment.items()},
+        "unrestorable_traces": unrestorable,
     }
 
 
