@@ -594,7 +594,7 @@ def detect_anomalous_steps_unsupervised(
         min_similar_steps: minimum number of similar steps required to be considered normal
         use_grpo_optimization: whether to use GRPO optimization (default True)
         z_score_threshold: z-score step cutoff gamma; steps below this are filtered out (paper: -1.0)
-        consensus_threshold: TF-IRF frequency threshold beta (default 0.3, i.e. term appears in >= 30% of steps)
+        consensus_threshold: step frequency threshold beta (default 0.3, i.e. term appears in >= 30% of steps)
         use_weighted_similarity: whether to use weighted Jaccard similarity (default True)
         domain: "logical" or "math"
 
@@ -1333,7 +1333,7 @@ def main():
         "--consensus_threshold",
         type=float,
         default=0.3,
-        help="TF-IRF frequency threshold beta; fraction of steps a term must appear in to be included in the consensus core (default 0.3)",
+        help="Step frequency threshold beta; fraction of steps a term must appear in to be included in the consensus core (default 0.3)",
     )
     parser.add_argument(
         "--use_weighted_similarity",

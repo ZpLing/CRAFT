@@ -2288,7 +2288,7 @@ def main():
         "--min_tfidf",
         type=float,
         default=0.01,
-        help="TF-IRF importance floor alpha (default: 0.01)"
+        help="TF-IRF threshold alpha (default: 0.01)"
     )
     parser.add_argument(
         "--idf_scope",

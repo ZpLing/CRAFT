@@ -739,15 +739,16 @@ def build_consensus_rkg(
             consensus_node_ids.add(src)
             consensus_node_ids.add(dst)
 
-    # Node-frequency vote (beta). Collecting nodes only from edges that clear theta
-    # loses every node of a sample whose traces disagree on structure: the graph comes
-    # back empty even when a step is present in every single trace. A node carried by
-    # at least beta of the traces belongs in the consensus on its own merit.
-    _beta = consensus_threshold if node_threshold is None else node_threshold
+    # Node-frequency vote (node_threshold, theta unless set). Collecting nodes only
+    # from edges that clear theta loses every node of a sample whose traces disagree
+    # on structure: the graph comes back empty even when a step is present in every
+    # single trace. A node carried by at least node_threshold of the traces belongs
+    # in the consensus on its own merit.
+    _node_threshold = consensus_threshold if node_threshold is None else node_threshold
     n_traces = max(len(trace_rkgs), 1)
     consensus_node_ids |= {
         nid for nid, cnt in node_trace_count.items()
-        if cnt / n_traces >= _beta
+        if cnt / n_traces >= _node_threshold
     }
 
     # Fact nodes are always retained
@@ -1051,7 +1052,7 @@ def main() -> None:
     parser.add_argument("--concurrency", type=int, default=10, help="Concurrency level (default 10)")
     parser.add_argument("--domain", default="logical", choices=["logical", "math"])
     parser.add_argument("--consensus_threshold", type=float, default=0.3,
-                        help="Edge weight threshold theta: an edge enters G* when at least this fraction of the K traces contain it (default 0.3)")
+                        help="Edge filtering threshold theta: an edge enters G* when at least this fraction of the K traces contain it (default 0.3)")
     parser.add_argument("--node_threshold", type=float, default=None,
                         help="Node threshold: fraction of the K traces a node must appear in (default: same as --consensus_threshold)")
     parser.add_argument("--max_samples", type=int, default=None)
@@ -1061,7 +1062,7 @@ def main() -> None:
                              "(the paper) or the cosine of all-mpnet-base-v2 "
                              "embeddings (the ablation's row)")
     parser.add_argument("--edge_lambda", type=float, default=0.3,
-                        help="Edge weight balance lambda: W(e) = (1-lambda)*LLM confidence "
+                        help="Weight of Jaccard in W(e), lambda: W(e) = (1-lambda)*LLM confidence "
                              "+ lambda*term overlap (paper: 0.3)")
 
     # Offline mode: re-vote an existing RKG file's cached trace_rkgs, no LLM calls.
