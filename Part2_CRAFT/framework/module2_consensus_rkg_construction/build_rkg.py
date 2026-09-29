@@ -2,8 +2,10 @@
 """
 build_rkg.py  (Module II — Consensus RKG Construction)
 ------------------------------------------------------------------------------
-Build a Reasoning Knowledge Graph (RKG) for each reasoning trace, then construct
-a label-weighted consensus RKG via edge-frequency voting across k traces.
+Build a Reasoning Knowledge Graph (RKG) G_S for each reasoning trace, weight its
+edges by W_S(e) = (1-lambda)*conf(e) + lambda*Jaccard(u,v), take the union G*,
+and keep the edges whose consensus weight W(e) = 1/K * sum_S W_S(e) reaches theta
+(Algorithm 1, Module II).
 
 Node types:
   - fact       : given premises from the problem (no incoming edges)
@@ -18,7 +20,7 @@ Core pipeline:
   2. Single LLM call per trace to extract all dependency edges
   3. Regex fallback (when LLM fails)
   4. Validate RKG acyclicity (detect cycles, dangling references)
-  5. Build Consensus RKG across k traces via edge-frequency voting (BuildRKG)
+  5. Build the consensus RKG G*: W(e) edge filtering, isolated-node filtering
 
 Output format:
   {
@@ -35,7 +37,8 @@ Output format:
     "consensus_rkg": {
       "nodes": [...],
       "edges": [...],
-      "edge_frequencies": {"Fact1->Step2": 0.9, ...}
+      "edge_weights": {"Fact1->Step2": 0.62, ...},      W(e)
+      "edge_frequencies": {"Fact1->Step2": 0.8, ...}    fraction of the K traces
     }
   }
 """
@@ -94,6 +97,7 @@ CHAT_URL = OPENAI_BASE_URL.rstrip("/") + "/chat/completions"
 _REF_STEP = re.compile(r'\bstep\s*(\d+)\b', re.IGNORECASE)
 _REF_FACT = re.compile(r'\bfact\s*(\d+)\b', re.IGNORECASE)
 _FACT_LINE = re.compile(r'^(?:fact\s*(\d+)\s*[:\.\-])\s*(.+)$', re.IGNORECASE | re.MULTILINE)
+_FACT_MARK = re.compile(r'\bfact\s*(\d+)\s*:', re.IGNORECASE)
 _GIVEN_LINE = re.compile(r'^(?:given|let|assume|suppose)[:\s]+(.+)$', re.IGNORECASE | re.MULTILINE)
 
 
@@ -110,15 +114,22 @@ def extract_facts_from_problem(problem_text: str, domain: str = "logical") -> Li
     facts = []
 
     if domain == "logical":
-        for m in _FACT_LINE.finditer(problem_text):
-            idx = int(m.group(1))
-            text = m.group(2).strip()
-            facts.append({
-                "id": f"Fact{idx}",
-                "type": "fact",
-                "text": text,
-                "step_number": None,
-            })
+        # The datasets write every fact on one line ("Fact1: ... Fact2: ..."), so
+        # the facts are cut at each inline "FactN:" marker rather than read one
+        # per line, which returned only Fact1 with the whole problem as its text.
+        marks = list(_FACT_MARK.finditer(problem_text))
+        for i, m in enumerate(marks):
+            end = marks[i + 1].start() if i + 1 < len(marks) else len(problem_text)
+            text = problem_text[m.end():end].strip()
+            # The last fact runs into whatever follows the facts (the hypothesis).
+            text = re.split(r"\b(?:Hypothesis|Question|Conclusion)\s*:", text, maxsplit=1)[0].strip()
+            if text:
+                facts.append({
+                    "id": f"Fact{int(m.group(1))}",
+                    "type": "fact",
+                    "text": text,
+                    "step_number": None,
+                })
 
     else:  # math domain
         # "Given: ..." / "Let x = ..." etc.
@@ -201,13 +212,16 @@ For each reasoning step, identify which facts or EARLIER steps it DIRECTLY depen
 - A step depends on another step if it uses that step's conclusion as a premise.
 - Do NOT list a step as depending on itself.
 - If a step uses no earlier steps or facts, set "uses" to [].
+- For every dependency, give your confidence in [0, 1] that the step really uses it:
+  1.0 when the step states or plainly applies that premise, lower when the link is
+  only implied, and do not list a dependency you would put below 0.3.
 
 Output ONLY valid JSON with this exact structure:
 {{
   "dependencies": [
     {{"step_id": "Step1", "uses": []}},
-    {{"step_id": "Step2", "uses": ["Fact1", "Step1"]}},
-    {{"step_id": "Step3", "uses": ["Step2"]}}
+    {{"step_id": "Step2", "uses": [{{"id": "Fact1", "confidence": 1.0}}, {{"id": "Step1", "confidence": 0.8}}]}},
+    {{"step_id": "Step3", "uses": [{{"id": "Step2", "confidence": 0.9}}]}}
   ]
 }}
 
@@ -329,7 +343,17 @@ async def extract_rkg_edges_with_llm(
         dst_id = dep.get("step_id", "")
         if dst_id not in step_ids:
             continue
-        for src_id in dep.get("uses", []):
+        for use in dep.get("uses", []):
+            # conf(e) of Section 3.2 is the extractor's own confidence. A bare id
+            # (the format before confidences were asked for) keeps the old 0.9.
+            if isinstance(use, dict):
+                src_id = use.get("id") or use.get("step_id") or ""
+                try:
+                    conf = min(1.0, max(0.0, float(use.get("confidence", 0.9))))
+                except (TypeError, ValueError):
+                    conf = 0.9
+            else:
+                src_id, conf = use, 0.9
             if src_id not in valid_src_ids or src_id == dst_id:
                 continue
             # Prevent forward references (src step_number > dst step_number)
@@ -340,7 +364,7 @@ async def extract_rkg_edges_with_llm(
             key = (src_id, dst_id)
             if key not in seen:
                 seen.add(key)
-                edges.append({"src": src_id, "dst": dst_id, "type": "uses", "confidence": 0.9})
+                edges.append({"src": src_id, "dst": dst_id, "type": "uses", "confidence": conf})
 
     if not edges:
         return extract_rkg_edges_regex_fallback(steps, facts), "regex_fallback"
@@ -529,36 +553,170 @@ def _similarity_score(text_a: str, text_b: str) -> float:
     return _term_overlap_score(text_a, text_b)
 
 
+_ALIGN_TOKEN = re.compile(r"[a-z]{3,}|\d+(?:\.\d+)?")
+_ALIGN_STOP = {"the", "and", "for", "that", "this", "with", "from", "are", "was", "were",
+               "have", "has", "had", "then", "therefore", "thus", "hence", "since",
+               "because", "step", "fact", "facts", "given", "which", "into", "its"}
+
+# Two steps of different traces are the same node when their step similarity
+# reaches this value. Not a paper hyperparameter: it only decides which ids
+# name the same step, which the paper takes as given.
+ALIGN_THRESHOLD = 0.4
+
+
+_STEP_REF = re.compile(r"\bstep\s*\d+\s*:?", re.IGNORECASE)
+_FACT_REF = re.compile(r"\bfact\s*(\d+)", re.IGNORECASE)
+
+
+def _align_tokens(text: str) -> Set[str]:
+    """Content tokens of a step, for matching it to other traces' steps.
+
+    Step numbers are positions within one trace ("Step 3", "from Step 2") and
+    say nothing about which inference a step is, so they are dropped. A cited
+    premise is kept whole ("fact8") because it is the most specific thing a
+    step says about itself.
+    """
+    text = _STEP_REF.sub(" ", text or "").lower()
+    facts = {f"fact{m}" for m in _FACT_REF.findall(text)}
+    text = _FACT_REF.sub(" ", text)
+    return facts | {t for t in _ALIGN_TOKEN.findall(text) if t not in _ALIGN_STOP}
+
+
+def _cited_facts(text: str) -> Set[str]:
+    return {f"Fact{m}" for m in _FACT_REF.findall(text or "")}
+
+
+def align_step_nodes(trace_rkgs: List[Dict[str, Any]]) -> Dict[int, Dict[str, str]]:
+    """Give the same step the same node id in every trace, in place.
+
+    Section 3.2 aggregates the per-trace graphs by set union on the premise that
+    "nodes and edges produced by LLMs are identical when they correspond to
+    identical steps". Extraction names steps by position, so Step3 of one trace
+    and Step3 of another are in general different inferences, and one inference
+    drawn by all K traces arrives under K different ids. This makes the premise
+    hold before the union.
+
+    Fact nodes are the problem's own premises and already share their ids, and
+    the conclusion has been merged into one node before this runs. Every other
+    step is matched greedily, trace by trace, to the closest step group no
+    earlier step of the same trace has joined; the similarity is the Jaccard of
+    the two texts, averaged with the Jaccard of the facts each step uses when
+    both use some. Below ALIGN_THRESHOLD a step opens a group of its own.
+    Groups are named Step1, Step2, ... by their mean relative position, so the
+    ids still read in reasoning order.
+
+    Returns {trace_idx: {original id: aligned id}} for every renamed node.
+    """
+    groups: List[Dict[str, Any]] = []   # {"members": [(tokens, fact_parents)], "pos": [..]}
+    assign: Dict[Tuple[int, str], int] = {}
+
+    for rkg in trace_rkgs:
+        tidx = rkg.get("trace_idx", 0)
+        steps = [n for n in rkg.get("nodes", []) if n.get("type") == "step"]
+        steps.sort(key=lambda n: (n.get("step_number") or 0))
+        fact_parents: Dict[str, Set[str]] = defaultdict(set)
+        for e in rkg.get("edges", []):
+            if e["src"].startswith("Fact"):
+                fact_parents[e["dst"]].add(e["src"])
+        used: Set[int] = set()
+        n_steps = max(len(steps), 1)
+        for i, node in enumerate(steps):
+            toks = _align_tokens(node.get("text", ""))
+            facts = fact_parents.get(node["id"], set()) | _cited_facts(node.get("text", ""))
+            best, best_sim = None, 0.0
+            for gi, g in enumerate(groups):
+                if gi in used:
+                    continue
+                sim = 0.0
+                for mtoks, mfacts in g["members"]:
+                    u = toks | mtoks
+                    st = len(toks & mtoks) / len(u) if u else 0.0
+                    if facts and mfacts:
+                        st = 0.5 * st + 0.5 * len(facts & mfacts) / len(facts | mfacts)
+                    sim = max(sim, st)
+                if sim > best_sim:
+                    best, best_sim = gi, sim
+            if best is None or best_sim < ALIGN_THRESHOLD:
+                groups.append({"members": [], "pos": []})
+                best = len(groups) - 1
+            groups[best]["members"].append((toks, facts))
+            groups[best]["pos"].append(i / n_steps)
+            used.add(best)
+            assign[(tidx, node["id"])] = best
+
+    order = sorted(range(len(groups)), key=lambda gi: sum(groups[gi]["pos"]) / len(groups[gi]["pos"]))
+    name = {gi: f"Step{rank + 1}" for rank, gi in enumerate(order)}
+
+    mapping: Dict[int, Dict[str, str]] = defaultdict(dict)
+    for rkg in trace_rkgs:
+        tidx = rkg.get("trace_idx", 0)
+        ren = {nid: name[gi] for (t, nid), gi in assign.items() if t == tidx}
+        for n in rkg.get("nodes", []):
+            if n["id"] in ren:
+                n.setdefault("orig_id", n["id"])
+                mapping[tidx][n["orig_id"]] = ren[n["id"]]
+                n["id"] = ren[n["id"]]
+        new_edges, seen = [], set()
+        for e in rkg.get("edges", []):
+            src, dst = ren.get(e["src"], e["src"]), ren.get(e["dst"], e["dst"])
+            if src == dst or (src, dst) in seen:
+                continue
+            seen.add((src, dst))
+            ee = dict(e); ee["src"] = src; ee["dst"] = dst
+            new_edges.append(ee)
+        rkg["edges"] = new_edges
+    return dict(mapping)
+
+
 def build_consensus_rkg(
     trace_rkgs: List[Dict[str, Any]],
-    consensus_threshold: float = 0.3,
-    node_threshold: Optional[float] = None,
-    term_overlap_weight: float = 0.3,   # lambda, the edge-weight balance
+    theta: float = 0.3,
+    lam: float = 0.3,
     weight_by: str = "uniform",   # "uniform" | "gold_depth"
     expected_depth: Optional[int] = None,
+    node_threshold: Optional[float] = None,
+    consensus_threshold: Optional[float] = None,
+    term_overlap_weight: Optional[float] = None,
+    align_steps: bool = True,
+    anchor_conclusion: bool = False,
+    support: str = "direct",
 ) -> Dict[str, Any]:
-    """Equal-weight edge-frequency voting across k trace RKGs to build the Consensus RKG.
+    """Module II (2): Edges & Nodes Filtering, as Algorithm 1 lines 10-15 write it.
 
-    P1-A — Term overlap edge confidence fusion:
-        For each LLM-extracted edge (src->dst), calibrate confidence using src.text/dst.text term overlap:
-        Auxiliary confidence calibration:
-        final_confidence = (1 - term_overlap_weight) * llm_confidence
-                         + term_overlap_weight * overlap_score
+        W_S(e) = (1 - lambda) * conf(e) + lambda * Jaccard(u, v)     per trace S, e in E_S
+        G* = (V*, E*) = union of the G_S
+        W(e)   = 1/K * sum_{S : e in E_S} W_S(e)                    consensus edge weight
+        G*    <- G* minus {e : W(e) < theta} minus isolated nodes
 
-    Args:
-        trace_rkgs:            k trace RKG list (one per trace)
-        consensus_threshold:   edge frequency threshold (edges >= this value are included in consensus)
-        term_overlap_weight:   lambda, the edge-weight balance between the LLM's confidence
-                               and the term-overlap score (paper: 0.3)
+    conf(e) is the extractor's confidence for the edge in trace S, and
+    Jaccard(u, v) compares the two steps as trace S wrote them. A trace without
+    the edge contributes zero, so W(e) rewards an edge both for how many traces
+    draw it and for how strongly each of them does. K is the number of traces
+    that produced an RKG. Under weight_by="gold_depth" the sum and K are both
+    trace-weighted, which is the uniform case when every weight is 1.
+
+    A node is isolated when no edge that survives theta touches it, and it is
+    removed whatever its type. Module III writes the verdict itself when the
+    conclusion node does not survive, so nothing downstream needs it kept.
+
+    consensus_threshold / term_overlap_weight are the old names of theta /
+    lambda and are still accepted. node_threshold no longer has an effect: the
+    paper filters nodes by isolation only.
 
     Returns:
         {
           "nodes": [...],
-          "edges": [...],           # high-frequency edges with frequency / confidence fields
-          "edge_frequencies": {...},
+          "edges": [...],            # E*, each with weight W(e), support and mean W_S(e)
+          "edge_weights": {...},     # W(e) for every edge of the union, kept or not
+          "edge_frequencies": {...}, # fraction of the K traces that contain each edge
+          "node_frequencies": {...},
           "node_texts": {...}
         }
     """
+    if consensus_threshold is not None:
+        theta = consensus_threshold
+    if term_overlap_weight is not None:
+        lam = term_overlap_weight
     if not trace_rkgs:
         return {"nodes": [], "edges": [], "edge_frequencies": {}, "node_texts": {}}
 
@@ -615,6 +773,7 @@ def build_consensus_rkg(
         for n in rkg_trace.get("nodes", []):
             if n["id"] == primary_id:
                 nn = dict(n); nn["id"] = _CONC_ID; nn["type"] = "conclusion"
+                nn["orig_conc_id"] = primary_id
                 new_nodes.append(nn)
             elif n["id"] in concl_node_ids:
                 continue  # drop secondary conclusion nodes from this trace
@@ -631,46 +790,73 @@ def build_consensus_rkg(
                 new_edges.append(ee)
         rkg_trace["edges"] = new_edges
 
-    # ── Build node text index (for P1-A term overlap) ──────────────────────
-    all_node_texts: Dict[str, str] = {}
+    # ── Identical steps, identical nodes (Section 3.2) ───────────────────
+    node_alignment = align_step_nodes(trace_rkgs) if align_steps else {}
+    for rkg_trace in trace_rkgs:
+        for n in rkg_trace.get("nodes", []):
+            if n["id"] == _CONC_ID and n.get("orig_conc_id"):
+                node_alignment.setdefault(rkg_trace.get("trace_idx", 0), {})[n["orig_conc_id"]] = _CONC_ID
+
+    # ── W_S(e) per trace, from that trace's own step texts ────────────────
     node_trace_count: Dict[str, int] = defaultdict(int)
     for rkg_trace in trace_rkgs:
         for nid in {n["id"] for n in rkg_trace.get("nodes", [])}:
             node_trace_count[nid] += 1      # how many traces contain this node at all
-    for rkg_trace in trace_rkgs:
-        for node in rkg_trace.get("nodes", []):
-            nid  = node["id"]
-            text = node.get("text", "")
-            if nid not in all_node_texts and text:
-                all_node_texts[nid] = text  # first occurrence; later overridden by majority vote
 
-    # ── Accumulate weighted edge frequencies ──────────────────────────────
-    edge_weight_sum:      Dict[str, float] = defaultdict(float)
-    edge_confidence_sum:  Dict[str, float] = defaultdict(float)
-    edge_count:           Dict[str, int]   = defaultdict(int)
+    edge_weight_sum:  Dict[str, float] = defaultdict(float)   # sum of trace weights (support)
+    edge_ws_sum:      Dict[str, float] = defaultdict(float)   # sum of w_S * W_S(e)
+    edge_count:       Dict[str, int]   = defaultdict(int)
 
+    per_trace_ws: List[Tuple[float, Dict[Tuple[str, str], float]]] = []
     for rkg_trace in trace_rkgs:
         tidx   = rkg_trace.get("trace_idx", 0)
         weight = trace_weights.get(tidx, 1.0)
-        seen   = set()
+        texts  = {n["id"]: n.get("text", "") for n in rkg_trace.get("nodes", [])}
+        ws_direct: Dict[Tuple[str, str], float] = {}
         for e in rkg_trace.get("edges", []):
             src, dst = e["src"], e["dst"]
-            key = f"{src}->{dst}"
-            if key in seen:
+            if (src, dst) in ws_direct:
                 continue
-            seen.add(key)
+            conf    = float(e.get("confidence", 0.7))
+            overlap = _similarity_score(texts.get(src, ""), texts.get(dst, ""))
+            w_s     = (1 - lam) * conf + lam * overlap
+            e["weight"] = round(w_s, 4)      # W_S(e), kept on the trace's own graph
+            ws_direct[(src, dst)] = w_s
+        per_trace_ws.append((weight, ws_direct))
 
-            # P1-A: fuse LLM confidence + term overlap
-            llm_conf     = e.get("confidence", 0.7)
-            overlap      = _similarity_score(
-                all_node_texts.get(src, ""),
-                all_node_texts.get(dst, ""),
-            )
-            fused_conf   = (1 - term_overlap_weight) * llm_conf + term_overlap_weight * overlap
+    # E* is the union of the edges the traces actually draw.
+    candidates = {k for _, wsd in per_trace_ws for k in wsd}
 
-            edge_weight_sum[key]     += weight
-            edge_confidence_sum[key] += fused_conf * weight
-            edge_count[key]          += 1
+    # Path support (adaptation). Traces disagree less on what depends on what
+    # than on which dependency they state directly: one writes u -> v, another
+    # u -> w -> v. With support="path" a trace that reaches v from u without the
+    # direct edge still backs u -> v, with the W_S of the weakest edge on its
+    # strongest path, so W(e) counts agreement on the dependency. With
+    # support="direct" only the edge itself counts, the literal reading.
+    for weight, wsd in per_trace_ws:
+        if support == "path":
+            nodes_ = {x for k in wsd for x in k}
+            best: Dict[Tuple[str, str], float] = dict(wsd)
+            for mid in nodes_:
+                for (a, b_), w1 in list(best.items()):
+                    if b_ != mid:
+                        continue
+                    for (c, d), w2 in list(best.items()):
+                        if c != mid or d == a:
+                            continue
+                        w = min(w1, w2)
+                        if w > best.get((a, d), 0.0):
+                            best[(a, d)] = w
+        else:
+            best = wsd
+        for (src, dst) in candidates:
+            w_s = best.get((src, dst), 0.0)
+            if w_s <= 0.0:
+                continue
+            key = f"{src}->{dst}"
+            edge_weight_sum[key] += weight
+            edge_ws_sum[key]     += w_s * weight
+            edge_count[key]      += 1
 
     # ── Accumulate node texts (majority-weighted version) ─────────────────
     node_text_wsum:  Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -716,65 +902,60 @@ def build_consensus_rkg(
         best = max(label_w, key=lambda l: label_w[l])
         node_texts[nid] = f"Final Conclusion: {best}"
 
-    # ── Filter high-weight edges ───────────────────────────────────────────
-    edge_frequencies = {
-        key: round(wsum / total_weight, 4)
-        for key, wsum in edge_weight_sum.items()
-    }
+    # ── W(e) and the edge filter ──────────────────────────────────────────
+    total = total_weight if total_weight > 0 else 1.0
+    edge_weights = {key: round(ws / total, 4) for key, ws in edge_ws_sum.items()}
+    edge_frequencies = {key: round(wsum / total, 4) for key, wsum in edge_weight_sum.items()}
 
-    consensus_edges    = []
+    consensus_edges: List[Dict[str, Any]] = []
+    for key, w in edge_weights.items():
+        if w < theta:
+            continue
+        src, dst = key.split("->", 1)
+        consensus_edges.append({
+            "src":        src,
+            "dst":        dst,
+            "type":       "uses",
+            "weight":     w,                                    # W(e)
+            "frequency":  edge_frequencies[key],                # support over K
+            # mean W_S(e) over the traces that draw the edge; the field downstream
+            # code already reads as the edge's confidence
+            "confidence": round(edge_ws_sum[key] / edge_weight_sum[key], 4)
+                          if edge_weight_sum[key] else 0.0,
+        })
+
+    # ── Conclusion anchoring (adaptation) ─────────────────────────────────
+    # Every trace ends in the verdict, but each reaches it from a different last
+    # step, so no single edge into the conclusion need carry theta and the node
+    # would be filtered as isolated. When none survives, the conclusion keeps its
+    # one highest-W(e) incoming edge whose source is still in the graph. Every
+    # other edge is filtered by theta exactly as above.
+    conclusion_ids = {nid for nid, t in node_types.items() if t == "conclusion"}
+    if anchor_conclusion and conclusion_ids and consensus_edges:
+        kept_ids = {e["src"] for e in consensus_edges} | {e["dst"] for e in consensus_edges}
+        for cid in conclusion_ids:
+            if any(e["dst"] == cid for e in consensus_edges):
+                continue
+            into = [(w, k) for k, w in edge_weights.items()
+                    if k.split("->", 1)[1] == cid and k.split("->", 1)[0] in kept_ids]
+            if into:
+                w, key = max(into)
+                src, dst = key.split("->", 1)
+                consensus_edges.append({
+                    "src": src, "dst": dst, "type": "uses", "weight": w,
+                    "frequency": edge_frequencies[key],
+                    "confidence": round(edge_ws_sum[key] / edge_weight_sum[key], 4)
+                                  if edge_weight_sum[key] else 0.0,
+                    "anchor": True,
+                })
+
+    # ── Node filter: remove isolated nodes, d+(v) = 0 and d-(v) = 0 ───────
     consensus_node_ids: Set[str] = set()
+    for e in consensus_edges:
+        consensus_node_ids.add(e["src"])
+        consensus_node_ids.add(e["dst"])
 
-    for key, freq in edge_frequencies.items():
-        if freq >= consensus_threshold:
-            src, dst   = key.split("->", 1)
-            avg_conf   = edge_confidence_sum[key] / edge_weight_sum[key] if edge_weight_sum[key] else 0.7
-            consensus_edges.append({
-                "src":       src,
-                "dst":       dst,
-                "type":      "uses",
-                "confidence": round(avg_conf, 3),
-                "frequency":  round(freq, 3),
-            })
-            consensus_node_ids.add(src)
-            consensus_node_ids.add(dst)
-
-    # Node-frequency vote (node_threshold, theta unless set). Collecting nodes only
-    # from edges that clear theta loses every node of a sample whose traces disagree
-    # on structure: the graph comes back empty even when a step is present in every
-    # single trace. A node carried by at least node_threshold of the traces belongs
-    # in the consensus on its own merit.
-    _node_threshold = consensus_threshold if node_threshold is None else node_threshold
     n_traces = max(len(trace_rkgs), 1)
-    consensus_node_ids |= {
-        nid for nid, cnt in node_trace_count.items()
-        if cnt / n_traces >= _node_threshold
-    }
-
-    # Fact nodes are always retained
-    fact_ids = {nid for nid, ntype in node_types.items() if ntype == "fact"}
-    consensus_node_ids |= fact_ids
-
-    # Conclusion nodes are always retained (regardless of edge frequency).
-    conclusion_ids = {nid for nid, ntype in node_types.items() if ntype == "conclusion"}
-    consensus_node_ids |= conclusion_ids
-    # Also retain any incoming edges to conclusion nodes that meet a relaxed threshold,
-    # to give the synthesizer something to anchor on.
-    if conclusion_ids:
-        relax = max(1.0 / max(len(trace_rkgs), 1), 0.05)  # at least 1/k of traces
-        for key, freq in edge_frequencies.items():
-            src, dst = key.split("->", 1)
-            if dst in conclusion_ids and freq >= relax:
-                if not any(e["src"] == src and e["dst"] == dst for e in consensus_edges):
-                    avg_conf = (edge_confidence_sum[key] / edge_weight_sum[key]
-                                if edge_weight_sum[key] else 0.7)
-                    consensus_edges.append({
-                        "src": src, "dst": dst, "type": "uses",
-                        "confidence": round(avg_conf, 3),
-                        "frequency":  round(freq, 3),
-                    })
-                    consensus_node_ids.add(src)
-
     consensus_nodes = []
     for nid in sorted(consensus_node_ids):
         if nid in node_texts:
@@ -787,12 +968,16 @@ def build_consensus_rkg(
             })
 
     return {
-        "nodes":           consensus_nodes,
-        "edges":           consensus_edges,
+        "nodes":            consensus_nodes,
+        "edges":            consensus_edges,
+        "edge_weights":     edge_weights,
         "edge_frequencies": edge_frequencies,
         "node_frequencies": {nid: round(c / n_traces, 4) for nid, c in node_trace_count.items()},
-        "node_texts":      node_texts,
-        "trace_weights":   trace_weights,   # uniform (all 1.0)
+        "node_texts":       node_texts,
+        "trace_weights":    trace_weights,
+        "theta":            theta,
+        "lambda":           lam,
+        "node_alignment":   {str(k): v for k, v in node_alignment.items()},
     }
 
 
@@ -805,9 +990,8 @@ async def build_rkgs_for_sample(
     sample: Dict[str, Any],
     model: str = DEFAULT_MODEL,
     domain: str = "logical",
-    consensus_threshold: float = 0.3,
-    node_threshold: Optional[float] = None,
-    edge_lambda: float = 0.3,
+    theta: float = 0.3,
+    lam: float = 0.3,
     weight_by: str = "uniform",
     expected_depth: Optional[int] = None,
 ) -> Dict[str, Any]:
@@ -853,9 +1037,8 @@ async def build_rkgs_for_sample(
 
     consensus = build_consensus_rkg(
         valid_rkgs,
-        consensus_threshold=consensus_threshold,
-        node_threshold=node_threshold,
-        term_overlap_weight=edge_lambda,
+        theta=theta,
+        lam=lam,
         weight_by=weight_by,
         expected_depth=expected_depth,
     )
@@ -873,10 +1056,9 @@ async def build_rkgs_for_dataset(
     model: str = DEFAULT_MODEL,
     concurrency: int = 10,
     domain: str = "logical",
-    consensus_threshold: float = 0.3,
-    node_threshold: Optional[float] = None,
+    theta: float = 0.3,
     max_samples: Optional[int] = None,
-    edge_lambda: float = 0.3,
+    lam: float = 0.3,
     weight_by: str = "uniform",
     expected_depth: Optional[int] = None,
 ) -> None:
@@ -910,9 +1092,8 @@ async def build_rkgs_for_dataset(
                     results[idx] = await build_rkgs_for_sample(
                         session, sample,
                         model=model, domain=domain,
-                        consensus_threshold=consensus_threshold,
-                        node_threshold=node_threshold,
-                        edge_lambda=edge_lambda,
+                        theta=theta,
+                        lam=lam,
                     )
                 except Exception as e:
                     results[idx] = {
@@ -934,9 +1115,8 @@ async def build_rkgs_for_dataset(
         "metadata": {
             "model": model,
             "domain": domain,
-            "consensus_threshold": consensus_threshold,
-            "edge_lambda": edge_lambda,
-            "node_threshold": consensus_threshold if node_threshold is None else node_threshold,
+            "theta": theta,
+            "lambda": lam,
             "total_samples": len(samples),
             "successful": sum(1 for r in results if r and "error" not in r),
             "api_calls": API_CALLS["count"],
@@ -958,9 +1138,8 @@ async def build_rkgs_for_dataset(
 
 def rebuild_consensus(
     input_file: Path,
-    consensus_threshold: float = 0.3,
-    node_threshold: Optional[float] = None,
-    term_overlap_weight: float = 0.3,
+    theta: float = 0.3,
+    lam: float = 0.3,
     weight_by: str = "uniform",
     gt_file: Optional[Path] = None,
     expected_depth: Optional[int] = None,
@@ -1001,9 +1180,8 @@ def rebuild_consensus(
         # graphs, so a lambda sweep compared the full model with itself.
         consensus = build_consensus_rkg(
             valid,
-            consensus_threshold=consensus_threshold,
-            node_threshold=node_threshold,
-            term_overlap_weight=term_overlap_weight,
+            theta=theta,
+            lam=lam,
             weight_by=weight_by,
             expected_depth=expected_depth,
         )
@@ -1051,19 +1229,20 @@ def main() -> None:
     parser.add_argument("--base_url", default=None, help="API Base URL")
     parser.add_argument("--concurrency", type=int, default=10, help="Concurrency level (default 10)")
     parser.add_argument("--domain", default="logical", choices=["logical", "math"])
-    parser.add_argument("--consensus_threshold", type=float, default=0.3,
-                        help="Edge filtering threshold theta: an edge enters G* when at least this fraction of the K traces contain it (default 0.3)")
+    parser.add_argument("--theta", "--consensus_threshold", dest="theta", type=float, default=0.3,
+                        help="Edge filtering threshold theta: an edge stays in G* when its consensus "
+                             "weight W(e) = 1/K * sum_S W_S(e) is at least theta (paper: 0.3)")
     parser.add_argument("--node_threshold", type=float, default=None,
-                        help="Node threshold: fraction of the K traces a node must appear in (default: same as --consensus_threshold)")
+                        help=argparse.SUPPRESS)  # no effect: nodes are filtered by isolation (paper)
     parser.add_argument("--max_samples", type=int, default=None)
     parser.add_argument("--similarity", choices=["jaccard", "embedding"],
                         default="jaccard",
                         help="The overlap measure fused into W(e): term Jaccard "
                              "(the paper) or the cosine of all-mpnet-base-v2 "
                              "embeddings (the ablation's row)")
-    parser.add_argument("--edge_lambda", type=float, default=0.3,
-                        help="Weight of Jaccard in W(e), lambda: W(e) = (1-lambda)*LLM confidence "
-                             "+ lambda*term overlap (paper: 0.3)")
+    parser.add_argument("--lambda", "--edge_lambda", dest="lam", type=float, default=0.3,
+                        help="Weight of Jaccard in W_S(e), lambda: W_S(e) = (1-lambda)*conf(e) "
+                             "+ lambda*Jaccard(u,v) (paper: 0.3)")
 
     # Offline mode: re-vote an existing RKG file's cached trace_rkgs, no LLM calls.
     parser.add_argument("--rebuild_consensus", action="store_true",
@@ -1093,9 +1272,8 @@ def main() -> None:
     if args.rebuild_consensus:
         rebuild_consensus(
             input_file=_cfg.resolve_input(args.input),
-            consensus_threshold=args.consensus_threshold,
-            node_threshold=args.node_threshold,
-            term_overlap_weight=args.edge_lambda,
+            theta=args.theta,
+            lam=args.lam,
             weight_by=args.weight_by,
             expected_depth=args.expected_depth,
             gt_file=_cfg.resolve_input(args.gt_file) if args.gt_file else None,
@@ -1108,10 +1286,9 @@ def main() -> None:
         model=args.model,
         concurrency=args.concurrency,
         domain=args.domain,
-        consensus_threshold=args.consensus_threshold,
-        node_threshold=args.node_threshold,
+        theta=args.theta,
         max_samples=args.max_samples,
-        edge_lambda=args.edge_lambda,
+        lam=args.lam,
         weight_by=args.weight_by,
         expected_depth=args.expected_depth,
     ))

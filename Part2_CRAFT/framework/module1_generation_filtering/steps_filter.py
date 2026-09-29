@@ -568,6 +568,106 @@ def verify_step_math(step_text: str) -> Optional[bool]:
     return True if verified_any else None
 
 
+def _step_term_set(text: str, domain: str) -> Set[str]:
+    """A step's terms: its tokens minus the CommonLogicalWords blocklist.
+
+    MATH:/EQ: formula tokens are never blocklisted, as in the rest of Module I.
+    """
+    common = MATH_COMMON_WORDS if domain == "math" else COMMON_LOGICAL_WORDS
+    return {t for t in tokenize_text(text, domain=domain)
+            if (domain == "math" and (t.startswith("MATH:") or t.startswith("EQ:")))
+            or t not in common}
+
+
+def paper_consensus_terms(
+    steps_info: List[Dict[str, Any]],
+    alpha: float = 0.01,
+    beta: float = 0.3,
+    domain: str = "logical",
+) -> Tuple[Set[str], Dict[str, Dict[str, float]]]:
+    """T_Con of Algorithm 1 line 4, from Eqs. (1)-(3) of the appendix.
+
+        TF(w)     = 1/K * sum_k #(w, t_k) / sum_w' #(w', t_k)     over the K traces t_k
+        RF(w)     = |{s in S : w in s}| / |S|                      over the steps S of the K traces
+        TF-IRF(w) = TF(w) * log(1 / RF(w))
+        T_Con     = {w : TF-IRF(w) > alpha  and  RF(w) >= beta}
+
+    Terms on the CommonLogicalWords blocklist are left out before anything is
+    counted. steps_info holds every step of the sample with its trace_idx.
+    Returns T_Con and, for inspection, each term's TF / RF / TF-IRF.
+    """
+    common = MATH_COMMON_WORDS if domain == "math" else COMMON_LOGICAL_WORDS
+    by_trace: Dict[int, Counter] = defaultdict(Counter)
+    step_sets: List[Set[str]] = []
+    for st in steps_info:
+        terms = [t for t in tokenize_text(st["step_text"], domain=domain)
+                 if (domain == "math" and t.startswith(("MATH:", "EQ:"))) or t not in common]
+        by_trace[st["trace_idx"]].update(terms)
+        step_sets.append(set(terms))
+
+    k = len(by_trace)
+    n_steps = len(step_sets)
+    if k == 0 or n_steps == 0:
+        return set(), {}
+
+    tf: Dict[str, float] = defaultdict(float)
+    for counts in by_trace.values():
+        total = sum(counts.values())
+        if total == 0:
+            continue
+        for w, c in counts.items():
+            tf[w] += c / total / k
+
+    stats: Dict[str, Dict[str, float]] = {}
+    t_con: Set[str] = set()
+    for w, tf_w in tf.items():
+        rf_w = sum(1 for ss in step_sets if w in ss) / n_steps
+        tfirf = tf_w * float(np.log(1.0 / rf_w)) if rf_w > 0 else 0.0
+        stats[w] = {"tf": tf_w, "rf": rf_w, "tfirf": tfirf}
+        if tfirf > alpha and rf_w >= beta:
+            t_con.add(w)
+    return t_con, stats
+
+
+def detect_anomalous_steps_zscore(
+    steps_info: List[Dict[str, Any]],
+    alpha: float = 0.01,
+    beta: float = 0.3,
+    gamma: float = -1.0,
+    domain: str = "logical",
+) -> Tuple[Set[Tuple[int, int]], Set[str]]:
+    """Module I steps filtering, Algorithm 1 lines 4-7.
+
+        Z(s) = (Jaccard(s, T_Con) - mu) / sigma,  remove s when Z(s) < gamma
+
+    mu and sigma are taken over all steps of the K traces. Two adaptations the
+    paper leaves open: a step with no terms cannot be scored and is kept, and
+    when sigma is 0 every step scores alike and none is removed. On maths, a
+    step whose equations SymPy verifies is kept even below gamma; it still
+    counts towards mu and sigma, so it changes no other step's score.
+    """
+    t_con, _ = paper_consensus_terms(steps_info, alpha=alpha, beta=beta, domain=domain)
+    scored = []
+    for st in steps_info:
+        terms = _step_term_set(st["step_text"], domain)
+        if not terms:
+            continue
+        scored.append((st, jaccard_similarity(terms, t_con)))
+    anomalous: Set[Tuple[int, int]] = set()
+    if len(scored) < 2:
+        return anomalous, t_con
+    xs = np.array([x for _, x in scored], dtype=float)
+    mu, sigma = float(xs.mean()), float(xs.std())
+    if sigma == 0.0:
+        return anomalous, t_con
+    for st, x in scored:
+        if (x - mu) / sigma < gamma:
+            if domain == "math" and _SYMPY_AVAILABLE and verify_step_math(st["step_text"]) is True:
+                continue
+            anomalous.add((st["trace_idx"], st["step_number"]))
+    return anomalous, t_con
+
+
 def detect_anomalous_steps_unsupervised(
     steps_with_terms: List[Dict[str, Any]],
     similarity_threshold: float = 0.3,
@@ -863,15 +963,27 @@ def detect_edge_frequency_anomalies(
     consensus_rkg: Dict[str, Any],
     threshold: float = 0.3,
 ) -> Set[str]:
-    """Phase 2: Edge-frequency voting: edges in trace_rkg with frequency < threshold in consensus RKG mark dst anomalous."""
-    edge_frequencies = consensus_rkg.get("edge_frequencies", {})
+    """Pass 2 edge filter: a step whose incoming edge has consensus weight W(e) < theta.
+
+    W(e) = 1/K * sum_S W_S(e) is read from the consensus graph's edge_weights,
+    the same quantity Module II filters E* with. A graph built before the
+    weights were stored carries only edge_frequencies, and is read from those.
+    """
+    weights = consensus_rkg.get("edge_weights")
+    if weights is None:
+        weights = consensus_rkg.get("edge_frequencies", {})
+    # Module II names the same step alike across traces (node_alignment). A
+    # trace graph saved before that renaming still uses its own ids, so they are
+    # mapped for the lookup; one saved after it (nodes carry orig_id) is not.
+    already = any("orig_id" in n for n in trace_rkg.get("nodes", []))
+    mapping = {} if already else (consensus_rkg.get("node_alignment") or {}).get(
+        str(trace_rkg.get("trace_idx", 0)), {})
     anomalous: Set[str] = set()
 
     for edge in trace_rkg.get("edges", []):
         src, dst = edge["src"], edge["dst"]
-        key = f"{src}->{dst}"
-        freq = edge_frequencies.get(key, 0.0)
-        if freq < threshold:
+        key = f"{mapping.get(src, src)}->{mapping.get(dst, dst)}"
+        if weights.get(key, 0.0) < threshold:
             anomalous.add(dst)
 
     return anomalous
@@ -1021,12 +1133,23 @@ def remove_anomalous_steps_rkg(
 
         last_step_number = max(s["step_number"] for s in parsed_steps)
         anomalous_node_ids = {nid for (ti, nid) in anomalous if ti == trace_idx}
+        # A node's id need not spell its step number once Module II has aligned
+        # steps across traces, so the flagged ids are read back through the
+        # trace graph's own nodes.
+        rkg_trace = next((d for d in trace_rkgs if d.get("trace_idx") == trace_idx), None) or {}
+        flagged_numbers = set()
+        for n in rkg_trace.get("nodes", []):
+            if n.get("id") in anomalous_node_ids and n.get("step_number") is not None:
+                flagged_numbers.add(n["step_number"])
+        for nid in anomalous_node_ids:
+            if nid.startswith("Step") and nid[4:].isdigit() and not any(
+                    "orig_id" in n for n in rkg_trace.get("nodes", [])):
+                flagged_numbers.add(int(nid[4:]))
 
         cleaned_steps = []
         for step_info in parsed_steps:
-            node_id = f"Step{step_info['step_number']}"
             is_last = step_info["step_number"] == last_step_number
-            if is_last or node_id not in anomalous_node_ids:
+            if is_last or step_info["step_number"] not in flagged_numbers:
                 cleaned_steps.append(step_info)
 
         cleaned_trace = trace.copy()
@@ -1066,9 +1189,21 @@ def process_sample(
     underthinking_threshold: float = 0.3,
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
+    alpha: float = 0.01,
+    beta: Optional[float] = None,
+    gamma: Optional[float] = None,
+    theta: Optional[float] = None,
+    tcon: str = "paper",
 ) -> Dict[str, Any]:
     """
     Process a single sample: detect and remove anomalous steps.
+
+    alpha / beta / gamma are Module I's TF-IRF threshold, step frequency
+    threshold and z-score cutoff; theta is Module II's edge filtering threshold,
+    which the rkg pass applies to W(e). beta and theta fall back to
+    consensus_threshold and gamma to z_score_threshold, the older names.
+    tcon="paper" builds T_Con from Eqs. (1)-(3); "legacy" keeps the per-step
+    term extraction runs before this change used.
 
     Args:
         sample: sample data dict
@@ -1091,6 +1226,10 @@ def process_sample(
             "source_dataset": sample.get("source_dataset"),
             "source_index": sample.get("source_index"),
             "target_answer": sample.get("target_answer"),
+            # Module II extracts the Fact nodes from the problem; a filtered file
+            # without it builds graphs with no premises at all.
+            "problem_text": sample.get("problem_text") or sample.get("problem_input"),
+            "domain": sample.get("domain"),
             "original_traces": [],
             "cleaned_traces": [],
             "anomalous_steps": [],
@@ -1106,8 +1245,13 @@ def process_sample(
             },
         }
 
+    beta  = consensus_threshold if beta is None else beta
+    theta = consensus_threshold if theta is None else theta
+    gamma = z_score_threshold if gamma is None else gamma
+
     anomalous_info = []
     n_underthinking = 0  # only populated for method="rkg"
+    t_con_used: Optional[Set[str]] = None
 
     if method == "supervised":
         steps_with_terms_dict = extract_terms_for_all_steps(
@@ -1129,6 +1273,28 @@ def process_sample(
                     "step_text": step_info["step_text"], "terms": list(step_info["terms_set"]),
                 })
 
+    elif method == "unsupervised" and tcon == "paper":
+        steps_info = []
+        for trace_idx, trace in enumerate(traces):
+            for st in parse_steps_from_trace(trace):
+                if st["step_text"]:
+                    steps_info.append({"trace_idx": trace_idx,
+                                       "step_number": st["step_number"],
+                                       "step_text": st["step_text"]})
+        anomalous_steps, t_con_used = detect_anomalous_steps_zscore(
+            steps_info, alpha=alpha, beta=beta, gamma=gamma, domain=domain,
+        )
+        cleaned_traces = remove_anomalous_steps(traces, anomalous_steps)
+        for trace_idx, step_num in anomalous_steps:
+            st = next((x for x in steps_info
+                       if x["trace_idx"] == trace_idx and x["step_number"] == step_num), None)
+            if st:
+                anomalous_info.append({
+                    "trace_idx": trace_idx, "step_number": step_num,
+                    "step_text": st["step_text"],
+                    "terms": sorted(_step_term_set(st["step_text"], domain)),
+                })
+
     elif method == "unsupervised":
         steps_with_terms_list = collect_all_steps_with_terms(
             traces, min_tf=min_tf, min_idf=min_idf, min_tfidf=min_tfidf, domain=domain,
@@ -1139,8 +1305,8 @@ def process_sample(
             similarity_threshold=similarity_threshold,
             min_similar_steps=min_similar_steps,
             use_grpo_optimization=use_grpo_optimization,
-            z_score_threshold=z_score_threshold,
-            consensus_threshold=consensus_threshold,
+            z_score_threshold=gamma,
+            consensus_threshold=beta,
             use_weighted_similarity=use_weighted_similarity,
             domain=domain,
         )
@@ -1165,7 +1331,7 @@ def process_sample(
         consensus_rkg = sample_rkg.get("consensus_rkg") or sample_rkg.get("consensus_dag") or {}
         anomalous_rkg, underthinking_traces, phase_of = detect_anomalous_steps_rkg(
             trace_rkgs, consensus_rkg,
-            consensus_threshold=consensus_threshold,
+            consensus_threshold=theta,
             underthinking_threshold=underthinking_threshold,
             domain=domain,
         )
@@ -1216,6 +1382,8 @@ def process_sample(
         "num_underthinking_traces": n_underthinking if method == "rkg" else 0,
         "method": method,
     }
+    if t_con_used is not None:
+        stats["t_con_size"] = len(t_con_used)
     if method == "rkg":
         stats["removed_by_filter"] = dict(Counter(
             a["filter"] for a in anomalous_info if a.get("filter")))
@@ -1225,6 +1393,8 @@ def process_sample(
         "source_dataset": sample.get("source_dataset"),
         "source_index": sample.get("source_index"),
         "target_answer": sample.get("target_answer"),
+        "problem_text": sample.get("problem_text") or sample.get("problem_input"),
+        "domain": sample.get("domain"),
         "original_traces": traces,
         "cleaned_traces": cleaned_traces,
         "anomalous_steps": anomalous_info,
@@ -1324,22 +1494,49 @@ def main():
         help="Disable GRPO optimization (use original method)",
     )
     parser.add_argument(
-        "--z_score_threshold",
+        "--alpha",
+        type=float,
+        default=0.01,
+        help="TF-IRF threshold alpha of T_Con (paper: 0.01)",
+    )
+    parser.add_argument(
+        "--gamma", "--z_score_threshold",
+        dest="gamma",
         type=float,
         default=-1.0,
         help="Z-score step cutoff gamma; steps below this are filtered out (--method unsupervised only; paper: -1.0)",
     )
     parser.add_argument(
-        "--consensus_threshold",
+        "--beta",
         type=float,
         default=0.3,
-        help="Step frequency threshold beta; fraction of steps a term must appear in to be included in the consensus core (default 0.3)",
+        help="Step frequency threshold beta of T_Con: RF(w) >= beta (paper: 0.3)",
+    )
+    parser.add_argument(
+        "--theta",
+        type=float,
+        default=0.3,
+        help="Edge filtering threshold theta for --method rkg: a step whose incoming "
+             "edge has W(e) < theta is removed (paper: 0.3)",
+    )
+    parser.add_argument(
+        "--consensus_threshold",
+        type=float,
+        default=None,
+        help="Old name that set beta and theta together; sets both when given",
+    )
+    parser.add_argument(
+        "--tcon",
+        choices=["paper", "legacy"],
+        default="paper",
+        help="T_Con construction: 'paper' follows Eqs. (1)-(3) (default); 'legacy' is the "
+             "per-step term extraction used before (--method unsupervised only)",
     )
     parser.add_argument(
         "--use_weighted_similarity",
         action="store_true",
-        default=True,
-        help="Whether to use weighted Jaccard similarity (accounts for TF-IRF weights, default True)",
+        default=False,
+        help="Weighted Jaccard instead of the paper's plain Jaccard (legacy T_Con only)",
     )
     parser.add_argument(
         "--no_weighted_similarity",
@@ -1362,6 +1559,8 @@ def main():
     )
 
     args = parser.parse_args()
+    if args.consensus_threshold is not None:
+        args.beta = args.theta = args.consensus_threshold
 
     # Read input file
     input_path = _cfg.resolve_input(args.input)
@@ -1418,8 +1617,13 @@ def main():
             method=args.method,
             min_similar_steps=args.min_similar_steps,
             use_grpo_optimization=args.use_grpo_optimization if args.method == "unsupervised" else False,
-            z_score_threshold=args.z_score_threshold if args.method == "unsupervised" else -1.0,
-            consensus_threshold=args.consensus_threshold,
+            z_score_threshold=args.gamma,
+            consensus_threshold=0.3,
+            alpha=args.alpha,
+            beta=args.beta,
+            gamma=args.gamma,
+            theta=args.theta,
+            tcon=args.tcon,
             use_weighted_similarity=args.use_weighted_similarity if args.method == "unsupervised" else False,
             domain=args.domain,
             sample_rkg=sample_rkg,
@@ -1459,8 +1663,11 @@ def main():
             "similarity_threshold": args.similarity_threshold,
             "min_similar_steps": args.min_similar_steps if args.method == "unsupervised" else None,
             "use_grpo_optimization": args.use_grpo_optimization if args.method == "unsupervised" else False,
-            "z_score_threshold": args.z_score_threshold if args.method == "unsupervised" else None,
-            "consensus_threshold": args.consensus_threshold if args.method == "unsupervised" else None,
+            "alpha": args.alpha,
+            "beta": args.beta,
+            "gamma": args.gamma,
+            "theta": args.theta,
+            "tcon": args.tcon,
             "use_weighted_similarity": args.use_weighted_similarity if args.method == "unsupervised" else False,
             "overall_stats": overall_stats,
             "note": "supervised: same-step comparison, requires one-to-one step correspondence across traces; unsupervised: cross-step comparison, GRPO-style, no alignment required; GRPO optimization: relative comparison, dynamic threshold, weighted similarity",

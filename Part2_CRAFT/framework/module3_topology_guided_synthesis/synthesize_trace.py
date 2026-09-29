@@ -762,6 +762,69 @@ def extract_facts_from_traces(traces: List[Dict[str, Any]]) -> str:
 # RKG-Guided Synthesis
 #########################
 
+def break_cycles_by_weight(consensus_rkg: Dict[str, Any]) -> Dict[str, Any]:
+    """Remove the lowest-W(e) edge of every cycle of G*, as Module III describes.
+
+    Extraction can leave a cycle when two traces order the same steps in
+    opposite directions. Each round finds one cycle and drops its weakest edge,
+    until G* is acyclic. W(e) is the consensus weight Module II stored as
+    "weight"; a graph built before that field existed is read by "confidence".
+    Returns a shallow copy with the pruned edge list; the input is not changed.
+    """
+    edges = list(consensus_rkg.get("edges", []))
+
+    def _w(e: Dict[str, Any]) -> float:
+        return float(e.get("weight", e.get("confidence", 0.0)))
+
+    def _find_cycle(es: List[Dict[str, Any]]) -> Optional[List[Dict[str, Any]]]:
+        adj: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        for e in es:
+            adj[e["src"]].append(e)
+        state: Dict[str, int] = {}
+        stack: List[Dict[str, Any]] = []
+
+        def dfs(u: str) -> Optional[List[Dict[str, Any]]]:
+            state[u] = 1
+            for e in adj[u]:
+                v = e["dst"]
+                if state.get(v, 0) == 0:
+                    stack.append(e)
+                    found = dfs(v)
+                    if found:
+                        return found
+                    stack.pop()
+                elif state.get(v) == 1:
+                    cyc = [e]
+                    for back in reversed(stack):
+                        cyc.append(back)
+                        if back["src"] == v:
+                            break
+                    return cyc
+            state[u] = 2
+            return None
+
+        for u in list(adj):
+            if state.get(u, 0) == 0:
+                found = dfs(u)
+                if found:
+                    return found
+        return None
+
+    removed = 0
+    while True:
+        cyc = _find_cycle(edges)
+        if not cyc:
+            break
+        weakest = min(cyc, key=_w)
+        edges = [e for e in edges if e is not weakest]
+        removed += 1
+
+    out = dict(consensus_rkg)
+    out["edges"] = edges
+    out["cycle_edges_removed"] = removed
+    return out
+
+
 def topological_sort_rkg(consensus_rkg: Dict[str, Any]) -> List[str]:
     """Kahn topological sort of consensus RKG nodes.
 
@@ -902,6 +965,82 @@ def build_synthesis_plan_from_rkg(
             "edge_confidence": round(avg_conf, 3),
         })
 
+    return plan
+
+
+def pad_math_plan(plan: List[Dict[str, Any]], total_steps: int) -> List[Dict[str, Any]]:
+    """Give a maths trace the length the K traces needed when G* is smaller.
+
+    Competition solutions decompose too differently for many of their steps to
+    reach theta, so G* often keeps only a few nodes, or none. The nodes it keeps
+    stay in their topological order and are spread over total_steps positions
+    (the median length of the K traces); the positions between them are steps
+    guided by the K traces' key terms for that position alone, which the maths
+    prompt carries in any case. An empty G* is a trace of term-guided steps
+    rather than no trace.
+    """
+    steps = [e for e in plan if e.get("node_type") != "fact"]
+    if len(steps) >= total_steps:
+        return plan
+    slots: List[Optional[Dict[str, Any]]] = [None] * total_steps
+    n = len(steps)
+    for i, e in enumerate(steps):
+        pos = min(total_steps - 1, max(0, round((i + 1) * total_steps / (n + 1)) - 1))
+        while slots[pos] is not None and pos < total_steps - 1:
+            pos += 1
+        slots[pos] = e
+    out: List[Dict[str, Any]] = []
+    for pos, e in enumerate(slots):
+        if e is None:
+            e = {"node_id": f"TermStep{pos + 1}", "node_type": "step",
+                 "direct_predecessors": [], "predecessor_texts": {},
+                 "key_terms": [], "node_text_hint": "", "node_frequency": None,
+                 "edge_confidence": 0.0, "term_guided": True}
+        e = dict(e)
+        e["step_position"] = pos + 1
+        out.append(e)
+    return out
+
+
+def ensure_verdict_step(
+    plan: List[Dict[str, Any]],
+    consensus_rkg: Dict[str, Any],
+    domain: str = "logical",
+) -> List[Dict[str, Any]]:
+    """End the synthesis on the verdict even when G* lost the conclusion node.
+
+    Every trace ends in a verdict, but each reaches it from its own last step,
+    so the conclusion's incoming edges often fall below theta and Module II
+    filters the node as isolated. G* is left exactly as Module II filtered it;
+    the step list Module III writes gets the verdict as its final step, after
+    the sinks of G*, with the conclusion text the traces' vote settled on. An
+    empty G* then still yields a one-step trace that states the verdict,
+    instead of no trace at all. Mathematics has no conclusion node (its answer
+    is boxed in the last step), so the plan is returned unchanged there.
+    """
+    if domain == "math" or any(e.get("node_type") == "conclusion" for e in plan):
+        return plan
+    node_texts = consensus_rkg.get("node_texts") or {}
+    cid = next((nid for nid, t in node_texts.items()
+                if re.search(r"__(?:PROVED|DISPROVED|UNKNOWN)__", t or "")), None)
+    if cid is None:
+        return plan
+    outs = {e["src"] for e in consensus_rkg.get("edges", [])}
+    sinks = [e["node_id"] for e in plan if e["node_id"] not in outs]
+    nodes = {n["id"]: n for n in consensus_rkg.get("nodes", [])}
+    plan = list(plan)
+    plan.append({
+        "node_id": cid,
+        "node_type": "conclusion",
+        "step_position": len([e for e in plan if e.get("node_type") != "fact"]) + 1,
+        "direct_predecessors": sinks,
+        "predecessor_texts": {sid: nodes.get(sid, {}).get("text", "") for sid in sinks},
+        "key_terms": [],
+        "node_text_hint": node_texts[cid][:200],
+        "node_frequency": (consensus_rkg.get("node_frequencies") or {}).get(cid),
+        "edge_confidence": 0.0,
+        "verdict_appended": True,
+    })
     return plan
 
 
@@ -1293,7 +1432,14 @@ async def synthesize_trace_rkg(
     sample_id      = sample.get("sample_id", "unknown")
     consensus_rkg  = sample_rkg.get("consensus_rkg") or sample_rkg.get("consensus_dag") or {}
 
-    if not consensus_rkg.get("nodes"):
+    # An empty G* still has the verdict the traces voted on; ensure_verdict_step
+    # turns it into a one-step trace for the logical datasets.
+    _has_verdict_text = any(
+        re.search(r"__(?:PROVED|DISPROVED|UNKNOWN)__", t or "")
+        for t in (consensus_rkg.get("node_texts") or {}).values())
+    # A maths G* that kept nothing is synthesized from the K traces' terms by
+    # pad_math_plan, so only a logical G* with no verdict either is a failure.
+    if not consensus_rkg.get("nodes") and domain != "math" and not _has_verdict_text:
         return {"sample_id": sample_id, "error": "empty_consensus_rkg", "synthesized_trace": None}
 
     problem_input = (
@@ -1380,10 +1526,12 @@ async def synthesize_trace_rkg(
                 if _total > 0:
                     _mv_strength = _label_counts[_mv_label] / _total
 
+    consensus_rkg = break_cycles_by_weight(consensus_rkg)
     topo_order = topological_sort_rkg(consensus_rkg)
     plan       = build_synthesis_plan_from_rkg(consensus_rkg, topo_order)
+    plan       = ensure_verdict_step(plan, consensus_rkg, domain)
 
-    if not plan:
+    if not plan and domain != "math":
         return {"sample_id": sample_id, "error": "empty_synthesis_plan", "synthesized_trace": None}
 
     # For math domain: RKG consensus typically has fewer nodes than the actual
@@ -1392,6 +1540,12 @@ async def synthesize_trace_rkg(
     if domain == "math" and _all_traces:
         _trace_step_counts = []
         for _t in _all_traces:
+            # How long a solution to this problem runs is the traces' length as
+            # written, before the step filters shortened them; Pass 2 alone can
+            # take a competition trace from ten steps to two.
+            if _t.get("original_num_steps"):
+                _trace_step_counts.append(int(_t["original_num_steps"]))
+                continue
             _steps = _t.get("reasoning_steps", [])
             if _steps:
                 _trace_step_counts.append(len(_steps))
@@ -1400,6 +1554,7 @@ async def synthesize_trace_rkg(
                 _trace_step_counts.append(max(1, _text.count("\nStep ")))
         _median_steps = sorted(_trace_step_counts)[len(_trace_step_counts) // 2] if _trace_step_counts else len(plan)
         total_steps = max(len(plan), _median_steps)
+        plan = pad_math_plan(plan, total_steps)
     else:
         total_steps = len(plan)
 
@@ -2019,58 +2174,8 @@ async def synthesize_traces_for_dataset(
     else:
         samples = data if isinstance(data, list) else []
 
-    # Load problem information from original file (if provided)
-    original_problem_info = {}
-    if original_file and original_file.exists():
-        print(f"Loading original file for problem information: {original_file}")
-        try:
-            with open(original_file, 'r', encoding='utf-8') as f:
-                original_data = json.load(f)
-            
-            # Handle data format
-            if isinstance(original_data, dict):
-                if 'results' in original_data:
-                    original_samples = original_data['results']
-                else:
-                    original_samples = [original_data]
-            else:
-                original_samples = original_data if isinstance(original_data, list) else []
-            
-            for orig_sample in original_samples:
-                sample_id = orig_sample.get('sample_id', 'unknown')
-                problem_block = orig_sample.get('problem', {})
-                parts = []
+    original_problem_info = load_original_problem_info(original_file)
 
-                if isinstance(problem_block, dict) and problem_block:
-                    # nested problem dict
-                    problem_input = problem_block.get('input', '')
-                    facts = problem_block.get('facts', [])
-                    if isinstance(facts, str):
-                        facts = [facts] if facts.strip() else []
-                    if problem_input and problem_input.strip():
-                        parts.append(problem_input.strip())
-                    if facts:
-                        facts_text = '\n'.join(str(f).strip() for f in facts if str(f).strip())
-                        if facts_text:
-                            parts.append(facts_text)
-                    gt = problem_block.get('ground_truth') or orig_sample.get('target_answer')
-                elif orig_sample.get('problem_text'):
-                    # flat k_traces format: problem_text + target_answer at top level
-                    parts.append(orig_sample.get('problem_text', '').strip())
-                    gt = orig_sample.get('target_answer') or orig_sample.get('ground_truth')
-                else:
-                    gt = orig_sample.get('target_answer') or orig_sample.get('ground_truth')
-
-                if parts:
-                    original_problem_info[sample_id] = {
-                        'problem_text': '\n'.join(parts),
-                        'ground_truth': gt,
-                    }
-            
-            print(f"Loaded problem information for {len(original_problem_info)} samples")
-        except Exception as e:
-            print(f"Warning: failed to load original file: {e}")
-    
     # IRF corpus: the flat table disables IRF; None means each sample's own steps
     df_table = None
     if idf_scope == "none":
@@ -2110,13 +2215,7 @@ async def synthesize_traces_for_dataset(
             sample_id = sample.get('sample_id', 'unknown')
 
             # Fill in problem information
-            if sample_id in original_problem_info:
-                if 'problem' not in sample or not sample.get('problem'):
-                    sample = sample.copy()
-                    sample['problem'] = {
-                        'input': original_problem_info[sample_id]['problem_text'],
-                        'ground_truth': original_problem_info[sample_id].get('ground_truth'),
-                    }
+            sample = fill_problem(sample, original_problem_info)
 
             # Route to RKG-guided or traditional synthesis
             if synthesis_strategy == "rkg":
@@ -2174,6 +2273,77 @@ def _load_records(path: Path) -> List[Dict[str, Any]]:
     return data if isinstance(data, list) else []
 
 
+def load_original_problem_info(original_file: Optional[Path]) -> Dict[str, Dict[str, Any]]:
+    """Problem text and ground truth per sample from the k_traces file.
+
+    The same reading serves a full run and a --retry_failed pass, so a retried
+    sample is prompted with exactly the problem its neighbours were.
+    """
+    original_problem_info: Dict[str, Dict[str, Any]] = {}
+    if original_file and original_file.exists():
+        print(f"Loading original file for problem information: {original_file}")
+        try:
+            with open(original_file, 'r', encoding='utf-8') as f:
+                original_data = json.load(f)
+            
+            # Handle data format
+            if isinstance(original_data, dict):
+                if 'results' in original_data:
+                    original_samples = original_data['results']
+                else:
+                    original_samples = [original_data]
+            else:
+                original_samples = original_data if isinstance(original_data, list) else []
+            
+            for orig_sample in original_samples:
+                sample_id = orig_sample.get('sample_id', 'unknown')
+                problem_block = orig_sample.get('problem', {})
+                parts = []
+
+                if isinstance(problem_block, dict) and problem_block:
+                    # nested problem dict
+                    problem_input = problem_block.get('input', '')
+                    facts = problem_block.get('facts', [])
+                    if isinstance(facts, str):
+                        facts = [facts] if facts.strip() else []
+                    if problem_input and problem_input.strip():
+                        parts.append(problem_input.strip())
+                    if facts:
+                        facts_text = '\n'.join(str(f).strip() for f in facts if str(f).strip())
+                        if facts_text:
+                            parts.append(facts_text)
+                    gt = problem_block.get('ground_truth') or orig_sample.get('target_answer')
+                elif orig_sample.get('problem_text'):
+                    # flat k_traces format: problem_text + target_answer at top level
+                    parts.append(orig_sample.get('problem_text', '').strip())
+                    gt = orig_sample.get('target_answer') or orig_sample.get('ground_truth')
+                else:
+                    gt = orig_sample.get('target_answer') or orig_sample.get('ground_truth')
+
+                if parts:
+                    original_problem_info[sample_id] = {
+                        'problem_text': '\n'.join(parts),
+                        'ground_truth': gt,
+                    }
+            
+            print(f"Loaded problem information for {len(original_problem_info)} samples")
+        except Exception as e:
+            print(f"Warning: failed to load original file: {e}")
+    return original_problem_info
+
+
+def fill_problem(sample: Dict[str, Any], original_problem_info: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """Attach the problem block a synthesis prompt reads, when the sample lacks one."""
+    sid = sample.get('sample_id', 'unknown')
+    if sid in original_problem_info and not sample.get('problem'):
+        sample = sample.copy()
+        sample['problem'] = {
+            'input': original_problem_info[sid]['problem_text'],
+            'ground_truth': original_problem_info[sid].get('ground_truth'),
+        }
+    return sample
+
+
 async def retry_failed_synthesis(
     synth_file: Path,
     input_file: Path,
@@ -2186,6 +2356,8 @@ async def retry_failed_synthesis(
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     in_place: bool = False,
+    min_tfidf: float = 0.01,
+    original_file: Optional[Path] = None,
 ) -> None:
     """Re-synthesize only the samples a prior run left without a pred_label.
 
@@ -2204,6 +2376,7 @@ async def retry_failed_synthesis(
 
     rkg_lookup     = {r["sample_id"]: r for r in _load_records(rkg_file) if "sample_id" in r}
     cleaned_lookup = {s["sample_id"]: s for s in _load_records(input_file) if "sample_id" in s}
+    original_problem_info = load_original_problem_info(original_file)
 
     df_table = None
     if idf_scope == "none":
@@ -2224,11 +2397,13 @@ async def retry_failed_synthesis(
                 if not sample or not rkg:
                     return sid, {"sample_id": sid, "error": "missing_input",
                                  "synthesized_trace": None}
+                sample = fill_problem(sample, original_problem_info)
                 try:
                     return sid, await synthesize_trace_rkg(
                         session, sample, rkg, model=model, domain=domain,
                         prior_mode=prior_mode, atomic_steps=atomic_steps,
                         df_table=df_table, idf_norm=(idf_norm == "log_n"),
+                        min_tfidf=min_tfidf,
                     )
                 except Exception as e:
                     return sid, {"sample_id": sid, "error": f"retry_failed: {e}",
@@ -2253,8 +2428,17 @@ async def retry_failed_synthesis(
         print(f"Backup: {backup}")
     else:
         out_path = out_path.with_name(out_path.stem + "_retried.json")
+    try:
+        with open(synth_file if not in_place else backup, encoding="utf-8") as fh:
+            _orig = json.load(fh)
+        metadata = dict(_orig.get("metadata") or {}) if isinstance(_orig, dict) else {}
+    except (OSError, ValueError):
+        metadata = {}
+    metadata["retried_samples"] = len(failed_sids)
+    metadata["recovered_samples"] = sum(1 for r in recovered.values() if r.get("pred_label"))
+    metadata["successful_samples"] = sum(1 for r in merged if r.get("synthesized_trace"))
     with open(out_path, 'w', encoding='utf-8') as f:
-        json.dump({"results": merged}, f, indent=2, ensure_ascii=False)
+        json.dump({"metadata": metadata, "results": merged}, f, indent=2, ensure_ascii=False)
 
     n_recovered = sum(1 for r in recovered.values() if r.get("pred_label"))
     print(f"\nWrote: {out_path}")
@@ -2285,10 +2469,11 @@ def main():
         help=f"Model to use (default: {DEFAULT_MODEL})"
     )
     parser.add_argument(
-        "--min_tfidf",
+        "--alpha", "--min_tfidf",
+        dest="min_tfidf",
         type=float,
         default=0.01,
-        help="TF-IRF threshold alpha (default: 0.01)"
+        help="TF-IRF threshold alpha below which a term is not shown as a key term (paper: 0.01)"
     )
     parser.add_argument(
         "--idf_scope",
@@ -2400,6 +2585,12 @@ def main():
              "and merge the recovered ones back. Pass the same IRF flags the run used.",
     )
     parser.add_argument(
+        "--no_auto_retry",
+        action="store_true",
+        default=False,
+        help="Do not retry timed-out samples once at the end of a run",
+    )
+    parser.add_argument(
         "--in_place",
         action="store_true",
         default=False,
@@ -2437,6 +2628,17 @@ def main():
     
     output_path = _cfg.resolve_output(args.output)
 
+    original_path = _cfg.resolve_input(args.original_file) if args.original_file else None
+
+    # Auto-detect original_file (k_traces) in the same directory as input
+    # so problem text is always available for synthesis prompts
+    if original_path is None:
+        _input_dir = input_path.parent
+        _candidates = sorted(_input_dir.glob("k_traces_*_samples.json"))
+        if _candidates:
+            original_path = _candidates[0]
+            print(f"Auto-detected original_file: {original_path}")
+
     if args.retry_failed:
         if args.rkg_file is None:
             parser.error("--retry_failed requires --rkg_file (the RKG the original run synthesized from)")
@@ -2456,20 +2658,11 @@ def main():
                 idf_scope=args.idf_scope,
                 idf_norm=args.idf_norm,
                 in_place=args.in_place,
+                min_tfidf=args.min_tfidf,
+                original_file=original_path,
             )
         )
         return
-
-    original_path = _cfg.resolve_input(args.original_file) if args.original_file else None
-
-    # Auto-detect original_file (k_traces) in the same directory as input
-    # so problem text is always available for synthesis prompts
-    if original_path is None:
-        _input_dir = input_path.parent
-        _candidates = sorted(_input_dir.glob("k_traces_*_samples.json"))
-        if _candidates:
-            original_path = _candidates[0]
-            print(f"Auto-detected original_file: {original_path}")
 
     asyncio.run(
         synthesize_traces_for_dataset(
@@ -2490,6 +2683,39 @@ def main():
             idf_norm=args.idf_norm,
         )
     )
+
+    # A request that times out under load leaves its sample without a trace,
+    # and on the maths sets that was a fifth of a run. Such samples are tried
+    # once more at half the concurrency, which is what --retry_failed does by
+    # hand; a sample refused for its content is not retried, it would fail
+    # again the same way.
+    if synthesis_strategy == "rkg" and args.rkg_file and not args.no_auto_retry:
+        try:
+            with open(output_path, encoding="utf-8") as fh:
+                _done = json.load(fh)
+            _rows = _done.get("results", _done) if isinstance(_done, dict) else _done
+            _timed_out = sum(1 for r in _rows if "Timeout" in str(r.get("error") or ""))
+        except (OSError, ValueError):
+            _timed_out = 0
+        if _timed_out:
+            print(f"Retrying {_timed_out} timed-out samples at concurrency {max(1, args.concurrency // 2)}")
+            asyncio.run(
+                retry_failed_synthesis(
+                    synth_file=output_path,
+                    input_file=input_path,
+                    rkg_file=_cfg.resolve_input(args.rkg_file),
+                    model=args.model,
+                    concurrency=max(1, args.concurrency // 2),
+                    domain=args.domain,
+                    prior_mode=args.prior_mode,
+                    atomic_steps=args.atomic_steps,
+                    idf_scope=args.idf_scope,
+                    idf_norm=args.idf_norm,
+                    in_place=True,
+                    min_tfidf=args.min_tfidf,
+                    original_file=original_path,
+                )
+            )
 
 
 if __name__ == "__main__":

@@ -443,7 +443,7 @@ async def generate_single_trace(
     base_temperature: float = 0.7,
     max_retries: int = 3,
     domain: str = "logical",
-    fixed_temp: bool = False,
+    fixed_temp: bool = True,
 ) -> Optional[Dict[str, Any]]:
     """Generate a single reasoning trace.
 
@@ -515,7 +515,7 @@ async def generate_k_traces_for_sample(
     k: int,
     base_temperature: float = 0.7,
     domain: Optional[str] = None,
-    fixed_temp: bool = False,
+    fixed_temp: bool = True,
 ) -> Dict[str, Any]:
     """Generate k reasoning traces for a single sample."""
     problem_text = sample_entry["problem_text"]
@@ -566,7 +566,7 @@ async def generate_k_traces_dataset(
     concurrency: int,
     base_temperature: float = 0.7,
     domain: str = "logical",
-    fixed_temp: bool = False,
+    fixed_temp: bool = True,
 ) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
     """Process all samples in batch, generating k traces per sample.
 
@@ -766,22 +766,33 @@ def parse_args() -> argparse.Namespace:
         help="Number of items to process",
     )
     parser.add_argument(
-        "--k",
+        "--K", "--k",
+        dest="k",
         type=int,
         default=5,
-        help="Number of reasoning traces to generate per item (paper: K=5)",
+        help="Number of traces K rolled out per sample (paper: K=5)",
     )
     parser.add_argument(
-        "--temperature",
+        "--T", "--temperature",
+        dest="temperature",
         type=float,
         default=0.7,
-        help="Base temperature; distributed linearly over [base-0.3, base+0.3] by default",
+        help="Sampling temperature T of every trace (paper: 0.7)",
+    )
+    parser.add_argument(
+        "--spread_temp",
+        action="store_false",
+        dest="fixed_temp",
+        help="Spread the K temperatures linearly over [T-0.3, T+0.3] instead of "
+             "sampling every trace at T (the behaviour of runs before this change)",
     )
     parser.add_argument(
         "--fixed_temp",
         action="store_true",
-        help="Fixed temperature mode: all k traces use the same temperature, no linear spacing",
+        dest="fixed_temp",
+        help=argparse.SUPPRESS,  # now the default; kept so old commands still parse
     )
+    parser.set_defaults(fixed_temp=True)
     parser.add_argument(
         "--domain",
         type=str,
