@@ -968,6 +968,65 @@ def build_synthesis_plan_from_rkg(
     return plan
 
 
+def attach_trace_references(plan: List[Dict[str, Any]], traces: List[Dict[str, Any]],
+                             mv_answer: Optional[str]) -> List[Dict[str, Any]]:
+    """Give each term-guided maths step the step one trace wrote at that point.
+
+    A padded position has no node of G* to anchor it, and a step written from
+    key terms alone came out less faithful to the problem and less grammatical
+    than the backbone's own chain. It is shown instead the step at the same
+    relative position of one trace, taken from a trace whose boxed answer is
+    the vote's (the longest trace when none is), and the prompt says it is one
+    trace's step rather than a consensus result. Nodes of G* are left as they
+    are.
+    """
+    def _steps(t):
+        st = t.get("reasoning_steps") or []
+        return [x for x in st if str(x).strip()] or [
+            x for x in re.split(r"(?m)^Step\s*\d+\s*:", t.get("reasoning_text") or "") if x.strip()]
+    pool = [t for t in traces if _steps(t)]
+    if not pool:
+        return plan
+    agree = [t for t in pool if mv_answer and _norm_ans((_extract_boxed_content(
+        (t.get("reasoning_text") or "") + " " + (t.get("raw_response") or "")) or [""])[-1]) == _norm_ans(mv_answer)]
+    ref = max(agree or pool, key=lambda t: len(_steps(t)))
+    ref_steps = _steps(ref)
+    n = max(len(plan), 1)
+    out = []
+    for i, e in enumerate(plan):
+        if e.get("term_guided") and not e.get("node_text_hint"):
+            j = min(len(ref_steps) - 1, round(i * (len(ref_steps) - 1) / max(n - 1, 1)))
+            e = dict(e)
+            e["node_text_hint"] = re.sub(r"^\s*Step\s*\d+\s*:\s*", "", str(ref_steps[j])).strip()[:400]
+            e["hint_from_trace"] = True
+        out.append(e)
+    return out
+
+
+def label_plan(plan: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Name every step of the plan by the position it is written at.
+
+    After Module II aligns steps across traces a node's id (Step14) says which
+    group of steps it stands for, not where it lands in the trace being
+    written, and a prompt that asked for "Step14 (Step 3 of 7)" with
+    prerequisites "Step5, Step10" had the model copy those ids into its steps
+    and cite steps that were never written. The prompt now names the step it
+    asks for, and each prerequisite, by written position; a fact keeps its own
+    name, since the problem states it under that name.
+    """
+    pos = {e["node_id"]: e.get("step_position") for e in plan if e.get("node_type") != "fact"}
+    out = []
+    for e in plan:
+        e = dict(e)
+        e["label"] = f"Step {e.get('step_position')}"
+        e["predecessor_labels"] = {
+            pid: (f"Step {pos[pid]}" if pid in pos else pid)
+            for pid in (e.get("predecessor_texts") or {})
+        }
+        out.append(e)
+    return out
+
+
 def pad_math_plan(plan: List[Dict[str, Any]], total_steps: int) -> List[Dict[str, Any]]:
     """Give a maths trace the length the K traces needed when G* is smaller.
 
@@ -1067,6 +1126,8 @@ def build_rkg_synthesis_prompt(
       where most k-traces predict the wrong label.
     """
     node_id    = plan_entry["node_id"]
+    step_label = plan_entry.get("label") or node_id
+    pred_labels = plan_entry.get("predecessor_labels") or {}
     node_type  = plan_entry["node_type"]
     step_pos   = plan_entry["step_position"]
     pred_texts = plan_entry["predecessor_texts"]
@@ -1082,7 +1143,7 @@ def build_rkg_synthesis_prompt(
 
 **Problem**:
 {problem_input}
-**Your current task**: Generate {node_id} (Step {step_pos} of {total_steps})
+**Your current task**: Generate {step_label} (Step {step_pos} of {total_steps})
 """
 
     # Math domain: show ALL previously generated steps for full context
@@ -1101,13 +1162,13 @@ def build_rkg_synthesis_prompt(
         for prev_step in previous_steps:
             prompt += f"{prev_step}\n"
         if pred_texts:
-            pred_ids_str = ", ".join(pred_texts.keys())
+            pred_ids_str = ", ".join(pred_labels.get(pid, pid) for pid in pred_texts)
             prompt += f"\n(Direct prerequisites for this step: {pred_ids_str})\n"
     elif pred_texts:
         prompt += "\n**Direct prerequisites** (the steps this one builds on):\n"
         for pid, ptext in pred_texts.items():
             actual_text = generated_nodes.get(pid, ptext)
-            prompt += f"  - {pid}: {actual_text[:400]}\n"
+            prompt += f"  - {pred_labels.get(pid, pid)}: {actual_text[:400]}\n"
     else:
         prompt += "\n**Direct prerequisites**: (none — use only the problem statement above)\n"
 
@@ -1360,7 +1421,7 @@ suggestion, not a settled result):
     else:
         prompt += "- Do NOT conclude the entire problem here — more steps follow\n"
 
-    prompt += f"\nGenerate ONLY {node_id}: [your reasoning here]"
+    prompt += f"\nGenerate ONLY {step_label}: [your reasoning here]"
     return prompt
 
 
@@ -1530,6 +1591,7 @@ async def synthesize_trace_rkg(
     topo_order = topological_sort_rkg(consensus_rkg)
     plan       = build_synthesis_plan_from_rkg(consensus_rkg, topo_order)
     plan       = ensure_verdict_step(plan, consensus_rkg, domain)
+    plan       = label_plan(plan)
 
     if not plan and domain != "math":
         return {"sample_id": sample_id, "error": "empty_synthesis_plan", "synthesized_trace": None}
@@ -1555,6 +1617,8 @@ async def synthesize_trace_rkg(
         _median_steps = sorted(_trace_step_counts)[len(_trace_step_counts) // 2] if _trace_step_counts else len(plan)
         total_steps = max(len(plan), _median_steps)
         plan = pad_math_plan(plan, total_steps)
+        plan = attach_trace_references(
+            plan, sample.get("original_traces") or _all_traces, _mv_answer)
     else:
         total_steps = len(plan)
 
@@ -1678,7 +1742,15 @@ async def synthesize_trace_rkg(
                     atomic_steps=atomic_steps,
                 )
                 _node_hint = (entry.get("node_text_hint") or "").strip()
-                if _node_hint:
+                if _node_hint and entry.get("hint_from_trace"):
+                    prompt += (
+                        f"\n**Reference from one of the traces** (one independent "
+                        f"solution's step at this point, not a consensus result):\n"
+                        f"  \"{_node_hint[:300]}\"\n"
+                        "  Use it only if it fits the steps above; write the step in "
+                        "your own words and re-derive every number.\n"
+                    )
+                elif _node_hint:
                     prompt += (
                         f"\n**Consensus node for this step** (what the surviving "
                         f"traces agreed this step establishes):\n"
