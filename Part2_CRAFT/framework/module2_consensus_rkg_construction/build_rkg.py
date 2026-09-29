@@ -793,7 +793,12 @@ def build_consensus_rkg(
     # the conclusion vote splits across distinct ids → consensus picks an arbitrary trace.
     _CONC_ID = "ConcShared"
     _LBL_PAT = re.compile(r"__(?:PROVED|DISPROVED|UNKNOWN)__")
-    unrestorable = sum(1 for rkg_trace in trace_rkgs if not restore_original_ids(rkg_trace))
+    # A trace whose ids cannot be restored contributes no edges: it still counts
+    # towards K in W(e), but its ambiguous edges never reach G*.
+    restored = [restore_original_ids(rkg_trace) for rkg_trace in trace_rkgs]
+    unrestorable = restored.count(False)
+    trace_rkgs = [t if ok else dict(t, nodes=[], edges=[])
+                  for t, ok in zip(trace_rkgs, restored)]
     for rkg_trace in trace_rkgs:
         # Find all conclusion-like nodes in this trace
         concl_node_ids = {
