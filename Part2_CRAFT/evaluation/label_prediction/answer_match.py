@@ -72,6 +72,8 @@ def _strip_wrappers(s: str) -> str:
     # Omni-MATH writes some answers as "\[ 2047 \]" and some as "\[\boxed{2018}\]".
     s = re.sub(r"\\[\[\]()]", " ", s)
     s = re.sub(r"\\boxed\s*\{(.+)\}\s*$", r"\1", s.strip(), flags=re.S)
+    # Set braces around a list of answers: \{1,2,5,8,9\} is the list 1,2,5,8,9.
+    s = re.sub(r"^\\\{(.*)\\\}$", r"\1", s.strip(), flags=re.S)
     s = s.replace("\\left", "").replace("\\right", "")
     s = re.sub(r"\\[,;:!]", " ", s)
     s = re.sub(r"\\quad|\\qquad", " ", s)
