@@ -1,65 +1,65 @@
 {
-  "file": "results/craft_runs/full500_v4/traces/FLDgpt/synth.json",
+  "file": "results/craft_runs/full500_v2/FLD_gpt-5.4-nano/synthesized.json",
   "source": "synthesized",
   "overall": {
-    "accuracy": 0.8158,
-    "macro_f1": 0.8151,
-    "avg_steps": 9.36,
-    "std_steps": 1.34,
-    "avg_tokens": 549.3,
-    "std_tokens": 141.7,
-    "mean_trace_acc": 0.8158,
-    "std_trace_acc": 0.3877,
-    "n_total": 494,
-    "n_correct": 403,
+    "accuracy": 0.8101,
+    "macro_f1": 0.8092,
+    "avg_steps": 6.81,
+    "std_steps": 1.78,
+    "avg_tokens": 621.8,
+    "std_tokens": 316.5,
+    "mean_trace_acc": 0.8101,
+    "std_trace_acc": 0.3922,
+    "n_total": 495,
+    "n_correct": 401,
     "n_no_pred": 0,
     "n_blocked": 0,
     "no_pred_rate": 0.0,
     "per_class_f1": {
-      "__PROVED__": 0.8035,
-      "__DISPROVED__": 0.8267
+      "__PROVED__": 0.7957,
+      "__DISPROVED__": 0.8226
     },
     "confusion_matrix": {
       "__PROVED__": {
-        "__PROVED__": 186,
-        "__DISPROVED__": 61,
+        "__PROVED__": 183,
+        "__DISPROVED__": 64,
         "none": 0
       },
       "__DISPROVED__": {
         "__PROVED__": 30,
-        "__DISPROVED__": 217,
+        "__DISPROVED__": 218,
         "none": 0
       }
     },
     "domain": "logical",
     "per_dataset": {
       "FLD.json": {
-        "accuracy": 0.8158,
-        "macro_f1": 0.8151,
-        "avg_steps": 9.36,
-        "std_steps": 1.34,
-        "avg_tokens": 549.3,
-        "std_tokens": 141.7,
-        "mean_trace_acc": 0.8158,
-        "std_trace_acc": 0.3877,
-        "n_total": 494,
-        "n_correct": 403,
+        "accuracy": 0.8101,
+        "macro_f1": 0.8092,
+        "avg_steps": 6.81,
+        "std_steps": 1.78,
+        "avg_tokens": 621.8,
+        "std_tokens": 316.5,
+        "mean_trace_acc": 0.8101,
+        "std_trace_acc": 0.3922,
+        "n_total": 495,
+        "n_correct": 401,
         "n_no_pred": 0,
         "n_blocked": 0,
         "no_pred_rate": 0.0,
         "per_class_f1": {
-          "__PROVED__": 0.8035,
-          "__DISPROVED__": 0.8267
+          "__PROVED__": 0.7957,
+          "__DISPROVED__": 0.8226
         },
         "confusion_matrix": {
           "__PROVED__": {
-            "__PROVED__": 186,
-            "__DISPROVED__": 61,
+            "__PROVED__": 183,
+            "__DISPROVED__": 64,
             "none": 0
           },
           "__DISPROVED__": {
             "__PROVED__": 30,
-            "__DISPROVED__": 217,
+            "__DISPROVED__": 218,
             "none": 0
           }
         },
@@ -69,32 +69,32 @@
   },
   "per_dataset": {
     "FLD.json": {
-      "accuracy": 0.8158,
-      "macro_f1": 0.8151,
-      "avg_steps": 9.36,
-      "std_steps": 1.34,
-      "avg_tokens": 549.3,
-      "std_tokens": 141.7,
-      "mean_trace_acc": 0.8158,
-      "std_trace_acc": 0.3877,
-      "n_total": 494,
-      "n_correct": 403,
+      "accuracy": 0.8101,
+      "macro_f1": 0.8092,
+      "avg_steps": 6.81,
+      "std_steps": 1.78,
+      "avg_tokens": 621.8,
+      "std_tokens": 316.5,
+      "mean_trace_acc": 0.8101,
+      "std_trace_acc": 0.3922,
+      "n_total": 495,
+      "n_correct": 401,
       "n_no_pred": 0,
       "n_blocked": 0,
       "no_pred_rate": 0.0,
       "per_class_f1": {
-        "__PROVED__": 0.8035,
-        "__DISPROVED__": 0.8267
+        "__PROVED__": 0.7957,
+        "__DISPROVED__": 0.8226
       },
       "confusion_matrix": {
         "__PROVED__": {
-          "__PROVED__": 186,
-          "__DISPROVED__": 61,
+          "__PROVED__": 183,
+          "__DISPROVED__": 64,
           "none": 0
         },
         "__DISPROVED__": {
           "__PROVED__": 30,
-          "__DISPROVED__": 217,
+          "__DISPROVED__": 218,
           "none": 0
         }
       },

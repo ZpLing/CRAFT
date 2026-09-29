@@ -14,10 +14,10 @@ Graph (RKG)**, and writes one trace by walking that graph.
 
 | Backbone | Setting | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| GPT-5.4-nano | Best of 12 baselines | 78.6 | 0.785 | **7.7** | 94.0 | 0.940 | 18.9 | 48.8 | 78.4 | 57.6 | 74.1 |
-| GPT-5.4-nano | **CRAFT** | **81.6** | **0.815** | 9.4 | **96.2** | **0.962** | **9.4** | **55.1** | **8.2** | **61.6** | **8.3** |
-| Gemini-3.1-flash-lite | Best of 12 baselines | **90.3** | **0.903** | 11.1 | 68.6 | 0.678 | 14.8 | 55.1 | 24.9 | 65.8 | 25.0 |
-| Gemini-3.1-flash-lite | **CRAFT** | 88.7 | 0.887 | **9.2** | **86.8** | **0.868** | **9.2** | **61.6** | **8.3** | **74.5** | **8.7** |
+| GPT-5.4-nano | Best of 12 baselines | 78.6 | 0.785 | 7.7 | 94.0 | 0.940 | 18.9 | 48.8 | 78.4 | 57.6 | 74.1 |
+| GPT-5.4-nano | **CRAFT** | **81.0** | **0.809** | **6.8** | **98.2** | **0.982** | **8.9** | **53.9** | **6.5** | **59.0** | **6.6** |
+| Gemini-3.1-flash-lite | Best of 12 baselines | 90.3 | 0.903 | 11.1 | 68.6 | 0.678 | 14.8 | 55.1 | 24.9 | 65.8 | 25.0 |
+| Gemini-3.1-flash-lite | **CRAFT** | **90.7** | **0.907** | **8.1** | **85.4** | **0.854** | **9.3** | **61.8** | **6.8** | **75.6** | **7.2** |
 
 > FOLIO and GSM8K were dropped after the pilot because both backbones were already close to
 > the ceiling on them. ProofWriter (depth 5) and Omni-MATH replaced them.
@@ -61,19 +61,19 @@ K_TRACES=$RUN/k_traces_500_samples.json   # the name every downstream glob looks
 
 # Module I — Multi-Trace Generation: K=5 traces at T=0.7
 python $M1/generate_traces.py --datasets dataset/FLD.json \
-    --k 5 --temperature 0.7 --output $K_TRACES
+    --K 5 --T 0.7 --output $K_TRACES
 
 # Module I — Steps Filtering: z-score cutoff over the TF-IRF consensus terms
 python $M1/steps_filter.py --input $K_TRACES \
-    --method unsupervised --z_score_threshold -1.0 --consensus_threshold 0.3 --output $RUN/cleaned_z.json
+    --method unsupervised --alpha 0.01 --beta 0.3 --gamma -1.0 --output $RUN/cleaned_z.json
 
 # Module II — Consensus RKG Construction: per-trace graphs, edge/node filtering, aggregation
 python framework/module2_consensus_rkg_construction/build_rkg.py --input $RUN/cleaned_z.json \
-    --consensus_threshold 0.3 --output $RUN/rkg.json
+    --lambda 0.3 --theta 0.3 --output $RUN/rkg.json
 
 # Module I again — the same step filter, now pruning against G*
 python $M1/steps_filter.py --input $RUN/cleaned_z.json \
-    --method rkg --rkg_file $RUN/rkg.json --output $RUN/cleaned.json
+    --method rkg --rkg_file $RUN/rkg.json --theta 0.3 --output $RUN/cleaned.json
 
 # Module III — Topology-guided Trace Synthesis: one step generated per node of G*
 python framework/module3_topology_guided_synthesis/synthesize_trace.py --input $RUN/cleaned.json \
@@ -218,8 +218,8 @@ python $DO/state_goal.py         --synth $RUN/adj_applied.json --problems $RUN/c
 python evaluation/label_prediction/evaluate_accuracy.py export
 ```
 
-All experiments use the same hyperparameters (§3.2): Module I `K=5`, `T=0.7`, `β=0.3`,
-`γ=-1.0`; Module II `λ=0.3`, `θ=0.3`; Module III `α=0.01`. They are the CLI defaults, so a
+All experiments use the same hyperparameters (§3.2): Module I `K=5`, `T=0.7`, `α=0.01`,
+`β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`. They are the CLI defaults, so a
 stage run without flags uses them.
 
 ## Configuration
