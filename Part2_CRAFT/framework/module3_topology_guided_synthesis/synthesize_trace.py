@@ -87,6 +87,8 @@ OPENAI_API_KEY        = _cfg.OPENAI_API_KEY
 OPENAI_BASE_URL       = _cfg.OPENAI_BASE_URL
 DEFAULT_MODEL         = _cfg.MODEL_SYNTHESIS   # Step 5: Reference-Guided Topological Synthesis
 REQUEST_TIMEOUT       = getattr(_cfg, "REQUEST_TIMEOUT", 180)
+# Default of every atomic_steps below; set once in config.py (CRAFT_ATOMIC_STEPS).
+ATOMIC_STEPS          = bool(getattr(_cfg, "ATOMIC_STEPS", True))
 RESPONSE_TOKENS       = 4096   # increased for o4-mini on competition math
 REQUEST_TEMPERATURE   = 0.0
 RESPONSE_TOKENS_MATH  = 8192   # per-step cap for math domain synthesis
@@ -277,7 +279,7 @@ def build_synthesis_prompt(
     domain: str = "logical",
     mv_label: Optional[str] = None,
     answer_is_prior: bool = False,
-    atomic_steps: bool = False,
+    atomic_steps: bool = ATOMIC_STEPS,
 ) -> str:
     """
     Build a prompt for generating a high-quality reasoning trace.
@@ -1129,7 +1131,7 @@ def build_rkg_synthesis_prompt(
     mv_answer: Optional[str] = None,
     mv_strength: Optional[float] = None,
     prior_mode: str = "verify",
-    atomic_steps: bool = False,
+    atomic_steps: bool = ATOMIC_STEPS,
     gt_label: Optional[str] = None,
     step_terms_summary: Optional[Dict[int, Dict]] = None,
     previous_steps: Optional[List[str]] = None,
@@ -1487,7 +1489,7 @@ async def synthesize_trace_rkg(
     model: str = DEFAULT_MODEL,
     domain: str = "logical",
     prior_mode: str = "verify",
-    atomic_steps: bool = True,
+    atomic_steps: bool = ATOMIC_STEPS,
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
     min_tfidf: float = 0.01,
@@ -2243,7 +2245,7 @@ async def synthesize_traces_for_dataset(
     synthesis_strategy: str = "step_by_step",
     rkg_file: Optional[Path] = None,
     prior_mode: str = "verify",
-    atomic_steps: bool = True,
+    atomic_steps: bool = ATOMIC_STEPS,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     resume: bool = True,
@@ -2518,7 +2520,7 @@ async def retry_failed_synthesis(
     concurrency: int = 4,
     domain: str = "logical",
     prior_mode: str = "verify",
-    atomic_steps: bool = True,
+    atomic_steps: bool = ATOMIC_STEPS,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
     in_place: bool = False,
@@ -2725,7 +2727,7 @@ def main():
         help="RKG JSON file path (required for synthesis_strategy=rkg; from build_rkg.py)",
     )
     parser.add_argument(
-        "--atomic_steps", action="store_true", default=True,
+        "--atomic_steps", action="store_true", default=ATOMIC_STEPS,
         help="Ask each synthesized step for one inference stated in two sentences, "
              "the Module III prompt of the paper's appendix (default)",
     )

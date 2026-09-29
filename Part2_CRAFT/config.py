@@ -30,6 +30,12 @@ else:
 DEFAULT_MODEL   = MODEL_SYNTHESIS
 REQUEST_TIMEOUT = int(os.getenv("OPENAI_REQUEST_TIMEOUT", "180"))
 
+# ── Module III prompt ────────────────────────────────────────────────────────
+# One switch for every atomic_steps default in the synthesis code: True writes
+# each step as one inference stated in two sentences, the Module III prompt of
+# the paper's appendix. CRAFT_ATOMIC_STEPS=0 turns it off for a run.
+ATOMIC_STEPS = os.getenv("CRAFT_ATOMIC_STEPS", "1").strip().lower() not in ("0", "false", "no", "off")
+
 # ── Pinned endpoint ──────────────────────────────────────────────────────────
 # Scripts that must reach one specific endpoint read these instead of
 # OPENAI_API_KEY / OPENAI_BASE_URL, which a stray env var can redirect.
