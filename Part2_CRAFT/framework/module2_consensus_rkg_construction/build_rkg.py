@@ -71,6 +71,7 @@ import sys as _sys
 from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
+from framework.llm_reply import larger_budget, reply_text, was_cut_off  # noqa: E402
 from framework.module1_generation_filtering.steps_filter import parse_steps_from_trace
 
 #########################
@@ -237,18 +238,6 @@ Reasoning steps:
 Respond with ONLY the JSON, no other text."""
 
 
-_REASONING_MODELS = ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1")
-
-
-def _apply_reasoning_budget(payload: dict, model: str) -> dict:
-    """Reasoning models bill hidden reasoning against max_tokens, so a budget sized
-    for the visible answer comes back empty. Raise the total and reserve a visible slice."""
-    if model in _REASONING_MODELS:
-        payload["max_tokens"] = max(payload.get("max_tokens") or 0, 16000)
-        payload["max_output_tokens"] = min(payload["max_tokens"], 4096)
-    return payload
-
-
 # Every LLM request this module makes passes through one function, so counting
 # there is the number of calls actually paid for — retries included — rather than
 # the number a run was expected to need. Each stage writes it into its own
@@ -264,16 +253,22 @@ API_CALLS = {"count": 0}
 )
 
 
-async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str) -> Optional[Dict]:
-    """Call the LLM and parse the JSON response. Returns None on failure."""
+async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str,
+                         max_tokens: Optional[int] = None) -> Optional[Dict]:
+    """Call the LLM and parse the JSON response. Returns None on failure.
+
+    A reply cut off by its token budget (a reasoning model can spend the whole
+    budget before writing any JSON) is requested again with twice the budget,
+    up to the ceiling in framework/llm_reply.py, whatever the model.
+    """
     API_CALLS["count"] += 1
+    budget = max_tokens or RESPONSE_TOKENS
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.0,
-        "max_tokens": RESPONSE_TOKENS,
+        "max_tokens": budget,
     }
-    _apply_reasoning_budget(payload, model)
     async with session.post(
         CHAT_URL, json=payload, headers=HEADERS,
         timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
@@ -281,12 +276,12 @@ async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str
         if resp.status != 200:
             raise RuntimeError(f"HTTP {resp.status}: {await resp.text()[:200]}")
         data = await resp.json()
-        msg = data["choices"][0]["message"]
-        # o4-mini / deepseek-r1 put reasoning in reasoning_content, not content
-        if model in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1"):
-            content = (msg.get("reasoning_content") or msg.get("content") or "").strip()
-        else:
-            content = (msg.get("content") or "").strip()
+        choice = data["choices"][0]
+        if was_cut_off(choice):
+            bigger = larger_budget(budget)
+            if bigger is not None:
+                return await _call_llm_json(session, prompt, model, max_tokens=bigger)
+        content = reply_text(choice["message"])
 
     # Extract JSON — LLM sometimes wraps it in ```json ... ```
     json_match = re.search(r'\{[\s\S]+\}', content)

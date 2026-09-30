@@ -217,6 +217,26 @@ Every module reads its credentials from the repo-root `config.py` (git-ignored) 
 `Part2_CRAFT/config.py`. A single run can override them with `--api_key`, `--base_url` and
 `--model`.
 
+### Using other models
+
+Any OpenAI-compatible chat-completions endpoint works, and no model name is special-cased
+in the code. What differs between models is handled from the API's own replies:
+
+- **Temperature.** Rollouts send the K temperatures described above. If a request is refused
+  as a client error (HTTP 400/422), it is sent once more without a temperature; if that
+  succeeds, the model is sampled at its default for the rest of the run, and its traces record
+  `temperature: null`. Some gateways accept any temperature and silently ignore it; nothing in
+  a reply shows this, so the recorded temperature is only what was sent.
+- **Token budget.** Reasoning models spend part of `max_tokens` on hidden reasoning. A reply
+  cut off by its budget (`finish_reason: "length"`) is requested again with twice the budget,
+  up to `CRAFT_MAX_TOKENS_CEILING` (default 32000). The first budget of a rollout is
+  `MAX_OUTPUT_TOKENS` (default 2048).
+- **Reply text.** The text is read from `content`, or from `reasoning_content` when a model
+  leaves `content` empty.
+- **Token-limit parameter** (evaluation scripts). Requests use `max_tokens`; an endpoint that
+  refuses it is tried with `max_completion_tokens` and without a temperature, and the form
+  that answers is kept for that model.
+
 ## Citation
 
 ```bibtex

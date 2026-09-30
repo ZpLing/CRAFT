@@ -1033,6 +1033,16 @@ def build_icl_prompt(problem: str, examples: List[Dict],
 # LLM call
 # ---------------------------------------------------------------------------
 
+# The request shape a model's API accepted, learned from its own replies: which
+# token-limit parameter it takes and whether it takes a temperature. Nothing is
+# assumed from the model's name. A request starts in the standard shape
+# (max_tokens, temperature); a 400/422 refusal tries the other shapes once, and
+# the one that answers is kept for that model.
+_REQUEST_SHAPE: Dict[str, Tuple[str, bool]] = {}
+_SHAPES = [("max_tokens", True), ("max_completion_tokens", True),
+           ("max_tokens", False), ("max_completion_tokens", False)]
+
+
 async def call_llm(
     session: aiohttp.ClientSession,
     semaphore: asyncio.Semaphore,
@@ -1044,45 +1054,55 @@ async def call_llm(
     temperature: float = 0.7,
     max_tokens: int = 4096,
 ) -> Optional[str]:
+    from framework.llm_reply import larger_budget, reply_text, was_cut_off
+
     url     = base_url.rstrip("/") + "/chat/completions"
     auth_value = f"Bearer {api_key}"
     headers = {"Authorization": auth_value, "Content-Type": "application/json"}
 
-    # o4-mini (and other o-series reasoning models) consume reasoning tokens internally;
-    # with small max_tokens the content field returns empty. Force at least 4096.
-    _is_reasoning = any(x in model.lower() for x in ("o1", "o3", "o4", "o-mini"))
-    effective_max = max(max_tokens, 4096) if _is_reasoning else max_tokens
+    def body(shape: Tuple[str, bool], budget: int) -> Dict[str, Any]:
+        limit_key, with_temperature = shape
+        b: Dict[str, Any] = {
+            "model":    model,
+            "messages": [{"role": "system", "content": system},
+                         {"role": "user",   "content": user}],
+            limit_key:  budget,
+        }
+        if with_temperature:
+            b["temperature"] = temperature
+        return b
 
-    payload = {
-        "model":    model,
-        "messages": [{"role": "system", "content": system},
-                     {"role": "user",   "content": user}],
-        "temperature": temperature,
-    }
-    # o-series uses max_completion_tokens; standard models use max_tokens
-    if _is_reasoning:
-        payload["max_completion_tokens"] = effective_max
-    else:
-        payload["max_tokens"] = effective_max
+    budget = max_tokens
     for attempt in range(4):
         async with semaphore:
             try:
-                async with session.post(
-                    url, headers=headers, json=payload,
-                    timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
-                ) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        msg = data["choices"][0]["message"]
-                        # o4-mini / deepseek-r1 via our API gateway put the reply in
-                        # reasoning_content; content field is empty
-                        content = (msg.get("reasoning_content") or
-                                   msg.get("content") or "")
-                        if content and content.strip():
-                            return content.strip()
-                        logger.warning("Empty content on attempt %d, retrying", attempt + 1)
-                    else:
-                        logger.warning("HTTP %s: %s", resp.status, (await resp.text())[:200])
+                shapes = ([_REQUEST_SHAPE[model]] if model in _REQUEST_SHAPE else _SHAPES)
+                for n, shape in enumerate(shapes):
+                    async with session.post(
+                        url, headers=headers, json=body(shape, budget),
+                        timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
+                    ) as resp:
+                        if resp.status == 200:
+                            data = await resp.json()
+                            break
+                        detail = (await resp.text())[:200]
+                        # Only a parameter refusal is worth another shape.
+                        if resp.status in (400, 422) and n + 1 < len(shapes):
+                            continue
+                        raise RuntimeError(f"HTTP {resp.status}: {detail}")
+                _REQUEST_SHAPE.setdefault(model, shape)
+                choice = data["choices"][0]
+                # A reasoning model can spend the whole budget on hidden
+                # reasoning; the reply says so, and is asked for again with more.
+                if was_cut_off(choice):
+                    bigger = larger_budget(budget)
+                    if bigger is not None:
+                        budget = bigger
+                        continue
+                content = reply_text(choice["message"])
+                if content:
+                    return content
+                logger.warning("Empty content on attempt %d, retrying", attempt + 1)
             except Exception as e:
                 logger.warning("Attempt %d: %s", attempt + 1, e)
         await asyncio.sleep(2 ** attempt)

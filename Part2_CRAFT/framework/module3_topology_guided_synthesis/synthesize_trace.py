@@ -37,6 +37,7 @@ from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 # Reuse functions from Module I's tfirf_terms and steps_filter
+from framework.llm_reply import larger_budget, reply_text, was_cut_off  # noqa: E402
 from framework.module1_generation_filtering.tfirf_terms import (
     tokenize_text,
     calculate_tf,
@@ -562,18 +563,6 @@ Please generate Step {label} now:"""
     return prompt
 
 
-_REASONING_MODELS = ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1")
-
-
-def _apply_reasoning_budget(payload: dict, model: str) -> dict:
-    """Reasoning models bill hidden reasoning against max_tokens, so a budget sized
-    for the visible answer comes back empty. Raise the total and reserve a visible slice."""
-    if model in _REASONING_MODELS:
-        payload["max_tokens"] = max(payload.get("max_tokens") or 0, 16000)
-        payload["max_output_tokens"] = min(payload["max_tokens"], 4096)
-    return payload
-
-
 # Every LLM request this module makes passes through one function, so counting
 # there is the number of calls actually paid for — retries included — rather than
 # the number a run was expected to need. Each stage writes it into its own
@@ -605,8 +594,7 @@ async def generate_reasoning_trace(
         "temperature": REQUEST_TEMPERATURE,
         "max_tokens": max_tokens or RESPONSE_TOKENS,
     }
-    _apply_reasoning_budget(payload, model)
-    
+
     async with session.post(
         CHAT_COMPLETIONS_URL,
         json=payload,
@@ -623,25 +611,20 @@ async def generate_reasoning_trace(
         # in the middle of a \\boxed{} or a sentence, and nothing downstream
         # can tell. Gemini bills its hidden reasoning against max_tokens, so a
         # budget sized for a step can run out before the step is written; the
-        # same request is made again with twice the budget, up to a ceiling.
+        # same request is made again with twice the budget, up to a ceiling
+        # (framework/llm_reply.py), whatever the model.
         budget = max_tokens or RESPONSE_TOKENS
-        if choice.get("finish_reason") == "length":
-            if budget < 32000:
-                return await generate_reasoning_trace(session, prompt, model,
-                                                      max_tokens=min(budget * 2, 32000))
+        if was_cut_off(choice):
+            bigger = larger_budget(budget)
+            if bigger is not None:
+                return await generate_reasoning_trace(session, prompt, model, max_tokens=bigger)
             # Cut off at the ceiling too. The text is returned -- a step that
             # stops early is still something the caller's own checks (the
             # \\boxed{} on a final step, the label on a logical one) can act
             # on -- but it is counted and said, not passed off as whole.
             TRUNCATED["count"] += 1
             print(f"  ! reply still cut off at {budget} tokens ({model})", flush=True)
-        msg = choice["message"]
-        # o4-mini / deepseek-r1 put reasoning in reasoning_content, not content
-        if model in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1"):
-            content = (msg.get("reasoning_content") or msg.get("content") or "").strip()
-        else:
-            content = (msg.get("content") or "").strip()
-        return content
+        return reply_text(choice["message"])
 
 
 def extract_problem_input(sample: Dict[str, Any]) -> str:

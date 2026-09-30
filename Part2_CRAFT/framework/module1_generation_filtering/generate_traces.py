@@ -81,10 +81,10 @@ MODEL_NAME:      str            = _cfg.MODEL_TRACE_GEN   # Step 1: generate k di
 OPENAI_BASE_URL: Optional[str]  = _cfg.OPENAI_BASE_URL
 API_CLIENT:      Optional[AsyncOpenAI] = None
 TEMPERATURE:     float          = float(os.getenv("OPENAI_TEMPERATURE", "0.7"))
+# The first budget of a request. A reply cut off by it is asked again with a
+# larger one (framework/llm_reply.py), so a reasoning model that bills hidden
+# reasoning against max_tokens gets the budget it needs without being named.
 MAX_OUTPUT_TOKENS: int          = int(os.getenv("MAX_OUTPUT_TOKENS", "2048"))
-# Reasoning models (o4-mini, deepseek-r1) bill hidden reasoning against max_tokens.
-REASONING_TOTAL_TOKENS: int     = int(os.getenv("REASONING_TOTAL_TOKENS", "16000"))
-REASONING_VISIBLE_TOKENS: int   = int(os.getenv("REASONING_VISIBLE_TOKENS", "4096"))
 
 # Relative — resolved under the results root by _cfg.resolve_output()
 DEFAULT_OUTPUT_PATH = Path("generated_k_traces_reasoning.json")
@@ -287,7 +287,7 @@ def _status_of(error: Exception) -> Optional[int]:
 
 @with_backoff
 async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str, str]], temperature: float = None,
-                         sent: Optional[Dict[str, Any]] = None) -> str:
+                         sent: Optional[Dict[str, Any]] = None, max_tokens: Optional[int] = None) -> str:
     """Call the Chat Completions endpoint and return the response text.
 
     sent, when given, receives "temperature": the temperature the request that
@@ -301,15 +301,7 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
     REQUEST_TIMEOUT = 300
     temp = temperature if temperature is not None else TEMPERATURE
 
-    # Reasoning models spend max_tokens on hidden reasoning before writing anything,
-    # so a budget sized for the visible answer alone comes back empty. Give the total
-    # a large ceiling and reserve a slice of it for the visible response.
-    _is_reasoning = MODEL_NAME in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1")
-    effective_max_tokens = MAX_OUTPUT_TOKENS
-    _visible_tokens = None
-    if _is_reasoning:
-        effective_max_tokens = max(effective_max_tokens, REASONING_TOTAL_TOKENS)
-        _visible_tokens = min(effective_max_tokens, REASONING_VISIBLE_TOKENS)
+    effective_max_tokens = max_tokens or MAX_OUTPUT_TOKENS
 
     if API_CLIENT is not None:
         data = {
@@ -321,7 +313,7 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
         if MODEL_NAME not in TEMPERATURE_REJECTED:
             data["temperature"] = temp
         if OPENAI_BASE_URL:
-            data["extra_body"] = {"max_output_tokens": _visible_tokens or effective_max_tokens}
+            data["extra_body"] = {"max_output_tokens": effective_max_tokens}
         try:
             used = data.get("temperature")
             try:
@@ -352,11 +344,12 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
                 raise RuntimeError(f"{MODEL_NAME} API returned a string instead of a response object: {resp[:200]}")
             if not hasattr(resp, 'choices') or not resp.choices:
                 raise RuntimeError(f"{MODEL_NAME} API response format error: {type(resp)}")
-            msg = resp.choices[0].message
-            # o4-mini / deepseek-r1 put reasoning in reasoning_content, not content
-            if MODEL_NAME in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1"):
-                return (getattr(msg, "reasoning_content", None) or msg.content or "").strip()
-            return (msg.content or "").strip()
+            choice = resp.choices[0]
+            if was_cut_off(choice):
+                bigger = larger_budget(effective_max_tokens)
+                if bigger is not None:
+                    return await ask_model_text(session, messages, temperature, sent, max_tokens=bigger)
+            return reply_text(choice.message)
         except asyncio.TimeoutError:
             raise RuntimeError(f"{MODEL_NAME} request timed out ({REQUEST_TIMEOUT}s)")
         except Exception as e:
@@ -371,8 +364,6 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
         }
         if MODEL_NAME not in TEMPERATURE_REJECTED:
             payload["temperature"] = temp
-        if _visible_tokens:
-            payload["max_output_tokens"] = _visible_tokens
         first_error = None
         for body in (payload, {k: v for k, v in payload.items() if k != "temperature"}):
             async with session.post(
@@ -396,11 +387,12 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
                     if "temperature" in payload and _may_be_temperature_refusal(resp.status, detail):
                         continue
                 raise first_error
-        msg = data["choices"][0]["message"]
-        # o4-mini / deepseek-r1 put reasoning in reasoning_content, not content
-        if MODEL_NAME in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1"):
-            return (msg.get("reasoning_content") or msg.get("content") or "").strip()
-        return (msg.get("content") or "").strip()
+        choice = data["choices"][0]
+        if was_cut_off(choice):
+            bigger = larger_budget(effective_max_tokens)
+            if bigger is not None:
+                return await ask_model_text(session, messages, temperature, sent, max_tokens=bigger)
+        return reply_text(choice["message"])
 
 #########################
 # Core generation logic
@@ -445,6 +437,7 @@ import sys as _sys_mt
 import pathlib as _pl_mt
 _sys_mt.path.insert(0, str(_pl_mt.Path(__file__).resolve().parents[2]))
 from framework.domain_optimization.math_text import split_steps  # noqa: E402
+from framework.llm_reply import larger_budget, reply_text, was_cut_off  # noqa: E402
 
 
 def extract_reasoning_steps(text: str) -> List[str]:
