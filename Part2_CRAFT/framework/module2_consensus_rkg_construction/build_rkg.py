@@ -265,26 +265,27 @@ async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str
     backoff wrapper, so a retry does not multiply it.
     """
     content = ""
-    for budget in llm_reply.budgets(model, max_tokens or RESPONSE_TOKENS):
-        API_CALLS["count"] += 1
-        payload = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.0,
-            "max_tokens": budget,
-        }
-        async with session.post(
-            CHAT_URL, json=payload, headers=HEADERS,
-            timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
-        ) as resp:
-            if resp.status != 200:
-                raise RuntimeError(f"HTTP {resp.status}: {await resp.text()[:200]}")
-            data = await resp.json()
-        choice = data["choices"][0]
-        content = reply_text(choice["message"])
-        if not was_cut_off(choice):
-            llm_reply.needed(model, budget)
-            break
+    async with llm_reply.first_request_settles(model):
+        for budget in llm_reply.budgets(model, max_tokens or RESPONSE_TOKENS):
+            API_CALLS["count"] += 1
+            payload = {
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.0,
+                "max_tokens": budget,
+            }
+            async with session.post(
+                CHAT_URL, json=payload, headers=HEADERS,
+                timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
+            ) as resp:
+                if resp.status != 200:
+                    raise RuntimeError(f"HTTP {resp.status}: {await resp.text()[:200]}")
+                data = await resp.json()
+            choice = data["choices"][0]
+            content = reply_text(choice["message"])
+            if not was_cut_off(choice):
+                llm_reply.needed(model, budget)
+                break
 
     # Extract JSON — LLM sometimes wraps it in ```json ... ```
     json_match = re.search(r'\{[\s\S]+\}', content)

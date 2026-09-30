@@ -300,11 +300,12 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
     backoff wrapper, so a retry repeats one request, not every step of it.
     """
     text = ""
-    for budget in llm_reply.budgets(MODEL_NAME, max_tokens or MAX_OUTPUT_TOKENS):
-        text, cut = await _ask_once(session, messages, temperature, sent, budget)
-        if not cut:
-            llm_reply.needed(MODEL_NAME, budget)
-            break
+    async with llm_reply.first_request_settles(MODEL_NAME):
+        for budget in llm_reply.budgets(MODEL_NAME, max_tokens or MAX_OUTPUT_TOKENS):
+            text, cut = await _ask_once(session, messages, temperature, sent, budget)
+            if not cut:
+                llm_reply.needed(MODEL_NAME, budget)
+                break
     return text
 
 

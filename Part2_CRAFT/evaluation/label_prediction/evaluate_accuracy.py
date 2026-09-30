@@ -1055,7 +1055,7 @@ async def call_llm(
     max_tokens: int = 4096,
 ) -> Optional[str]:
     from framework import llm_reply
-    from framework.llm_reply import larger_budget, reply_text, was_cut_off
+    from framework.llm_reply import reply_text, was_cut_off
 
     url     = base_url.rstrip("/") + "/chat/completions"
     auth_value = f"Bearer {api_key}"
@@ -1073,35 +1073,43 @@ async def call_llm(
             b["temperature"] = temperature
         return b
 
-    budget = next(llm_reply.budgets(model, max_tokens))
+    async def one_reply() -> Tuple[Optional[str], bool]:
+        """One reply, climbing the budget while it is cut off: (text, whether it was)."""
+        text, cut = None, False
+        for budget in llm_reply.budgets(model, max_tokens):
+            shapes = ([_REQUEST_SHAPE[model]] if model in _REQUEST_SHAPE else _SHAPES)
+            for n, shape in enumerate(shapes):
+                async with session.post(
+                    url, headers=headers, json=body(shape, budget),
+                    timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
+                ) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        break
+                    detail = (await resp.text())[:200]
+                    # Only a parameter refusal is worth another shape.
+                    if resp.status in (400, 422) and n + 1 < len(shapes):
+                        continue
+                    raise RuntimeError(f"HTTP {resp.status}: {detail}")
+            _REQUEST_SHAPE.setdefault(model, shape)
+            choice = data["choices"][0]
+            text, cut = reply_text(choice["message"]), was_cut_off(choice)
+            # A reasoning model can spend the whole budget on hidden reasoning;
+            # the reply says so, and is asked for again with more.
+            if not cut:
+                llm_reply.needed(model, budget)
+                break
+        return text, cut
+
+    # The attempts are for errors and empty replies; the budget climb happens
+    # inside one attempt, so it does not use them up. Until the model has
+    # answered once, its first request goes out alone and the rest of a batch
+    # waits for the budget it needed.
     for attempt in range(4):
         async with semaphore:
             try:
-                shapes = ([_REQUEST_SHAPE[model]] if model in _REQUEST_SHAPE else _SHAPES)
-                for n, shape in enumerate(shapes):
-                    async with session.post(
-                        url, headers=headers, json=body(shape, budget),
-                        timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
-                    ) as resp:
-                        if resp.status == 200:
-                            data = await resp.json()
-                            break
-                        detail = (await resp.text())[:200]
-                        # Only a parameter refusal is worth another shape.
-                        if resp.status in (400, 422) and n + 1 < len(shapes):
-                            continue
-                        raise RuntimeError(f"HTTP {resp.status}: {detail}")
-                _REQUEST_SHAPE.setdefault(model, shape)
-                choice = data["choices"][0]
-                # A reasoning model can spend the whole budget on hidden
-                # reasoning; the reply says so, and is asked for again with more.
-                if was_cut_off(choice):
-                    bigger = larger_budget(budget)
-                    if bigger is not None:
-                        budget = bigger
-                        continue
-                llm_reply.needed(model, budget)
-                content = reply_text(choice["message"])
+                async with llm_reply.first_request_settles(model):
+                    content, _ = await one_reply()
                 if content:
                     return content
                 logger.warning("Empty content on attempt %d, retrying", attempt + 1)

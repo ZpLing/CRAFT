@@ -13,7 +13,9 @@ Two things differ between models, and neither is decided by the model's name:
     "length". A cut-off reply is requested again with twice the budget, up to
     MAX_TOKENS_CEILING, so a model that needs a larger budget gets one without
     being listed anywhere. The budget that answered is remembered per model, and
-    that model's later requests start from it.
+    that model's later requests start from it. Until a model has answered once,
+    its first request goes out alone, so a concurrent batch does not repeat the
+    climb once per request.
 
 Environment:
     CRAFT_MAX_TOKENS_CEILING   largest budget a request is raised to (default 32000)
@@ -22,7 +24,9 @@ Environment:
 from __future__ import annotations
 
 import os
-from typing import Any, Dict, Iterator, Optional
+import asyncio
+from contextlib import asynccontextmanager
+from typing import Any, Dict, Iterator, Optional, Tuple
 
 MAX_TOKENS_CEILING: int = int(os.getenv("CRAFT_MAX_TOKENS_CEILING", "32000"))
 
@@ -70,7 +74,40 @@ def budgets(model: str, base: int) -> Iterator[int]:
     budget = max(base, _NEEDED.get(model, 0))
     while budget is not None:
         yield budget
-        budget = larger_budget(budget)
+        nxt = larger_budget(budget)
+        # Another request may have learned a larger budget meanwhile.
+        budget = None if nxt is None else max(nxt, _NEEDED.get(model, 0))
+
+
+# One request per model goes out first. Until a model has answered once, a batch
+# sent concurrently would start every request at the base budget and climb each
+# of them separately; the others wait here for the first, then start from the
+# budget it needed. Keyed by event loop as well, since each asyncio.run is new.
+_FIRST: Dict[Tuple[int, str], asyncio.Event] = {}
+
+
+@asynccontextmanager
+async def first_request_settles(model: str):
+    """Hold a request until this model's first request has come back.
+
+    The first caller for a model goes straight through; the others wait until
+    it finishes, whether it answered or failed. Once a model has answered,
+    nobody waits.
+    """
+    if model in _NEEDED:
+        yield
+        return
+    key = (id(asyncio.get_running_loop()), model)
+    done = _FIRST.get(key)
+    if done is None:
+        done = _FIRST[key] = asyncio.Event()
+        try:
+            yield
+        finally:
+            done.set()
+    else:
+        await done.wait()
+        yield
 
 
 def needed(model: str, budget: int) -> None:

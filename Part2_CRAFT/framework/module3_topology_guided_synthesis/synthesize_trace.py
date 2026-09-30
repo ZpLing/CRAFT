@@ -597,30 +597,31 @@ async def generate_reasoning_trace(
     """
     base = max_tokens or RESPONSE_TOKENS
     choice, budget = None, base
-    for budget in llm_reply.budgets(model, base):
-        API_CALLS["count"] += 1
-        payload = {
-            "model": model,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": REQUEST_TEMPERATURE,
-            "max_tokens": budget,
-        }
-        async with session.post(
-            CHAT_COMPLETIONS_URL,
-            json=payload,
-            headers=HEADERS,
-            timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
-        ) as resp:
-            if resp.status != 200:
-                detail = await resp.text()
-                raise RuntimeError(f"HTTP {resp.status}: {detail[:200]}")
-            data = await resp.json()
-        choice = data["choices"][0]
-        if not was_cut_off(choice):
-            llm_reply.needed(model, budget)
-            return reply_text(choice["message"])
+    async with llm_reply.first_request_settles(model):
+        for budget in llm_reply.budgets(model, base):
+            API_CALLS["count"] += 1
+            payload = {
+                "model": model,
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": REQUEST_TEMPERATURE,
+                "max_tokens": budget,
+            }
+            async with session.post(
+                CHAT_COMPLETIONS_URL,
+                json=payload,
+                headers=HEADERS,
+                timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
+            ) as resp:
+                if resp.status != 200:
+                    detail = await resp.text()
+                    raise RuntimeError(f"HTTP {resp.status}: {detail[:200]}")
+                data = await resp.json()
+            choice = data["choices"][0]
+            if not was_cut_off(choice):
+                llm_reply.needed(model, budget)
+                return reply_text(choice["message"])
     # Cut off at the ceiling too. The text is returned -- a step that stops
     # early is still something the caller's own checks (the \\boxed{} on a
     # final step, the label on a logical one) can act on -- but it is counted
