@@ -66,17 +66,27 @@ def budgets(model: str, base: int) -> Iterator[int]:
     """The budgets to try for one request, smallest first: the larger of base and
     what this model has needed before, then doubling up to MAX_TOKENS_CEILING.
 
-    The caller makes one request per budget until a reply is not cut off, and
-    calls needed(model, budget) with the budget that answered. Used as a loop
+    The caller makes one request per budget and stops asking once a reply is
+    not cut off (calling needed(model, budget) with it). Asking for the next
+    budget means the last one was cut off, which is recorded as the model's
+    need, so no request of that model climbs past it again. Used as a loop
     inside one request, so a retry wrapper around the request does not repeat
     the climb for every step of it.
     """
     budget = max(base, _NEEDED.get(model, 0))
     while budget is not None:
         yield budget
+        # The caller came back for more, so a reply at this budget was cut off:
+        # the model needs at least the next one. Recorded now, not only once a
+        # reply fits, so a retry after an error, or another request of the same
+        # model, starts where this climb got to instead of at the base.
         nxt = larger_budget(budget)
+        if nxt is None:
+            needed(model, budget)       # cut off at the ceiling: never climb again
+            return
+        needed(model, nxt)
         # Another request may have learned a larger budget meanwhile.
-        budget = None if nxt is None else max(nxt, _NEEDED.get(model, 0))
+        budget = max(nxt, _NEEDED.get(model, 0))
 
 
 # One request per model goes out first. Until a model has answered once, a batch

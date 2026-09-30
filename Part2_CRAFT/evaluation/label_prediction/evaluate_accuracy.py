@@ -1109,9 +1109,14 @@ async def call_llm(
         async with semaphore:
             try:
                 async with llm_reply.first_request_settles(model):
-                    content, _ = await one_reply()
+                    content, cut = await one_reply()
                 if content:
                     return content
+                if cut:
+                    # Empty even at the largest budget: asking again would only
+                    # repeat the same request at the same budget.
+                    logger.warning("Reply still cut off at the largest budget; giving up")
+                    return None
                 logger.warning("Empty content on attempt %d, retrying", attempt + 1)
             except Exception as e:
                 logger.warning("Attempt %d: %s", attempt + 1, e)
