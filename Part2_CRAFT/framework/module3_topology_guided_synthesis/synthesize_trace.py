@@ -1986,8 +1986,13 @@ async def synthesize_trace_rkg(
         if (prior_mode == "follow" and domain == "logical" and _mv_label
                 and synthesized_text and generated_steps
                 and pred_label and pred_label != _mv_label):
-            last = generated_steps[-1]
-            cut = synthesized_text.rfind(last)
+            # The closing step is the last "Step N:" one; a bare "Final
+            # conclusion: X" suffix appended after it is dropped with it.
+            k = len(generated_steps) - 1
+            while k > 0 and not re.match(r"\s*Step\s*\d+", generated_steps[k]):
+                k -= 1
+            last = generated_steps[k]
+            cut = synthesized_text.rfind(last) if last.strip() else -1
             if cut >= 0:
                 head = synthesized_text[:cut].rstrip()
                 _lbl_m = re.match(r"\s*(Step\s*\d+\s*:)", last)
@@ -2004,9 +2009,15 @@ async def synthesize_trace_rkg(
                     "Output ONLY that final step."
                 )
                 fixed = await generate_reasoning_trace(session, retarget, model)
-                if fixed and _extract_answer(fixed) == _mv_label:
-                    synthesized_text = head + "\n" + fixed.strip()
-                    generated_steps[-1] = fixed.strip()
+                # Only a real step replaces the old one: a reply that is a bare
+                # marker, or not a "Step N:" step at all, would throw away the
+                # trace's closing reasoning, so the chain's ending stands.
+                fixed = (fixed or "").strip()
+                if (_extract_answer(fixed) == _mv_label
+                        and re.match(r"Step\s*\d+\s*:", fixed)
+                        and len(_LABEL_RE_LOCAL.sub("", fixed).split()) >= 12):
+                    synthesized_text = (head + "\n" + fixed) if head else fixed
+                    generated_steps[k:] = [fixed]
                     pred_label = _mv_label
 
         if pred_label and not _has_conclusion(synthesized_text):
