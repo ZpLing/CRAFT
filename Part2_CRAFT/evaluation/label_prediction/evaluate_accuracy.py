@@ -1411,32 +1411,29 @@ async def run_setting_icl(
 # cells. This map is the one place that says which file each cell reports
 # from; the export fails rather than falling back if that file is missing.
 #
-# (dataset, model) -> (cell directory under --runs, file, how it was run).
-# The 2026-09-23 run: the atomic synthesizer for every cell; ProofWriter goes
-# through the closed-world recheck with its proof search written back as
-# steps; gpt's ProofWriter trace is then restated with its answer pinned;
-# gemini's mathematics has the adjudicator's derivation written back as steps
-# and opens with the problem's own statement of the goal.
-REPORTED_CELLS = {
-    ("FLD", "gemini-3.1-flash-lite"):
-        ("FLDgem", "synth", "prior_mode=verify"),
-    ("FLD", "gpt-5.4-nano"):
-        ("FLDgpt", "synth", "prior_mode=follow"),
-    ("ProofWriter", "gemini-3.1-flash-lite"):
-        ("PWgem", "cwa_resolve",
-         "prior_mode=verify, weight_by=gold_depth, cwa_recheck (integrated), cwa_resolve"),
-    ("ProofWriter", "gpt-5.4-nano"):
-        ("PWgpt", "polish",
-         "prior_mode=verify, weight_by=gold_depth, cwa_recheck (integrated), cwa_resolve, polish two3"),
-    ("OmniMATH", "gemini-3.1-flash-lite"):
-        ("OMgem", "adj_goal", "prior_mode=verify, adjudication (integrated), goal stated"),
-    ("OmniMATH", "gpt-5.4-nano"):
-        ("OMgpt", "synth", "prior_mode=follow"),
-    ("OlympiadBench", "gemini-3.1-flash-lite"):
-        ("OBgem", "adj_goal", "prior_mode=verify, adjudication (integrated), goal stated"),
-    ("OlympiadBench", "gpt-5.4-nano"):
-        ("OBgpt", "synth", "prior_mode=follow"),
+# (dataset, model) -> (cell directory under --runs, file stem, how it was run).
+# How a cell is run is not restated here: it is cells.py's Cell.describe(), the
+# same definition run_cell.py builds the cell's commands from. What stays here
+# is where the 2026-09-23 run left each cell's reported file, whose folders and
+# stems predate run_cell.py (Module III wrote synth.json there; a run_cell.py
+# directory holds <Cell.reported_stem>.json instead).
+from cells import CELLS  # noqa: E402  (Part2_CRAFT is on sys.path, see Config above)
+
+_REPORTED_RUNS = {
+    ("FLD", "gemini-3.1-flash-lite"):           ("FLDgem", "synth"),
+    ("FLD", "gpt-5.4-nano"):                    ("FLDgpt", "synth"),
+    ("ProofWriter", "gemini-3.1-flash-lite"):   ("PWgem", "cwa_resolve"),
+    ("ProofWriter", "gpt-5.4-nano"):            ("PWgpt", "polish"),
+    ("OmniMATH", "gemini-3.1-flash-lite"):      ("OMgem", "adj_goal"),
+    ("OmniMATH", "gpt-5.4-nano"):               ("OMgpt", "synth"),
+    ("OlympiadBench", "gemini-3.1-flash-lite"): ("OBgem", "adj_goal"),
+    ("OlympiadBench", "gpt-5.4-nano"):          ("OBgpt", "synth"),
 }
+if set(_REPORTED_RUNS) != set(CELLS):
+    raise RuntimeError("evaluate_accuracy._REPORTED_RUNS and cells.CELLS name different cells: "
+                       f"{sorted(set(_REPORTED_RUNS) ^ set(CELLS))}")
+REPORTED_CELLS = {key: (run, stem, CELLS[key].describe())
+                  for key, (run, stem) in _REPORTED_RUNS.items()}
 
 _STEP_HEAD_RE = re.compile(r"(?m)^\s*Step\s*\d+\s*[:.\-]\s*")
 
