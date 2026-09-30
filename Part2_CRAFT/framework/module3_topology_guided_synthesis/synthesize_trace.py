@@ -783,7 +783,7 @@ _ECHOED_HEADER = re.compile(
     re.IGNORECASE)
 
 
-def resolve_prior_mode(prior_mode: str, domain: str, mv_strength: Optional[float]) -> str:
+def resolve_prior_mode(prior_mode: str, domain: str, unanimous: bool) -> str:
     """The prior mode one sample is synthesised under.
 
     "auto": on a logical problem, a vote all K traces agree on is settled
@@ -794,7 +794,6 @@ def resolve_prior_mode(prior_mode: str, domain: str, mv_strength: Optional[float
     """
     if prior_mode != "auto":
         return prior_mode
-    unanimous = mv_strength is not None and mv_strength >= 1.0 - 1e-9
     return "follow" if domain == "logical" and unanimous else "verify"
 
 
@@ -1573,6 +1572,7 @@ async def synthesize_trace_rkg(
     _mv_label:  Optional[str] = None   # logical domain
     _mv_answer: Optional[str] = None   # math domain
     _mv_strength: Optional[float] = None  # share of the weighted vote behind _mv_label
+    _mv_unanimous = False                 # all K traces state the same label
     _all_traces = sample.get("cleaned_traces") or sample.get("traces", [])
 
     # The weight Module II gave each trace when it built the consensus. This
@@ -1611,23 +1611,33 @@ async def synthesize_trace_rkg(
                 _mv_answer = max(_ans_counts, key=_ans_counts.get)
         else:
             _label_counts: Dict[str, int] = {}
+            _raw_labels: List[Optional[str]] = []   # one per trace, unweighted
             for _t in _all_traces:
                 _lbl = _t.get("label")
                 if _lbl and _lbl in ("__PROVED__", "__DISPROVED__"):
                     _label_counts[_lbl] = _label_counts.get(_lbl, 0) + _weight_of(_t)
+                    _raw_labels.append(_lbl)
                     continue
                 _txt = (_t.get("reasoning_text") or "") + " " + (_t.get("raw_response") or "")
                 _ms = re.findall(r"__(PROVED|DISPROVED)__", _txt, re.IGNORECASE)
                 if _ms:
                     _lbl = f"__{_ms[-1].upper()}__"
                     _label_counts[_lbl] = _label_counts.get(_lbl, 0) + _weight_of(_t)
+                    _raw_labels.append(_lbl)
+                else:
+                    _raw_labels.append(None)
+            # Unanimous: every one of the K traces states the same label. Not
+            # read off the weighted share, which skips unlabelled traces and a
+            # dissenting trace of weight zero.
+            _mv_unanimous = (bool(_raw_labels) and None not in _raw_labels
+                             and len(set(_raw_labels)) == 1)
             if _label_counts:
                 _mv_label = max(_label_counts, key=_label_counts.get)
                 _total = sum(_label_counts.values())
                 if _total > 0:
                     _mv_strength = _label_counts[_mv_label] / _total
 
-    prior_mode = resolve_prior_mode(prior_mode, domain, _mv_strength)
+    prior_mode = resolve_prior_mode(prior_mode, domain, _mv_unanimous)
 
     consensus_rkg = break_cycles_by_weight(consensus_rkg)
     topo_order = topological_sort_rkg(consensus_rkg)
