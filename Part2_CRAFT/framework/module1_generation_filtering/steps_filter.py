@@ -7,13 +7,7 @@ traces, and drops the steps below gamma. The --method rkg pass belongs to the
 same stage but runs after Module II, pruning steps against the consensus graph.
 Steps Filtering (Module I): z-score filtering of reasoning steps against the consensus terms T_Con, following GRPO's group-relative comparison.
 
-Two detection methods are provided:
-
-Method 1: supervised (same-position comparison)
-- Compares steps at the same position across traces (requires matching step counts)
-- Stricter, suitable when trace lengths are consistent
-
-Method 2: unsupervised (cross-position comparison, GRPO-style)
+Method unsupervised (cross-position comparison, GRPO-style):
 - Cross-position comparison across traces (no alignment required)
 - More flexible for variable-length traces
 - Uses group relative policy optimization (GRPO) style relative comparison
@@ -104,132 +98,6 @@ def parse_steps_from_trace(trace: Dict[str, Any]) -> List[Dict[str, Any]]:
             })
 
     return parsed_steps
-
-
-def extract_step_terms(
-    step_text: str,
-    all_step_documents: List[List[str]],
-    min_tf: float = 0.001,
-    min_idf: float = 0.1,
-    min_tfidf: float = 0.0,
-    domain: str = "logical",
-    df_table: Optional[DocFreqTable] = None,
-) -> List[str]:
-    """Extract important terms for a single step (domain-aware).
-
-    df_table: when given, IDF is scored against that table (FlatDocFreqTable for
-    --idf_scope none) and all_step_documents is ignored; when None, IDF comes from
-    all_step_documents, i.e. the within-sample setting.
-    """
-    if not step_text:
-        return []
-
-    tokens = tokenize_text(step_text, domain=domain)
-    if not tokens:
-        return []
-
-    tf_dict = calculate_tf(tokens)
-    common_filter = MATH_COMMON_WORDS if domain == "math" else COMMON_LOGICAL_WORDS
-
-    step_terms = []
-    for term, tf_value in tf_dict.items():
-        if tf_value < min_tf:
-            continue
-        # math: do not filter MATH:/EQ: prefix tokens; filter operation words via common_filter
-        if not (domain == "math" and (term.startswith("MATH:") or term.startswith("EQ:"))):
-            if term in common_filter:
-                continue
-
-        idf = (df_table.idf(term) if df_table is not None
-               else calculate_idf(all_step_documents, term))
-        if idf < min_idf:
-            continue
-
-        tfidf_score = tf_value * idf
-        if tfidf_score < min_tfidf:
-            continue
-
-        step_terms.append((term, tfidf_score))
-
-    step_terms.sort(key=lambda x: x[1], reverse=True)
-    return [term for term, _ in step_terms[:20]]
-
-
-def extract_terms_for_all_steps(
-    sample_traces: List[Dict[str, Any]],
-    min_tf: float = 0.001,
-    min_idf: float = 0.1,
-    min_tfidf: float = 0.0,
-    domain: str = "logical",
-    df_table: Optional[DocFreqTable] = None,
-    idf_norm: bool = False,
-) -> Dict[int, List[Dict[str, Any]]]:
-    """
-    Extract terms for all steps across all traces in a sample.
-
-    Returns:
-        Dict[step_number, List[Dict]]:
-        {
-            step_number: [
-                {
-                    "trace_idx": int,
-                    "step_text": str,
-                    "terms": List[str],
-                    "terms_set": Set[str]
-                },
-                ...
-            ]
-        }
-    """
-    # Step 1: collect all step texts (for IDF computation)
-    all_step_texts = []
-    all_steps_by_number = defaultdict(list)
-
-    for trace_idx, trace in enumerate(sample_traces):
-        parsed_steps = parse_steps_from_trace(trace)
-        for step_info in parsed_steps:
-            step_number = step_info["step_number"]
-            step_text = step_info["step_text"]
-
-            if step_text:
-                all_step_texts.append(step_text)
-                all_steps_by_number[step_number].append({
-                    "trace_idx": trace_idx,
-                    "step_text": step_text,
-                })
-
-    # Under --idf_scope none df_table is the flat table; otherwise build this sample's
-    # own, which is the within-sample setting. Either way the terms below are scored
-    # against a table, so no raw document list needs to reach them.
-    if df_table is None:
-        df_table = DocFreqTable.from_documents(
-            [tokenize_text(text, domain=domain) for text in all_step_texts],
-            normalize=idf_norm,
-        )
-
-    # Step 2: extract terms for each step
-    steps_with_terms = defaultdict(list)
-
-    for step_number, step_list in all_steps_by_number.items():
-        for step_info in step_list:
-            terms = extract_step_terms(
-                step_info["step_text"],
-                [],
-                min_tf=min_tf,
-                min_idf=min_idf,
-                min_tfidf=min_tfidf,
-                domain=domain,
-                df_table=df_table,
-            )
-
-            steps_with_terms[step_number].append({
-                "trace_idx": step_info["trace_idx"],
-                "step_text": step_info["step_text"],
-                "terms": terms,
-                "terms_set": set(terms),
-            })
-
-    return steps_with_terms
 
 
 def jaccard_similarity(set1: Set[str], set2: Set[str]) -> float:
@@ -324,74 +192,6 @@ def compute_sample_consensus_core(
     return consensus_core
 
 
-def detect_anomalous_steps_supervised(
-    steps_with_terms: Dict[int, List[Dict[str, Any]]],
-    similarity_threshold: float = 0.3,
-) -> Set[Tuple[int, int]]:
-    """
-    Detect anomalous steps (Method 1: same-position comparison).
-
-    Requires one-to-one step correspondence across traces
-    (only compares steps with the same step_number).
-
-    Args:
-        steps_with_terms: step info for each step_number across all traces
-        similarity_threshold: steps below this similarity are filtered out
-
-    Returns:
-        Set[Tuple[step_number, trace_idx]]: anomalous steps
-    """
-    """
-    Detect anomalous steps.
-
-    Args:
-        steps_with_terms: step info for each step_number across all traces
-        similarity_threshold: steps below this similarity are filtered out
-
-    Returns:
-        Set[Tuple[step_number, trace_idx]]: anomalous steps
-    """
-    anomalous_steps = set()
-
-    for step_number, step_list in steps_with_terms.items():
-        if len(step_list) < 2:
-            # Only one trace has this step — cannot compare, skip
-            continue
-
-        # For each trace's step, check similarity against other traces' steps
-        for i, step_i in enumerate(step_list):
-            trace_idx_i = step_i["trace_idx"]
-            terms_set_i = step_i["terms_set"]
-
-            if not terms_set_i:
-                # Nothing to compare: the tokenizer produced no terms for this step, which
-                # says the step could not be measured, not that it is anomalous. A logical
-                # step written purely in symbols, or a math step written purely in prose,
-                # lands here through no fault of its own, so it is kept and left unscored.
-                continue
-
-            # Compute similarity against other traces
-            max_similarity = 0.0
-
-            for j, step_j in enumerate(step_list):
-                if i == j:
-                    continue
-
-                terms_set_j = step_j["terms_set"]
-                if not terms_set_j:
-                    continue
-
-                # Compute Jaccard similarity
-                similarity = jaccard_similarity(terms_set_i, terms_set_j)
-                max_similarity = max(max_similarity, similarity)
-
-            # If max similarity is below threshold, flag as anomalous
-            if max_similarity < similarity_threshold:
-                anomalous_steps.add((step_number, trace_idx_i))
-
-    return anomalous_steps
-
-
 def extract_step_terms_with_tfidf(
     step_text: str,
     all_step_documents: List[List[str]],
@@ -403,7 +203,9 @@ def extract_step_terms_with_tfidf(
 ) -> Tuple[List[str], Dict[str, float]]:
     """Extract important terms and their TF-IRF scores for a single step (domain-aware).
 
-    df_table follows the same convention as extract_step_terms().
+    df_table: when given, IDF is scored against that table (FlatDocFreqTable for
+    --idf_scope none) and all_step_documents is ignored; when None, IDF comes from
+    all_step_documents, i.e. the within-sample setting.
     """
     if not step_text:
         return [], {}
@@ -750,7 +552,10 @@ def detect_anomalous_steps_unsupervised(
             tfidf_i = step_i.get("tfidf_scores", {})
 
             if not terms_set_i:
-                # Unscoreable, not anomalous — see the note in the supervised detector.
+                # Nothing to compare: the tokenizer produced no terms for this step, which
+                # says the step could not be measured, not that it is anomalous. A logical
+                # step written purely in symbols, or a math step written purely in prose,
+                # lands here through no fault of its own, so it is kept and left unscored.
                 continue
 
             if use_weighted_similarity and tfidf_i:
@@ -808,7 +613,7 @@ def detect_anomalous_steps_unsupervised(
             tfidf_i = step_i.get("tfidf_scores", {})
 
             if not terms_set_i:
-                # Unscoreable, not anomalous — see the note in the supervised detector.
+                # Unscoreable, not anomalous — see the note in the GRPO branch above.
                 continue
 
             similarities = []
@@ -1186,7 +991,7 @@ def process_sample(
     min_idf: float = 0.1,
     min_tfidf: float = 0.0,
     similarity_threshold: float = 0.3,
-    method: str = "supervised",
+    method: str = "unsupervised",
     min_similar_steps: int = 2,
     use_grpo_optimization: bool = True,
     z_score_threshold: Optional[float] = None,
@@ -1215,7 +1020,7 @@ def process_sample(
 
     Args:
         sample: sample data dict
-        method: "supervised" | "unsupervised" | "rkg"
+        method: "unsupervised" | "rkg"
         sample_rkg: required when method="rkg"; RKG data for this sample (from build_rkg.py)
         domain: "logical" or "math"
         df_table: FlatDocFreqTable for --idf_scope none; None keeps IDF within the sample
@@ -1265,29 +1070,7 @@ def process_sample(
     n_underthinking = 0  # only populated for method="rkg"
     t_con_used: Optional[Set[str]] = None
 
-    if method == "supervised":
-        steps_with_terms_dict = extract_terms_for_all_steps(
-            traces, min_tf=min_tf, min_idf=min_idf, min_tfidf=min_tfidf, domain=domain,
-            df_table=df_table, idf_norm=idf_norm,
-        )
-        anomalous_steps = detect_anomalous_steps_supervised(
-            steps_with_terms_dict, similarity_threshold=similarity_threshold,
-        )
-        # this detector reports (step_number, trace_idx); removal takes the reverse
-        cleaned_traces = remove_anomalous_steps(
-            traces, {(t, s_) for s_, t in anomalous_steps})
-        for step_num, trace_idx in anomalous_steps:
-            step_info = next(
-                (s for s in steps_with_terms_dict.get(step_num, []) if s["trace_idx"] == trace_idx),
-                None,
-            )
-            if step_info:
-                anomalous_info.append({
-                    "step_number": step_num, "trace_idx": trace_idx,
-                    "step_text": step_info["step_text"], "terms": list(step_info["terms_set"]),
-                })
-
-    elif method == "unsupervised" and tcon == "paper":
+    if method == "unsupervised" and tcon == "paper":
         steps_info = []
         for trace_idx, trace in enumerate(traces):
             for st in parse_steps_from_trace(trace):
@@ -1377,7 +1160,7 @@ def process_sample(
         anomalous_steps = anomalous_rkg
 
     else:
-        raise ValueError(f"Unknown method: {method}. Choose 'supervised' / 'unsupervised' / 'rkg'")
+        raise ValueError(f"Unknown method: {method}. Choose 'unsupervised' / 'rkg'")
 
     # Compute statistics
     original_steps_counts = [len(parse_steps_from_trace(t)) for t in traces]
@@ -1466,7 +1249,7 @@ def main():
         default=0.0,
         help="TF-IRF importance floor; 0.0 (default) applies no floor, which is how the "
              "reported runs scored terms here. The paper's alpha=0.01 is applied at "
-             "synthesis (Module III --min_tfidf)",
+             "synthesis (Module III --alpha)",
     )
     parser.add_argument(
         "--similarity_threshold",
@@ -1478,10 +1261,10 @@ def main():
         "--method",
         type=str,
         default="unsupervised",
-        choices=["supervised", "unsupervised", "rkg"],
+        choices=["unsupervised", "rkg"],
         help="Detection method: unsupervised (default; the paper's z-score step filtering, "
-             "the only method that honours --z_score_threshold) | supervised (same-step "
-             "pairwise similarity) | rkg (structural + edge-frequency filter, requires --rkg_file)",
+             "the only method that honours --gamma) | rkg (Pass 2: structural + "
+             "edge-frequency filter against G*, requires --rkg_file)",
     )
     parser.add_argument(
         "--rkg_file",
@@ -1496,16 +1279,11 @@ def main():
         help="Minimum number of similar steps required to be considered normal (unsupervised method only, default 2)",
     )
     parser.add_argument(
-        "--use_grpo_optimization",
-        action="store_true",
-        default=True,
-        help="Whether to use GRPO optimization (unsupervised method only, default True)",
-    )
-    parser.add_argument(
         "--no_grpo_optimization",
         action="store_false",
         dest="use_grpo_optimization",
-        help="Disable GRPO optimization (use original method)",
+        default=True,
+        help="Disable GRPO optimization (use original method; legacy T_Con only)",
     )
     parser.add_argument(
         "--alpha",
@@ -1514,7 +1292,7 @@ def main():
         help="TF-IRF threshold alpha of T_Con (default: config.ALPHA)",
     )
     parser.add_argument(
-        "--gamma", "--z_score_threshold",
+        "--gamma",
         dest="gamma",
         type=float,
         default=GAMMA,
@@ -1532,12 +1310,6 @@ def main():
         default=THETA,
         help="Edge filtering threshold theta for --method rkg: a step whose incoming "
              "edge has W(e) < theta is removed (paper: 0.3)",
-    )
-    parser.add_argument(
-        "--consensus_threshold",
-        type=float,
-        default=None,
-        help="Old name that set beta and theta together; sets both when given",
     )
     parser.add_argument(
         "--tcon",
@@ -1573,8 +1345,6 @@ def main():
     )
 
     args = parser.parse_args()
-    if args.consensus_threshold is not None:
-        args.beta = args.theta = args.consensus_threshold
 
     # Read input file
     input_path = _cfg.resolve_input(args.input)
@@ -1631,7 +1401,6 @@ def main():
             method=args.method,
             min_similar_steps=args.min_similar_steps,
             use_grpo_optimization=args.use_grpo_optimization if args.method == "unsupervised" else False,
-            z_score_threshold=args.gamma,
             alpha=args.alpha,
             beta=args.beta,
             gamma=args.gamma,
@@ -1683,7 +1452,7 @@ def main():
             "tcon": args.tcon,
             "use_weighted_similarity": args.use_weighted_similarity if args.method == "unsupervised" else False,
             "overall_stats": overall_stats,
-            "note": "supervised: same-step comparison, requires one-to-one step correspondence across traces; unsupervised: cross-step comparison, GRPO-style, no alignment required; GRPO optimization: relative comparison, dynamic threshold, weighted similarity",
+            "note": "unsupervised: cross-step comparison, GRPO-style, no alignment required; GRPO optimization: relative comparison, dynamic threshold, weighted similarity",
         },
         "results": results,
     }

@@ -925,7 +925,7 @@ def main():
         default=0.0,
         help="TF-IRF importance floor; 0.0 (default) applies no floor, which is how the "
              "reported runs scored terms here. The paper's alpha=0.01 is applied at "
-             "synthesis (Module III --min_tfidf)",
+             "synthesis (Module III --alpha)",
     )
     parser.add_argument(
         "--no_prioritize_logical",

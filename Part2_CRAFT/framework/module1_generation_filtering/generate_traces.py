@@ -770,14 +770,14 @@ def parse_args() -> argparse.Namespace:
         help="Number of items to process",
     )
     parser.add_argument(
-        "--K", "--k",
+        "--K",
         dest="k",
         type=int,
         default=K,
         help="Number of traces K rolled out per sample (default: config.K)",
     )
     parser.add_argument(
-        "--T", "--temperature",
+        "--T",
         dest="temperature",
         type=float,
         default=T,
@@ -789,12 +789,6 @@ def parse_args() -> argparse.Namespace:
         dest="fixed_temp",
         help="Spread the K temperatures linearly over [T-0.3, T+0.3] instead of "
              "sampling every trace at T (the behaviour of runs before this change)",
-    )
-    parser.add_argument(
-        "--fixed_temp",
-        action="store_true",
-        dest="fixed_temp",
-        help=argparse.SUPPRESS,  # now the default; kept so old commands still parse
     )
     parser.set_defaults(fixed_temp=True)
     parser.add_argument(
