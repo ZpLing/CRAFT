@@ -73,6 +73,7 @@ _cfg  = _ilu.module_from_spec(_spec); _spec.loader.exec_module(_cfg)
 # Table 1 hyperparameters, set once in config.py
 K = _cfg.K
 T = _cfg.T
+T_SPREAD = _cfg.T_SPREAD
 
 
 OPENAI_API_KEY:  str            = _cfg.OPENAI_API_KEY
@@ -239,6 +240,50 @@ def build_reasoning_prompt_math(problem: str) -> List[Dict[str, str]]:
 # metadata as api_calls, which is where the cost of a run is read from.
 API_CALLS = {"count": 0}
 
+# Models whose API refused a temperature in this run. Their requests go out
+# without one, so the model samples at its own default. No model is listed in
+# advance: a model lands here only when its own API rejects a request that
+# carries a temperature and then accepts the same request without it. A gateway
+# that accepts any temperature (and may ignore it) never lands here.
+TEMPERATURE_REJECTED: set = set()
+
+
+def rollout_temperatures(k: int, t: float = None, spread: float = None) -> List[float]:
+    """The K rollout temperatures: evenly spaced over [t - spread, t + spread].
+
+    0.4, 0.55, 0.7, 0.85, 1.0 for the defaults K=5, T=0.7, T_SPREAD=0.3. The
+    ends are clamped to [0.3, 1.2]; spread 0, or k 1, gives t for every trace.
+    """
+    t = T if t is None else t
+    spread = T_SPREAD if spread is None else spread
+    if k <= 1 or not spread:
+        return [t] * max(k, 1)
+    lo, hi = max(0.3, t - spread), min(1.2, t + spread)
+    return [round(lo + (hi - lo) * i / (k - 1), 2) for i in range(k)]
+
+
+def _may_be_temperature_refusal(status: Optional[int], error_text: str) -> bool:
+    """Could this failure be the endpoint refusing the temperature parameter?
+
+    Worth one retry without the temperature when it is a client error (400 or
+    422, the codes an API uses for a parameter it will not take), or, where no
+    status is available, when the message names the parameter. Whether it
+    really was the temperature is settled by that retry, not by the wording,
+    so a provider that phrases the refusal differently is handled the same way.
+    """
+    if status in (400, 422):
+        return True
+    return status is None and "temperature" in (error_text or "").lower()
+
+
+def _status_of(error: Exception) -> Optional[int]:
+    """The HTTP status an API client attached to its exception, if any."""
+    for attr in ("status_code", "status", "http_status"):
+        v = getattr(error, attr, None)
+        if isinstance(v, int):
+            return v
+    return None
+
 
 @with_backoff
 async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str, str]], temperature: float = None) -> str:
@@ -264,17 +309,35 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
         data = {
             "model": MODEL_NAME,
             "messages": messages,
-            "temperature": temp,
             "max_tokens": effective_max_tokens,
             "timeout": REQUEST_TIMEOUT,
         }
+        if MODEL_NAME not in TEMPERATURE_REJECTED:
+            data["temperature"] = temp
         if OPENAI_BASE_URL:
             data["extra_body"] = {"max_output_tokens": _visible_tokens or effective_max_tokens}
         try:
-            resp = await asyncio.wait_for(
-                API_CLIENT.chat.completions.create(**data),
-                timeout=REQUEST_TIMEOUT
-            )
+            try:
+                resp = await asyncio.wait_for(
+                    API_CLIENT.chat.completions.create(**data),
+                    timeout=REQUEST_TIMEOUT
+                )
+            except Exception as e:
+                # Asked again at once without the temperature; the backoff
+                # retries would only repeat a refusal. If that succeeds the
+                # temperature was what the API refused; if not, the first error
+                # stands and the model keeps its temperature.
+                if "temperature" not in data or not _may_be_temperature_refusal(_status_of(e), str(e)):
+                    raise
+                retry = {k: v for k, v in data.items() if k != "temperature"}
+                try:
+                    resp = await asyncio.wait_for(
+                        API_CLIENT.chat.completions.create(**retry),
+                        timeout=REQUEST_TIMEOUT
+                    )
+                except Exception:
+                    raise e
+                TEMPERATURE_REJECTED.add(MODEL_NAME)
             if isinstance(resp, str):
                 raise RuntimeError(f"{MODEL_NAME} API returned a string instead of a response object: {resp[:200]}")
             if not hasattr(resp, 'choices') or not resp.choices:
@@ -294,26 +357,38 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
         payload = {
             "model": MODEL_NAME,
             "messages": messages,
-            "temperature": temp,
             "max_tokens": effective_max_tokens,
         }
+        if MODEL_NAME not in TEMPERATURE_REJECTED:
+            payload["temperature"] = temp
         if _visible_tokens:
             payload["max_output_tokens"] = _visible_tokens
-        async with session.post(
-            "https://api.openai.com/v1/chat/completions",
-            json=payload,
-            headers=HEADERS,
-            timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
-        ) as resp:
-            if resp.status != 200:
+        first_error = None
+        for body in (payload, {k: v for k, v in payload.items() if k != "temperature"}):
+            async with session.post(
+                "https://api.openai.com/v1/chat/completions",
+                json=body,
+                headers=HEADERS,
+                timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    if first_error is not None:
+                        TEMPERATURE_REJECTED.add(MODEL_NAME)
+                    break
                 detail = await resp.text()
-                raise RuntimeError(f"{MODEL_NAME} HTTP {resp.status}: {detail[:150]}")
-            data = await resp.json()
-            msg = data["choices"][0]["message"]
-            # o4-mini / deepseek-r1 put reasoning in reasoning_content, not content
-            if MODEL_NAME in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1"):
-                return (msg.get("reasoning_content") or msg.get("content") or "").strip()
-            return (msg.get("content") or "").strip()
+                if first_error is None:
+                    first_error = RuntimeError(f"{MODEL_NAME} HTTP {resp.status}: {detail[:150]}")
+                    # Same rule as above: one retry without the temperature,
+                    # and only a success there marks the model.
+                    if "temperature" in payload and _may_be_temperature_refusal(resp.status, detail):
+                        continue
+                raise first_error
+        msg = data["choices"][0]["message"]
+        # o4-mini / deepseek-r1 put reasoning in reasoning_content, not content
+        if MODEL_NAME in ("o4-mini", "o4-mini-2025-04-16", "deepseek-r1"):
+            return (msg.get("reasoning_content") or msg.get("content") or "").strip()
+        return (msg.get("content") or "").strip()
 
 #########################
 # Core generation logic
@@ -447,28 +522,25 @@ async def generate_single_trace(
     base_temperature: float = T,
     max_retries: int = 3,
     domain: str = "logical",
-    fixed_temp: bool = True,
+    spread: float = T_SPREAD,
 ) -> Optional[Dict[str, Any]]:
     """Generate a single reasoning trace.
 
     Args:
         trace_idx: Index of the current trace (0-based)
         k: Total number of traces to generate
-        base_temperature: Base temperature (used directly when fixed_temp=True)
+        base_temperature: T, the centre of the K rollout temperatures
         max_retries: Maximum number of retry attempts
         domain: "logical" or "math"
-        fixed_temp: True → all traces use the same temperature (base_temperature), disables linear spacing
+        spread: the K temperatures are spaced over [T - spread, T + spread];
+            0 samples every trace at T (see rollout_temperatures)
 
     Returns:
-        Generated trace dict, or None on failure
+        Generated trace dict, or None on failure. Its "temperature" is the one
+        the request carried, or None when the model's API refused a temperature
+        and the trace was sampled at the model's default.
     """
-    if fixed_temp or k == 1:
-        temperature = base_temperature
-    else:
-        # Arithmetic sampling: k traces uniformly cover [t_min, t_max]
-        t_min = max(0.3, base_temperature - 0.3)
-        t_max = min(1.2, base_temperature + 0.3)
-        temperature = round(t_min + (t_max - t_min) * trace_idx / (k - 1), 2)
+    temperature = rollout_temperatures(k, base_temperature, spread)[trace_idx]
 
     if domain == "math":
         messages = build_reasoning_prompt_math(problem_text)
@@ -497,7 +569,7 @@ async def generate_single_trace(
 
             return {
                 "trace_idx": trace_idx,
-                "temperature": temperature,
+                "temperature": None if MODEL_NAME in TEMPERATURE_REJECTED else temperature,
                 "reasoning_steps": steps,
                 "reasoning_text": reasoning_text,
                 "label": label,
@@ -519,7 +591,7 @@ async def generate_k_traces_for_sample(
     k: int,
     base_temperature: float = T,
     domain: Optional[str] = None,
-    fixed_temp: bool = True,
+    spread: float = T_SPREAD,
 ) -> Dict[str, Any]:
     """Generate k reasoning traces for a single sample."""
     problem_text = sample_entry["problem_text"]
@@ -528,7 +600,7 @@ async def generate_k_traces_for_sample(
 
     tasks = [
         generate_single_trace(session, problem_text, trace_idx, k, base_temperature,
-                              domain=sample_domain, fixed_temp=fixed_temp)
+                              domain=sample_domain, spread=spread)
         for trace_idx in range(k)
     ]
     traces_results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -570,7 +642,7 @@ async def generate_k_traces_dataset(
     concurrency: int,
     base_temperature: float = T,
     domain: str = "logical",
-    fixed_temp: bool = True,
+    spread: float = T_SPREAD,
 ) -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
     """Process all samples in batch, generating k traces per sample.
 
@@ -594,7 +666,7 @@ async def generate_k_traces_dataset(
                     # Per-sample domain: read from sample_entry, do not pass global domain parameter
                     results[idx] = await generate_k_traces_for_sample(
                         session, entry, k, base_temperature, domain=domain,
-                        fixed_temp=fixed_temp
+                        spread=spread
                     )
                 except Exception as e:
                     results[idx] = {
@@ -636,6 +708,12 @@ async def generate_k_traces_dataset(
         "metadata": {
             "model": MODEL_NAME,
             "temperature": base_temperature,
+            "temperature_spread": spread,
+            # What the requests carried; a model whose API refused a
+            # temperature was sampled at its default instead.
+            "rollout_temperatures": (None if MODEL_NAME in TEMPERATURE_REJECTED
+                                     else rollout_temperatures(k, base_temperature, spread)),
+            "temperature_rejected": MODEL_NAME in TEMPERATURE_REJECTED,
             "k": k,
             "api_calls": API_CALLS["count"],
             "statistics": statistics,
@@ -781,16 +859,18 @@ def parse_args() -> argparse.Namespace:
         dest="temperature",
         type=float,
         default=T,
-        help="Sampling temperature T of every trace (default: config.T)",
+        help="Centre T of the K rollout temperatures (default: config.T)",
     )
     parser.add_argument(
-        "--spread_temp",
-        action="store_false",
-        dest="fixed_temp",
-        help="Spread the K temperatures linearly over [T-0.3, T+0.3] instead of "
-             "sampling every trace at T (the behaviour of runs before this change)",
+        "--T_spread",
+        dest="spread",
+        type=float,
+        default=T_SPREAD,
+        help="The K temperatures are spaced evenly over [T - spread, T + spread] "
+             "(default: config.T_SPREAD, 0.3, which gives 0.4 ... 1.0 for K=5); "
+             "0 samples every trace at T. A model whose API refuses a "
+             "temperature is sampled at its default.",
     )
-    parser.set_defaults(fixed_temp=True)
     parser.add_argument(
         "--domain",
         type=str,
@@ -842,13 +922,7 @@ def main() -> None:
     print(f"Model: {MODEL_NAME}")
     print(f"Samples loaded: {len(samples)}")
     print(f"Traces per sample: {args.k}")
-    if args.fixed_temp:
-        temp_desc = f"fixed {args.temperature}"
-    else:
-        t_min = max(0.3, args.temperature - 0.3)
-        t_max = min(1.2, args.temperature + 0.3)
-        temp_desc = f"linear [{t_min:.2f} -> {t_max:.2f}] (base±0.3)"
-    print(f"Temperature mode: {temp_desc}")
+    print(f"Rollout temperatures: {rollout_temperatures(args.k, args.temperature, args.spread)}")
     print(f"Concurrency: {args.concurrency}")
     print(f"Reasoning domain (per-sample, auto-detected): {domain_counts}")
     print(f"Output file: {output_path}")
@@ -861,7 +935,7 @@ def main() -> None:
             concurrency=args.concurrency,
             base_temperature=args.temperature,
             domain=args.domain,
-            fixed_temp=args.fixed_temp,
+            spread=args.spread,
         )
     )
 

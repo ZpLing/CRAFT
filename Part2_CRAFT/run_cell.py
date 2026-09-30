@@ -63,7 +63,7 @@ TAKES_CONCURRENCY = {"generate_traces.py", "build_rkg.py", "synthesize_trace.py"
 def hyperparameters() -> Dict[str, object]:
     """The Algorithm 1 values every stage defaults to, as this run resolves them."""
     return {name: getattr(_cfg, name) for name in
-            ("K", "T", "ALPHA", "BETA", "GAMMA", "LAMBDA", "THETA", "ATOMIC_STEPS")}
+            ("K", "T", "T_SPREAD", "ALPHA", "BETA", "GAMMA", "LAMBDA", "THETA", "ATOMIC_STEPS")}
 
 
 def dataset_path(cell: Cell) -> Path:

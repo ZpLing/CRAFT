@@ -203,8 +203,10 @@ python evaluation/label_prediction/evaluate_accuracy.py export
 ```
 
 All experiments use the same hyperparameters (§3.2): Module I `K=5`, `T=0.7`, `α=0.01`,
-`β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`. They are defined once in
-`Part2_CRAFT/config.py` (`K`, `T`, `ALPHA`, `BETA`, `GAMMA`, `LAMBDA`, `THETA`, and
+`β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`. The K rollout temperatures are spaced
+evenly around `T` (`T_SPREAD=0.3`, so 0.4, 0.55, 0.7, 0.85, 1.0); a model whose API refuses
+a temperature is sampled at its default. They are defined once in
+`Part2_CRAFT/config.py` (`K`, `T`, `T_SPREAD`, `ALPHA`, `BETA`, `GAMMA`, `LAMBDA`, `THETA`, and
 `ATOMIC_STEPS` for the Module III prompt) and every stage takes its defaults from there,
 so a stage run without flags uses them. One variable changes a value everywhere for a
 run, e.g. `CRAFT_THETA=0.25` or `CRAFT_ATOMIC_STEPS=0`.

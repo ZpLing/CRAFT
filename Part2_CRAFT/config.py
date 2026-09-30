@@ -39,6 +39,10 @@ def _env_num(name, default, kind=float):
 
 K      = _env_num("CRAFT_K",      5, int)    # traces rolled out per sample
 T      = _env_num("CRAFT_T",      0.7)       # sampling temperature
+# The K rollout temperatures are spaced evenly over [T - T_SPREAD, T + T_SPREAD]:
+# 0.4, 0.55, 0.7, 0.85, 1.0 for K=5, the setting every reported run used.
+# CRAFT_T_SPREAD=0 samples every trace at T.
+T_SPREAD = _env_num("CRAFT_T_SPREAD", 0.3)
 ALPHA  = _env_num("CRAFT_ALPHA",  0.01)      # TF-IRF threshold of T_Con
 BETA   = _env_num("CRAFT_BETA",   0.3)       # step frequency threshold of T_Con
 GAMMA  = _env_num("CRAFT_GAMMA",  -1.0)      # z-score step cutoff
