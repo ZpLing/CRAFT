@@ -285,7 +285,6 @@ def _status_of(error: Exception) -> Optional[int]:
     return None
 
 
-@with_backoff
 async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str, str]], temperature: float = None,
                          sent: Optional[Dict[str, Any]] = None, max_tokens: Optional[int] = None) -> str:
     """Call the Chat Completions endpoint and return the response text.
@@ -294,15 +293,38 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
     answered actually carried, or None when it went out without one. That is
     this request's own record, not the model's state at some later moment.
 
-    A reply cut off by its budget is asked for again here with twice the
-    budget, up to a ceiling, and the model's later requests start at the budget
-    that answered (framework/llm_reply.py). The climb is a loop inside the
-    backoff wrapper, so a retry repeats one request, not every step of it.
+    A reply cut off by its budget is asked for again with twice the budget, up
+    to a ceiling or the largest budget the model's API accepts, and the model's
+    later requests start at the budget that answered (framework/llm_reply.py).
+    The climb is a loop inside the backoff wrapper, and a retry after an error
+    carries on from where it got to.
     """
-    text = ""
+    return await _ask_with_retries(session, messages, temperature, sent,
+                                   max_tokens or MAX_OUTPUT_TOKENS, {})
+
+
+_HTTP_STATUS = re.compile(r"\bHTTP (\d{3})\b")
+
+
+@with_backoff
+async def _ask_with_retries(session, messages, temperature, sent, base: int,
+                            progress: Dict[str, int]) -> str:
+    # progress is the same dict on every retry of this one request.
+    text, last_ok = "", None
     async with llm_reply.first_request_settles(MODEL_NAME):
-        for budget in llm_reply.budgets(MODEL_NAME, max_tokens or MAX_OUTPUT_TOKENS):
-            text, cut = await _ask_once(session, messages, temperature, sent, budget)
+        for budget in llm_reply.budgets(MODEL_NAME, base, progress):
+            try:
+                text, cut = await _ask_once(session, messages, temperature, sent, budget)
+            except Exception as e:
+                # A larger budget refused after a smaller one was answered is
+                # the API's max_tokens limit: remember it, keep the reply.
+                m = _HTTP_STATUS.search(str(e))
+                status = _status_of(e) or (int(m.group(1)) if m else None)
+                if status in (400, 422) and last_ok is not None:
+                    llm_reply.refused(MODEL_NAME, last_ok)
+                    break
+                raise
+            last_ok = budget
             if not cut:
                 llm_reply.needed(MODEL_NAME, budget)
                 break

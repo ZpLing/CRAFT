@@ -1073,10 +1073,12 @@ async def call_llm(
             b["temperature"] = temperature
         return b
 
+    progress: Dict[str, int] = {}     # the same for every attempt of this request
+
     async def one_reply() -> Tuple[Optional[str], bool]:
         """One reply, climbing the budget while it is cut off: (text, whether it was)."""
-        text, cut = None, False
-        for budget in llm_reply.budgets(model, max_tokens):
+        text, cut, last_ok = None, False, None
+        for budget in llm_reply.budgets(model, max_tokens, progress):
             shapes = ([_REQUEST_SHAPE[model]] if model in _REQUEST_SHAPE else _SHAPES)
             for n, shape in enumerate(shapes):
                 async with session.post(
@@ -1090,8 +1092,14 @@ async def call_llm(
                     # Only a parameter refusal is worth another shape.
                     if resp.status in (400, 422) and n + 1 < len(shapes):
                         continue
+                    # A larger budget refused after a smaller one was answered
+                    # is the API's max_tokens limit: remember it, keep the reply.
+                    if resp.status in (400, 422) and last_ok is not None:
+                        llm_reply.refused(model, last_ok)
+                        return text, cut
                     raise RuntimeError(f"HTTP {resp.status}: {detail}")
             _REQUEST_SHAPE.setdefault(model, shape)
+            last_ok = budget
             choice = data["choices"][0]
             text, cut = reply_text(choice["message"]), was_cut_off(choice)
             # A reasoning model can spend the whole budget on hidden reasoning;

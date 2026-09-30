@@ -573,12 +573,6 @@ API_CALLS = {"count": 0}
 TRUNCATED = {"count": 0}
 
 
-@backoff.on_exception(
-    backoff.expo,
-    (aiohttp.ClientError, asyncio.TimeoutError, RuntimeError),
-    max_tries=7,
-    factor=2
-)
 async def generate_reasoning_trace(
     session: aiohttp.ClientSession,
     prompt: str,
@@ -590,15 +584,27 @@ async def generate_reasoning_trace(
     A reply cut off by the token budget is not a reply: the trace ends in the
     middle of a \\boxed{} or a sentence, and nothing downstream can tell.
     Gemini bills its hidden reasoning against max_tokens, so a budget sized for
-    a step can run out before the step is written. The request is repeated in
-    this loop with twice the budget, up to a ceiling, and later requests from
-    the same model start at the budget that answered (framework/llm_reply.py).
-    The loop is inside the backoff wrapper, so a retry does not multiply it.
+    a step can run out before the step is written. The request is repeated with
+    twice the budget, up to a ceiling or the largest budget the model's API
+    accepts, and later requests from the same model start at the budget that
+    answered (framework/llm_reply.py). The climb is a loop inside the backoff
+    wrapper, and a retry after an error carries on from where it got to.
     """
-    base = max_tokens or RESPONSE_TOKENS
-    choice, budget = None, base
+    return await _generate_with_retries(session, prompt, model, max_tokens or RESPONSE_TOKENS, {})
+
+
+@backoff.on_exception(
+    backoff.expo,
+    (aiohttp.ClientError, asyncio.TimeoutError, RuntimeError),
+    max_tries=7,
+    factor=2
+)
+async def _generate_with_retries(session, prompt: str, model: str, base: int,
+                                 progress: Dict[str, int]) -> str:
+    # progress is the same dict on every retry of this one request.
+    choice, budget, last_ok = None, base, None
     async with llm_reply.first_request_settles(model):
-        for budget in llm_reply.budgets(model, base):
+        for budget in llm_reply.budgets(model, base, progress):
             API_CALLS["count"] += 1
             payload = {
                 "model": model,
@@ -616,18 +622,23 @@ async def generate_reasoning_trace(
             ) as resp:
                 if resp.status != 200:
                     detail = await resp.text()
+                    # A larger budget refused after a smaller one was answered
+                    # is the API's max_tokens limit: remember it, keep the reply.
+                    if resp.status in (400, 422) and last_ok is not None:
+                        llm_reply.refused(model, last_ok)
+                        break
                     raise RuntimeError(f"HTTP {resp.status}: {detail[:200]}")
                 data = await resp.json()
-            choice = data["choices"][0]
+            choice, last_ok = data["choices"][0], budget
             if not was_cut_off(choice):
                 llm_reply.needed(model, budget)
                 return reply_text(choice["message"])
-    # Cut off at the ceiling too. The text is returned -- a step that stops
-    # early is still something the caller's own checks (the \\boxed{} on a
-    # final step, the label on a logical one) can act on -- but it is counted
+    # Cut off at the largest budget too. The text is returned -- a step that
+    # stops early is still something the caller's own checks (the \\boxed{} on
+    # a final step, the label on a logical one) can act on -- but it is counted
     # and said, not passed off as whole.
     TRUNCATED["count"] += 1
-    print(f"  ! reply still cut off at {budget} tokens ({model})", flush=True)
+    print(f"  ! reply still cut off at {last_ok} tokens ({model})", flush=True)
     return reply_text(choice["message"])
 
 

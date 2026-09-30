@@ -246,27 +246,40 @@ Respond with ONLY the JSON, no other text."""
 API_CALLS = {"count": 0}
 
 
+async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str,
+                         max_tokens: Optional[int] = None) -> Optional[Dict]:
+    """Call the LLM and parse the JSON response. Returns None on failure.
+
+    A reply cut off by its token budget (a reasoning model can spend the whole
+    budget before writing any JSON) is requested again with twice the budget,
+    up to the ceiling in framework/llm_reply.py or the largest budget the
+    model's API accepts, and the model's later requests start at the budget
+    that answered. A retry after an error carries on from where the climb got to.
+    """
+    content = await _reply_with_retries(session, prompt, model, max_tokens or RESPONSE_TOKENS, {})
+
+    # Extract JSON — LLM sometimes wraps it in ```json ... ```
+    json_match = re.search(r'\{[\s\S]+\}', content)
+    if not json_match:
+        return None
+    try:
+        return json.loads(json_match.group(0))
+    except json.JSONDecodeError:
+        return None
+
+
 @backoff.on_exception(
     backoff.expo,
     (aiohttp.ClientError, asyncio.TimeoutError, RuntimeError),
     max_tries=5,
     factor=2,
 )
-
-
-async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str,
-                         max_tokens: Optional[int] = None) -> Optional[Dict]:
-    """Call the LLM and parse the JSON response. Returns None on failure.
-
-    A reply cut off by its token budget (a reasoning model can spend the whole
-    budget before writing any JSON) is requested again in this loop with twice
-    the budget, up to the ceiling in framework/llm_reply.py, and the model's
-    later requests start at the budget that answered. The loop is inside the
-    backoff wrapper, so a retry does not multiply it.
-    """
-    content = ""
+async def _reply_with_retries(session, prompt: str, model: str, base: int,
+                              progress: Dict[str, int]) -> str:
+    # progress is the same dict on every retry of this one request.
+    content, last_ok = "", None
     async with llm_reply.first_request_settles(model):
-        for budget in llm_reply.budgets(model, max_tokens or RESPONSE_TOKENS):
+        for budget in llm_reply.budgets(model, base, progress):
             API_CALLS["count"] += 1
             payload = {
                 "model": model,
@@ -279,22 +292,20 @@ async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str
                 timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
             ) as resp:
                 if resp.status != 200:
-                    raise RuntimeError(f"HTTP {resp.status}: {await resp.text()[:200]}")
+                    detail = (await resp.text())[:200]
+                    # A larger budget refused after a smaller one was answered
+                    # is the API's max_tokens limit: remember it, keep the reply.
+                    if resp.status in (400, 422) and last_ok is not None:
+                        llm_reply.refused(model, last_ok)
+                        break
+                    raise RuntimeError(f"HTTP {resp.status}: {detail}")
                 data = await resp.json()
-            choice = data["choices"][0]
+            choice, last_ok = data["choices"][0], budget
             content = reply_text(choice["message"])
             if not was_cut_off(choice):
                 llm_reply.needed(model, budget)
                 break
-
-    # Extract JSON — LLM sometimes wraps it in ```json ... ```
-    json_match = re.search(r'\{[\s\S]+\}', content)
-    if not json_match:
-        return None
-    try:
-        return json.loads(json_match.group(0))
-    except json.JSONDecodeError:
-        return None
+    return content
 
 
 async def extract_rkg_edges_with_llm(

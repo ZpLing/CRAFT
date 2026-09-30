@@ -56,37 +56,60 @@ def larger_budget(budget: int) -> Optional[int]:
     return min(max(budget, 1) * 2, MAX_TOKENS_CEILING)
 
 
-# The largest budget each model has needed so far in this run. A request starts
-# there instead of climbing from its base again, so a model that needs 16000
-# tokens pays for the climb once, not on every one of thousands of requests.
+# What this run has learned about each model's budgets, shared by all its
+# requests. _NEEDED is the largest budget a reply of the model has fitted in, so
+# later requests start there; it is raised only by a reply that fits, so one
+# problem whose reply never fits does not push every other request to the
+# ceiling. _CAP is the largest budget the model's API has accepted when a larger
+# one was refused (many APIs limit max_tokens below the ceiling); no request of
+# that model asks for more, so the refusal is not repeated on every request.
 _NEEDED: Dict[str, int] = {}
+_CAP: Dict[str, int] = {}
 
 
-def budgets(model: str, base: int) -> Iterator[int]:
-    """The budgets to try for one request, smallest first: the larger of base and
-    what this model has needed before, then doubling up to MAX_TOKENS_CEILING.
+def budgets(model: str, base: int, progress: Optional[Dict[str, int]] = None) -> Iterator[int]:
+    """The budgets to try for one request, smallest first.
 
-    The caller makes one request per budget and stops asking once a reply is
-    not cut off (calling needed(model, budget) with it). Asking for the next
-    budget means the last one was cut off, which is recorded as the model's
-    need, so no request of that model climbs past it again. Used as a loop
-    inside one request, so a retry wrapper around the request does not repeat
-    the climb for every step of it.
+    It starts at the largest of base, what this model has needed before, and
+    what this same request reached before an error (progress), and doubles up
+    to MAX_TOKENS_CEILING or the model's learned cap. The caller makes one
+    request per budget until a reply is not cut off and calls needed(model,
+    budget) with the budget that answered.
+
+    progress is the caller's per-request record: pass the same dict to every
+    attempt of one request (its retries after an error), and a retry carries on
+    from the budget the climb had reached instead of starting it again. It never
+    affects other requests.
     """
-    budget = max(base, _NEEDED.get(model, 0))
-    while budget is not None:
+    cap = _CAP.get(model, MAX_TOKENS_CEILING)
+    budget = min(max(base, _NEEDED.get(model, 0), (progress or {}).get("budget", 0)), cap)
+    while True:
+        if progress is not None:
+            progress["budget"] = budget
         yield budget
-        # The caller came back for more, so a reply at this budget was cut off:
-        # the model needs at least the next one. Recorded now, not only once a
-        # reply fits, so a retry after an error, or another request of the same
-        # model, starts where this climb got to instead of at the base.
         nxt = larger_budget(budget)
-        if nxt is None:
-            needed(model, budget)       # cut off at the ceiling: never climb again
+        cap = _CAP.get(model, MAX_TOKENS_CEILING)
+        if nxt is None or budget >= cap:
             return
-        needed(model, nxt)
-        # Another request may have learned a larger budget meanwhile.
-        budget = max(nxt, _NEEDED.get(model, 0))
+        # Another request may have learned a larger need meanwhile.
+        budget = min(max(nxt, _NEEDED.get(model, 0)), cap)
+
+
+def needed(model: str, budget: int) -> None:
+    """Record that a reply from this model fitted in budget."""
+    if budget > _NEEDED.get(model, 0):
+        _NEEDED[model] = budget
+
+
+def refused(model: str, largest_accepted: int) -> None:
+    """Record that the model's API refused a budget above largest_accepted.
+
+    Called when a larger budget is refused (HTTP 400/422) after a smaller one
+    was answered in the same climb, so the refusal is about the budget.
+    """
+    _CAP[model] = min(_CAP.get(model, MAX_TOKENS_CEILING), largest_accepted)
+    if _NEEDED.get(model, 0) > _CAP[model]:
+        _NEEDED[model] = _CAP[model]
 
 
 # One request per model goes out first. Until a model has answered once, a batch
@@ -118,9 +141,3 @@ async def first_request_settles(model: str):
     else:
         await done.wait()
         yield
-
-
-def needed(model: str, budget: int) -> None:
-    """Record that a reply from this model fitted in budget."""
-    if budget > _NEEDED.get(model, 0):
-        _NEEDED[model] = budget
