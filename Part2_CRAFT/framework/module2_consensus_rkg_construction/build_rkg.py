@@ -714,12 +714,7 @@ def build_consensus_rkg(
     lam: float = LAMBDA,
     weight_by: str = "uniform",   # "uniform" | "gold_depth"
     expected_depth: Optional[int] = None,
-    node_threshold: Optional[float] = None,
-    consensus_threshold: Optional[float] = None,
-    term_overlap_weight: Optional[float] = None,
     align_steps: bool = True,
-    anchor_conclusion: bool = False,
-    support: str = "direct",
 ) -> Dict[str, Any]:
     """Module II (2): Edges & Nodes Filtering, as Algorithm 1 lines 10-15 write it.
 
@@ -739,10 +734,6 @@ def build_consensus_rkg(
     removed whatever its type. Module III writes the verdict itself when the
     conclusion node does not survive, so nothing downstream needs it kept.
 
-    consensus_threshold / term_overlap_weight are the old names of theta /
-    lambda and are still accepted. node_threshold no longer has an effect: the
-    paper filters nodes by isolation only.
-
     Returns:
         {
           "nodes": [...],
@@ -753,10 +744,6 @@ def build_consensus_rkg(
           "node_texts": {...}
         }
     """
-    if consensus_threshold is not None:
-        theta = consensus_threshold
-    if term_overlap_weight is not None:
-        lam = term_overlap_weight
     if not trace_rkgs:
         return {"nodes": [], "edges": [], "edge_frequencies": {}, "node_texts": {}}
 
@@ -882,30 +869,11 @@ def build_consensus_rkg(
     # E* is the union of the edges the traces actually draw.
     candidates = {k for _, wsd in per_trace_ws for k in wsd}
 
-    # Path support (adaptation). Traces disagree less on what depends on what
-    # than on which dependency they state directly: one writes u -> v, another
-    # u -> w -> v. With support="path" a trace that reaches v from u without the
-    # direct edge still backs u -> v, with the W_S of the weakest edge on its
-    # strongest path, so W(e) counts agreement on the dependency. With
-    # support="direct" only the edge itself counts, the literal reading.
+    # Only the edge a trace draws backs it, as W(e) is written: a trace that
+    # reaches v from u through w does not support u -> v.
     for weight, wsd in per_trace_ws:
-        if support == "path":
-            nodes_ = {x for k in wsd for x in k}
-            best: Dict[Tuple[str, str], float] = dict(wsd)
-            for mid in nodes_:
-                for (a, b_), w1 in list(best.items()):
-                    if b_ != mid:
-                        continue
-                    for (c, d), w2 in list(best.items()):
-                        if c != mid or d == a:
-                            continue
-                        w = min(w1, w2)
-                        if w > best.get((a, d), 0.0):
-                            best[(a, d)] = w
-        else:
-            best = wsd
         for (src, dst) in candidates:
-            w_s = best.get((src, dst), 0.0)
+            w_s = wsd.get((src, dst), 0.0)
             if w_s <= 0.0:
                 continue
             key = f"{src}->{dst}"
@@ -978,31 +946,6 @@ def build_consensus_rkg(
             "confidence": round(edge_ws_sum[key] / edge_weight_sum[key], 4)
                           if edge_weight_sum[key] else 0.0,
         })
-
-    # ── Conclusion anchoring (adaptation) ─────────────────────────────────
-    # Every trace ends in the verdict, but each reaches it from a different last
-    # step, so no single edge into the conclusion need carry theta and the node
-    # would be filtered as isolated. When none survives, the conclusion keeps its
-    # one highest-W(e) incoming edge whose source is still in the graph. Every
-    # other edge is filtered by theta exactly as above.
-    conclusion_ids = {nid for nid, t in node_types.items() if t == "conclusion"}
-    if anchor_conclusion and conclusion_ids and consensus_edges:
-        kept_ids = {e["src"] for e in consensus_edges} | {e["dst"] for e in consensus_edges}
-        for cid in conclusion_ids:
-            if any(e["dst"] == cid for e in consensus_edges):
-                continue
-            into = [(w, k) for k, w in edge_weights.items()
-                    if k.split("->", 1)[1] == cid and k.split("->", 1)[0] in kept_ids]
-            if into:
-                w, key = max(into)
-                src, dst = key.split("->", 1)
-                consensus_edges.append({
-                    "src": src, "dst": dst, "type": "uses", "weight": w,
-                    "frequency": edge_frequencies[key],
-                    "confidence": round(edge_ws_sum[key] / edge_weight_sum[key], 4)
-                                  if edge_weight_sum[key] else 0.0,
-                    "anchor": True,
-                })
 
     # ── Node filter: remove isolated nodes, d+(v) = 0 and d-(v) = 0 ───────
     consensus_node_ids: Set[str] = set()
@@ -1231,9 +1174,9 @@ def rebuild_consensus(
         if not valid:
             r["consensus_rkg"] = {"nodes": [], "edges": []}
             continue
-        # lambda and the node threshold travel with the rest. They used not to:
-        # a rebuild always used build_consensus_rkg's defaults for both, so
-        # --edge_lambda 0 rebuilt a graph byte-identical to --edge_lambda 0.3 —
+        # lambda travels with the rest. It used not to: a rebuild always used
+        # build_consensus_rkg's default for it, so
+        # --lambda 0 rebuilt a graph byte-identical to --lambda 0.3 —
         # node sets, edge sets and edge confidences all unchanged on 100 of 100
         # graphs, so a lambda sweep compared the full model with itself.
         consensus = build_consensus_rkg(
@@ -1287,18 +1230,16 @@ def main() -> None:
     parser.add_argument("--base_url", default=None, help="API Base URL")
     parser.add_argument("--concurrency", type=int, default=10, help="Concurrency level (default 10)")
     parser.add_argument("--domain", default="logical", choices=["logical", "math"])
-    parser.add_argument("--theta", "--consensus_threshold", dest="theta", type=float, default=THETA,
+    parser.add_argument("--theta", dest="theta", type=float, default=THETA,
                         help="Edge filtering threshold theta: an edge stays in G* when its consensus "
                              "weight W(e) = 1/K * sum_S W_S(e) is at least theta (paper: 0.3)")
-    parser.add_argument("--node_threshold", type=float, default=None,
-                        help=argparse.SUPPRESS)  # no effect: nodes are filtered by isolation (paper)
     parser.add_argument("--max_samples", type=int, default=None)
     parser.add_argument("--similarity", choices=["jaccard", "embedding"],
                         default="jaccard",
                         help="The overlap measure fused into W(e): term Jaccard "
                              "(the paper) or the cosine of all-mpnet-base-v2 "
                              "embeddings (the ablation's row)")
-    parser.add_argument("--lambda", "--edge_lambda", dest="lam", type=float, default=LAMBDA,
+    parser.add_argument("--lambda", dest="lam", type=float, default=LAMBDA,
                         help="Weight of Jaccard in W_S(e), lambda: W_S(e) = (1-lambda)*conf(e) "
                              "+ lambda*Jaccard(u,v) (paper: 0.3)")
 
@@ -1312,8 +1253,9 @@ def main() -> None:
                              "the selection and not gold annotation about the sample")
     parser.add_argument("--weight_by", choices=["uniform", "gold_depth"],
                         default="uniform",
-                        help="--rebuild_consensus: trace weighting; 'gold_depth' favors traces "
-                             "whose length is near --expected_depth")
+                        help="Trace weighting of the consensus (the build and "
+                             "--rebuild_consensus): 'gold_depth' favors traces whose length "
+                             "is near --expected_depth")
     parser.add_argument("--gt_file", default=None,
                         help="--rebuild_consensus: cleaned_with_problem.json, for conclusion-label diagnostics")
     args = parser.parse_args()
