@@ -286,8 +286,14 @@ def _status_of(error: Exception) -> Optional[int]:
 
 
 @with_backoff
-async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str, str]], temperature: float = None) -> str:
-    """Call the Chat Completions endpoint and return the response text."""
+async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str, str]], temperature: float = None,
+                         sent: Optional[Dict[str, Any]] = None) -> str:
+    """Call the Chat Completions endpoint and return the response text.
+
+    sent, when given, receives "temperature": the temperature the request that
+    answered actually carried, or None when it went out without one. That is
+    this request's own record, not the model's state at some later moment.
+    """
     API_CALLS["count"] += 1
     if aiohttp is None:
         raise RuntimeError("Missing aiohttp dependency")
@@ -317,6 +323,7 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
         if OPENAI_BASE_URL:
             data["extra_body"] = {"max_output_tokens": _visible_tokens or effective_max_tokens}
         try:
+            used = data.get("temperature")
             try:
                 resp = await asyncio.wait_for(
                     API_CLIENT.chat.completions.create(**data),
@@ -338,6 +345,9 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
                 except Exception:
                     raise e
                 TEMPERATURE_REJECTED.add(MODEL_NAME)
+                used = None
+            if sent is not None:
+                sent["temperature"] = used
             if isinstance(resp, str):
                 raise RuntimeError(f"{MODEL_NAME} API returned a string instead of a response object: {resp[:200]}")
             if not hasattr(resp, 'choices') or not resp.choices:
@@ -375,6 +385,8 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
                     data = await resp.json()
                     if first_error is not None:
                         TEMPERATURE_REJECTED.add(MODEL_NAME)
+                    if sent is not None:
+                        sent["temperature"] = body.get("temperature")
                     break
                 detail = await resp.text()
                 if first_error is None:
@@ -549,7 +561,8 @@ async def generate_single_trace(
 
     for attempt in range(max_retries):
         try:
-            raw_text = await ask_model_text(session, messages, temperature=temperature)
+            sent: Dict[str, Any] = {}
+            raw_text = await ask_model_text(session, messages, temperature=temperature, sent=sent)
 
             steps = extract_reasoning_steps(raw_text)
             reasoning_text = "\n".join(steps) if steps else raw_text.strip()
@@ -569,7 +582,7 @@ async def generate_single_trace(
 
             return {
                 "trace_idx": trace_idx,
-                "temperature": None if MODEL_NAME in TEMPERATURE_REJECTED else temperature,
+                "temperature": sent.get("temperature", temperature),
                 "reasoning_steps": steps,
                 "reasoning_text": reasoning_text,
                 "label": label,
@@ -709,11 +722,13 @@ async def generate_k_traces_dataset(
             "model": MODEL_NAME,
             "temperature": base_temperature,
             "temperature_spread": spread,
-            # What the requests carried; a model whose API refused a
-            # temperature was sampled at its default instead.
-            "rollout_temperatures": (None if MODEL_NAME in TEMPERATURE_REJECTED
-                                     else rollout_temperatures(k, base_temperature, spread)),
-            "temperature_rejected": MODEL_NAME in TEMPERATURE_REJECTED,
+            # Read back from the traces: the temperatures their requests
+            # actually carried, and how many went out without one because
+            # the model's API refused it (sampled at the model's default).
+            "rollout_temperatures": sorted({t["temperature"] for r in resolved for t in r.get("traces", [])
+                                            if t.get("temperature") is not None}),
+            "traces_at_default_temperature": sum(1 for r in resolved for t in r.get("traces", [])
+                                                 if t.get("temperature") is None),
             "k": k,
             "api_calls": API_CALLS["count"],
             "statistics": statistics,
