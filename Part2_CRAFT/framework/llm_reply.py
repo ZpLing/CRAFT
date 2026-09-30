@@ -12,7 +12,8 @@ Two things differ between models, and neither is decided by the model's name:
     before any of it is written. The API says so: the reply's finish_reason is
     "length". A cut-off reply is requested again with twice the budget, up to
     MAX_TOKENS_CEILING, so a model that needs a larger budget gets one without
-    being listed anywhere.
+    being listed anywhere. The budget that answered is remembered per model, and
+    that model's later requests start from it.
 
 Environment:
     CRAFT_MAX_TOKENS_CEILING   largest budget a request is raised to (default 32000)
@@ -21,7 +22,7 @@ Environment:
 from __future__ import annotations
 
 import os
-from typing import Any, Optional
+from typing import Any, Dict, Iterator, Optional
 
 MAX_TOKENS_CEILING: int = int(os.getenv("CRAFT_MAX_TOKENS_CEILING", "32000"))
 
@@ -49,3 +50,30 @@ def larger_budget(budget: int) -> Optional[int]:
     if budget >= MAX_TOKENS_CEILING:
         return None
     return min(max(budget, 1) * 2, MAX_TOKENS_CEILING)
+
+
+# The largest budget each model has needed so far in this run. A request starts
+# there instead of climbing from its base again, so a model that needs 16000
+# tokens pays for the climb once, not on every one of thousands of requests.
+_NEEDED: Dict[str, int] = {}
+
+
+def budgets(model: str, base: int) -> Iterator[int]:
+    """The budgets to try for one request, smallest first: the larger of base and
+    what this model has needed before, then doubling up to MAX_TOKENS_CEILING.
+
+    The caller makes one request per budget until a reply is not cut off, and
+    calls needed(model, budget) with the budget that answered. Used as a loop
+    inside one request, so a retry wrapper around the request does not repeat
+    the climb for every step of it.
+    """
+    budget = max(base, _NEEDED.get(model, 0))
+    while budget is not None:
+        yield budget
+        budget = larger_budget(budget)
+
+
+def needed(model: str, budget: int) -> None:
+    """Record that a reply from this model fitted in budget."""
+    if budget > _NEEDED.get(model, 0):
+        _NEEDED[model] = budget

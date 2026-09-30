@@ -1054,6 +1054,7 @@ async def call_llm(
     temperature: float = 0.7,
     max_tokens: int = 4096,
 ) -> Optional[str]:
+    from framework import llm_reply
     from framework.llm_reply import larger_budget, reply_text, was_cut_off
 
     url     = base_url.rstrip("/") + "/chat/completions"
@@ -1072,7 +1073,7 @@ async def call_llm(
             b["temperature"] = temperature
         return b
 
-    budget = max_tokens
+    budget = next(llm_reply.budgets(model, max_tokens))
     for attempt in range(4):
         async with semaphore:
             try:
@@ -1099,6 +1100,7 @@ async def call_llm(
                     if bigger is not None:
                         budget = bigger
                         continue
+                llm_reply.needed(model, budget)
                 content = reply_text(choice["message"])
                 if content:
                     return content

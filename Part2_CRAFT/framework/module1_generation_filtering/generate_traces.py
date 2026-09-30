@@ -22,7 +22,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 try:
     import aiohttp
@@ -293,7 +293,24 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
     sent, when given, receives "temperature": the temperature the request that
     answered actually carried, or None when it went out without one. That is
     this request's own record, not the model's state at some later moment.
+
+    A reply cut off by its budget is asked for again here with twice the
+    budget, up to a ceiling, and the model's later requests start at the budget
+    that answered (framework/llm_reply.py). The climb is a loop inside the
+    backoff wrapper, so a retry repeats one request, not every step of it.
     """
+    text = ""
+    for budget in llm_reply.budgets(MODEL_NAME, max_tokens or MAX_OUTPUT_TOKENS):
+        text, cut = await _ask_once(session, messages, temperature, sent, budget)
+        if not cut:
+            llm_reply.needed(MODEL_NAME, budget)
+            break
+    return text
+
+
+async def _ask_once(session: aiohttp.ClientSession, messages: List[Dict[str, str]], temperature: Optional[float],
+                    sent: Optional[Dict[str, Any]], max_tokens: int) -> Tuple[str, bool]:
+    """One request at one budget: (reply text, whether it was cut off)."""
     API_CALLS["count"] += 1
     if aiohttp is None:
         raise RuntimeError("Missing aiohttp dependency")
@@ -301,7 +318,7 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
     REQUEST_TIMEOUT = 300
     temp = temperature if temperature is not None else TEMPERATURE
 
-    effective_max_tokens = max_tokens or MAX_OUTPUT_TOKENS
+    effective_max_tokens = max_tokens
 
     if API_CLIENT is not None:
         data = {
@@ -345,11 +362,7 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
             if not hasattr(resp, 'choices') or not resp.choices:
                 raise RuntimeError(f"{MODEL_NAME} API response format error: {type(resp)}")
             choice = resp.choices[0]
-            if was_cut_off(choice):
-                bigger = larger_budget(effective_max_tokens)
-                if bigger is not None:
-                    return await ask_model_text(session, messages, temperature, sent, max_tokens=bigger)
-            return reply_text(choice.message)
+            return reply_text(choice.message), was_cut_off(choice)
         except asyncio.TimeoutError:
             raise RuntimeError(f"{MODEL_NAME} request timed out ({REQUEST_TIMEOUT}s)")
         except Exception as e:
@@ -388,11 +401,7 @@ async def ask_model_text(session: aiohttp.ClientSession, messages: List[Dict[str
                         continue
                 raise first_error
         choice = data["choices"][0]
-        if was_cut_off(choice):
-            bigger = larger_budget(effective_max_tokens)
-            if bigger is not None:
-                return await ask_model_text(session, messages, temperature, sent, max_tokens=bigger)
-        return reply_text(choice["message"])
+        return reply_text(choice["message"]), was_cut_off(choice)
 
 #########################
 # Core generation logic
@@ -437,7 +446,8 @@ import sys as _sys_mt
 import pathlib as _pl_mt
 _sys_mt.path.insert(0, str(_pl_mt.Path(__file__).resolve().parents[2]))
 from framework.domain_optimization.math_text import split_steps  # noqa: E402
-from framework.llm_reply import larger_budget, reply_text, was_cut_off  # noqa: E402
+from framework import llm_reply  # noqa: E402
+from framework.llm_reply import reply_text, was_cut_off  # noqa: E402
 
 
 def extract_reasoning_steps(text: str) -> List[str]:

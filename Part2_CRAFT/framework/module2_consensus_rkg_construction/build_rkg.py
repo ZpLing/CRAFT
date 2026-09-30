@@ -71,7 +71,8 @@ import sys as _sys
 from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
-from framework.llm_reply import larger_budget, reply_text, was_cut_off  # noqa: E402
+from framework import llm_reply  # noqa: E402
+from framework.llm_reply import reply_text, was_cut_off  # noqa: E402
 from framework.module1_generation_filtering.steps_filter import parse_steps_from_trace
 
 #########################
@@ -258,30 +259,32 @@ async def _call_llm_json(session: aiohttp.ClientSession, prompt: str, model: str
     """Call the LLM and parse the JSON response. Returns None on failure.
 
     A reply cut off by its token budget (a reasoning model can spend the whole
-    budget before writing any JSON) is requested again with twice the budget,
-    up to the ceiling in framework/llm_reply.py, whatever the model.
+    budget before writing any JSON) is requested again in this loop with twice
+    the budget, up to the ceiling in framework/llm_reply.py, and the model's
+    later requests start at the budget that answered. The loop is inside the
+    backoff wrapper, so a retry does not multiply it.
     """
-    API_CALLS["count"] += 1
-    budget = max_tokens or RESPONSE_TOKENS
-    payload = {
-        "model": model,
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.0,
-        "max_tokens": budget,
-    }
-    async with session.post(
-        CHAT_URL, json=payload, headers=HEADERS,
-        timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
-    ) as resp:
-        if resp.status != 200:
-            raise RuntimeError(f"HTTP {resp.status}: {await resp.text()[:200]}")
-        data = await resp.json()
+    content = ""
+    for budget in llm_reply.budgets(model, max_tokens or RESPONSE_TOKENS):
+        API_CALLS["count"] += 1
+        payload = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.0,
+            "max_tokens": budget,
+        }
+        async with session.post(
+            CHAT_URL, json=payload, headers=HEADERS,
+            timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
+        ) as resp:
+            if resp.status != 200:
+                raise RuntimeError(f"HTTP {resp.status}: {await resp.text()[:200]}")
+            data = await resp.json()
         choice = data["choices"][0]
-        if was_cut_off(choice):
-            bigger = larger_budget(budget)
-            if bigger is not None:
-                return await _call_llm_json(session, prompt, model, max_tokens=bigger)
         content = reply_text(choice["message"])
+        if not was_cut_off(choice):
+            llm_reply.needed(model, budget)
+            break
 
     # Extract JSON — LLM sometimes wraps it in ```json ... ```
     json_match = re.search(r'\{[\s\S]+\}', content)

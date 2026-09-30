@@ -37,7 +37,8 @@ from pathlib import Path as _Path
 _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
 
 # Reuse functions from Module I's tfirf_terms and steps_filter
-from framework.llm_reply import larger_budget, reply_text, was_cut_off  # noqa: E402
+from framework import llm_reply  # noqa: E402
+from framework.llm_reply import reply_text, was_cut_off  # noqa: E402
 from framework.module1_generation_filtering.tfirf_terms import (
     tokenize_text,
     calculate_tf,
@@ -584,47 +585,49 @@ async def generate_reasoning_trace(
     model: str = DEFAULT_MODEL,
     max_tokens: Optional[int] = None,
 ) -> str:
-    """Call the model to generate a reasoning trace."""
-    API_CALLS["count"] += 1
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": REQUEST_TEMPERATURE,
-        "max_tokens": max_tokens or RESPONSE_TOKENS,
-    }
+    """Call the model to generate a reasoning trace.
 
-    async with session.post(
-        CHAT_COMPLETIONS_URL,
-        json=payload,
-        headers=HEADERS,
-        timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
-    ) as resp:
-        if resp.status != 200:
-            detail = await resp.text()
-            raise RuntimeError(f"HTTP {resp.status}: {detail[:200]}")
-        
-        data = await resp.json()
+    A reply cut off by the token budget is not a reply: the trace ends in the
+    middle of a \\boxed{} or a sentence, and nothing downstream can tell.
+    Gemini bills its hidden reasoning against max_tokens, so a budget sized for
+    a step can run out before the step is written. The request is repeated in
+    this loop with twice the budget, up to a ceiling, and later requests from
+    the same model start at the budget that answered (framework/llm_reply.py).
+    The loop is inside the backoff wrapper, so a retry does not multiply it.
+    """
+    base = max_tokens or RESPONSE_TOKENS
+    choice, budget = None, base
+    for budget in llm_reply.budgets(model, base):
+        API_CALLS["count"] += 1
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": REQUEST_TEMPERATURE,
+            "max_tokens": budget,
+        }
+        async with session.post(
+            CHAT_COMPLETIONS_URL,
+            json=payload,
+            headers=HEADERS,
+            timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT),
+        ) as resp:
+            if resp.status != 200:
+                detail = await resp.text()
+                raise RuntimeError(f"HTTP {resp.status}: {detail[:200]}")
+            data = await resp.json()
         choice = data["choices"][0]
-        # A reply cut off by the token budget is not a reply: the trace ends
-        # in the middle of a \\boxed{} or a sentence, and nothing downstream
-        # can tell. Gemini bills its hidden reasoning against max_tokens, so a
-        # budget sized for a step can run out before the step is written; the
-        # same request is made again with twice the budget, up to a ceiling
-        # (framework/llm_reply.py), whatever the model.
-        budget = max_tokens or RESPONSE_TOKENS
-        if was_cut_off(choice):
-            bigger = larger_budget(budget)
-            if bigger is not None:
-                return await generate_reasoning_trace(session, prompt, model, max_tokens=bigger)
-            # Cut off at the ceiling too. The text is returned -- a step that
-            # stops early is still something the caller's own checks (the
-            # \\boxed{} on a final step, the label on a logical one) can act
-            # on -- but it is counted and said, not passed off as whole.
-            TRUNCATED["count"] += 1
-            print(f"  ! reply still cut off at {budget} tokens ({model})", flush=True)
-        return reply_text(choice["message"])
+        if not was_cut_off(choice):
+            llm_reply.needed(model, budget)
+            return reply_text(choice["message"])
+    # Cut off at the ceiling too. The text is returned -- a step that stops
+    # early is still something the caller's own checks (the \\boxed{} on a
+    # final step, the label on a logical one) can act on -- but it is counted
+    # and said, not passed off as whole.
+    TRUNCATED["count"] += 1
+    print(f"  ! reply still cut off at {budget} tokens ({model})", flush=True)
+    return reply_text(choice["message"])
 
 
 def extract_problem_input(sample: Dict[str, Any]) -> str:
