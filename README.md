@@ -49,42 +49,32 @@ The ROSCOE scorer downloads two files from ParlAI the first time it runs.
 
 ## Quick start
 
-A full CRAFT run on one dataset. Each stage writes a JSON file that the next stage reads,
-so keep every path inside one run directory. Module I's step filter runs twice: first
-against the consensus terms, then against the consensus RKG once Module II has built it.
+One command runs a dataset x backbone cell end to end: Module I (generation, then the
+z-score step filter), Module II, Pass 2 of the step filter against G*, Module III, the
+cell's own post passes, and scoring.
 
 ```bash
 cd Part2_CRAFT
-RUN=craft_runs/fld_gemini
-M1=framework/module1_generation_filtering
-K_TRACES=$RUN/k_traces_500_samples.json   # the name every downstream glob looks for
-
-# Module I — Multi-Trace Generation: K=5 traces at T=0.7
-python $M1/generate_traces.py --datasets dataset/FLD.json \
-    --K 5 --T 0.7 --output $K_TRACES
-
-# Module I — Steps Filtering: z-score cutoff over the TF-IRF consensus terms
-python $M1/steps_filter.py --input $K_TRACES \
-    --method unsupervised --alpha 0.01 --beta 0.3 --gamma -1.0 --output $RUN/cleaned_z.json
-
-# Module II — Consensus RKG Construction: per-trace graphs, edge/node filtering, aggregation
-python framework/module2_consensus_rkg_construction/build_rkg.py --input $RUN/cleaned_z.json \
-    --lambda 0.3 --theta 0.3 --output $RUN/rkg.json
-
-# Module I again — the same step filter, now pruning against G*
-python $M1/steps_filter.py --input $RUN/cleaned_z.json \
-    --method rkg --rkg_file $RUN/rkg.json --theta 0.3 --output $RUN/cleaned.json
-
-# Module III — Topology-guided Trace Synthesis: one step generated per node of G*
-python framework/module3_topology_guided_synthesis/synthesize_trace.py --input $RUN/cleaned.json \
-    --rkg_file $RUN/rkg.json --output $RUN/synthesized.json
+RUN=craft_runs/fld_gemini    # relative: lands under Part2_CRAFT/results/, like every --output
+python run_cell.py --dataset FLD --model gemini-3.1-flash-lite --run_dir $RUN
 ```
 
-Every stage after generation takes a single `--domain`, so run Omni-MATH and
-OlympiadBench separately with `--domain math`. Keep the file names above: the evaluation
-scripts find a run by `k_traces_*_samples.json`, `cleaned_z*.json`, `cleaned.json`,
-`rkg*.json` and `synthesized.json`. `tfirf_terms.py` is not a pipeline stage. It prints
-the TF-IRF terms for inspection, and the filters import its functions.
+What differs between cells (Module II's trace weighting, Module III's `--prior_mode`, the
+ProofWriter and mathematics post passes) is defined once, in `cells.py`, and `run_cell.py`
+reads it from there; it takes no flag that could change a cell's settings. Each stage runs
+the script it names under `framework/`, writes `<run_dir>/<stage>.json` (the rollouts are
+`k_traces_<n>_samples.json`, the name the evaluation scripts look for) and logs to
+`<run_dir>/log_<stage>.txt`; `<run_dir>/manifest.json` records the cell, the
+hyperparameters, the commit and every command. A run that stops resumes where it left off.
+
+```bash
+python run_cell.py ... --dry_run              # print every stage's exact command, run nothing
+python run_cell.py ... --k_traces FILE        # reuse Module I's rollouts instead of generating them
+python run_cell.py ... --from synthesized     # rerun from one stage onward (--no_resume: all of them)
+```
+
+`tfirf_terms.py` is not a pipeline stage. It prints the TF-IRF terms for inspection, and
+the filters import its functions.
 
 ## Repository layout
 
@@ -103,6 +93,9 @@ framework (§3.2).
 │   │   └── significance_test.py
 │   └── results/<model>/
 ├── Part2_CRAFT/
+│   ├── cells.py
+│   ├── run_cell.py
+│   ├── test_cells.py
 │   ├── dataset/
 │   │   ├── FLD.json
 │   │   ├── ProofWriter.json
@@ -179,10 +172,10 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 
 ## Part 2: CRAFT (§3.2)
 
-Label prediction, for the main table and the ablation:
+Label prediction, for the main table and the ablation. `run_cell.py` scores the file its
+cell reports at the end (`<run_dir>/score.json`); any other output is scored the same way:
 
 ```bash
-# label prediction — the main table, and the ablation
 python evaluation/label_prediction/evaluate_accuracy.py score --input $RUN/synthesized.json --source synthesized
 ```
 
@@ -197,23 +190,14 @@ python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json 
 python $ROS/roscoe_score.py         --export_dir $RUN/roscoe_export
 ```
 
-After Module III, ProofWriter and the mathematical datasets get their own passes, and the
-trace each cell reports is then exported:
+After Module III, ProofWriter and gemini's mathematics get their own passes
+(`framework/domain_optimization/`): on ProofWriter a closed-world recheck that writes its
+proof search back as steps, then a resolve pass, and on gpt-5.4-nano a restatement with the
+answer pinned; on Omni-MATH and OlympiadBench with gemini the split votes are adjudicated,
+the derivation is written back as steps and the trace opens with the goal. `run_cell.py`
+runs them in that order from `cells.py`. The trace each cell reports is then exported:
 
 ```bash
-DO=framework/domain_optimization
-
-# ProofWriter: closed-world recheck, the proof search written back as steps, then resolve
-python $DO/cwa_recheck.py --synth $RUN/synthesized.json    --k_traces $K_TRACES --direction prove   --output $RUN/synth_cwa.json
-python $DO/cwa_recheck.py --synth $RUN/synth_cwa.json      --k_traces $K_TRACES --direction resolve --output $RUN/synth_cwa_resolve.json
-# ProofWriter on gpt-5.4-nano: restated with the answer pinned
-python $DO/polish_trace.py --synth $RUN/synth_cwa_resolve.json --k_traces $K_TRACES --dataset ProofWriter --style two3 --output $RUN/polish.json
-
-# Omni-MATH / OlympiadBench on gemini: split votes adjudicated, the derivation written back as steps, the goal stated first
-python $DO/adjudicate_math.py   --k_traces $K_TRACES --dataset OmniMATH --model gemini-3.1-flash-lite --output $RUN/adjudicated.json
-python $DO/apply_adjudication.py --synth $RUN/synthesized.json --adjudicated $RUN/adjudicated.json --dataset OmniMATH --output $RUN/adj_applied.json
-python $DO/state_goal.py         --synth $RUN/adj_applied.json --problems $RUN/cleaned.json --output $RUN/adj_goal.json
-
 # the trace each cell reports -> results/CRAFT_results/Output/<model>/<dataset>_Output.jsonl
 python evaluation/label_prediction/evaluate_accuracy.py export
 ```
