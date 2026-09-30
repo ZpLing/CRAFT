@@ -15,9 +15,9 @@ Graph (RKG)**, and writes one trace by walking that graph.
 | Backbone | Setting | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | GPT-5.4-nano | Best of 12 baselines | 78.6 | 0.785 | 7.7 | 94.0 | 0.940 | 18.9 | 48.8 | 78.4 | 57.6 | 74.1 |
-| GPT-5.4-nano | **CRAFT** | **81.0** | **0.809** | **6.8** | **98.2** | **0.982** | **8.9** | **53.9** | **6.5** | **59.0** | **6.6** |
-| Gemini-3.1-flash-lite | Best of 12 baselines | 90.3 | 0.903 | 11.1 | 68.6 | 0.678 | 14.8 | 55.1 | 24.9 | 65.8 | 25.0 |
-| Gemini-3.1-flash-lite | **CRAFT** | **90.7** | **0.907** | **8.1** | **85.4** | **0.854** | **9.3** | **61.8** | **6.8** | **75.6** | **7.2** |
+| GPT-5.4-nano | **CRAFT** | **83.0** | **0.830** | **6.6** | **96.2** | **0.962** | **7.6** | **55.5** | **7.2** | **63.2** | **7.3** |
+| Gemini-3.1-flash-lite | Best of 12 baselines | **90.3** | **0.903** | 11.1 | 68.6 | 0.678 | 14.8 | 55.1 | 24.9 | 65.8 | 25.0 |
+| Gemini-3.1-flash-lite | **CRAFT** | 89.3 | 0.893 | **8.1** | **86.6** | **0.866** | **8.3** | **59.4** | **7.8** | **73.4** | **8.1** |
 
 > FOLIO and GSM8K were dropped after the pilot because both backbones were already close to
 > the ceiling on them. ProofWriter (depth 5) and Omni-MATH replaced them.

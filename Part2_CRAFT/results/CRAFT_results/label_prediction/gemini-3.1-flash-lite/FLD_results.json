@@ -1,23 +1,23 @@
 {
-  "file": "results/craft_runs/full500_v2/FLD_gemini-3.1-flash-lite/synthesized.json",
+  "file": "results/craft_runs/full500_v6/FLD_gemini-3.1-flash-lite/synthesized.json",
   "source": "synthesized",
   "overall": {
-    "accuracy": 0.9073,
-    "macro_f1": 0.9072,
-    "avg_steps": 8.13,
-    "std_steps": 1.59,
-    "avg_tokens": 655.5,
-    "std_tokens": 229.9,
-    "mean_trace_acc": 0.9073,
-    "std_trace_acc": 0.2901,
+    "accuracy": 0.8931,
+    "macro_f1": 0.8931,
+    "avg_steps": 8.07,
+    "std_steps": 1.61,
+    "avg_tokens": 439.7,
+    "std_tokens": 119.2,
+    "mean_trace_acc": 0.8931,
+    "std_trace_acc": 0.3089,
     "n_total": 496,
-    "n_correct": 450,
+    "n_correct": 443,
     "n_no_pred": 0,
     "n_blocked": 0,
     "no_pred_rate": 0.0,
     "per_class_f1": {
-      "__PROVED__": 0.9091,
-      "__DISPROVED__": 0.9053
+      "__PROVED__": 0.8967,
+      "__DISPROVED__": 0.8894
     },
     "confusion_matrix": {
       "__PROVED__": {
@@ -26,30 +26,30 @@
         "none": 0
       },
       "__DISPROVED__": {
-        "__PROVED__": 29,
-        "__DISPROVED__": 220,
+        "__PROVED__": 36,
+        "__DISPROVED__": 213,
         "none": 0
       }
     },
     "domain": "logical",
     "per_dataset": {
       "FLD.json": {
-        "accuracy": 0.9073,
-        "macro_f1": 0.9072,
-        "avg_steps": 8.13,
-        "std_steps": 1.59,
-        "avg_tokens": 655.5,
-        "std_tokens": 229.9,
-        "mean_trace_acc": 0.9073,
-        "std_trace_acc": 0.2901,
+        "accuracy": 0.8931,
+        "macro_f1": 0.8931,
+        "avg_steps": 8.07,
+        "std_steps": 1.61,
+        "avg_tokens": 439.7,
+        "std_tokens": 119.2,
+        "mean_trace_acc": 0.8931,
+        "std_trace_acc": 0.3089,
         "n_total": 496,
-        "n_correct": 450,
+        "n_correct": 443,
         "n_no_pred": 0,
         "n_blocked": 0,
         "no_pred_rate": 0.0,
         "per_class_f1": {
-          "__PROVED__": 0.9091,
-          "__DISPROVED__": 0.9053
+          "__PROVED__": 0.8967,
+          "__DISPROVED__": 0.8894
         },
         "confusion_matrix": {
           "__PROVED__": {
@@ -58,8 +58,8 @@
             "none": 0
           },
           "__DISPROVED__": {
-            "__PROVED__": 29,
-            "__DISPROVED__": 220,
+            "__PROVED__": 36,
+            "__DISPROVED__": 213,
             "none": 0
           }
         },
@@ -69,22 +69,22 @@
   },
   "per_dataset": {
     "FLD.json": {
-      "accuracy": 0.9073,
-      "macro_f1": 0.9072,
-      "avg_steps": 8.13,
-      "std_steps": 1.59,
-      "avg_tokens": 655.5,
-      "std_tokens": 229.9,
-      "mean_trace_acc": 0.9073,
-      "std_trace_acc": 0.2901,
+      "accuracy": 0.8931,
+      "macro_f1": 0.8931,
+      "avg_steps": 8.07,
+      "std_steps": 1.61,
+      "avg_tokens": 439.7,
+      "std_tokens": 119.2,
+      "mean_trace_acc": 0.8931,
+      "std_trace_acc": 0.3089,
       "n_total": 496,
-      "n_correct": 450,
+      "n_correct": 443,
       "n_no_pred": 0,
       "n_blocked": 0,
       "no_pred_rate": 0.0,
       "per_class_f1": {
-        "__PROVED__": 0.9091,
-        "__DISPROVED__": 0.9053
+        "__PROVED__": 0.8967,
+        "__DISPROVED__": 0.8894
       },
       "confusion_matrix": {
         "__PROVED__": {
@@ -93,8 +93,8 @@
           "none": 0
         },
         "__DISPROVED__": {
-          "__PROVED__": 29,
-          "__DISPROVED__": 220,
+          "__PROVED__": 36,
+          "__DISPROVED__": 213,
           "none": 0
         }
       },
