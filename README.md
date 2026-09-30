@@ -6,11 +6,11 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
 </p>
 
-A correct label does not mean the steps behind it are correct, and giving the model the
-correct answer does not fix them: our pilot study finds no consistent gain from it.
-**CRAFT** repairs the structure of the reasoning instead. It rolls out `K` candidate traces,
-drops the steps they disagree on, merges the rest into a consensus **Reasoning Knowledge
-Graph (RKG)**, and writes one trace by walking that graph.
+A correct label can sit on top of wrong steps, and giving the model the correct answer does
+not repair them: our pilot study finds no consistent gain from it. **CRAFT** works on the
+structure of the reasoning. It rolls out `K` candidate traces, drops the steps they disagree
+on, merges the rest into a consensus Reasoning Knowledge Graph (RKG), and writes one trace
+by walking that graph.
 
 | Backbone | Setting | FLD<br>Acc(%)&uarr; | FLD<br>F1&uarr; | FLD<br>Steps&darr; | ProofWriter<br>Acc(%)&uarr; | ProofWriter<br>F1&uarr; | ProofWriter<br>Steps&darr; | Omni-MATH<br>Acc(%)&uarr; | Omni-MATH<br>Steps&darr; | OlympiadBench<br>Acc(%)&uarr; | OlympiadBench<br>Steps&darr; |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -59,13 +59,14 @@ RUN=craft_runs/fld_gemini    # relative: lands under Part2_CRAFT/results/, like 
 python run_cell.py --dataset FLD --model gemini-3.1-flash-lite --run_dir $RUN
 ```
 
-What differs between cells (Module II's trace weighting, Module III's `--prior_mode`, the
-ProofWriter and mathematics post passes) is defined once, in `cells.py`, and `run_cell.py`
-reads it from there; it takes no flag that could change a cell's settings. Each stage runs
-the script it names under `framework/`, writes `<run_dir>/<stage>.json` (the rollouts are
-`k_traces_<n>_samples.json`, the name the evaluation scripts look for) and logs to
-`<run_dir>/log_<stage>.txt`; `<run_dir>/manifest.json` records the cell, the
-hyperparameters, the commit and every command. A run that stops resumes where it left off.
+The settings that differ between cells are defined once, in `cells.py`: Module II's trace
+weighting, Module III's `--prior_mode`, and the ProofWriter and mathematics post passes.
+`run_cell.py` reads them from there and has no flag that could change them.
+
+Each stage runs a script under `framework/`, writes `<run_dir>/<stage>.json` and logs to
+`<run_dir>/log_<stage>.txt`. The rollouts are saved as `k_traces_<n>_samples.json`, the name
+the evaluation scripts look for. `<run_dir>/manifest.json` records the cell, the
+hyperparameters, the commit and every command, and a run that stops resumes where it left off.
 
 ```bash
 python run_cell.py ... --dry_run              # print every stage's exact command, run nothing
@@ -73,8 +74,8 @@ python run_cell.py ... --k_traces FILE        # reuse Module I's rollouts instea
 python run_cell.py ... --from synthesized     # rerun from one stage onward (--no_resume: all of them)
 ```
 
-`tfirf_terms.py` is not a pipeline stage. It prints the TF-IRF terms for inspection, and
-the filters import its functions.
+`tfirf_terms.py` is not a pipeline stage. It prints the TF-IRF terms for inspection, and the
+filters import their functions from it.
 
 ## Repository layout
 
@@ -148,10 +149,11 @@ framework (§3.2).
 
 ### The four datasets
 
-Two logical and two mathematical datasets, 500 problems each; the logical two are balanced
-between proved and disproved. Neither backbone is near the ceiling on any of them before a
-method is applied (see the Direct and Raw CoT rows of the paper's main table). ProofWriter
-is always used at question depth 5, so every problem needs a five-step deduction.
+There are two logical and two mathematical datasets with 500 problems each, and the two
+logical ones are balanced between proved and disproved. Neither backbone is near the ceiling
+on any of them before a method is applied, as the Direct and Raw CoT rows of the paper's main
+table show. ProofWriter is always used at question depth 5, so every problem needs a
+five-step deduction.
 
 
 ## Part 1: Pilot Study (§4.1)
@@ -172,14 +174,15 @@ python "$P1"/experiments/roscoe_experiment/generate_traces.py --model <model> --
 
 ## Part 2: CRAFT (§3.2)
 
-Label prediction, for the main table and the ablation. `run_cell.py` scores the file its
-cell reports at the end (`<run_dir>/score.json`); any other output is scored the same way:
+Label prediction covers the main table and the ablation. `run_cell.py` scores the file its
+cell reports when it finishes (`<run_dir>/score.json`), and any other output is scored the
+same way:
 
 ```bash
 python evaluation/label_prediction/evaluate_accuracy.py score --input $RUN/synthesized.json --source synthesized
 ```
 
-Trace quality: ROSCOE scores the Raw CoT trace and the CRAFT trace of each problem. The
+For trace quality, ROSCOE scores the Raw CoT trace and the CRAFT trace of each problem. The
 scorer needs about 5 GB of local models, so it usually runs on another machine:
 
 ```bash
@@ -190,12 +193,13 @@ python $ROS/roscoe_adapter_craft.py --craft_dir $RUN --dataset dataset/FLD.json 
 python $ROS/roscoe_score.py         --export_dir $RUN/roscoe_export
 ```
 
-After Module III, ProofWriter and gemini's mathematics get their own passes
-(`framework/domain_optimization/`): on ProofWriter a closed-world recheck that writes its
-proof search back as steps, then a resolve pass, and on gpt-5.4-nano a restatement with the
-answer pinned; on Omni-MATH and OlympiadBench with gemini the split votes are adjudicated,
-the derivation is written back as steps and the trace opens with the goal. `run_cell.py`
-runs them in that order from `cells.py`. The trace each cell reports is then exported:
+After Module III, ProofWriter and Gemini's mathematics cells get their own passes, in
+`framework/domain_optimization/`. On ProofWriter a closed-world recheck writes its proof
+search back as steps and a resolve pass follows; with GPT-5.4-nano the trace is then restated
+with its answer pinned. On Omni-MATH and OlympiadBench with Gemini the split votes are
+adjudicated, the derivation is written back as steps, and the trace opens with the goal.
+`run_cell.py` runs these passes in order from `cells.py`. The trace each cell reports is then
+exported:
 
 ```bash
 # the trace each cell reports -> results/CRAFT_results/Output/<model>/<dataset>_Output.jsonl
@@ -203,13 +207,13 @@ python evaluation/label_prediction/evaluate_accuracy.py export
 ```
 
 All experiments use the same hyperparameters (§3.2): Module I `K=5`, `T=0.7`, `α=0.01`,
-`β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`. The K rollout temperatures are spaced
-evenly around `T` (`T_SPREAD=0.3`, so 0.4, 0.55, 0.7, 0.85, 1.0); a model whose API refuses
-a temperature is sampled at its default. They are defined once in
-`Part2_CRAFT/config.py` (`K`, `T`, `T_SPREAD`, `ALPHA`, `BETA`, `GAMMA`, `LAMBDA`, `THETA`, and
-`ATOMIC_STEPS` for the Module III prompt) and every stage takes its defaults from there,
-so a stage run without flags uses them. One variable changes a value everywhere for a
-run, e.g. `CRAFT_THETA=0.25` or `CRAFT_ATOMIC_STEPS=0`.
+`β=0.3`, `γ=-1.0`; Module II `λ=0.3`, `θ=0.3`. The K rollout temperatures are spaced evenly
+around `T` (`T_SPREAD=0.3`, so 0.4, 0.55, 0.7, 0.85 and 1.0), and a model whose API refuses a
+temperature is sampled at its default. All of them are defined once in `Part2_CRAFT/config.py`
+(`K`, `T`, `T_SPREAD`, `ALPHA`, `BETA`, `GAMMA`, `LAMBDA`, `THETA`, and `ATOMIC_STEPS` for the
+Module III prompt). Every stage takes its defaults from there, so a stage run without flags
+uses them, and one environment variable changes a value everywhere for a run, e.g.
+`CRAFT_THETA=0.25` or `CRAFT_ATOMIC_STEPS=0`.
 
 ## Configuration
 
@@ -219,8 +223,8 @@ Every module reads its credentials from the repo-root `config.py` (git-ignored) 
 
 ### Using other models
 
-Any OpenAI-compatible chat-completions endpoint works, and no model name is special-cased
-in the code. What differs between models is handled from the API's own replies:
+Any OpenAI-compatible chat-completions endpoint works. The code does not special-case any
+model name; what differs between models is worked out from the API's own replies:
 
 - **Temperature.** Rollouts send the K temperatures described above. If a request is refused
   as a client error (HTTP 400/422), it is sent once more without a temperature; if that
