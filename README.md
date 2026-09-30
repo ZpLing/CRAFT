@@ -74,9 +74,6 @@ python run_cell.py ... --k_traces FILE        # reuse Module I's rollouts instea
 python run_cell.py ... --from synthesized     # rerun from one stage onward (--no_resume: all of them)
 ```
 
-The tests are in `Part2_CRAFT/test/`, and `python3 test/run_all.py` (from `Part2_CRAFT`) runs
-all of them. None of them calls an API.
-
 `tfirf_terms.py` is not a pipeline stage. It prints the TF-IRF terms for inspection, and the
 filters import their functions from it.
 
@@ -133,9 +130,6 @@ framework (§3.2).
 │   │   │   └── roscoe_score.py
 │   │   └── Ablation_Study/
 │   │       └── ablation_study.py
-│   ├── test/
-│   │   ├── run_all.py
-│   │   └── test_*.py
 │   └── results/
 │       ├── baseline_results/<model>/<baseline>/
 │       └── CRAFT_results/

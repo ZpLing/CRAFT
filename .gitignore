@@ -100,3 +100,6 @@ Part2_CRAFT/evaluation/SFT/
 Part2_CRAFT/evaluation/other_evaluation/trace_utility/
 Part2_CRAFT/results/CRAFT_results/SFT/
 Part2_CRAFT/results/CRAFT_results/other_results/trace_utility/
+
+# Tests stay local and are not published
+Part2_CRAFT/test/
