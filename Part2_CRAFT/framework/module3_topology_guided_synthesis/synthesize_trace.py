@@ -291,7 +291,7 @@ def build_synthesis_prompt(
         problem_input: Problem context
         step_terms_summary: Summary of terms at each step position
         ground_truth: Expected answer (optional)
-        current_step: Which bucket of terms to draw on (if None, generate all at once)
+        current_step: Which bucket of terms to draw on; the prompt asks for that one step
         step_label: What to call this step in the prompt. The buckets are
             percentage positions over the K traces, so their keys skip a number
             whenever no trace put a step in that tenth -- and the step then went
@@ -302,6 +302,10 @@ def build_synthesis_prompt(
         domain: "logical" or "math"
     """
 
+    # Every caller writes one step at a time; the whole-trace prompt this used
+    # to build without a current_step belonged to a strategy nothing ran.
+    if current_step is None:
+        raise ValueError("build_synthesis_prompt writes one step: pass current_step")
     label = step_label if step_label is not None else current_step
 
     # The maths trace comes out five to seven times longer than the CoT it is
@@ -410,45 +414,23 @@ and follow your own derivation if it disagrees):
             prompt += f"Step {i}: {step_text}\n"
         prompt += "\n"
 
-    if current_step is not None:
-        step_data = step_terms_summary.get(current_step)
-        if step_data:
-            terms = step_data["terms"]
-            frequencies = step_data["term_frequencies"]
-            num_traces = step_data["num_traces"]
+    step_data = step_terms_summary.get(current_step)
+    if step_data:
+        terms = step_data["terms"]
+        frequencies = step_data["term_frequencies"]
+        num_traces = step_data["num_traces"]
 
-            min_freq = max(1, int(num_traces * 0.3))
-            high_freq_terms = [
-                term for term in terms
-                if frequencies.get(term, 0) >= min_freq
-            ]
+        min_freq = max(1, int(num_traces * 0.3))
+        high_freq_terms = [
+            term for term in terms
+            if frequencies.get(term, 0) >= min_freq
+        ]
 
-            prompt += f"""
+        prompt += f"""
 **Current Step ({label}) - Important Terms** (extracted from {num_traces} traces):
   Key terms: {', '.join(high_freq_terms[:20])}
   Term frequencies: {dict((t, frequencies[t]) for t in high_freq_terms[:10])}
 """
-    else:
-        prompt += f"""
-**Important Terms by Step Position** (extracted from multiple reasoning traces):
-
-"""
-        for step_pos, step_data in sorted_steps:
-            terms = step_data["terms"]
-            frequencies = step_data["term_frequencies"]
-            num_traces = step_data["num_traces"]
-
-            min_freq = max(1, int(num_traces * 0.3))
-            high_freq_terms = [
-                term for term in terms
-                if frequencies.get(term, 0) >= min_freq
-            ]
-
-            if high_freq_terms:
-                prompt += f"Step {step_pos} (appears in {num_traces} traces):\n"
-                prompt += f"  Key terms: {', '.join(high_freq_terms[:20])}\n"
-                prompt += f"  Term frequencies: {dict((t, frequencies[t]) for t in high_freq_terms[:10])}\n\n"
-
     # Add domain-specific quality guidelines to prevent common errors
     if domain == "math":
         prompt += f"""
@@ -514,17 +496,16 @@ and follow your own derivation if it disagrees):
 **Instructions**:
 """
 
-    if current_step is not None:
-        total_steps = len(sorted_steps)
-        is_last_step = (current_step == sorted_steps[-1][0])
+    total_steps = len(sorted_steps)
+    is_last_step = (current_step == sorted_steps[-1][0])
 
-        prompt += f"""
+    prompt += f"""
 **Current Task**: Generate Step {label} of {total_steps} total steps"""
 
-        if is_last_step:
-            prompt += f""" (THIS IS THE FINAL STEP - MUST REACH A CLEAR CONCLUSION)"""
+    if is_last_step:
+        prompt += f""" (THIS IS THE FINAL STEP - MUST REACH A CLEAR CONCLUSION)"""
 
-        prompt += f"""
+    prompt += f"""
 
 **CRITICAL REQUIREMENTS**:
 
@@ -544,9 +525,9 @@ and follow your own derivation if it disagrees):
    - Output format: "Step {label}: [your reasoning here]"
    - Do NOT generate any other steps"""
 
-        if is_last_step:
-            if domain == "math":
-                prompt += f"""
+    if is_last_step:
+        if domain == "math":
+            prompt += f"""
 
 3. **Final Step Requirements** (CRITICAL - This is Step {label}, the LAST step):
    - You MUST arrive at a clear, numeric or symbolic answer
@@ -554,8 +535,8 @@ and follow your own derivation if it disagrees):
    - Do NOT stop before boxing the answer
    - Example: "Therefore, x = 3, so the answer is \\boxed{{3}}"
    - This is REQUIRED - do not skip the boxed answer"""
-            else:
-                prompt += f"""
+        else:
+            prompt += f"""
 
 3. **Final Step Requirements** (CRITICAL - This is Step {label}, the LAST step):
    - You MUST reach a clear, explicit conclusion about the hypothesis
@@ -564,8 +545,8 @@ and follow your own derivation if it disagrees):
    - Explicitly state your final answer in the format: "Therefore, [conclusion]"
    - Example: "Therefore, the hypothesis is __PROVED__" or "Therefore, the hypothesis is __DISPROVED__"
    - This is REQUIRED - do not skip this final conclusion"""
-        else:
-            prompt += f"""
+    else:
+        prompt += f"""
 
 3. **Continuation Requirements**:
    - This is Step {label} of {total_steps} - you are NOT done yet
@@ -573,43 +554,10 @@ and follow your own derivation if it disagrees):
    - Do NOT conclude or stop here
    - Prepare for the next step"""
 
-        prompt += f"""
+    prompt += f"""
 
 {_verify_block}
 Please generate Step {label} now:"""
-    else:
-        if domain == "math":
-            prompt += """
-1. Solve the problem step-by-step, incorporating the important terms from each step position
-2. Show complete equations at each step (both sides of the equals sign)
-3. Cite which given value or previous result you use in each step
-4. Follow ALL quality guidelines above
-5. The final step MUST include the answer in \\boxed{<answer>} notation
-
-**Output Format**:
-Step 1: [arithmetic/algebraic manipulation with full equations]
-Step 2: [next manipulation]
-...
-Step N: [final answer — must include \\boxed{<answer>}]
-
-Please solve the problem now:"""
-        else:
-            prompt += """
-1. Generate a step-by-step reasoning process that incorporates the important terms from each step position
-2. Use the terms naturally in your reasoning, ensuring logical flow
-3. Follow the step structure indicated by the term positions
-4. Ensure each step builds logically on the previous steps
-5. Follow ALL quality guidelines above
-6. Use clear, precise language
-7. End with a clear conclusion
-
-**Output Format**:
-Step 1: [reasoning using terms from Step 1]
-Step 2: [reasoning using terms from Step 2]
-...
-Step N: [final conclusion]
-
-Please generate the reasoning process now:"""
 
     return prompt
 
@@ -2046,17 +1994,16 @@ async def synthesize_trace_for_sample(
     sample: Dict[str, Any],
     min_tfidf: float = ALPHA,
     model: str = DEFAULT_MODEL,
-    step_by_step: bool = True,
     domain: str = "logical",
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
     atomic_steps: bool = ATOMIC_STEPS,
 ) -> Dict[str, Any]:
     """
-    Generate a high-quality reasoning trace for a single sample.
+    Generate a reasoning trace for a single sample without the graph, one step
+    at a time, each step seeing the previous ones: the ablation's w/o RKG row.
 
     Args:
-        step_by_step: If True, generate each step one at a time; if False, generate all steps at once
         domain: "logical" or "math"
     """
     sample_id = sample.get("sample_id", "unknown")
@@ -2158,93 +2105,85 @@ async def synthesize_trace_for_sample(
         final_markers = ["__proved__", "__disproved__", "therefore", "conclusion"]
 
     try:
-        if step_by_step:
-            generated_steps = []
+        generated_steps = []
 
-            _math_max_tok = RESPONSE_TOKENS_MATH if domain == "math" else None
+        _math_max_tok = RESPONSE_TOKENS_MATH if domain == "math" else None
 
-            for idx, step_pos in enumerate(sorted_step_positions):
-                is_last_step = (idx == len(sorted_step_positions) - 1)
+        for idx, step_pos in enumerate(sorted_step_positions):
+            is_last_step = (idx == len(sorted_step_positions) - 1)
 
-                prompt = build_synthesis_prompt(
-                    problem_input,
-                    step_terms_summary,
-                    ground_truth,
-                    current_step=step_pos,
-                    previous_steps=generated_steps,
-                    domain=domain,
-                    answer_is_prior=answer_is_prior,
-                    atomic_steps=atomic_steps,
-                )
+            prompt = build_synthesis_prompt(
+                problem_input,
+                step_terms_summary,
+                ground_truth,
+                current_step=step_pos,
+                previous_steps=generated_steps,
+                domain=domain,
+                answer_is_prior=answer_is_prior,
+                atomic_steps=atomic_steps,
+            )
 
-                response = await generate_reasoning_trace(
-                    session, prompt, model, max_tokens=_math_max_tok)
+            response = await generate_reasoning_trace(
+                session, prompt, model, max_tokens=_math_max_tok)
 
-                step_content = parse_step_from_response(response, step_pos)
-                if step_content:
-                    generated_steps.append(step_content)
+            step_content = parse_step_from_response(response, step_pos)
+            if step_content:
+                generated_steps.append(step_content)
+            else:
+                cleaned_response = (response or "").strip()
+                if cleaned_response:
+                    generated_steps.append(cleaned_response)
                 else:
-                    cleaned_response = (response or "").strip()
-                    if cleaned_response:
-                        generated_steps.append(cleaned_response)
-                    else:
-                        # Final step empty → retry with a direct solve prompt
-                        if is_last_step and domain == "math":
-                            prev_text = "\n".join(generated_steps)
-                            retry_prompt = (
-                                f"Problem:\n{problem_input}\n\n"
-                                f"Reasoning so far:\n{prev_text}\n\n"
-                                "Continue and complete the solution. "
-                                "Compute the exact final answer and express it as "
-                                "\\boxed{<answer>}. Show your work."
-                            )
-                            retry_resp = await generate_reasoning_trace(
-                                session, retry_prompt, model, max_tokens=_math_max_tok)
-                            if retry_resp and retry_resp.strip():
-                                generated_steps.append(retry_resp.strip())
-                            else:
-                                generated_steps.append(
-                                    f"[Step {step_pos} content not generated]")
+                    # Final step empty → retry with a direct solve prompt
+                    if is_last_step and domain == "math":
+                        prev_text = "\n".join(generated_steps)
+                        retry_prompt = (
+                            f"Problem:\n{problem_input}\n\n"
+                            f"Reasoning so far:\n{prev_text}\n\n"
+                            "Continue and complete the solution. "
+                            "Compute the exact final answer and express it as "
+                            "\\boxed{<answer>}. Show your work."
+                        )
+                        retry_resp = await generate_reasoning_trace(
+                            session, retry_prompt, model, max_tokens=_math_max_tok)
+                        if retry_resp and retry_resp.strip():
+                            generated_steps.append(retry_resp.strip())
                         else:
                             generated_steps.append(
                                 f"[Step {step_pos} content not generated]")
+                    else:
+                        generated_steps.append(
+                            f"[Step {step_pos} content not generated]")
 
-            synthesized_text = "\n".join([
-                f"Step {i+1}: {step_content}"
-                for i, step_content in enumerate(generated_steps)
-            ])
+        synthesized_text = "\n".join([
+            f"Step {i+1}: {step_content}"
+            for i, step_content in enumerate(generated_steps)
+        ])
 
-            # ── Force-conclude for math: ensure \boxed{} is present ──────────
-            if domain == "math" and r'\boxed' not in synthesized_text:
-                force_prompt = (
-                    f"Problem:\n{problem_input}\n\n"
-                    f"Reasoning:\n{synthesized_text}\n\n"
-                    "Based on the complete reasoning above, what is the final numerical answer?\n"
-                    "Respond with ONLY: \\boxed{<answer>} — no other text."
+        # ── Force-conclude for math: ensure \boxed{} is present ──────────
+        if domain == "math" and r'\boxed' not in synthesized_text:
+            force_prompt = (
+                f"Problem:\n{problem_input}\n\n"
+                f"Reasoning:\n{synthesized_text}\n\n"
+                "Based on the complete reasoning above, what is the final numerical answer?\n"
+                "Respond with ONLY: \\boxed{<answer>} — no other text."
+            )
+            force_resp = await generate_reasoning_trace(
+                session, force_prompt, model, max_tokens=256)
+            boxes = re.findall(r'\\boxed\{([^}]+)\}', force_resp or "")
+            if boxes:
+                synthesized_text += f"\nFinal Answer: \\boxed{{{boxes[-1]}}}"
+            else:
+                # Last resort: fresh solve attempt
+                fresh_prompt = (
+                    f"Solve the following math problem. "
+                    f"Show your work step by step and end with \\boxed{{answer}}.\n\n"
+                    f"{problem_input}"
                 )
-                force_resp = await generate_reasoning_trace(
-                    session, force_prompt, model, max_tokens=256)
-                boxes = re.findall(r'\\boxed\{([^}]+)\}', force_resp or "")
-                if boxes:
-                    synthesized_text += f"\nFinal Answer: \\boxed{{{boxes[-1]}}}"
-                else:
-                    # Last resort: fresh solve attempt
-                    fresh_prompt = (
-                        f"Solve the following math problem. "
-                        f"Show your work step by step and end with \\boxed{{answer}}.\n\n"
-                        f"{problem_input}"
-                    )
-                    fresh_resp = await generate_reasoning_trace(
-                        session, fresh_prompt, model, max_tokens=_math_max_tok)
-                    if fresh_resp and r'\boxed' in fresh_resp:
-                        synthesized_text = fresh_resp.strip()
-        else:
-            prompt = build_synthesis_prompt(
-                problem_input, step_terms_summary, ground_truth, domain=domain,
-                answer_is_prior=answer_is_prior,
-                    atomic_steps=atomic_steps,
-                )
-            synthesized_text = await generate_reasoning_trace(session, prompt, model)
+                fresh_resp = await generate_reasoning_trace(
+                    session, fresh_prompt, model, max_tokens=_math_max_tok)
+                if fresh_resp and r'\boxed' in fresh_resp:
+                    synthesized_text = fresh_resp.strip()
 
         # Extract pred_label from synthesized text
         if domain == "math":
@@ -2276,7 +2215,7 @@ async def synthesize_trace_for_sample(
             "synthesized_trace": synthesized_text,
             "num_original_traces": len(traces),
             "num_step_positions": len(step_terms_summary),
-            "generation_method": "step_by_step" if step_by_step else "all_at_once",
+            "generation_method": "step_by_step",
         }
     except Exception as e:
         return {
@@ -2294,7 +2233,6 @@ async def synthesize_traces_for_dataset(
     concurrency: int = 20,
     max_samples: Optional[int] = None,
     original_file: Optional[Path] = None,
-    step_by_step: bool = True,
     domain: str = "logical",
     synthesis_strategy: str = "step_by_step",
     rkg_file: Optional[Path] = None,
@@ -2433,7 +2371,6 @@ async def synthesize_traces_for_dataset(
             else:
                 tasks.append(_bounded(synthesize_trace_for_sample(
                     session, sample, min_tfidf, model,
-                    step_by_step=(synthesis_strategy != "all_at_once"),
                     domain=domain,
                     df_table=df_table,
                     idf_norm=(idf_norm == "log_n"),
@@ -2705,7 +2642,7 @@ def main():
         help=f"Model to use (default: {DEFAULT_MODEL})"
     )
     parser.add_argument(
-        "--alpha", "--min_tfidf",
+        "--alpha",
         dest="min_tfidf",
         type=float,
         default=ALPHA,
@@ -2758,20 +2695,6 @@ def main():
         help="API Base URL (overrides default)"
     )
     parser.add_argument(
-        "--step_by_step",
-        action="store_true",
-        default=False,
-        help="Shorthand for --synthesis_strategy step_by_step: generate one step at a "
-             "time without the graph, each step seeing the previous ones"
-    )
-    parser.add_argument(
-        "--all_at_once",
-        action="store_true",
-        default=False,
-        help="Shorthand for --synthesis_strategy all_at_once: generate the whole trace "
-             "in one call"
-    )
-    parser.add_argument(
         "--domain",
         type=str,
         default="logical",
@@ -2782,11 +2705,11 @@ def main():
         "--synthesis_strategy",
         type=str,
         default="rkg",
-        choices=["step_by_step", "all_at_once", "rkg"],
+        choices=["step_by_step", "rkg"],
         help="Synthesis strategy. 'rkg' (default) is Module III as the paper describes "
              "it — a topological walk over the consensus RKG, so it requires --rkg_file. "
-             "'step_by_step' and 'all_at_once' ignore the graph and are the ablation's "
-             "'w/o RKG' setting rather than CRAFT",
+             "'step_by_step' ignores the graph and is the ablation's 'w/o RKG' setting "
+             "rather than CRAFT",
     )
     parser.add_argument(
         "--rkg_file",
@@ -2844,16 +2767,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Synthesis strategy
-    # The two shorthands select a strategy, and saying both is a contradiction
-    # rather than a precedence puzzle.
-    if args.all_at_once and args.step_by_step:
-        parser.error("--step_by_step and --all_at_once select different strategies; pass one")
     synthesis_strategy = args.synthesis_strategy
-    if args.all_at_once:
-        synthesis_strategy = "all_at_once"
-    elif args.step_by_step:
-        synthesis_strategy = "step_by_step"
 
     # Update configuration
     global OPENAI_API_KEY, OPENAI_BASE_URL, CHAT_COMPLETIONS_URL, HEADERS
@@ -2917,7 +2831,6 @@ def main():
             concurrency=args.concurrency,
             max_samples=args.max_samples,
             original_file=original_path,
-            step_by_step=(synthesis_strategy == "step_by_step"),
             domain=args.domain,
             synthesis_strategy=synthesis_strategy,
             rkg_file=_cfg.resolve_input(args.rkg_file) if args.rkg_file else None,
