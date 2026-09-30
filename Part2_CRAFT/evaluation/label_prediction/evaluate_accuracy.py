@@ -1408,32 +1408,16 @@ async def run_setting_icl(
 # A cell's reported number does not always come from `synthesized.json`: the
 # settings differ per configuration and each writes its own file, so reading
 # a run directory and taking the obvious name gives the wrong trace for most
-# cells. This map is the one place that says which file each cell reports
-# from; the export fails rather than falling back if that file is missing.
+# cells. Where each cell's file is, like how it was run, comes from cells.py:
+# run_cell.py puts a cell in <runs>/<dataset>_<model>/ and its reported file is
+# <Cell.reported_stem>.json. The export fails rather than falling back if that
+# file is missing.
 #
 # (dataset, model) -> (cell directory under --runs, file stem, how it was run).
-# How a cell is run is not restated here: it is cells.py's Cell.describe(), the
-# same definition run_cell.py builds the cell's commands from. What stays here
-# is where the 2026-09-23 run left each cell's reported file, whose folders and
-# stems predate run_cell.py (Module III wrote synth.json there; a run_cell.py
-# directory holds <Cell.reported_stem>.json instead).
 from cells import CELLS  # noqa: E402  (Part2_CRAFT is on sys.path, see Config above)
 
-_REPORTED_RUNS = {
-    ("FLD", "gemini-3.1-flash-lite"):           ("FLDgem", "synth"),
-    ("FLD", "gpt-5.4-nano"):                    ("FLDgpt", "synth"),
-    ("ProofWriter", "gemini-3.1-flash-lite"):   ("PWgem", "cwa_resolve"),
-    ("ProofWriter", "gpt-5.4-nano"):            ("PWgpt", "polish"),
-    ("OmniMATH", "gemini-3.1-flash-lite"):      ("OMgem", "adj_goal"),
-    ("OmniMATH", "gpt-5.4-nano"):               ("OMgpt", "synth"),
-    ("OlympiadBench", "gemini-3.1-flash-lite"): ("OBgem", "adj_goal"),
-    ("OlympiadBench", "gpt-5.4-nano"):          ("OBgpt", "synth"),
-}
-if set(_REPORTED_RUNS) != set(CELLS):
-    raise RuntimeError("evaluate_accuracy._REPORTED_RUNS and cells.CELLS name different cells: "
-                       f"{sorted(set(_REPORTED_RUNS) ^ set(CELLS))}")
-REPORTED_CELLS = {key: (run, stem, CELLS[key].describe())
-                  for key, (run, stem) in _REPORTED_RUNS.items()}
+REPORTED_CELLS = {(c.dataset, c.model): (f"{c.dataset}_{c.model}", c.reported_stem, c.describe())
+                  for c in CELLS.values()}
 
 _STEP_HEAD_RE = re.compile(r"(?m)^\s*Step\s*\d+\s*[:.\-]\s*")
 
@@ -1454,7 +1438,7 @@ def main_export(argv) -> None:
     parser = argparse.ArgumentParser(
         prog="evaluate_accuracy.py export", description=main_export.__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--runs", default="craft_runs/full500_v4/traces",
+    parser.add_argument("--runs", default="craft_runs/full500_v6",
                         help="Directory holding one folder per cell (see REPORTED_CELLS)")
     parser.add_argument("--out_dir", default="CRAFT_results/Output")
     args = parser.parse_args(argv)
