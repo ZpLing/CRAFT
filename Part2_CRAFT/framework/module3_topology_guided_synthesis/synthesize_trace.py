@@ -783,6 +783,21 @@ _ECHOED_HEADER = re.compile(
     re.IGNORECASE)
 
 
+def resolve_prior_mode(prior_mode: str, domain: str, mv_strength: Optional[float]) -> str:
+    """The prior mode one sample is synthesised under.
+
+    "auto": on a logical problem, a vote all K traces agree on is settled
+    ("follow") and a split one is checked against the chain ("verify").
+    Overruling a unanimous vote was right 7 times and wrong 32 across the four
+    logical cells (FLD and ProofWriter, both models), while overruling a split
+    vote gained on every one of them. A mathematical problem keeps "verify".
+    """
+    if prior_mode != "auto":
+        return prior_mode
+    unanimous = mv_strength is not None and mv_strength >= 1.0 - 1e-9
+    return "follow" if domain == "logical" and unanimous else "verify"
+
+
 def break_cycles_by_weight(consensus_rkg: Dict[str, Any]) -> Dict[str, Any]:
     """Remove the lowest-W(e) edge of every cycle of G*, as Module III describes.
 
@@ -1137,7 +1152,7 @@ def build_rkg_synthesis_prompt(
     mv_label: Optional[str] = None,
     mv_answer: Optional[str] = None,
     mv_strength: Optional[float] = None,
-    prior_mode: str = "verify",
+    prior_mode: str = "auto",
     atomic_steps: bool = ATOMIC_STEPS,
     gt_label: Optional[str] = None,
     step_terms_summary: Optional[Dict[int, Dict]] = None,
@@ -1495,7 +1510,7 @@ async def synthesize_trace_rkg(
     sample_rkg: Dict[str, Any],
     model: str = DEFAULT_MODEL,
     domain: str = "logical",
-    prior_mode: str = "verify",
+    prior_mode: str = "auto",
     atomic_steps: bool = ATOMIC_STEPS,
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
@@ -1611,6 +1626,8 @@ async def synthesize_trace_rkg(
                 _total = sum(_label_counts.values())
                 if _total > 0:
                     _mv_strength = _label_counts[_mv_label] / _total
+
+    prior_mode = resolve_prior_mode(prior_mode, domain, _mv_strength)
 
     consensus_rkg = break_cycles_by_weight(consensus_rkg)
     topo_order = topological_sort_rkg(consensus_rkg)
@@ -2254,7 +2271,7 @@ async def synthesize_traces_for_dataset(
     domain: str = "logical",
     synthesis_strategy: str = "step_by_step",
     rkg_file: Optional[Path] = None,
-    prior_mode: str = "verify",
+    prior_mode: str = "auto",
     atomic_steps: bool = ATOMIC_STEPS,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
@@ -2539,7 +2556,7 @@ async def retry_failed_synthesis(
     model: str = DEFAULT_MODEL,
     concurrency: int = 4,
     domain: str = "logical",
-    prior_mode: str = "verify",
+    prior_mode: str = "auto",
     atomic_steps: bool = ATOMIC_STEPS,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
@@ -2760,10 +2777,12 @@ def main():
         help="Let a step carry all its intermediate work instead",
     )
     parser.add_argument(
-        "--prior_mode", choices=["verify", "follow"], default="verify",
+        "--prior_mode", choices=["auto", "verify", "follow"], default="auto",
         help="How Module III is told to treat the consensus vote when it writes "
-             "the conclusion. 'verify' (default) gives it as a prior the derived "
-             "chain may overrule; 'follow' asks for reasoning that leads to it. "
+             "the conclusion. 'verify' gives it as a prior the derived chain may "
+             "overrule; 'follow' asks for reasoning that leads to it; 'auto' "
+             "(default) follows a unanimous vote on a logical problem and "
+             "verifies otherwise. "
              "Selected per configuration on a validation split: a model whose "
              "single re-derivation is weaker than its own vote does better with "
              "'follow'.",
