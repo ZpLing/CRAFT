@@ -783,20 +783,6 @@ _ECHOED_HEADER = re.compile(
     re.IGNORECASE)
 
 
-def resolve_prior_mode(prior_mode: str, domain: str, unanimous: bool) -> str:
-    """The prior mode one sample is synthesised under.
-
-    "auto": on a logical problem, a vote all K traces agree on is settled
-    ("follow") and a split one is checked against the chain ("verify").
-    Overruling a unanimous vote was right 7 times and wrong 32 across the four
-    logical cells (FLD and ProofWriter, both models), while overruling a split
-    vote gained on every one of them. A mathematical problem keeps "verify".
-    """
-    if prior_mode != "auto":
-        return prior_mode
-    return "follow" if domain == "logical" and unanimous else "verify"
-
-
 def break_cycles_by_weight(consensus_rkg: Dict[str, Any]) -> Dict[str, Any]:
     """Remove the lowest-W(e) edge of every cycle of G*, as Module III describes.
 
@@ -1151,7 +1137,7 @@ def build_rkg_synthesis_prompt(
     mv_label: Optional[str] = None,
     mv_answer: Optional[str] = None,
     mv_strength: Optional[float] = None,
-    prior_mode: str = "auto",
+    prior_mode: str = "verify",
     atomic_steps: bool = ATOMIC_STEPS,
     gt_label: Optional[str] = None,
     step_terms_summary: Optional[Dict[int, Dict]] = None,
@@ -1509,7 +1495,7 @@ async def synthesize_trace_rkg(
     sample_rkg: Dict[str, Any],
     model: str = DEFAULT_MODEL,
     domain: str = "logical",
-    prior_mode: str = "auto",
+    prior_mode: str = "verify",
     atomic_steps: bool = ATOMIC_STEPS,
     df_table: Optional[DocFreqTable] = None,
     idf_norm: bool = False,
@@ -1572,7 +1558,6 @@ async def synthesize_trace_rkg(
     _mv_label:  Optional[str] = None   # logical domain
     _mv_answer: Optional[str] = None   # math domain
     _mv_strength: Optional[float] = None  # share of the weighted vote behind _mv_label
-    _mv_unanimous = False                 # all K traces state the same label
     _all_traces = sample.get("cleaned_traces") or sample.get("traces", [])
 
     # The weight Module II gave each trace when it built the consensus. This
@@ -1611,33 +1596,21 @@ async def synthesize_trace_rkg(
                 _mv_answer = max(_ans_counts, key=_ans_counts.get)
         else:
             _label_counts: Dict[str, int] = {}
-            _raw_labels: List[Optional[str]] = []   # one per trace, unweighted
             for _t in _all_traces:
                 _lbl = _t.get("label")
                 if _lbl and _lbl in ("__PROVED__", "__DISPROVED__"):
                     _label_counts[_lbl] = _label_counts.get(_lbl, 0) + _weight_of(_t)
-                    _raw_labels.append(_lbl)
                     continue
                 _txt = (_t.get("reasoning_text") or "") + " " + (_t.get("raw_response") or "")
                 _ms = re.findall(r"__(PROVED|DISPROVED)__", _txt, re.IGNORECASE)
                 if _ms:
                     _lbl = f"__{_ms[-1].upper()}__"
                     _label_counts[_lbl] = _label_counts.get(_lbl, 0) + _weight_of(_t)
-                    _raw_labels.append(_lbl)
-                else:
-                    _raw_labels.append(None)
-            # Unanimous: every one of the K traces states the same label. Not
-            # read off the weighted share, which skips unlabelled traces and a
-            # dissenting trace of weight zero.
-            _mv_unanimous = (bool(_raw_labels) and None not in _raw_labels
-                             and len(set(_raw_labels)) == 1)
             if _label_counts:
                 _mv_label = max(_label_counts, key=_label_counts.get)
                 _total = sum(_label_counts.values())
                 if _total > 0:
                     _mv_strength = _label_counts[_mv_label] / _total
-
-    prior_mode = resolve_prior_mode(prior_mode, domain, _mv_unanimous)
 
     consensus_rkg = break_cycles_by_weight(consensus_rkg)
     topo_order = topological_sort_rkg(consensus_rkg)
@@ -1976,13 +1949,13 @@ async def synthesize_trace_rkg(
                 generated_steps.append(closing.strip())
                 pred_label = _mv_answer
 
-        # The same for a logical problem: under "follow" (under "auto", a vote
-        # all K traces agree on) the final step was still writing the other
-        # label on 11 of nano FLD's 282 unanimous samples, 8 of them wrongly,
-        # although its requirements name the consensus label. Here the closing
-        # step is rewritten rather than appended to, so the trace does not
-        # carry two verdicts; if the rewrite will not reach the consensus
-        # label, the chain's own ending stands.
+        # The same for a logical problem: under "follow" the final step was
+        # still writing the other label on 11 of nano FLD's 282 samples whose
+        # K traces all agreed, 8 of them wrongly, although its requirements
+        # name the consensus label. Here the closing step is rewritten rather
+        # than appended to, so the trace does not carry two verdicts; if the
+        # rewrite will not reach the consensus label, the chain's own ending
+        # stands.
         if (prior_mode == "follow" and domain == "logical" and _mv_label
                 and synthesized_text and generated_steps
                 and pred_label and pred_label != _mv_label):
@@ -2000,8 +1973,8 @@ async def synthesize_trace_rkg(
                 retarget = (
                     f"Problem:\n{problem_input}\n\n"
                     f"Reasoning so far:\n{head}\n\n"
-                    f"Its final step concluded {pred_label}, but every independent "
-                    f"reasoning trace concludes {_mv_label}. Re-read the hypothesis, "
+                    f"Its final step concluded {pred_label}, but independent "
+                    f"reasoning traces agree it is {_mv_label}. Re-read the hypothesis, "
                     f"including any negation it carries, check it against the steps "
                     f"above, and write the corrected final step. Begin it with "
                     f"\"{step_lbl}\", restate the hypothesis in the problem's wording, "
@@ -2325,7 +2298,7 @@ async def synthesize_traces_for_dataset(
     domain: str = "logical",
     synthesis_strategy: str = "step_by_step",
     rkg_file: Optional[Path] = None,
-    prior_mode: str = "auto",
+    prior_mode: str = "verify",
     atomic_steps: bool = ATOMIC_STEPS,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
@@ -2610,7 +2583,7 @@ async def retry_failed_synthesis(
     model: str = DEFAULT_MODEL,
     concurrency: int = 4,
     domain: str = "logical",
-    prior_mode: str = "auto",
+    prior_mode: str = "verify",
     atomic_steps: bool = ATOMIC_STEPS,
     idf_scope: str = "sample",
     idf_norm: str = "raw",
@@ -2831,12 +2804,10 @@ def main():
         help="Let a step carry all its intermediate work instead",
     )
     parser.add_argument(
-        "--prior_mode", choices=["auto", "verify", "follow"], default="auto",
+        "--prior_mode", choices=["verify", "follow"], default="verify",
         help="How Module III is told to treat the consensus vote when it writes "
-             "the conclusion. 'verify' gives it as a prior the derived chain may "
-             "overrule; 'follow' asks for reasoning that leads to it; 'auto' "
-             "(default) follows a unanimous vote on a logical problem and "
-             "verifies otherwise. "
+             "the conclusion. 'verify' (default) gives it as a prior the derived "
+             "chain may overrule; 'follow' asks for reasoning that leads to it. "
              "Selected per configuration on a validation split: a model whose "
              "single re-derivation is weaker than its own vote does better with "
              "'follow'.",
