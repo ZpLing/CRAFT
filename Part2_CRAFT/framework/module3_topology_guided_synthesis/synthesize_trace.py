@@ -1976,6 +1976,39 @@ async def synthesize_trace_rkg(
                 generated_steps.append(closing.strip())
                 pred_label = _mv_answer
 
+        # The same for a logical problem: under "follow" (under "auto", a vote
+        # all K traces agree on) the final step was still writing the other
+        # label on 11 of nano FLD's 282 unanimous samples, 8 of them wrongly,
+        # although its requirements name the consensus label. Here the closing
+        # step is rewritten rather than appended to, so the trace does not
+        # carry two verdicts; if the rewrite will not reach the consensus
+        # label, the chain's own ending stands.
+        if (prior_mode == "follow" and domain == "logical" and _mv_label
+                and synthesized_text and generated_steps
+                and pred_label and pred_label != _mv_label):
+            last = generated_steps[-1]
+            cut = synthesized_text.rfind(last)
+            if cut >= 0:
+                head = synthesized_text[:cut].rstrip()
+                _lbl_m = re.match(r"\s*(Step\s*\d+\s*:)", last)
+                step_lbl = _lbl_m.group(1) if _lbl_m else f"Step {len(generated_steps)}:"
+                retarget = (
+                    f"Problem:\n{problem_input}\n\n"
+                    f"Reasoning so far:\n{head}\n\n"
+                    f"Its final step concluded {pred_label}, but every independent "
+                    f"reasoning trace concludes {_mv_label}. Re-read the hypothesis, "
+                    f"including any negation it carries, check it against the steps "
+                    f"above, and write the corrected final step. Begin it with "
+                    f"\"{step_lbl}\", restate the hypothesis in the problem's wording, "
+                    f"and end with the exact marker {_mv_label}.\n"
+                    "Output ONLY that final step."
+                )
+                fixed = await generate_reasoning_trace(session, retarget, model)
+                if fixed and _extract_answer(fixed) == _mv_label:
+                    synthesized_text = head + "\n" + fixed.strip()
+                    generated_steps[-1] = fixed.strip()
+                    pred_label = _mv_label
+
         if pred_label and not _has_conclusion(synthesized_text):
             synthesized_text += _conclude_append(pred_label)
 
