@@ -74,6 +74,9 @@ python run_cell.py ... --k_traces FILE        # reuse Module I's rollouts instea
 python run_cell.py ... --from synthesized     # rerun from one stage onward (--no_resume: all of them)
 ```
 
+The tests are in `Part2_CRAFT/test/`, and `python3 test/run_all.py` (from `Part2_CRAFT`) runs
+all of them. None of them calls an API.
+
 `tfirf_terms.py` is not a pipeline stage. It prints the TF-IRF terms for inspection, and the
 filters import their functions from it.
 
@@ -96,7 +99,6 @@ framework (§3.2).
 ├── Part2_CRAFT/
 │   ├── cells.py
 │   ├── run_cell.py
-│   ├── test_cells.py
 │   ├── dataset/
 │   │   ├── FLD.json
 │   │   ├── ProofWriter.json
@@ -111,18 +113,14 @@ framework (§3.2).
 │   │   │   └── build_rkg.py
 │   │   ├── module3_topology_guided_synthesis/
 │   │   │   ├── synthesize_trace.py
-│   │   │   ├── dedup_trace.py
-│   │   │   └── test_dedup_trace.py
+│   │   │   └── dedup_trace.py
 │   │   └── domain_optimization/
 │   │       ├── math_text.py
 │   │       ├── cwa_recheck.py
 │   │       ├── adjudicate_math.py
 │   │       ├── apply_adjudication.py
 │   │       ├── polish_trace.py
-│   │       ├── state_goal.py
-│   │       ├── test_math_text.py
-│   │       ├── test_cwa_recheck.py
-│   │       └── test_apply_adjudication.py
+│   │       └── state_goal.py
 │   ├── evaluation/
 │   │   ├── label_prediction/
 │   │   │   ├── evaluate_accuracy.py
@@ -135,6 +133,9 @@ framework (§3.2).
 │   │   │   └── roscoe_score.py
 │   │   └── Ablation_Study/
 │   │       └── ablation_study.py
+│   ├── test/
+│   │   ├── run_all.py
+│   │   └── test_*.py
 │   └── results/
 │       ├── baseline_results/<model>/<baseline>/
 │       └── CRAFT_results/
