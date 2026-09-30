@@ -51,6 +51,11 @@ THETA  = _env_num("CRAFT_THETA",  0.3)       # edge filtering threshold on W(e)
 # the paper's appendix. CRAFT_ATOMIC_STEPS=0 turns it off for a run.
 ATOMIC_STEPS = os.getenv("CRAFT_ATOMIC_STEPS", "1").strip().lower() not in ("0", "false", "no", "off")
 
+# How many API requests each stage keeps in flight, for run_cell.py. Unset, every
+# script uses its own default. It changes how fast a cell runs, not its result,
+# so it is not one of the hyperparameters a run directory is checked against.
+CONCURRENCY = _env_num("CRAFT_CONCURRENCY", None, int)
+
 # ── Pinned endpoint ──────────────────────────────────────────────────────────
 # Scripts that must reach one specific endpoint read these instead of
 # OPENAI_API_KEY / OPENAI_BASE_URL, which a stray env var can redirect.

@@ -54,6 +54,10 @@ M1 = "framework/module1_generation_filtering"
 M2 = "framework/module2_consensus_rkg_construction"
 M3 = "framework/module3_topology_guided_synthesis"
 SCORE = "evaluation/label_prediction/evaluate_accuracy.py"
+# The stage scripts that take --concurrency (config.CONCURRENCY / CRAFT_CONCURRENCY).
+TAKES_CONCURRENCY = {"generate_traces.py", "build_rkg.py", "synthesize_trace.py",
+                     "cwa_recheck.py", "polish_trace.py", "adjudicate_math.py",
+                     "apply_adjudication.py"}
 
 
 def hyperparameters() -> Dict[str, object]:
@@ -113,6 +117,10 @@ def plan(cell: Cell, run_dir: Path, k_traces: Path,
         stages.append((step.name, [py, step.script, *args, "--output", o(step.name)]))
     stages.append(("score", [py, SCORE, "score", "--input", o(cell.reported_stem),
                              "--source", "synthesized", "--output", o("score")]))
+    if _cfg.CONCURRENCY:
+        stages = [(name, cmd + ["--concurrency", str(_cfg.CONCURRENCY)]
+                   if Path(cmd[1]).name in TAKES_CONCURRENCY else cmd)
+                  for name, cmd in stages]
     return [(name, cmd, out["k_traces"] if name == "generate" else out[name])
             for name, cmd in stages]
 
